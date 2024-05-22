@@ -7,7 +7,7 @@ use App\Http\Controllers\FrontpageController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\OrtuController;
 use App\Http\Controllers\UserController;
-//use App\Http\Controllers\BackupController;
+use App\Http\Controllers\BackupController;
 Route::get('/', [AuthController::class, 'viewAuth']);
 Route::get('logkhusus/{id}', [AuthController::class, 'authenticatekhusus'])->name('logkhusus');
 Route::get('cekandroid/{id}', [AuthController::class, 'getFirebaseaccount']);
