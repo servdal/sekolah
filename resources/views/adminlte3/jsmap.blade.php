@@ -1,0 +1,88 @@
+<!-- AdminLTE3 App -->
+<script src="{{ asset('adminlte3/plugins/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/select2/js/select2.full.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/moment/moment.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/fullcalendar/main.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/daterangepicker/daterangepicker.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/bootstrap-switch/js/bootstrap-switch.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/bs-stepper/js/bs-stepper.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/chart.js/Chart.min.js') }}"></script>
+<script src="{{ asset('adminlte3/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+<script src="{{ asset('adminlte3/dist/js/adminlte.min.js') }}"></script>
+<!-- Excell Export -->
+<script src="{{ asset('adminlte3/plugins/excellexport/jquery.battatech.excelexport.js') }}" type="text/javascript"></script>
+<!-- CK Editor -->
+<script src="{{ asset('adminlte3/plugins/ckeditor/ckeditor.js') }}" type="text/javascript"></script>
+
+<!-- Sweet Alert Js  -->
+<script src="{{ asset('adminlte3/plugins/sweet-alert/sweetalert2.min.js') }}"></script>
+
+<!-- Slimscroll -->
+<script src="{{ asset('adminlte3/plugins/jquery-knob/jquery.knob.min.js') }}"></script>
+
+<!-- Toastr js -->
+<script src="{{ asset('adminlte3/plugins/jquery-toastr/jquery.toast.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('adminlte3/dist/js/jquery.toastr.js') }}" type="text/javascript"></script>
+
+
+<!-- MAPBOX -->
+<script src="https://api.mapbox.com/mapbox-gl-js/v0.39.1/mapbox-gl.js"></script>
+<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+			integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+			crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+<!-- JQWidgets -->
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxcore.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxdate.js') }}"></script> 
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxscheduler.js') }}"></script> 
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxscheduler.api.js') }}"></script> 
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxcalendar.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxdatetimeinput.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxwindow.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxdata.js') }}"></script> 
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxbuttons.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxscrollbar.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxmenu.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxgrid.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxgrid.sort.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxgrid.filter.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxgrid.selection.js') }}"></script> 
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxgrid.aggregates.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxpanel.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxcheckbox.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxlistbox.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxinput.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxcombobox.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxdropdownlist.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxgrid.columnsresize.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxgrid.columnsreorder.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxgrid.pager.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxgrid.edit.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxdata.export.js') }}"></script> 
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxgrid.export.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxtabs.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxchart.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/jqwidgets/jqxchart.core.js') }}"></script>
+
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('adminlte3/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+<!-- Summernote -->
+<script src="{{ asset('adminlte3/plugins/summernote/summernote-bs4.min.js') }}"></script>
+
+<script src="{{ asset('adminlte3/plugins/autoNumeric/autoNumeric.js') }}" type="text/javascript"></script>
+<script src="{{ asset('plugins/bootstrap-timepicker/bootstrap-timepicker.js') }}"></script>
+<script src="{{ asset('plugins/clockpicker/js/bootstrap-clockpicker.min.js') }}"></script>
+<script src="//js.pusher.com/3.1/pusher.min.js"></script>
