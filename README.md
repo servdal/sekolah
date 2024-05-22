@@ -1,64 +1,75 @@
 <p align="center"><a href="https://duidev.com" target="_blank"><img src="https://github.com/servdal/sdtq/blob/master/public/header.png" width="400"></a></p>
 
 <p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+<a href="https://amil.sdimohammadhatta.sch.id"><img src="https://simbian.duidev.com/logo/1602884372logo.png" width="35" alt="SDI Mohammad Hatta Malang"></a>
+<a href="https://gmm.duidev.com"><img src="https://simbian.duidev.com/logo/1603375609logo.png" width="35" alt="Yayasan Gema Mitra Muslim"></a>
+<a href="https://apps.sdtq-daarulukhuwwah.sch.id/"><img src="https://github.com/servdal/sdtq/blob/master/public/logo/1715426344logo.png" widtg="35" alt="SDTQ Daarul Ukhuwwah"></a>
 </p>
+# Sistem Manajemen Sekolah Terpadu
 
-## About Laravel
+Aplikasi Sistem Manajemen Sekolah Terpadu adalah sebuah aplikasi yang dikembangkan untuk membantu manajemen sekolah dalam mengelola berbagai aspek kegiatan sehari-hari di sekolah.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Deskripsi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Aplikasi ini dirancang untuk memudahkan administrasi sekolah dalam mengelola data siswa, data guru, jadwal pelajaran, absensi, catatan rapat, dan masih banyak lagi. Dengan antarmuka yang intuitif dan fitur-fitur yang lengkap, aplikasi ini dapat membantu meningkatkan efisiensi dan kualitas layanan pendidikan di sekolah.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
+## Fitur Utama
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Manajemen Data Siswa: Tambah, edit, dan hapus data siswa dengan mudah.
+- Manajemen Data Guru: Kelola informasi guru termasuk data pribadi, pengalaman kerja, dan lainnya.
+- Jadwal Pelajaran: Buat jadwal pelajaran yang dapat diakses oleh semua pihak terkait.
+- Absensi Siswa: Rekam absensi siswa secara elektronik dan pantau kehadiran mereka dengan mudah.
+- Catatan Alquran: Simpan catatan murojaah / tahsin / Ziyadah / Tilawah.
+- Database Keuangan : Tabungan Siswa, Neraca Pemasukan dan Pengeluaran Sekolah, Laporan SPP / DPP / Insidental
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalasi Mobile Apps
 
-## Laravel Sponsors
+1. Unduh aplikasi dari [Google Play Store](https://play.google.com/store/apps/details?id=com.duidev.simaster).
+2. Instal aplikasi di perangkat Android Anda.
+3. Buka aplikasi dan ikuti panduan konfigurasi yang disediakan.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+**Catatan**: Aplikasi ini menggunakan WebView untuk mengakses aplikasi berbasis web yang terletak di [simbian.duidev.com](https://simbian.duidev.com/), yang dikembangkan oleh [Duidev](https://duidev.com/).
 
-### Premium Partners
+### Instalasi dari GitHub
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+1. Unduh aplikasi dari [halaman GitHub repository](https://github.com/servdal/sdtq).
+2. Ekstrak file ZIP yang telah diunduh ke dalam direktori web server Anda.
+3. Buka terminal atau command prompt dan arahkan ke direktori aplikasi.
+4. Jalankan perintah `composer install` untuk menginstal semua dependensi PHP.
+5. Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database Anda.
+6. Jalankan perintah `php artisan key:generate` untuk menghasilkan kunci aplikasi yang unik.
+7. Jalankan perintah `php artisan migrate` untuk menjalankan migrasi dan mempersiapkan basis data.
+8. Akses aplikasi melalui browser Anda.
 
-## Contributing
+### Instalasi Local Webserver (XAMPP / Linux dengan Apache/Nginx)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Pastikan Anda telah menginstal XAMPP atau konfigurasi server web yang sesuai di lingkungan Linux Anda. Pastikan juga PHP minimal versi 8 dan MySQL telah terinstal.
 
-## Code of Conduct
+1. Unduh aplikasi dari [halaman GitHub repository](https://github.com/servdal/sdtq).
+2. Ekstrak file ZIP yang telah diunduh ke dalam direktori web server Anda.
+3. Buka terminal dan arahkan ke direktori aplikasi.
+4. Jalankan perintah `composer install` untuk menginstal semua dependensi PHP.
+5. Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database Anda.
+6. Jalankan perintah `php artisan key:generate` untuk menghasilkan kunci aplikasi yang unik.
+7. Jalankan perintah `php artisan migrate` untuk menjalankan migrasi dan mempersiapkan basis data.
+8. Buka web browser Anda dan arahkan ke alamat URL tempat aplikasi telah diinstal.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Kontribusi
 
-## Security Vulnerabilities
+Kami terbuka terhadap kontribusi dari komunitas. Jika Anda menemukan masalah atau ingin berkontribusi dalam pengembangan aplikasi ini, silakan buka [laporan masalah](https://github.com/servdal/sdtq/issues) atau kirimkan pull request.
+Kami senang mendengar umpan balik dari Anda! Jika Anda memiliki pertanyaan atau saran, jangan ragu untuk menghubungi kami di [swandhana17@gmail.com](mailto:swandhana17@gmail.com)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Lisensi
 
-## License
+Aplikasi ini dilisensikan di bawah [MIT License](LICENSE).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Donasi
+
+Jika Anda ingin mendukung pengembangan aplikasi ini, Anda dapat berdonasi melalui transfer bank ke rekening berikut:
+
+BRI, Norek : 005101142079504
+Mandiri, Norek : 1440019278099
+BSI, Norek : 7167036915
+An. Dwi Swandhana Rahmadi Putra
+
