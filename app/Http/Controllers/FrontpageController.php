@@ -1162,15 +1162,43 @@ class FrontpageController extends Controller
 			return response(file_get_contents($file),200)->header('Content-Type','application/pdf');
 		} else {
 			$homebase	= url("/");
-			$domain		= str_replace('https://', '', $homebase);
+			$domain		= str_replace('http://', '', $homebase);
+			$domain		= str_replace('https://', '', $domain);
+			$domain		= str_replace('/', '', $domain);
 			$info = array(
-				'Name' 			=> 'DuiDev Software Hose',
-				'Location' 		=> 'Malang East Java',
-				'Reason' 		=> 'Dokumen ini ditandatangani secara elektronik',
+				'Name' 			=> config('global.Title2'),
+				'Location' 		=> config('global.alamat'),
+				'Reason' 		=> 'Dokumen ini ditandatangani secara elektronik, verifikasi keaslian dokumen ini merujuk ke '.config('global.kota'),
 				'ContactInfo' 	=> $domain,
 			);
-			
-			$certificate= 'file://'.base_path().'/public/sco.crt';
+			$domain		= str_replace('#', '', $domain);
+			$domain		= str_replace('-', '', $domain);
+			$domain		= str_replace('.', '', $domain);
+			$fileserti 	= $domain.'.crt';
+			if (file_exists(public_path('tte/'.$fileserti))){
+				$certificate 	= 'file://'.base_path().'/public/tte/'.$fileserti;
+			} else {
+				$dn = array(
+					"countryName" 			=> "IN",
+					"stateOrProvinceName" 	=> config('global.kota'),
+					"localityName" 			=> config('global.Title2'),
+					"organizationName" 		=> config('global.yayasan'),
+					"organizationalUnitName"=> config('global.singkatan'),
+					"commonName" 			=> config('global.sekolah'),
+					"emailAddress" 			=> config('global.email')
+				);
+				$privkey = openssl_pkey_new(array(
+					"private_key_bits" => 2048,
+					"private_key_type" => OPENSSL_KEYTYPE_RSA,
+				));
+				$csr = openssl_csr_new($dn, $privkey, array('digest_alg' => 'RSA-SHA256'));
+				$sscert = openssl_csr_sign($csr, null, $privkey, 365);
+				openssl_csr_export($csr, $csrout);
+				openssl_x509_export($sscert, $certout);
+				openssl_pkey_export($privkey, $pkeyout);
+				Storage::disk('local')->put('/tte/'.$domain.'.crt', $pkeyout);
+				file_put_contents(public_path()."/tte/".$domain.".crt", $certout, FILE_APPEND | LOCK_EX);
+			}
 			$getdata 	= HPTKeuangan::where('id', $id)->first();
 			if (isset($getdata->id)){
 				$idne 		= $getdata->id;
@@ -1211,37 +1239,6 @@ class FrontpageController extends Controller
 					$imageName 		= "post-".time().".".$imgExt;
 					Storage::disk('local')->put('/scan/generate/'.$imageName, base64_decode($image));
 					$tandatangan 	= '<img src="'.$homebase.'/scan/generate/'.$imageName.'" width="100">';
-					$nippjbt		= md5($bendahara);
-					$ceksertifikatpribadi 	= $nippjbt.'.crt';
-					$sertifikatpribadi 		= $nippjbt.'.csr';
-					if (file_exists(public_path('tte/'.$ceksertifikatpribadi))){
-						$certificate 	= 'file://'.base_path().'/public/tte/'.$ceksertifikatpribadi;
-					} else {
-						$dn = array(
-							"countryName" 			=> "IN",
-							"stateOrProvinceName" 	=> "East Java Indonesia",
-							"localityName" 			=> "Malang",
-							"organizationName" 		=> "CV SWANDHANA",
-							"organizationalUnitName"=> "Duidev Software House",
-							"commonName" 			=> $bendahara,
-							"emailAddress" 			=> "swandhana17@gmail.com"
-						);
-						$privkey = openssl_pkey_new(array(
-							"private_key_bits" => 2048,
-							"private_key_type" => OPENSSL_KEYTYPE_RSA,
-						));
-						$csr = openssl_csr_new($dn, $privkey, array('digest_alg' => 'sha256'));
-						$sscert = openssl_csr_sign($csr, null, $privkey, $days=365, array('digest_alg' => 'sha256'));
-						openssl_csr_export($csr, $csrout);
-						openssl_x509_export($sscert, $certout);
-						openssl_pkey_export($privkey, $pkeyout);
-						file_put_contents(base_path()."/public/tte/".$nippjbt.".crt", $pkeyout);
-						file_put_contents(base_path()."/public/tte/".$nippjbt.".crt", $certout, FILE_APPEND | LOCK_EX);
-					}
-					$certificate 				= $nippjbt.'.crt';
-					if (file_exists(public_path('tte/'.$certificate))){
-						$certificate 			= 'file://'.base_path().'/public/tte/'.$nippjbt.'.crt';
-					}
 				}
 				if ($tglkwitansi == '' OR is_null($tglkwitansi) OR $tglkwitansi == '0000-00-00'){
 					$tanggal 	= $getdata->tanggal;
@@ -1265,13 +1262,13 @@ class FrontpageController extends Controller
 					$logo 			= $rsetting->logo;
 					$logogrey 		= $rsetting->logo_grey;	
 				} else {
-					$sekolah 		= Session('namaapps01');
-					$yayasan 		= Session('domainapps01');
-					$alamat 		= Session('addressapps01');
-					$kepalasekolah 	= Session('subsubdomainapps01');
-					$mutiara 		= Session('lamanapps01');
-					$logo 			= Session('logofrontapps01');
-					$logogrey 		= $homebase.'/boxed-bg.jpg';	
+					$sekolah 		= config('global.sekolah');
+					$yayasan 		= config('global.yayasan');
+					$alamat 		= config('global.alamat');
+					$kepalasekolah 	= config('global.Title2');
+					$mutiara 		= 'Mulia Bersama Alquran';
+					$logo 			= config('global.logoapss');
+					$logogrey 		= $homebase.'/'.config('global.logoapss');
 				}
 				$x 				= SendMail::terbilang($total);
 				$tulisan		= number_format( $total , 0 , '.' , ',' );
@@ -1411,45 +1408,54 @@ class FrontpageController extends Controller
 								<tr><td colspan="8">&nbsp;</td></tr>
 							</table>';
 				}
-				$page_format 		= array(
-					'MediaBox' 	=> array ('llx' => 0, 'lly' => 0, 'urx' => 215, 'ury' => 200),
-					'Dur' 		=> 3,
-					'PZ' 		=> 1,
-				);
-				PDFCREATOR::setSignature($certificate, $certificate, $id, '', 2, $info, 'A');
-				PDFCREATOR::SetCreator($sekolah);
-				PDFCREATOR::SetAuthor(Session('nama'));
-				PDFCREATOR::SetTitle('KWITANSI '.$deskripsi);
-				PDFCREATOR::SetSubject($format);
-				PDFCREATOR::SetKeywords($tulisanne);
-				PDFCREATOR::setPrintHeader(false);
-				PDFCREATOR::setPrintFooter(false);
-				PDFCREATOR::SetMargins(5, 0, 5);
-				PDFCREATOR::setFontSubsetting(true);
-				PDFCREATOR::setImageScale(PDF_IMAGE_SCALE_RATIO);
-				PDFCREATOR::AddPage('P', $page_format, false, false);
-				$bMargin = PDFCREATOR::getBreakMargin();
-				$auto_page_break = PDFCREATOR::getAutoPageBreak();
-				PDFCREATOR::SetAutoPageBreak(false, 0);
-				$img_file = 'bgkwitansi.png';
-				PDFCREATOR::Image($img_file, 0, 0, 215, 200);
-				PDFCREATOR::SetAutoPageBreak(true, 0);
-				PDFCREATOR::setPageMark();
-				PDFCREATOR::writeHTML($generatetable, true, 0, true, 0);
-				PDFCREATOR::setCellHeightRatio(2);
-				PDFCREATOR::setFooterMargin(0);
-				$pdfdoc = PDFCREATOR::Output('', 'S');
-				PDFCREATOR::reset();
-				$imageName 	=  'scan/generate/'.$imageName;
-				Storage::disk('local')->delete($imageName);
-				if ($getdata->tandatangan == '' OR is_null($getdata->tandatangan)){
-					Storage::disk('local')->put('/scan/generate/Kwitansi-'.$idne.'.pdf', $pdfdoc);
-					$file 		= public_path('scan/generate/Kwitansi-'.$idne.'.pdf');
-				} else {
-					Storage::disk('local')->put('/kwitansi/'.$idne.'.pdf', $pdfdoc);
-					$file 		= public_path('kwitansi/'.$idne.'.pdf');
+				try {
+					$page_format 		= array(
+						'MediaBox' 	=> array ('llx' => 0, 'lly' => 0, 'urx' => 215, 'ury' => 200),
+						'Dur' 		=> 3,
+						'PZ' 		=> 1,
+					);
+					PDFCREATOR::setSignature($certificate, $certificate, $id, '', 2, $info, 'A');
+					PDFCREATOR::SetCreator($sekolah);
+					PDFCREATOR::SetAuthor(Session('nama'));
+					PDFCREATOR::SetTitle('KWITANSI '.$deskripsi);
+					PDFCREATOR::SetSubject($format);
+					PDFCREATOR::SetKeywords($tulisanne);
+					PDFCREATOR::setPrintHeader(false);
+					PDFCREATOR::setPrintFooter(false);
+					PDFCREATOR::SetMargins(5, 0, 5);
+					PDFCREATOR::setFontSubsetting(true);
+					PDFCREATOR::setImageScale(PDF_IMAGE_SCALE_RATIO);
+					PDFCREATOR::AddPage('P', $page_format, false, false);
+					$bMargin = PDFCREATOR::getBreakMargin();
+					$auto_page_break = PDFCREATOR::getAutoPageBreak();
+					PDFCREATOR::SetAutoPageBreak(false, 0);
+					$img_file = 'bgkwitansi.png';
+					PDFCREATOR::Image($img_file, 0, 0, 215, 200);
+					PDFCREATOR::SetAutoPageBreak(true, 0);
+					PDFCREATOR::setPageMark();
+					PDFCREATOR::writeHTML($generatetable, true, 0, true, 0);
+					PDFCREATOR::setCellHeightRatio(2);
+					PDFCREATOR::setFooterMargin(0);
+					$pdfdoc = PDFCREATOR::Output('', 'S');
+					PDFCREATOR::reset();
+					$imageName 	=  'scan/generate/'.$imageName;
+					Storage::disk('local')->delete($imageName);
+					if ($getdata->tandatangan == '' OR is_null($getdata->tandatangan)){
+						$filelama 	=  'scan/generate/Kwitansi-'.$idne.'.pdf';
+						Storage::disk('local')->delete($filelama);
+						Storage::disk('local')->put('/scan/generate/Kwitansi-'.$idne.'.pdf', $pdfdoc);
+						$file 		= public_path('scan/generate/Kwitansi-'.$idne.'.pdf');
+					} else {
+						Storage::disk('local')->put('/kwitansi/'.$idne.'.pdf', $pdfdoc);
+						$file 		= public_path('kwitansi/'.$idne.'.pdf');
+					}
+					return response(file_get_contents($file),200)->header('Content-Type','application/pdf');
+				} catch (\Exception $e) {
+					$data['generatetbl']   	= $generatetable;
+					$data['catatankaki']   	= $e->getMessage();
+					return view('cetak.biodatarapot', $data);
 				}
-				return response(file_get_contents($file),200)->header('Content-Type','application/pdf');
+				
 			}
 		}
 	}
@@ -1478,14 +1484,21 @@ class FrontpageController extends Controller
 			$tanggal 	= $dd;
 			$bulan 		= $mm;
 			$tahun 		= $tahuniki;	
-			if ($jenis == 'operasional') { $tulisanne = 'BUKU OPERASIONAL RUTIN'; }
-			elseif ($jenis == 'spp') { $tulisanne = 'BUKU KEUANGAN PEMBAYARAN SPP'; }
-			elseif ($jenis == 'dpp') { $tulisanne = 'BUKU KEUANGAN DANA PEMBANGUNAN'; }
-			elseif ($jenis == 'bos') { $tulisanne = 'BUKU KEUANGAN DANA BOS'; }
-			elseif ($jenis == 'pajak') { $tulisanne = 'BUKU KEUANGAN PAJAK'; }
-			elseif ($jenis == 'nonopsrutin') { $tulisanne = 'BUKU NON OPERASIONAL RUTIN '; }
-			elseif ($jenis == 'lainlain') { $tulisanne = 'BUKU KEUANGAN LAIN-LAIN '; }
-			else {$tulisanne = 'BUKU '.strtoupper($jenis); }
+			if ($jenis == 'pendaftaran') { $tulisanne = '(01). LAPORAN BUKU PENDAFTARAN<br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'spp') { $tulisanne = '(02). LAPORAN KEUANGAN PEMBAYARAN SPP<br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'makan') { $tulisanne = '(03). LAPORAN BUKU UANG MAKAN<br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'ekstrakurikuler') { $tulisanne = '(04). LAPORAN KEUANGAN EKSTRAKULIKULER<br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'kegiatan') { $tulisanne = '(05). LAPORAN KEUANGAN KEGIATAN<br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'peralatan') { $tulisanne = '(06). LAPORAN UANG PERALATAN <br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'bos') { $tulisanne = '(07). LAPORAN DANA BOS<br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'pembangunan') { $tulisanne = '(08). LAPORAN INFAQ PEMBEBASAN LAHAN DAN PEMBANGUNAN <br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'seragam') { $tulisanne = '(09). LAPORAN UANG SERAGAM <br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'buku') { $tulisanne = '(10). LAPORAN UANG BUKU <br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'jariyah') { $tulisanne = '(11). LAPORAN UANG JARIYAH <br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else if ($jenis == 'lainlain') { $tulisanne = '(12). LAPORAN KEUANGAN LAIN-LAIN <br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
+			else {
+				$tulisanne	= strtoupper($jenis);
+			}
 			if (is_null($tandatangan) OR $tandatangan == ''){
 				$data           		=   [];
 				if ($pengeluaran == '' OR $pengeluaran == 0) {$total = $pemasukan; $format = 'pemasukan'; }
@@ -1669,7 +1682,6 @@ class FrontpageController extends Controller
 				$data['alamatweb']    	=   '';
 				$data['surat']     		=   $rom;
 				return view('simaster.formttd', $data);
-			
 			} else {
 				$data					= [];
 				$data['sidebar'] 		= 'ttdkwitansi';

@@ -7975,11 +7975,49 @@ class AdminController extends Controller
 			'nama_rek' 			=> $request->edit_nama_rek,
 			'nama_bank_rek' 	=> $request->edit_nama_bank_rek,
 		]);
+		$gagal 		= '';
+		$sukses 	= '';
+		$homebase	= url("/");
+		$domain		= str_replace('http://', '', $homebase);
+		$domain		= str_replace('https://', '', $domain);
+		$domain		= str_replace('/', '', $domain);
+		$domain		= str_replace('#', '', $domain);
+		$domain		= str_replace('-', '', $domain);
+		$domain		= str_replace('.', '', $domain);
+		$fileserti 	= $domain.'.crt';
+		if (file_exists(public_path('tte/'.$fileserti))){
+			$certificate 	= 'file://'.base_path().'/public/tte/'.$fileserti;
+		} else {
+			try {
+				$dn = array(
+					"countryName" 			=> "IN",
+					"stateOrProvinceName" 	=> $request->edit_kota,
+					"localityName" 			=> config('global.Title2'),
+					"organizationName" 		=> $request->edit_nama_yayasan,
+					"organizationalUnitName"=> $request->edit_kode_sekolah,
+					"commonName" 			=> $request->edit_nama_sekolah,
+					"emailAddress" 			=> $request->edit_email
+				);
+				$privkey = openssl_pkey_new(array(
+					"private_key_bits" => 2048,
+					"private_key_type" => OPENSSL_KEYTYPE_RSA,
+				));
+				$csr = openssl_csr_new($dn, $privkey, array('digest_alg' => 'RSA-SHA256'));
+				$sscert = openssl_csr_sign($csr, null, $privkey, 365);
+				openssl_csr_export($csr, $csrout);
+				openssl_x509_export($sscert, $certout);
+				openssl_pkey_export($privkey, $pkeyout);
+				Storage::disk('local')->put('/tte/'.$domain.'.crt', $pkeyout);
+				file_put_contents(public_path()."/tte/".$domain.".crt", $certout, FILE_APPEND | LOCK_EX);
+			} catch (\Exception $e) {
+				$sendstatus = $e->getMessage();
+				$gagal 		= $gagal.$sendstatus;
+			}
+		}
 		if ($request->hasFile('edit_logo')) {
 			$ekstensi		= $request->file('edit_logo')->getClientOriginalExtension();
 			if ($ekstensi != 'png') {
-				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Gagal Upload Logo, File Logo wajib berekstensi png (huruf kecil)']);
-				return back();						
+				$gagal 		= $gagal.'Gagal Upload Logo, File Logo wajib berekstensi png (huruf kecil) <br />';
 			} else {
 				$namafile		= session('sekolah_id_sekolah').'-'.time().'logo.'.$request->file('edit_logo')->getClientOriginalExtension();
 				$uploadedFile 	= $request->file('edit_logo');
@@ -7992,8 +8030,7 @@ class AdminController extends Controller
 		if ($request->hasFile('edit_logo_grey')) {
 			$ekstensi		= $request->file('edit_logo_grey')->getClientOriginalExtension();
 			if ($ekstensi != 'png') {
-				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Gagal Upload Logo Background, Hanya File ber ekstensi png (huruf kecil)']);
-				return back();						
+				$gagal 		= $gagal.'Gagal Upload Background, File Background wajib berekstensi png (huruf kecil) <br />';
 			} else {
 				$background 	= session('sekolah_id_sekolah').'-'.time().'logo-gray.png';
 				$uploadedFile 	= $request->file('edit_logo_grey');
@@ -8006,8 +8043,7 @@ class AdminController extends Controller
 		if ($request->hasFile('edit_frontpage')) {
 			$ekstensi		= $request->file('edit_frontpage')->getClientOriginalExtension();
 			if ($ekstensi != 'png') {
-				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Gagal Upload Logo Front Logo, Hanya File ber ekstensi png (huruf kecil)']);
-				return back();
+				$gagal 		= $gagal.'Gagal Upload Front Logo, File Front Logo wajib berekstensi png (huruf kecil) <br />';
 			} else {
 				$frontlogo 		= session('sekolah_id_sekolah').'-'.time().'logofront.png';
 				$uploadedFile 	= $request->file('edit_frontpage');
@@ -8020,8 +8056,7 @@ class AdminController extends Controller
 		if ($request->hasFile('edit_kopsurat')) {
 			$ekstensi		= $request->file('edit_kopsurat')->getClientOriginalExtension();
 			if ($ekstensi != 'png') {
-				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Gagal Upload Kop Surat, Hanya File ber ekstensi png (huruf kecil)']);
-				return back();
+				$gagal 		= $gagal.'Gagal Upload Kop Surat, File Kop Surat wajib berekstensi png (huruf kecil) <br />';
 			} else {
 				$kopsurat 		= session('sekolah_id_sekolah').'-'.time().'kopsurat.png';
 				$uploadedFile 	= $request->file('edit_kopsurat');
@@ -8031,11 +8066,11 @@ class AdminController extends Controller
 				]);
 			}
 		}
-		if ($update){			
+		if ($gagal == ''){			
 			return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Berhasil diubah']);
 			return back();
 		}else {
-			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Gagal diubah']);
+			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => $gagal]);
 			return back();
 		}
 	}
