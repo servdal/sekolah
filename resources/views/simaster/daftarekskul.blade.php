@@ -158,6 +158,8 @@
                     },
                 ]
             });
+        } else {
+            $(".shadow").hide();
         }
     }
     window.onload = openedpage;

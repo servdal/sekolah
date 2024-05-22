@@ -9651,50 +9651,138 @@ class AdminController extends Controller
 		}
 		echo json_encode($alldata);
 	}
-	public function zis(Request $request) {
-		$id 					= $request->input('id');
-		$rsetting				= Sekolah::where('id', $id)->first();
-		if(!$rsetting){
-			return view('accessdenided');	
-		}
-		$sekolah 				= $rsetting->nama_sekolah;
-		$yayasan 				= $rsetting->nama_yayasan;
-		$alamat 				= $rsetting->alamat;
-		$kepalasekolah 			= $rsetting->kepala_sekolah->nama;
-		$mutiara 				= $rsetting->slogan;
-		$logo 					= $rsetting->logo;
-		$frontpage 				= $rsetting->frontpage;
-		$pengumuman 			= $rsetting->pengumuman;
-		$pendaftaran 			= $rsetting->pendaftaran;
-		$no_rek 				= $rsetting->no_rek;
-		$nama_rek 				= $rsetting->nama_rek;
-		$nama_bank_rek 			= $rsetting->nama_bank_rek;
-
-        $tasks					= [];
-		$tasks['id_sekolah']	= $id;
-		$tasks['logo']			= $logo;
-		$tasks['frontpage']		= $frontpage;
-		$tasks['yayasan']		= $yayasan;
-		$tasks['sekolah']		= $sekolah;
-		$tasks['alamat']		= $alamat;
-		$tasks['kepalasekolah']	= $kepalasekolah;
-		$tasks['pengumuman']	= $pengumuman;
-		$tasks['pendaftaran']	= $pendaftaran;
-		$tasks['no_rek']		= $no_rek;
-		$tasks['nama_rek']		= $nama_rek;
-		$tasks['nama_bank_rek']	= $nama_bank_rek;
-		
-		$rstatuszis				= Layanan::where('layanan', 'pembayaranzis')->where('id_sekolah', $id)->first();
-		if (isset($rstatuszis->status)){
-			$ijinzis 			= $rstatuszis->status;
-		} else { $ijinzis		= ''; }
-		if ($ijinzis == 'mati'){
-			$tasks['sidebar']	= 'zis';
-			return view('errors.tutup', $tasks);
+	public function zis() {
+		$rsetting				= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
+		if (isset($rsetting->id)){
+			$id 					= $rsetting->id;
+			$sekolah 				= $rsetting->nama_sekolah;
+			$yayasan 				= $rsetting->nama_yayasan;
+			$alamat 				= $rsetting->alamat;
+			$kepalasekolah 			= $rsetting->kepala_sekolah->nama;
+			$mutiara 				= $rsetting->slogan;
+			$logo 					= $rsetting->logo;
+			$frontpage 				= $rsetting->frontpage;
+			$pengumuman 			= $rsetting->pengumuman;
+			$pendaftaran 			= $rsetting->pendaftaran;
+			$no_rek 				= $rsetting->no_rek;
+			$nama_rek 				= $rsetting->nama_rek;
+			$nama_bank_rek 			= $rsetting->nama_bank_rek;
+	
+			$tasks					= [];
+			$tasks['id_sekolah']	= $id;
+			$tasks['logo']			= $logo;
+			$tasks['frontpage']		= $frontpage;
+			$tasks['yayasan']		= $yayasan;
+			$tasks['sekolah']		= $sekolah;
+			$tasks['alamat']		= $alamat;
+			$tasks['kepalasekolah']	= $kepalasekolah;
+			$tasks['pengumuman']	= $pengumuman;
+			$tasks['pendaftaran']	= $pendaftaran;
+			$tasks['no_rek']		= $no_rek;
+			$tasks['nama_rek']		= $nama_rek;
+			$tasks['nama_bank_rek']	= $nama_bank_rek;
+			
+			$rstatuszis				= Layanan::where('layanan', 'pembayaranzis')->where('id_sekolah', $id)->first();
+			if (isset($rstatuszis->status)){
+				$ijinzis 			= $rstatuszis->status;
+			} else { $ijinzis		= ''; }
+			if ($ijinzis == 'mati'){
+				$tasks['kalimatheader']  	= 'Mohon Maaf';
+				$tasks['kalimatbody']  		= 'Laman ini sementara di Tutup dan Akan dibuka saat Jadwal Penerimaan sudah di tentukan';
+				return view('errors.notready', $tasks);
+			} else {
+				$tasks['sidebar']	= 'zis';
+				return view('zis', $tasks);
+			}
 		} else {
-			$tasks['sidebar']	= 'zis';
-			return view('zis', $tasks);
+			$tasks['kalimatheader']  	= 'Mohon Maaf';
+            $tasks['kalimatbody']  		= 'Session Tidak Valid, Silahkan Relogin untuk mengakses Halaman Ini';
+            return view('errors.notready', $tasks);
+        }
+    }
+	public function exSimpanpendaftaran(Request $request) {
+		if (Session('sekolah_id_sekolah') != null ){
+			if (Session('sekolah_id_sekolah') != ''){
+				$id_sekolah = Session('sekolah_id_sekolah');
+			} else {
+				$id_sekolah =   $request->id_sekolah;
+			}
+		} else {
+			$id_sekolah =   $request->id_sekolah;
 		}
+		$homebase	= 	url("/");
+		$nominal   	=   $request->val07;
+		$zakatmal   =   $request->val08;
+		$donasi   	=   $request->val09;
+		$idinput   	=   $request->val11;
+		$nominal 	= 	str_replace(',','',$nominal);
+		$zakatmal 	= 	str_replace(',','',$zakatmal);
+		$donasi 	= 	str_replace(',','',$donasi);
+		
+		if ($idinput == 'new'){
+			$idinput 	= 	Pembayaranzis::insertGetId([
+				'namawali'		=> $request->val02, 
+				'namasiswa'		=> $request->val03, 
+				'kelas'			=> $request->val04, 
+				'jeniszakat'	=> $request->val05, 
+				'orang'			=> $request->val06, 
+				'nominal'		=> $nominal, 
+				'zakatmaal'		=> $zakatmal, 
+				'donasi'		=> $donasi,
+				'hape'			=> $request->val10, 
+				'validator'		=> '', 
+				'tglvalidasi'	=> '',
+				'namafile'		=> '',
+				'id_sekolah'	=> $id_sekolah,
+			]);
+			$alamatweb		= $homebase.'/ceking/'.$idinput;
+			if ($request->hasFile('file')) {
+				$jenfile	= 	$request->file->getClientOriginalExtension();
+				$file_tmp	= 	$request->file('file');
+				$data 		= 	file_get_contents($file_tmp);
+				$bukti 		= 	'data:image/' . $jenfile . ';base64,' . base64_encode($data);
+				Pembayaranzis::where('id', $idinput)->update([
+					'namafile'		=> $bukti,
+				]);
+			}
+		} else {
+			$alamatweb		= $homebase.'/ceking/'.$idinput;
+			$idinput 		= Pembayaranzis::where('id', $idinput)->update([
+				'namawali'		=> $request->val02, 
+				'namasiswa'		=> $request->val03, 
+				'kelas'			=> $request->val04, 
+				'jeniszakat'	=> $request->val05, 
+				'orang'			=> $request->val06, 
+				'nominal'		=> $nominal, 
+				'zakatmaal'		=> $zakatmal, 
+				'donasi'		=> $donasi,
+				'hape'			=> $request->val10, 
+			]);
+			if ($request->hasFile('file')) {
+				$jenfile	= 	$request->file->getClientOriginalExtension();
+				$file_tmp	= 	$request->file('file');
+				$data 		= 	file_get_contents($file_tmp);
+				$bukti 		= 	'data:image/' . $jenfile . ';base64,' . base64_encode($data);
+				Pembayaranzis::where('id', $idinput)->update([
+					'namafile'		=> $bukti,
+				]);
+			}
+		}
+		if ($idinput){			
+			echo '<div class="alert alert-success alert-dismissable">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<h4><i class="icon fa fa-check"></i> Sukses</h4>
+					Pembayaranzis Zakat, Infaq dan Shodaqoh Anda Telah Kami Terima, Mohon Simpan Link Berikut untuk mengetahui tindak lanjut dari Pembayaranzis anda.!<br />
+					<strong><h3><a href="'.$alamatweb.'">'.$alamatweb.'</a></h3></strong>
+				  </div>';
+		} else {
+			echo '<div class="alert alert-danger alert-dismissable">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<h4><i class="icon fa fa-ban"></i> Error</h4>
+					 System Down, Mohon di Coba Beberapa Saat Lagi
+				  </div>';
+		}
+		
     }
 	public function pip(Request $request) {
 		$id 					= $request->input('id');

@@ -66,6 +66,15 @@ class FrontpageController extends Controller
 				$data['gambar']   		= url('/').'/dist/img/takadagambar.jpg';
 			}
 			return view('cetak.filelampiran', $data);
+		} else if ($tabel == 'pembayaran'){
+			$getdata 					= Pembayaran::where('id', $id)->first();
+			if (isset($getdata->buktibayar)){
+				$namafile				= $getdata->buktibayar;
+				$data['gambar']   		= $namafile;
+			} else {
+				$data['gambar']   		= url('/').'/dist/img/takadagambar.jpg';
+			}
+			return view('cetak.filelampiran', $data);
 		} else if ($tabel == 'suratijin'){
 			$getdata 					= Datapresensi::where('id', $id)->first();
 			if (isset($getdata->surat)){
@@ -660,6 +669,10 @@ class FrontpageController extends Controller
 		$surat = self::genSurat($id, 'zis');
 		return $surat;
 	}
+	public function viewBuktiBayar ($id){
+		$surat = self::genSurat($id, 'pembayaran');
+		return $surat;
+	}
 	public function ctkKwitansi($id) {
 		$tasks			= [];
 		$bulanlist 		= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
@@ -1004,10 +1017,10 @@ class FrontpageController extends Controller
 			$alamatcetak		= $homebase.'/verifikasi/'.$id;
 			if ($tglvalidasi == '0000-00-00'){
 				$qrcode 		= '';
-				$status 		= '<span class="label label-danger">Belum di Validasi</span>';
+				$status 		= '<span class="badge badge-danger">Belum di Validasi</span>';
 			} else {
 				$qrcode 		= QrCode::size(150)->generate($alamatweb);
-				$status 		= '<a href="'.$alamatcetak.'" target="_blank"><span class="label label-primary">Telah di validasi, Klik untuk Cetak Tanda Terima</span></a>';
+				$status 		= '<a href="'.$alamatcetak.'" target="_blank"><span class="badge badge-primary">Telah di validasi, Klik untuk Cetak Tanda Terima</span></a>';
 			}
 			$data 						= [];
 			$rsetting					= Sekolah::where('id', $id_sekolah)->first();
@@ -1017,9 +1030,24 @@ class FrontpageController extends Controller
 			$kepalasekolah 				= $rsetting->kepala_sekolah->nama;
 			$mutiara 					= $rsetting->slogan;
 			$logo 						= $rsetting->logo;
-			
+			$kopsurat 					= $rsetting->kopsurat;
+			if ($kopsurat == '' OR $kopsurat == null){
+				$kopsurat 			= '<tr>
+											<td colspan="3" rowspan="4" align="center" valign="middle" style="border-bottom:double"><img src="{{ $logo }}" width="98" height="75" /></td>
+											<td colspan="8">'.$yayasan.'</td>
+										</tr>
+										<tr>
+											<td colspan="8">'.$sekolah.'</td>
+										</tr>
+										<tr>
+											<td colspan="8">'.$alamat.'</td>
+										</tr>';
+			} else {
+				$kopsurat			= '<tr><td colspan="11"><img src="'.$homebase.'/'.$kopsurat.'" width="100%" /></td></tr>';
+			}
 			$data['logo']				= $homebase.'/'.$logo;
 			$data['logo_grey']			= $homebase.'/'.$rsetting->logo_grey;
+			$data['kopsurat']   		= $kopsurat;
 			$data['yayasan']   			= $yayasan;
 			$data['sekolah']   			= $sekolah;
 			$data['alamat']   			= $alamat;
@@ -1037,7 +1065,7 @@ class FrontpageController extends Controller
 			$data['qrcode']            	= $qrcode;
 			$data['status']           	= $status;
 		}
-		return view('viewstatus', $data);
+		return view('cetak.viewstatus', $data);
 	}
 	public function verifikasiPembayaran ($id){
 		$homebase			= url("/");
@@ -4471,90 +4499,6 @@ class FrontpageController extends Controller
 		$tasks['lvlsekolah']	= $rsetting->level;
 		$tasks['sidebar']		= 'ppdb';
 		return view('ppdb', $tasks);
-    }
-    public function exSimpanpendaftaran(Request $request) {
-		if (Session('sekolah_id_sekolah') != null ){
-			if (Session('sekolah_id_sekolah') != ''){
-				$id_sekolah = Session('sekolah_id_sekolah');
-			} else {
-				$id_sekolah =   $request->id_sekolah;
-			}
-		} else {
-			$id_sekolah =   $request->id_sekolah;
-		}
-		$homebase	= 	url("/");
-		$nominal   	=   $request->val07;
-		$zakatmal   =   $request->val08;
-		$donasi   	=   $request->val09;
-		$idinput   	=   $request->val11;
-		$nominal 	= 	str_replace(',','',$nominal);
-		$zakatmal 	= 	str_replace(',','',$zakatmal);
-		$donasi 	= 	str_replace(',','',$donasi);
-		
-		if ($idinput == 'new'){
-			$idinput 	= 	Pembayaranzis::insertGetId([
-				'namawali'		=> $request->val02, 
-				'namasiswa'		=> $request->val03, 
-				'kelas'			=> $request->val04, 
-				'jeniszakat'	=> $request->val05, 
-				'orang'			=> $request->val06, 
-				'nominal'		=> $nominal, 
-				'zakatmaal'		=> $zakatmal, 
-				'donasi'		=> $donasi,
-				'hape'			=> $request->val10, 
-				'validator'		=> '', 
-				'tglvalidasi'	=> '',
-				'namafile'		=> '',
-				'id_sekolah'	=> $id_sekolah,
-			]);
-			$alamatweb		= $homebase.'/ceking/'.$idinput;
-			if ($request->hasFile('file')) {
-				$jenfile	= 	$request->file->getClientOriginalExtension();
-				$file_tmp	= 	$request->file('file');
-				$data 		= 	file_get_contents($file_tmp);
-				$bukti 		= 	'data:image/' . $jenfile . ';base64,' . base64_encode($data);
-				Pembayaranzis::where('id', $idinput)->update([
-					'namafile'		=> $bukti,
-				]);
-			}
-		} else {
-			$alamatweb		= $homebase.'/ceking/'.$idinput;
-			$idinput 		= Pembayaranzis::where('id', $idinput)->update([
-				'namawali'		=> $request->val02, 
-				'namasiswa'		=> $request->val03, 
-				'kelas'			=> $request->val04, 
-				'jeniszakat'	=> $request->val05, 
-				'orang'			=> $request->val06, 
-				'nominal'		=> $nominal, 
-				'zakatmaal'		=> $zakatmal, 
-				'donasi'		=> $donasi,
-				'hape'			=> $request->val10, 
-			]);
-			if ($request->hasFile('file')) {
-				$jenfile	= 	$request->file->getClientOriginalExtension();
-				$file_tmp	= 	$request->file('file');
-				$data 		= 	file_get_contents($file_tmp);
-				$bukti 		= 	'data:image/' . $jenfile . ';base64,' . base64_encode($data);
-				Pembayaranzis::where('id', $idinput)->update([
-					'namafile'		=> $bukti,
-				]);
-			}
-		}
-		if ($idinput){			
-			echo '<div class="alert alert-success alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<h4><i class="icon fa fa-check"></i> Sukses</h4>
-					Pembayaranzis Zakat, Infaq dan Shodaqoh Anda Telah Kami Terima, Mohon Simpan Link Berikut untuk mengetahui tindak lanjut dari Pembayaranzis anda.!<br />
-					<strong><h3><a href="'.$alamatweb.'">'.$alamatweb.'</a></h3></strong>
-				  </div>';
-		} else {
-			echo '<div class="alert alert-danger alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<h4><i class="icon fa fa-ban"></i> Error</h4>
-					 System Down, Mohon di Coba Beberapa Saat Lagi
-				  </div>';
-		}
-		
     }
 	public function exPpdb(Request $request) {
 		$id_sekolah				= $request->id_sekolah;

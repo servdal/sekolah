@@ -619,7 +619,7 @@
                                                 <div class="col-lg-4 col-md-4">
                                                     <canvas id="signature-pad" class="signature-pad" width=320 height=200></canvas>
                                                     <canvas id="signature-blank" width=320 height=200 style='display:none'></canvas>
-                                                    <img src="{{ asset('boxed-bg.png') }}" width=320 height=200 />
+                                                    <img src="{{ asset('boxed-bg.jpg') }}" width=320 height=200 />
                                                 </div>
                                                 <div class="col-lg-4 col-md-4"></div>
                                             </div>

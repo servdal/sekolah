@@ -40,7 +40,7 @@
                             <div class="info-box">
                                 <span class="info-box-icon bg-info"><i class="fa fa-credit-card"></i></span>
                                 <div class="info-box-content">
-                                    <span class="info-box-text"><font color=blue>Bank Account<br />SDI MH</font></span>
+                                    <span class="info-box-text"><font color=blue>Bank Account<br />{!! Session('sekolah_nama_sekolah') !!}</font></span>
                                     <span class="info-box-number">{!! $namabank !!}<br />Norek : {!! $norek !!}</span>
                                 </div>
                             </div>
@@ -109,6 +109,22 @@
                                     </div>
                                 </div>
                             </div>
+							<div class="row">
+								<div class="col-lg-8">
+									<input type="text" class="form-control" disabled="disable" value="DPP">
+								</div>
+								<div class="col-lg-4">
+									<input type="text" class="form-control" id="byr_dpp">
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-lg-8">
+									<input type="text" class="form-control" disabled="disable" value="Uang Makan">
+								</div>
+								<div class="col-lg-4">
+									<input type="text" class="form-control" id="byr_paguyuban">
+								</div>
+							</div>
                             <div class="form-group">
                                 <label>Ekstrakulikuler</label>
                                 <div class="row">
@@ -162,7 +178,6 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <input type="hidden" id="id_paguyuban" name="id_paguyuban" class="form-control" disabled="disable">	
                             <button type="button" class="btn btn-info" id="bayarrutinan">Simpan</button>
                         </div>
                         <div class="overlay"><i class="fa fa-refresh fa-spin"></i></div>
@@ -188,7 +203,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            Jika Kolom Verifikasi Berarti Anda Belum Menyetorkan Uang Ke Loket TU !! { $subsubdomainapps01 !!} atau Petugas Loket TU Belum Mengklik tombol Verifikasi di sistem
+                            Jika Kolom Verifikasi Berarti Anda Belum Menyetorkan Uang Ke Loket TU !! {!! Session('sekolah_nama_sekolah') !!} atau Petugas Loket TU Belum Mengklik tombol Verifikasi di sistem
                             <div id="griddatabayar"></div>
                         </div>
                         <div class="overlay"><i class="fa fa-refresh fa-spin"></i></div>
@@ -310,9 +325,9 @@ $(document).ready(function () {
 	$('#divriwayat').hide();
 	$('#divuploadbukti').hide();
 	$('#divtambahinsidental').hide();
-	$("#byr_insidentil").autoNumeric(
-		'init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'}
-	  );
+	$("#byr_insidentil").autoNumeric('init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'});
+	$("#byr_dpp").autoNumeric('init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'});
+	$("#byr_paguyuban").autoNumeric('init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'});
 	$('.btnkembali').on('click', function (){		
 		$('#divbayarinsidental').hide();
 		$('#divbayarrutin').hide();
@@ -350,19 +365,27 @@ $(document).ready(function () {
 		$('.overlay').show();
 		var set01=document.getElementById('upl_marking').value;
 		var set02=document.getElementById('getfoto').value;
-		$.post('ortu/exuploadbuktibyr', { val01: set01, val02: set02, _token: token },
-		function(data){	
-			$('.overlay').hide();
-			$("html, body").animate({ scrollTop: 0 }, "slow");
-			$('#status').html(data);
-			$("#griddatabayar").jqxGrid("updatebounddata");
-			$('#divbayarinsidental').hide();
-			$('#divbayarrutin').hide();
-			$('#divriwayat').hide();
-			$('#divtambahinsidental').hide();
-			$('#divuploadbukti').hide();
-			$('#divawal').show();
-		});		
+		if (set02 == ''){
+			swal({
+				title	: 'Stop',
+				text	: 'Pilih File Bukti Bayar Terlebih Dahulu',
+				type	: 'info',
+			})
+		} else {
+			$.post('{{ route("exUploadbuktibyr") }}', { val01: set01, val02: set02, _token: token },
+			function(data){	
+				$('.overlay').hide();
+				$("html, body").animate({ scrollTop: 0 }, "slow");
+				$('#status').html(data);
+				$("#griddatabayar").jqxGrid("updatebounddata");
+				$('#divbayarinsidental').hide();
+				$('#divbayarrutin').hide();
+				$('#divriwayat').hide();
+				$('#divtambahinsidental').hide();
+				$('#divuploadbukti').hide();
+				$('#divawal').show();
+			});
+		}
 	});
 	$('#bayarrutinan').on('click', function (){		
 		$('.overlay').show();
@@ -371,7 +394,9 @@ $(document).ready(function () {
 		var set03=document.getElementById('id_tahun').value;
 		var set04=document.getElementById('getnama').value;
 		var set05=document.getElementById('id_byrapa').value;
-		$.post('ortu/bayariuran', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, _token: token },
+		var set06=document.getElementById('byr_dpp').value;
+		var set07=document.getElementById('byr_paguyuban').value;
+		$.post('{{ route("exBayariuran") }}', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, val07: set07, _token: token },
 		function(data){	
 			$('.overlay').hide();
 			$("html, body").animate({ scrollTop: 0 }, "slow");
@@ -385,7 +410,7 @@ $(document).ready(function () {
 			$('#divawal').show();
 		});		
 	});
-	$('#byrinsedental').on('click', function (){		
+	$('#byrinsedental').on('click', function (){
 		$('.overlay').show();
 		var set01=document.getElementById('ins_bulan').value;
 		var set02=document.getElementById('ins_tahun').value;
@@ -393,7 +418,7 @@ $(document).ready(function () {
 		var set04=document.getElementById('kodeinsidental').value;
 		var set05=document.getElementById('indukinsidental').value;
 		var set06=document.getElementById('getnama').value;
-		$.post('ortu/bayariuranins', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, _token: token },
+		$.post('{{ route("exBayariuranins") }}', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, _token: token },
 		function(data){	
 			$('.overlay').hide();
 			$("html, body").animate({ scrollTop: 0 }, "slow");
@@ -423,7 +448,8 @@ $(document).ready(function () {
 		var skul5 = $(this).find('option:selected').attr('id12');
 		var biya5 = $(this).find('option:selected').attr('id13');
 		$('#id_spp').val(sppne);
-		$('#id_paguyuban').val(pagye);		
+		$('#byr_dpp').val(dppne);
+		$('#byr_paguyuban').val(pagye);
 		$('#id_ekskul1').val(skul1);
 		$('#id_nil1').val(biya1);
 		$('#id_ekskul2').val(skul2);
@@ -438,15 +464,15 @@ $(document).ready(function () {
     var sourceinsidental = {
 		datatype: "json",
 		datafields: [
-		{ name: 'no',type: 'text'},	
-		{ name: 'kode',type: 'text'},
-		{ name: 'deskripsi',type: 'text'},
-		{ name: 'biaya',type: 'text'},	
-		{ name: 'noinduk',type: 'text'},
+			{ name: 'no',type: 'text'},	
+			{ name: 'kode',type: 'text'},
+			{ name: 'deskripsi',type: 'text'},
+			{ name: 'biaya',type: 'text'},	
+			{ name: 'noinduk',type: 'text'},
 		],
-		url: 'json/insidental',
-		cache: false,
-		pager: function (pagenum, pagesize, oldpagenum) {}
+		url		: '{{ route("jsonInsidental") }}',
+		cache	: false,
+		pager	: function (pagenum, pagesize, oldpagenum) {}
 	};
 	var datainsidental = new $.jqx.dataAdapter(sourceinsidental);
 	var editrow = -1;
@@ -462,18 +488,18 @@ $(document).ready(function () {
 			{ text: 'Bayar', columntype: 'button', width: '10%', cellsrenderer: function () {
 				return "Bayar";
 				}, buttonclick: function (row) {	
-				editrow = row;	
-				var offset 		= $("#griddatainsidental").offset();		
-				var dataRecord 	= $("#griddatainsidental").jqxGrid('getrowdata', editrow);
-				$("#byr_deskripsi").val(dataRecord.deskripsi);	
-				$("#byr_insidentil").val(dataRecord.biaya);	
-				$("#kodeinsidental").val(dataRecord.kode);	
-				$("#indukinsidental").val(dataRecord.noinduk);	
-				$('#divbayarinsidental').hide();
-				$('#divbayarrutin').hide();
-				$('#divriwayat').hide();
-				$('#divtambahinsidental').show();
-				$('#divawal').hide();
+					editrow = row;	
+					var offset 		= $("#griddatainsidental").offset();
+					var dataRecord 	= $("#griddatainsidental").jqxGrid('getrowdata', editrow);
+					$("#byr_deskripsi").val(dataRecord.deskripsi);
+					$("#byr_insidentil").val(dataRecord.biaya);
+					$("#kodeinsidental").val(dataRecord.kode);
+					$("#indukinsidental").val(dataRecord.noinduk);
+					$('#divbayarinsidental').hide();
+					$('#divbayarrutin').hide();
+					$('#divriwayat').hide();
+					$('#divtambahinsidental').show();
+					$('#divawal').hide();
 				}
 			},	
 		],                
@@ -491,68 +517,88 @@ $(document).ready(function () {
 			{ name: 'tanggal',type: 'text'},
 			{ name: 'foto',type: 'text'},
 		],
-		url: 'json/databayarortu',
+		url: '{{ route("jsonDatabayarortu") }}',
 		cache: false,
 		pager: function (pagenum, pagesize, oldpagenum) {}
 	};
 	var datapembayaran = new $.jqx.dataAdapter(sourcepembayaran);
 	var editrow = -1;
 	var photorenderer = function (row, column, value) {
+		var no 	= $('#griddatabayar').jqxGrid('getrowdata', row).no;
 		var name = $('#griddatabayar').jqxGrid('getrowdata', row).foto;
 		if (name == ''){ var img = '<div style="background: white;"></div>'; }
-		else { var img = '<div style="background: white;"><a target="_blank" href="' + name + '"><img style="margin:2px; margin-left: 10px;" width="32" height="32" src="' + name + '"></a></div>'; }
+		else { var img = '<div style="background: white;"><a target="_blank" href="{{url('/')}}/buktibayar/' + no + '"><img style="margin:2px; margin-left: 10px;" width="32" height="32" src="' + name + '"></a></div>'; }
 		return img;
 	}
 	$("#griddatabayar").jqxGrid({
-		width: '100%',   
-		columnsresize: true,
-		autoheight: true,
-		altrows: true,
-		theme: "orange",
-		rowsheight: 35,
-		source: datapembayaran,
-		selectionmode: 'multiplecellsextended',
-		columns: [
-			{ text: 'Upload', columntype: 'button', width: 70, cellsrenderer: function () {
+		width			: '100%',   
+		columnsresize	: true,
+		autoheight		: true,
+		altrows			: true,
+		theme			: "orange",
+		rowsheight		: 35,
+		source			: datapembayaran,
+		selectionmode	: 'multiplecellsextended',
+		columns			: [
+			{ text: 'Upload', columntype: 'button', width: '10%', cellsrenderer: function () {
 				return "Upload";
 				}, buttonclick: function (row) {	
-				editrow = row;	
-				var offset 		= $("#griddatabayar").offset();		
-				var dataRecord 	= $("#griddatabayar").jqxGrid('getrowdata', editrow);
-				var gbrkosong	= 'dist/img/default-50x50.gif';
-				$("#upl_deskripsi").val(dataRecord.rutin);	
-				$("#upl_total").val(dataRecord.total);	
-				$("#upl_marking").val(dataRecord.marking);
-				$("#getfoto").val('');
-				$("#avatar").attr("src",gbrkosong);
-				$("#indukinsidental").val(dataRecord.noinduk);	
-				$('#divbayarinsidental').hide();
-				$('#divbayarrutin').hide();
-				$('#divriwayat').hide();
-				$('#divtambahinsidental').hide();
-				$('#divuploadbukti').show();
-				$('#divawal').hide();
+					editrow 		= row;	
+					var offset 		= $("#griddatabayar").offset();		
+					var dataRecord 	= $("#griddatabayar").jqxGrid('getrowdata', editrow);
+					var gbrkosong	= 'dist/img/default-50x50.gif';
+					var verifi		= dataRecord.verifi;
+					if (verifi == ''){
+						$("#upl_deskripsi").val(dataRecord.rutin);	
+						$("#upl_total").val(dataRecord.total);	
+						$("#upl_marking").val(dataRecord.marking);
+						$("#getfoto").val('');
+						$("#avatar").attr("src",gbrkosong);
+						$("#indukinsidental").val(dataRecord.noinduk);	
+						$('#divbayarinsidental').hide();
+						$('#divbayarrutin').hide();
+						$('#divriwayat').hide();
+						$('#divtambahinsidental').hide();
+						$('#divuploadbukti').show();
+						$('#divawal').hide();
+						
+					} else {
+						swal({
+							title	: 'Stop',
+							text	: 'Kwitansi ini telah di verifikasi, upload bukti sudah tidak diperlukan lagi',
+							type	: 'info',
+						})
+					}
+					
 				}
 			},	
-			{ text: 'Nama', datafield: 'nama', width: 200, align: 'center' },
-			{ text: 'NIS', datafield: 'noinduk', width: 40, align: 'center' },
-			{ text: 'Tagihan', datafield: 'rutin', width: 140, align: 'center' },
-			{ text: 'Total', datafield: 'total', width: 90, cellsalign: 'right', align: 'center' },
-			{ text: 'Tgl.Bayar', datafield: 'tanggal', width: 170, cellsalign: 'left', align: 'center' },
-			{ text: 'Verifikasi', datafield: 'verifi', width: 170, cellsalign: 'left', align: 'center' },
-			{ text: 'Bukti', width: 40, cellsrenderer: photorenderer, editable: false, sortable: false, filterable: false },
-			{ text: 'Kwitansi', editable: false, sortable: false, filterable: false, columntype: 'button', width: 70, align: 'center', cellsrenderer: function () {
+			{ text: 'Nama', datafield: 'nama', width: '20%', align: 'center' },
+			{ text: 'Tagihan', datafield: 'rutin', width: '10%', align: 'center' },
+			{ text: 'Total', datafield: 'total', width: '10%', cellsalign: 'right', align: 'center' },
+			{ text: 'Tgl.Bayar', datafield: 'tanggal', width: '15%', cellsalign: 'left', align: 'center' },
+			{ text: 'Verifikasi', datafield: 'verifi', width: '15%', cellsalign: 'left', align: 'center' },
+			{ text: 'Bukti', width: '10%', cellsrenderer: photorenderer, editable: false, sortable: false, filterable: false },
+			{ text: 'Kwitansi', editable: false, sortable: false, filterable: false, columntype: 'button', width: '10%', align: 'center', cellsrenderer: function () {
 				return "Save";
 				}, buttonclick: function (row) {
-					editrow = row;
+					editrow 		= row;
 					var offset 		= $("#griddatabayar").offset();
 					var dataRecord 	= $("#griddatabayar").jqxGrid('getrowdata', editrow);
 					var goook		= dataRecord.marking;
-					var url 		= "{{URL::to("/")}}/kwitansi/"+goook;
-					var windowName 	= goook;
-					var windowSize 	= "width=800,height=800";
-					window.open(url, windowName, windowSize);
-					event.preventDefault();
+					var verifi		= dataRecord.verifi;
+					if (verifi == ''){
+						swal({
+							title	: 'Stop',
+							text	: 'Kwitansi ini belum di verifikasi, mohon menghubungi staf administrasi untuk di proses verifikasi',
+							type	: 'info',
+						})
+					} else {
+						var url 		= "{{URL::to("/")}}/kwitansi/"+goook;
+						var windowName 	= goook;
+						var windowSize 	= "width=800,height=800";
+						window.open(url, windowName, windowSize);
+						event.preventDefault();
+					}
 				}
 			},		
 		],                

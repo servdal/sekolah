@@ -12,7 +12,6 @@ Route::get('/', [AuthController::class, 'viewAuth']);
 Route::get('logkhusus/{id}', [AuthController::class, 'authenticatekhusus'])->name('logkhusus');
 Route::get('cekandroid/{id}', [AuthController::class, 'getFirebaseaccount']);
 Route::post('authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
-Route::post('exsimpanpendaftaran', [AuthController::class, 'exSimpanpendaftaran'])->name('exsimpanpendaftaran');
 Route::post('exdaftarbaru', [AuthController::class, 'exDaftarBaru'])->name('exDaftarBaru');
 Route::get('login', [FrontpageController::class, 'login'])->name('login');
 Route::post('exresetpassword', [AuthController::class, 'exResetPassword'])->name('exResetPassword');
@@ -24,6 +23,7 @@ Route::get('frontpage', [FrontpageController::class, 'FrontPageindex']);
 Route::get('ppdb', [FrontpageController::class, 'ppdb'])->name('ppdb');
 Route::get('suratijinortu/{id}', [FrontpageController::class, 'viewSurat']);
 Route::get('viewlampiran/{id}', [FrontpageController::class, 'viewLampiran']);
+Route::get('buktibayar/{id}', [FrontpageController::class, 'viewBuktiBayar']);
 Route::get('rapot/{id}', [FrontpageController::class, 'viewRapot']);
 Route::get('ceking/{id}', [FrontpageController::class, 'cekingPembayaran']);
 Route::get('karpes/{id}', [FrontpageController::class, 'viewKarpes']);
@@ -72,7 +72,8 @@ Route::group([], function () {
 	Route::get('lapamil', [AdminController::class, 'viewAmilZIS']);
 	Route::post('jalldata', [AdminController::class, 'jallData'])->name('jallData');
 	Route::post('exverifikasi', [AdminController::class, 'exVerifikasi'])->name('exVerifikasi');
-	
+	Route::post('exsimpanpendaftaran', [AdminController::class, 'exSimpanpendaftaran'])->name('exsimpanpendaftaran');
+
 	Route::get('datainduk', [AdminController::class, 'viewDatainduk']);
 	Route::get('presensifinger', [AdminController::class, 'viewPresensiFinger']);
 	Route::get('profilpegawai/{id}', [AdminController::class, 'viewProfilPegawai']);

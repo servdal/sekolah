@@ -7545,7 +7545,7 @@ class GuruController extends Controller
 		$homebase	= url("/");
 		if (Session('previlage') == 'ortu'){
 			if ($jenis == 'last'){
-				$sql	= Datainduk::where('kodeortu', Session('id'))->orWhere('kodeortuasuh', Session('email'))->where('nokelulusan', '')->get();
+				$sql			= Datainduk::where('kodeortu', Session('id'))->orWhere('kodeortuasuh', Session('email'))->where('nokelulusan', '')->get();
 			} else {
 				$arrpresensi 	= Datasetorantahfid::where('noinduk', $jilid)->where('id_sekolah',  Session('sekolah_id_sekolah'))->orderBy('tanggal', 'DESC')->get();
 				$sql 			= null;

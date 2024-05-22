@@ -113,9 +113,9 @@
     $(document).ready(function () {
         $('.overlay').hide();
         $('#divpermohonanremidi').hide();
-        var ttdPad = new SignaturePad(document.getElementById('id_ttd'), {
-            backgroundColor: 'rgba(255, 255, 255, 0)',
-            penColor: 'rgb(0, 0, 0)'
+            var ttdPad = new SignaturePad(document.getElementById('id_ttd'), {
+                backgroundColor: 'rgba(255, 255, 255, 0)',
+                penColor: 'rgb(0, 0, 0)'
         });
         $('#btnsimpanttd').on('click', function (){		
             var set01 = ttdPad.toDataURL('image/png');
@@ -193,17 +193,17 @@
         };
         var datanilai = new $.jqx.dataAdapter(sourcenilai);
         $("#gridnilaianak").jqxGrid({
-            width: '100%',
-            columnsresize: true,
-            theme: "energyblue",
-            autoheight: true,
-            altrows: true,
-            filterable: true,
-            filtermode: 'excel',
-            source: datanilai,
-            selectionmode: 'singlecell',
-            columns: [
-                { text: 'Permohonan', columntype: 'button', width: '10%', cellsrenderer: function () {
+            width           : '100%',
+            columnsresize   : true,
+            theme           : "energyblue",
+            autoheight      : true,
+            altrows         : true,
+            filterable      : true,
+            filtermode      : 'excel',
+            source          : datanilai,
+            selectionmode   : 'singlecell',
+            columns         : [
+                { text: 'Permohonan', columntype: 'button', width: '8%', cellsrenderer: function () {
                     return "REMIDI";
                     }, buttonclick: function (row) {
                         editrow = row;
@@ -217,18 +217,18 @@
                         $('#divawal').hide();
                     }
                 },
-                { text: 'Tanggal', datafield: 'tanggal', width: 150, align: 'center' },
-                { text: 'Nama', datafield: 'nama', width: 200, align: 'center' },
-                { text: 'TAPEL', datafield: 'tapel', width: 70, cellsalign: 'right', align: 'center'},
-                { text: 'KELAS', datafield: 'kelas', width: 50, cellsalign: 'center', align: 'center'},
-                { text: 'SMT', datafield: 'semester', width: 50, cellsalign: 'center', align: 'center'},
-                { text: 'TEMA', datafield: 'tema', width: 50, cellsalign: 'center', align: 'center'},
-                { text: 'SUBTEMA', datafield: 'subtema', width: 80, cellsalign: 'center', align: 'center'},
-                { text: 'MATPEL', datafield: 'matpel', width: 100, cellsalign: 'left', align: 'center'},
-                { text: 'JENIS', datafield: 'jennilai', width: 80, cellsalign: 'center', align: 'center'},
-                { text: 'NILAI', datafield: 'nilai', width: 50, cellsalign: 'center', align: 'center'},
-                { text: 'RATAKELAS', datafield: 'ratakelas', width: 80, cellsalign: 'center', align: 'center'},
-                { text: 'GURU', datafield: 'guru', width: 120, cellsalign: 'center', align: 'center'},
+                { text: 'Tanggal', datafield: 'tanggal', width: '7%', align: 'center' },
+                { text: 'Nama', datafield: 'nama', width: '15%', align: 'center' },
+                { text: 'TAPEL', datafield: 'tapel', width: '8%', cellsalign: 'right', align: 'center'},
+                { text: 'KELAS', datafield: 'kelas', width: '7%', cellsalign: 'center', align: 'center'},
+                { text: 'SMT', datafield: 'semester', width: '5%', cellsalign: 'center', align: 'center'},
+                { text: 'TEMA', datafield: 'tema', width: '5%', cellsalign: 'center', align: 'center'},
+                { text: 'SUBTEMA', datafield: 'subtema', width: '5%', cellsalign: 'center', align: 'center'},
+                { text: 'MATPEL', datafield: 'matpel', width: '10%', cellsalign: 'left', align: 'center'},
+                { text: 'JENIS', datafield: 'jennilai', width: '10%', cellsalign: 'center', align: 'center'},
+                { text: 'NILAI', datafield: 'nilai', width: '5%', cellsalign: 'center', align: 'center'},
+                { text: 'RATAKELAS', datafield: 'ratakelas', width: '5%', cellsalign: 'center', align: 'center'},
+                { text: 'GURU', datafield: 'guru', width: '10%', cellsalign: 'center', align: 'center'},
             ],
         });
     });

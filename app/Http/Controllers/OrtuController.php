@@ -933,8 +933,14 @@ class OrtuController extends Controller
 		$tahun		= $request->val03;
 		$inputor	= $request->val04;
 		$setbayar	= $request->val05;
+		$dpp		= $request->val06;
+		$paguyuban	= $request->val07;
+		if ($dpp == 0){ $dpp = ''; }
+		if ($paguyuban == 0){ $paguyuban = ''; }
+		
 		if ($noinduk != ''  and $bulan != '' and $tahun != ''){
 			$qcarijeneng	= Datainduk::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+			$nama			= $qcarijeneng->nama;
 			if (isset($qcarijeneng->klspos)){
 				$klspos			= $qcarijeneng->klspos;
 			} else { $klspos = ''; }
@@ -947,18 +953,14 @@ class OrtuController extends Controller
 			$totalbayar		= 0;
 			$rdetail		= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
 			if (isset($rdetail->nama)){
-				$nama		= $rdetail->nama;
 				$spp		= $rdetail->spp;
-				$paguyuban	= $rdetail->paguyuban;				
 				$neksul1	= $rdetail->eksul1;
 				$neksul2	= $rdetail->eksul2;
 				$neksul3	= $rdetail->eksul3;
 				$neksul4	= $rdetail->eksul4;
 				$neksul5	= $rdetail->eksul5;
 			} else { 
-				$nama		= '';
 				$spp		= '';
-				$paguyuban	= '';
 				$neksul1	= '';
 				$neksul2	= '';
 				$neksul3	= '';
@@ -966,20 +968,12 @@ class OrtuController extends Controller
 				$neksul5	= '';
 			}
 			if ($spp != '' AND $setbayar != 'eksulsaja'){
-				$cekdahbyr1		= Pembayaran::where('jenis', 'spp')
-				->where('bulan', $bulan)
-				->where('tahun', $tahun)
-				->where('noinduk', $noinduk)
-				->where('biaya', $spp)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
-				
+				$cekdahbyr1		= Pembayaran::where('jenis', 'spp')->where('bulan', $bulan)->where('tahun', $tahun)->where('noinduk', $noinduk)->where('biaya', $spp)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
 				if ($cekdahbyr1 != 0){
 					$statusinput = $statusinput.'<br /><font color=red>Telah Bayar SPP Untuk Bulan '.$bulan.' Tahun '.$tahun.' an. '.$nama.'</font>'; 
 				} else {
 					$spp 		= str_replace(',','',$spp);
-					$cekmasuk	= Pembayaran::where('jenis', 'spp')
-					->where('bulan', $bulan)
-					->where('tahun', $tahun)
-					->where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+					$cekmasuk	= Pembayaran::where('jenis', 'spp')->where('bulan', $bulan)->where('tahun', $tahun)->where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
 					if ($cekmasuk == 0){
 						$bayar	= Pembayaran::create([
 							'nama'		=> $nama, 
@@ -1008,26 +1002,54 @@ class OrtuController extends Controller
 					}
 				}
 			}
-			if ($paguyuban != '' AND $setbayar != 'eksulsaja'){
-				$cekdahbyr2		= Pembayaran::where('jenis', 'paguyuban')
-				->where('bulan', $bulan)
-				->where('tahun', $tahun)
-				->where('noinduk', $noinduk)
-				->where('biaya', $paguyuban)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+			if ($dpp != '' AND $setbayar != 'eksulsaja'){
+				$cekdahbyr2		= Pembayaran::where('jenis', 'dpp')->where('bulan', $bulan)->where('tahun', $tahun)->where('noinduk', $noinduk)->where('biaya', $dpp)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
 				if ($cekdahbyr2 != 0){
-					$statusinput = $statusinput.'<br /><font color=red>Telah Bayar Paguyuban Untuk Bulan '.$bulan.' Tahun '.$tahun.' an. '.$nama.'</font>'; 
+					$statusinput = $statusinput.'<br /><font color=red>Telah Bayar DPP Untuk Bulan '.$bulan.' Tahun '.$tahun.' an. '.$nama.'</font>'; 
 				} else {
-					$paguyuban 		= str_replace(',','',$paguyuban);
-					$cekmasuk		= Pembayaran::where('jenis', 'paguyuban')
-										->where('bulan', $bulan)
-										->where('tahun', $tahun)
-										->where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+					$dpp 		= str_replace(',','',$dpp);
+					$cekmasuk		= Pembayaran::where('jenis', 'dpp')->where('bulan', $bulan)->where('tahun', $tahun)->where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
 					if ($cekmasuk == 0){
 						$bayar	= Pembayaran::create([
 							'nama'		=> $nama, 
 							'noinduk'	=> $noinduk, 
 							'kelas'		=> $klspos, 
-							'jenis'		=> 'paguyuban', 
+							'jenis'		=> 'dpp', 
+							'biaya'		=> $dpp, 
+							'bulan'		=> $bulan, 
+							'tahun'		=> $tahun, 
+							'timestamp'	=> 'CURRENT_TIMESTAMP', 
+							'verifikasi'=> '', 
+							'marking'	=> $marking, 
+							'harian'	=> $dinoan, 
+							'inputor'	=> Session('nama'), 
+							'buktibayar'=> '',
+							'id_sekolah'=> session('sekolah_id_sekolah')
+						]);
+						if ($bayar){
+							$totalbayar	 = $totalbayar + $dpp;
+							$statusinput = $statusinput.'<br /><font color=green>Sukses Input DPP an. '.$nama.' Bulan '.$bulan.' Tahun '.$tahun.' Sejumlah '.$dpp.'</font>';
+						} else {
+							$statusinput = $statusinput.'<br /><font color=red>Gagal Input Pembayaran DPP an. '.$nama.'  Bulan '.$bulan.' Tahun '.$tahun.' Sejumlah '.$dpp.' Silahkan coba beberapa saat lagi</font>';
+						}
+					} else {
+						$statusinput = $statusinput.'<br /><font color=red>Data Pembayaran DPP Untuk Bulan '.$bulan.' Tahun '.$tahun.' an. '.$nama.' sudah ada</font>'; 
+					}
+				}
+			}
+			if ($paguyuban != '' AND $setbayar != 'eksulsaja'){
+				$cekdahbyr2		= Pembayaran::where('jenis', 'Uang Makan')->where('bulan', $bulan)->where('tahun', $tahun)->where('noinduk', $noinduk)->where('biaya', $paguyuban)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+				if ($cekdahbyr2 != 0){
+					$statusinput = $statusinput.'<br /><font color=red>Telah Bayar Uang Makan Untuk Bulan '.$bulan.' Tahun '.$tahun.' an. '.$nama.'</font>'; 
+				} else {
+					$paguyuban 		= str_replace(',','',$paguyuban);
+					$cekmasuk		= Pembayaran::where('jenis', 'Uang Makan')->where('bulan', $bulan)->where('tahun', $tahun)->where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+					if ($cekmasuk == 0){
+						$bayar	= Pembayaran::create([
+							'nama'		=> $nama, 
+							'noinduk'	=> $noinduk, 
+							'kelas'		=> $klspos, 
+							'jenis'		=> 'Uang Makan', 
 							'biaya'		=> $paguyuban, 
 							'bulan'		=> $bulan, 
 							'tahun'		=> $tahun, 
@@ -1041,12 +1063,12 @@ class OrtuController extends Controller
 						]);
 						if ($bayar){
 							$totalbayar	 = $totalbayar + $paguyuban;
-							$statusinput = $statusinput.'<br /><font color=green>Sukses Input paguyuban an. '.$nama.' Bulan '.$bulan.' Tahun '.$tahun.' Sejumlah '.$paguyuban.'</font>';
+							$statusinput = $statusinput.'<br /><font color=green>Sukses Input Uang Makan an. '.$nama.' Bulan '.$bulan.' Tahun '.$tahun.' Sejumlah '.$paguyuban.'</font>';
 						} else {
-							$statusinput = $statusinput.'<br /><font color=red>Gagal Input Pembayaran paguyuban an. '.$nama.'  Bulan '.$bulan.' Tahun '.$tahun.' Sejumlah '.$paguyuban.' Silahkan coba beberapa saat lagi</font>';
+							$statusinput = $statusinput.'<br /><font color=red>Gagal Input Pembayaran Uang Makan an. '.$nama.'  Bulan '.$bulan.' Tahun '.$tahun.' Sejumlah '.$paguyuban.' Silahkan coba beberapa saat lagi</font>';
 						}
 					} else {
-						$statusinput = $statusinput.'<br /><font color=red>Data Pembayaran paguyuban Untuk Bulan '.$bulan.' Tahun '.$tahun.' an. '.$nama.' sudah ada</font>'; 
+						$statusinput = $statusinput.'<br /><font color=red>Data Pembayaran Uang Makan Untuk Bulan '.$bulan.' Tahun '.$tahun.' an. '.$nama.' sudah ada</font>'; 
 					}
 				}
 			}
@@ -1055,20 +1077,12 @@ class OrtuController extends Controller
 				if (isset($getbiaya1->biaya)){
 					$eksul1		= $getbiaya1->biaya;
 				} else { $eksul1= 0; }
-				$cekdahbyr3		= Pembayaran::where('jenis', $neksul1)
-								->where('bulan', $bulan)
-								->where('tahun', $tahun)
-								->where('noinduk', $noinduk)
-								->where('biaya', $neksul1)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
-				
+				$cekdahbyr3		= Pembayaran::where('jenis', $neksul1)->where('bulan', $bulan)->where('tahun', $tahun)->where('noinduk', $noinduk)->where('biaya', $neksul1)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
 				if ($cekdahbyr3 != 0){
 					$statusinput = $statusinput.'<br /><font color=red>Telah Bayar '.$neksul1.' Untuk Bulan '.$bulan.' Tahun '.$tahun.' an. '.$nama.'</font>'; 
 				} else {
 					$eksul1   	= str_replace(',','',$eksul1);
-					$cekmasuk	= Pembayaran::where('jenis', $neksul1)
-					->where('bulan', $bulan)
-					->where('tahun', $tahun)
-					->where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+					$cekmasuk	= Pembayaran::where('jenis', $neksul1)->where('bulan', $bulan)->where('tahun', $tahun)->where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
 					if ($cekmasuk == 0){
 						$bayar	= Pembayaran::create([
 							'nama'		=> $nama,
