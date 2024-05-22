@@ -1452,7 +1452,6 @@ class FrontpageController extends Controller
 				return response(file_get_contents($file),200)->header('Content-Type','application/pdf');
 			}
 		}
-		
 	}
 	public function TtdKwitansi($id){
 		$homebase	= url("/");

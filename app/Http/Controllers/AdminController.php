@@ -4084,7 +4084,7 @@ class AdminController extends Controller
 				'id_sekolah'	=> session('sekolah_id_sekolah')
 			]);
 			if ($update){
-				$uploaddata = Pembayaran::where('marking', $setmark)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+				$uploaddata = Pembayaran::where('marking', $marking)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
 				foreach($uploaddata as $row){
 					if ($row->biaya != 0){
 						$jenis 		= $row->jenis;
@@ -4113,6 +4113,7 @@ class AdminController extends Controller
 							'tahun'			=> $thniki,
 							'deskripsi'		=> $row->jenis.' an. '.$row->nama.' Kelas '.$row->kelas.' Bulan '.$row->bulan.' Tahun '.$row->tahun,
 							'jenis'			=> $jenis,
+							'pemasukan'		=> $row->biaya,
 							'bendahara'		=> null,
 							'tglkwitansi'	=> null,
 							'tandatangan'	=> null,
@@ -5874,7 +5875,7 @@ class AdminController extends Controller
 			'id_sekolah'	=> session('sekolah_id_sekolah'),
 		]);
 		if ($update){
-			$uploaddata = Pembayaran::where('marking', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+			$uploaddata = Pembayaran::where('marking', $marking)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
 			foreach($uploaddata as $row){
 				if ($row->biaya != 0){
 					$jenis 		= $row->jenis;
@@ -5903,6 +5904,7 @@ class AdminController extends Controller
 						'tahun'			=> $thniki,
 						'deskripsi'		=> $row->jenis.' an. '.$row->nama.' Kelas '.$row->kelas.' Bulan '.$row->bulan.' Tahun '.$row->tahun,
 						'jenis'			=> $jenis,
+						'pemasukan'		=> $row->biaya,
 						'bendahara'		=> null,
 						'tglkwitansi'	=> null,
 						'tandatangan'	=> null,

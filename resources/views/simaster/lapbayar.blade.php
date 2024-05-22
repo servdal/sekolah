@@ -626,16 +626,10 @@ $(document).ready(function () {
 					editrow = row;	
 					var offset 		= $("#griddatabayar").offset();		
 					var dataRecord 	= $("#griddatabayar").jqxGrid('getrowdata', editrow);
-					var goook		= dataRecord.marking;	
-					var staff		= 'cetak';
-					var mstdate		= document.getElementById('id_mastertgl').value;
-					$.post('cetak/viewdetailtu', { valkirim: goook, jeneng: staff, tanggal: mstdate, _token: token },
-					function(data){		
-						var url 		= "{{URL::to("/")}}/kwitansi/"+goook;
-						var windowName 	= dataRecord.marking;
-						var windowSize 	= "width=800,height=800";
-						window.open(url, windowName, windowSize);
-					});
+					var url 		= "{{URL::to("/")}}/kwitansi/"+dataRecord.marking;
+					var windowName 	= dataRecord.marking;
+					var windowSize 	= "width=800,height=800";
+					window.open(url, windowName, windowSize);
 				}
 			},
 			{ text: 'Verified', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', align: 'center', cellsrenderer: function () {
