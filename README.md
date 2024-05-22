@@ -5,7 +5,8 @@
 <a href="https://gmm.duidev.com"><img src="https://simbian.duidev.com/logo/1603375609logo.png" width="35" alt="Yayasan Gema Mitra Muslim"></a>
 <a href="https://apps.sdtq-daarulukhuwwah.sch.id/"><img src="https://github.com/servdal/sdtq/blob/master/public/logo/1715426344logo.png" width="35" alt="SDTQ Daarul Ukhuwwah"></a>
 </p>
-# Sistem Manajemen Sekolah Terpadu
+
+## Sistem Manajemen Sekolah Terpadu
 
 Aplikasi Sistem Manajemen Sekolah Terpadu adalah sebuah aplikasi yang dikembangkan untuk membantu manajemen sekolah dalam mengelola berbagai aspek kegiatan sehari-hari di sekolah.
 
@@ -67,7 +68,6 @@ Aplikasi ini dilisensikan di bawah [MIT License](LICENSE).
 ## Donasi
 
 Jika Anda ingin mendukung pengembangan aplikasi ini, Anda dapat berdonasi melalui transfer bank ke rekening berikut:
-
 BRI, Norek : 005101142079504
 Mandiri, Norek : 1440019278099
 BSI, Norek : 7167036915
