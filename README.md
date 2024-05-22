@@ -3,7 +3,7 @@
 <p align="center">
 <a href="https://amil.sdimohammadhatta.sch.id"><img src="https://simbian.duidev.com/logo/1602884372logo.png" width="35" alt="SDI Mohammad Hatta Malang"></a>
 <a href="https://gmm.duidev.com"><img src="https://simbian.duidev.com/logo/1603375609logo.png" width="35" alt="Yayasan Gema Mitra Muslim"></a>
-<a href="https://apps.sdtq-daarulukhuwwah.sch.id/"><img src="https://github.com/servdal/sdtq/blob/master/public/logo/1715426344logo.png" widtg="35" alt="SDTQ Daarul Ukhuwwah"></a>
+<a href="https://apps.sdtq-daarulukhuwwah.sch.id/"><img src="https://github.com/servdal/sdtq/blob/master/public/logo/1715426344logo.png" width="35" alt="SDTQ Daarul Ukhuwwah"></a>
 </p>
 # Sistem Manajemen Sekolah Terpadu
 
