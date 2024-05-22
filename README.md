@@ -71,5 +71,6 @@ Jika Anda ingin mendukung pengembangan aplikasi ini, Anda dapat berdonasi melalu
 - BRI, Norek : 005101142079504
 - Mandiri, Norek : 1440019278099
 - BSI, Norek : 7167036915
+
 An. Dwi Swandhana Rahmadi Putra
 
