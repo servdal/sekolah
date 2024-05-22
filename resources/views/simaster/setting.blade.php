@@ -315,7 +315,7 @@
                                 <dd>
 									<div class="btn-group">
 										<a href="/backup/database"><button type="button" class="btn btn-primary"><i class="fa fa-database"></i></button></a>
-										<a href="/backup/public"><button type="button" class="btn btn-danger"><i class="fa fa-file"></i></a>
+										<a href="/backup/public"><button type="button" class="btn btn-danger"><i class="fa fa-file"></i></button></a>
 									</div>
                                 </dd>
                             </dl>
