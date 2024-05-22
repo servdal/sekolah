@@ -317,9 +317,8 @@ Route::group([], function () {
     Route::get('/argonprofil',[UserController::class, 'viewDataIndukArgonThem'])->name('argonprofil');
     Route::post('getnotifcount', [UserController::class, 'cekNotifikasi'])->name('cekNotifikasi');
 	Route::post('exeditprofil', [UserController::class, 'exEditProfil'])->name('exEditProfil');
-	//Belum di Implementasikan
-	//Route::get('/backup/public', [BackupController::class, 'backupPublicFolder'])->name('backup.public');
-	//Route::get('/backup/database', [BackupController::class, 'backupDatabase'])->name('backup.database');
-
+	
+	Route::get('/backup/public', [BackupController::class, 'backupPublicFolder'])->name('backup.public');
+	Route::get('/backup/database', [BackupController::class, 'backupDatabase'])->name('backup.database');
 });
 

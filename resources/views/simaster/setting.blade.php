@@ -313,8 +313,10 @@
                                 <dt>Backup Database</dt>
                                 <dd>Perintah ini berfungsi untuk membackup keseluruhan database. Setelah anda mengklik bakcup, mohon simpan file hasil tersebut di tempat yang aman (kami menyarankan sekolah mempunyai account di Google Drive dan simpan file backup tersebut di Google Drive) Mohon fasilitas ini dimanfaatkan minimal 3 bulan sekali, untuk menghindari hal-hal yang tidak diinginkan</dd>
                                 <dd>
-                                    <a href="/adminer"><input type="button" name="submit" value="backup" class="btn btn-primary btn-block btn-flat"></a>
-                                    
+									<div class="btn-group">
+										<a href="/backup/database"><button type="button" class="btn btn-primary"><i class="fa fa-database"></i></button></a>
+										<a href="/backup/public"><button type="button" class="btn btn-danger"><i class="fa fa-file"></i></a>
+									</div>
                                 </dd>
                             </dl>
                         </div>
