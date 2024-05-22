@@ -1,4 +1,4 @@
-<p align="center"><a href="https://duidev.com" target="_blank"><img src="https://pj.duidev.com/dist/img/logokecil.png" width="400"></a></p>
+<p align="center"><a href="https://duidev.com" target="_blank"><img src="https://github.com/servdal/sdtq/blob/master/public/header.png" width="400"></a></p>
 
 <p align="center">
 <a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
