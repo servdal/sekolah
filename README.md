@@ -59,7 +59,6 @@ Pastikan Anda telah menginstal XAMPP atau konfigurasi server web yang sesuai di 
 ## Kontribusi
 
 Kami terbuka terhadap kontribusi dari komunitas. Jika Anda menemukan masalah atau ingin berkontribusi dalam pengembangan aplikasi ini, silakan buka [laporan masalah](https://github.com/servdal/sdtq/issues) atau kirimkan pull request.
-Kami senang mendengar umpan balik dari Anda! Jika Anda memiliki pertanyaan atau saran, jangan ragu untuk menghubungi kami di [swandhana17@gmail.com](mailto:swandhana17@gmail.com)
 
 ## Lisensi
 
