@@ -4,10 +4,10 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Setkuangan extends Model
+class XFiles extends Model
 {
-    protected $table    =   "db_setkeuangan";
+    protected $table    =   "x_files";
     public $timestamps  =   false;
-	protected $guarded  = [];
+    protected $guarded  = [];
 
 }

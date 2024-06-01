@@ -4,13 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Pembayaran extends Model
+class Inboxsurat extends Model
 {
-    protected $table    = "db_pembayaran";
+    protected $table    = "tbl_inbox";
     protected $guarded  = [];
-
     public function getTandatangan()
     {
-        return $this->hasOne('App\XFiles','xmarking','marking');
+        return $this->hasOne('App\XFiles','xmarking','xmarking');
     }
 }

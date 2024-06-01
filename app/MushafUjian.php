@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Datapresensiekskul extends Model
+class MushafUjian extends Model
 {
-    protected $table    = "db_presensiekskul";
+    protected $table    = "mushaf_ujian";
     protected $guarded  = [];
 }

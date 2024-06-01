@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Prestasi extends Model
 {
     protected $table    =   "db_prestasi";
-    public $timestamps  =   false;
     protected $guarded  = [];
+
+    public function getTandatangan()
+    {
+        return $this->hasOne('App\XFiles','xmarking','namafile');
+    }
 }

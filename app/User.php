@@ -47,7 +47,10 @@ class User extends Authenticatable
         'dark_mode',
         'messenger_color',
     ];
-
+    public function notifications()
+    {
+        return $this->hasMany(\App\Models\Notification::class);
+    }
     /**
      * The attributes that should be hidden for arrays.
      *

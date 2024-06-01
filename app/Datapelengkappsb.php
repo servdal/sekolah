@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Datapelengkappsb extends Model
 {
-    protected $table    =   "db_pelengkappsb";
-    public $timestamps  =   false;
+    protected $table    = "db_pelengkappsb";
+    public $timestamps  = false;
     protected $guarded  = [];
 }

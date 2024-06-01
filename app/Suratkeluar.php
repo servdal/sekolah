@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Pembayaran extends Model
+class Suratkeluar extends Model
 {
-    protected $table    = "db_pembayaran";
+    protected $table    =   "tbl_suratkeluar";
     protected $guarded  = [];
 
     public function getTandatangan()
