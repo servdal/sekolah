@@ -13,7 +13,7 @@ return [
 	'logoapss' 			=> 	'logo.png',
 	'kota' 				=> 	'Malang',
 	'email'				=> 	'swandhana17@gmail.com',
-	'nomerinduksekolah'	=> 	'081359108565 ',
+	'nomerinduksekolah'	=> 	'081359108565',
 	'alamat'			=> 	'Jl. Lamandau 18 A Bunulrejo Blimbing Malang',
 	'id_sekolah'		=> 	'1',
 ];
