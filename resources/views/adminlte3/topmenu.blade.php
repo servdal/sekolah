@@ -214,6 +214,7 @@
             <li class="dropdown-submenu dropdown-hover">
                 <a id="groupkesiswaan" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Sarana dan Prasarana</a>
                 <ul aria-labelledby="groupkesiswaan" class="dropdown-menu border-0 shadow">
+                    <li><a class="dropdown-item" href="{{ url('persuratan') }}">Persuratan</a></li>
                     <li><a class="dropdown-item" href="{{ url('sarpras') }}">Sarana dan Prasarana</a></li>
                     <li><a class="dropdown-item" href="{{ url('minimi') }}"> Perpustakaan</a></li>
                     <li><a class="dropdown-item" href="{{ url('datakeluhan') }}">Kritik dan Keluhan</a></li>
@@ -608,6 +609,7 @@
             <li class="dropdown-submenu dropdown-hover">
                 <a id="groupkesiswaan" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Sarana dan Prasarana</a>
                 <ul aria-labelledby="groupkesiswaan" class="dropdown-menu border-0 shadow">
+                    <li><a class="dropdown-item" href="{{ url('persuratan') }}">Persuratan</a></li>
                     <li><a class="dropdown-item" href="{{ url('sarpras') }}">Sarana dan Prasarana</a></li>
                     <li><a class="dropdown-item" href="{{ url('minimi') }}"> Perpustakaan</a></li>
                     <li><a class="dropdown-item" href="{{ url('datakeluhan') }}">Kritik dan Keluhan</a></li>
