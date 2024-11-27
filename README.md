@@ -37,7 +37,7 @@ Aplikasi ini dirancang untuk memudahkan administrasi sekolah dalam mengelola dat
 1. Unduh aplikasi dari [halaman GitHub repository](https://github.com/servdal/sekolah).
 2. Ekstrak file ZIP yang telah diunduh ke dalam direktori web server Anda.
 3. Buka terminal atau command prompt dan arahkan ke direktori aplikasi.
-4. Jalankan perintah `composer install` untuk menginstal semua dependensi PHP.
+4. Jalankan perintah `php composer.phar update` untuk menginstal semua dependensi PHP.
 5. Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database Anda.
 6. Pastikan untuk Email sudah di isikan username dan password dan server SMTP anda (karena default pendaftaran menggunakan email untuk aktivasi)
 7. Jalankan perintah `php artisan key:generate` untuk menghasilkan kunci aplikasi yang unik.
@@ -51,16 +51,16 @@ Pastikan Anda telah menginstal XAMPP atau konfigurasi server web yang sesuai di 
 1. Unduh aplikasi dari [halaman GitHub repository](https://github.com/servdal/sekolah).
 2. Ekstrak file ZIP yang telah diunduh ke dalam direktori web server Anda.
 3. Buka terminal dan arahkan ke direktori aplikasi.
-4. Jalankan perintah `composer install` untuk menginstal semua dependensi PHP.
+4. Jalankan perintah `php composer.phar update` untuk menginstal semua dependensi PHP.
 5. Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database Anda.
 6. Pastikan untuk Email sudah di isikan username dan password dan server SMTP anda (karena default pendaftaran menggunakan email untuk aktivasi)
 7. Jalankan perintah `php artisan key:generate` untuk menghasilkan kunci aplikasi yang unik.
-8. Jalankan perintah `php artisan migrate` untuk menjalankan migrasi dan mempersiapkan basis data.
-9. Buka web browser Anda dan arahkan ke alamat URL tempat aplikasi telah diinstal.
+8. Jalankan perintah `php artisan migrate` untuk menjalankan migrasi dan mempersiapkan basis data (jika gagal import file sql yg ada di folder database/scheme/).
+9. Buka web browser Anda dan arahkan ke alamat URL tempat aplikasi telah diinstal (Username dan Password Default : simaster@duidev.com | bismillah).
 
 ## Kontribusi
 
-Kami terbuka terhadap kontribusi dari komunitas. Jika Anda menemukan masalah atau ingin berkontribusi dalam pengembangan aplikasi ini, silakan buka [laporan masalah](https://github.com/servdal/sdtq/issues) atau kirimkan pull request.
+Kami terbuka terhadap kontribusi dari komunitas. Jika Anda menemukan masalah atau ingin berkontribusi dalam pengembangan aplikasi ini, silakan buka [laporan masalah](https://github.com/servdal/sekolah/issues) atau kirimkan pull request.
 
 ## Lisensi
 
