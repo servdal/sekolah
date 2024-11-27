@@ -8,6 +8,8 @@ use App\Http\Controllers\GuruController;
 use App\Http\Controllers\OrtuController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\BankSoalController;
+
 Route::get('/', [AuthController::class, 'viewAuth']);
 Route::get('logkhusus/{id}', [AuthController::class, 'authenticatekhusus'])->name('logkhusus');
 Route::get('cekandroid/{id}', [AuthController::class, 'getFirebaseaccount']);
@@ -272,7 +274,32 @@ Route::group([], function () {
 	Route::get('jrekapkonselingthnini', [GuruController::class, 'jsonKonselingthnini']);	
 	Route::post('guru/exsimpankonseling', [GuruController::class, 'exSimpankonseling'])->name('exSimpankonseling');
 	Route::post('guru/jalldatakonseling', [GuruController::class, 'jsonAlldatakonseling'])->name('jsonAlldatakonseling');
-	
+	Route::get('banksoal', [BankSoalController::class, 'viewIndex']);
+	Route::get('test', [BankSoalController::class, 'viewPortalUjian'])->name('viewPortalUjian');
+	Route::get('ujiancbt',[BankSoalController::class, 'viewUjianKompetensi'])->name('viewUjianKompetensi');
+    Route::get('tryout', [BankSoalController::class, 'viewTryOut'])->name('viewTryOut');
+	Route::post('exlogintest', [BankSoalController::class, 'exLoginTest'])->name('exLoginTest');
+	Route::post('exloginujian', [BankSoalController::class, 'exLoginUdin'])->name('exLoginUdin');
+
+	Route::post('exfirstsoal', [BankSoalController::class, 'getFirstSoal'])->name('getFirstSoal');
+	Route::post('exfirstdataujian', [BankSoalController::class, 'getFirstDataUjian'])->name('getFirstDataUjian');
+	Route::post('exinputbanksoal', [BankSoalController::class, 'exInputBankSoal'])->name('exInputBankSoal');
+	Route::post('exceksoalkembar', [BankSoalController::class, 'exCeksoalkembar'])->name('exCeksoalkembar');
+	Route::post('exsimpanjawaban', [BankSoalController::class, 'exSimpanJawaban'])->name('exSimpanJawaban');
+	Route::post('jsonaktiftest', [BankSoalController::class, 'dataJsonaktiftest'])->name('jsonaktiftest');
+	Route::get('getbanksoal', [BankSoalController::class, 'getBankSoal'])->name('getBankSoal');
+	Route::get('jsongetsoalaktif', [BankSoalController::class, 'jsonGetSoalAktif'])->name('jsonGetSoalAktif');
+	Route::post('exaddtest', [BankSoalController::class, 'exAddTest'])->name('exAddTest');
+	Route::post('exaddpesertatest', [BankSoalController::class, 'exAddPesertaTest'])->name('exAddPesertaTest');
+	Route::post('exhitungnilai', [BankSoalController::class, 'exHitungNilai'])->name('exHitungNilai');
+	Route::post('exaddtotxt', [BankSoalController::class, 'exAddtoTXT'])->name('exaddtotxt');
+	Route::post('jsonallcase', [BankSoalController::class, 'jsonallcase'])->name('jsonallcase');
+	Route::post('aktifet', [BankSoalController::class, 'aktifet'])->name('aktifet');
+	Route::post('jgetdetailpeserta', [BankSoalController::class, 'jgetdetailPeserta'])->name('jgetdetailPeserta');
+	Route::post('jsonallinterviewer', [BankSoalController::class, 'jsonallInterviewer'])->name('jsonallinterviewer');
+    Route::post('rad-json-pesertates', [BankSoalController::class, 'jsonPesertaTest'])->name('rad-json-pesertates');
+    Route::post('rad-json-datausercari', [BankSoalController::class, 'jsonUsercari'])->name('rad-json-datausercari');
+    
 	Route::get('biodata', [OrtuController::class, 'index']);
 	Route::post('json/viewdatainduk', [OrtuController::class, 'jsonViewDatainduk'])->name('jsonViewDatainduk');
 	Route::post('json/getstatdatakd', [OrtuController::class, 'jsonStatistikDatakd'])->name('jsonStatistikDatakd');
