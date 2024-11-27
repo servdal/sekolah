@@ -16,6 +16,7 @@
                         <ul aria-labelledby="groupruangguru" class="dropdown-menu border-0 shadow">
                             <li><a class="dropdown-item" href="{{ url('konseling') }}">Data Bimbingan dan Konseling</a></li>
                             <li><a class="dropdown-item" href="{{ url('setrps') }}">Kurikulum</a></li>
+                            <li><a class="dropdown-item" href="{{ url('banksoal') }}">Bank Soal</a></li>
                             @if(Session('sekolah_level') == 1)
                                 <li class="dropdown-submenu dropdown-hover">
                                     <a id="groupmenukelaskb" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Kelompok Belajar</a>
@@ -241,6 +242,7 @@
             <li><a class="dropdown-item" href="{{ url('pengumuman') }}">Pengumuman</a></li>
             <li><a class="dropdown-item" href="{{ url('konseling') }}">Data Bimbingan dan Konseling</a></li>
             <li><a class="dropdown-item" href="{{ url('setrps') }}">Kurikulum</a></li>
+            <li><a class="dropdown-item" href="{{ url('banksoal') }}">Bank Soal</a></li>
             @if(Session('sekolah_level') == 1)
                 <li class="dropdown-submenu dropdown-hover">
                     <a id="groupmenukelaskb" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Kelompok Belajar</a>
@@ -415,6 +417,7 @@
         <ul aria-labelledby="groupmenuguru" class="dropdown-menu border-0 shadow">
             <li><a class="dropdown-item" href="{{ url('pengumuman') }}">Pengumuman</a></li>
             <li><a class="dropdown-item" href="{{ url('setrps') }}">Kurikulum</a></li>
+            <li><a class="dropdown-item" href="{{ url('banksoal') }}">Bank Soal</a></li>
             @if(Session('sekolah_level') == 1)
                 <li class="dropdown-submenu dropdown-hover">
                     <a id="groupmenukelaskb" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Kelompok Belajar</a>
