@@ -2279,7 +2279,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 INSERT INTO `users` (`id`, `nama`, `username`, `password`, `previlage`, `remember_token`, `api_token`, `fakultas`, `fakpanjang`, `merangkap`, `nip`, `golongan`, `email`, `spesial`, `tandatangan`, `paraf`, `firebaseid`, `photo`, `klsajar`, `smt`, `tapel`, `nik`, `semester`, `status`, `created_at`, `updated_at`, `id_sekolah`, `created_by`, `updated_by`, `active_status`, `avatar`, `dark_mode`, `messenger_color`, `email_verified_at`) VALUES
-(1, 'Admin SIMASTER', 'simaster@duidev.com', '$2y$10$QiwfNjESfQb5WGR2facx9OCl1ncznEcOTov0mkmx5y0fqH2an/2IS', 'level1', 'XUBaU7Nv5pQGwxhWwT1xWL7gpyPLZ9kLG2pwpaytgICP8vi8H4EEe1v3Z5cM', NULL, 'SD', 'NAMA SD', '', 3273202104960001, 0, 'simater@duidev.com', NULL, NULL, NULL, '1', NULL, '1A', '2', '2024-2025', NULL, NULL, 1, '2019-09-29 01:14:27', '2024-10-15 01:21:10', 1, NULL, NULL, 0, 'avatar.png', 0, NULL, NULL);
+(1, 'Admin SIMASTER', 'simaster@duidev.com', '$2y$10$QiwfNjESfQb5WGR2facx9OCl1ncznEcOTov0mkmx5y0fqH2an/2IS', 'level1', 'XUBaU7Nv5pQGwxhWwT1xWL7gpyPLZ9kLG2pwpaytgICP8vi8H4EEe1v3Z5cM', NULL, 'SD', 'NAMA SD', '', 3273202104960001, 0, 'simaster@duidev.com', NULL, NULL, NULL, '1', NULL, '1A', '2', '2024-2025', NULL, NULL, 1, '2019-09-29 01:14:27', '2024-10-15 01:21:10', 1, NULL, NULL, 0, 'avatar.png', 0, NULL, NULL);
 
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `x_files`;
