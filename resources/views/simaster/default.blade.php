@@ -22,7 +22,7 @@
                         </div>
                         <div class="card-body">
                             <div id="loading">
-								<img src="{{ asset('dist/img/loading.gif') }}" class="img-responsive" alt="Photo">
+								<img src="{{ asset('dist/img/loading.gif') }}" class="img-responsive" alt="Photo" width="100%">
 							</div>
                             <div class="tab-content" id="divawal">
                                 <div class="active tab-pane" id="depan">
@@ -30,21 +30,7 @@
                                         <div class="col-md-4">
                                             <div class="card-body box-profile bg-danger">
                                                 <div class="text-center">
-                                                    <a href="ppdb?id=1" target="_blank"><img src="ppdb-sdtq.png" alt="User profile picture" width="100%" height="60"></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="card-body box-profile bg-success">
-                                                <div class="text-center">
-                                                    <a href="https://mataba.sdtq-daarulukhuwwah.sch.id" target="_blank"><img src="https://mataba.sdtq-daarulukhuwwah.sch.id/header.png" alt="User profile picture" width="100%"  height="60"></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="card-body box-profile bg-info">
-                                                <div class="text-center">
-                                                    <a href="https://sdtq-daarulukhuwwah.sch.id:2096/cpsess2051834714/3rdparty/roundcube/" target="_blank"><img src="https://sdtq-daarulukhuwwah.sch.id:2096/cPanel_magic_revision_1705947650/unprotected/cpanel/images/webmail-logo.svg" alt="User profile picture" width="100%"  height="60"></a>
+                                                    <a href="ppdb?id={{$id_sekolah}}" target="_blank"><img src="{{ asset('dist/img/logokecil.png') }}" alt="User profile picture" width="100%" height="60"></a>
                                                 </div>
                                             </div>
                                         </div>
