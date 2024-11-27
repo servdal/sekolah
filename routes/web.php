@@ -7,15 +7,19 @@ use App\Http\Controllers\FrontpageController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\OrtuController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PersuratanController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\BankSoalController;
+use Onecentlin\Adminer\Http\Controllers\AdminerController;
 
 Route::get('/', [AuthController::class, 'viewAuth']);
-Route::get('logkhusus/{id}', [AuthController::class, 'authenticatekhusus'])->name('logkhusus');
 Route::get('cekandroid/{id}', [AuthController::class, 'getFirebaseaccount']);
+Route::get('cekandroid', [AuthController::class, 'goToLogin']);
+Route::get('/adminer', [AdminerController::class, 'index'])->middleware('adminer.access');
+
 Route::post('authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
 Route::post('exdaftarbaru', [AuthController::class, 'exDaftarBaru'])->name('exDaftarBaru');
-Route::get('login', [FrontpageController::class, 'login'])->name('login');
+Route::get('login', [AuthController::class, 'viewAuth'])->name('login');
 Route::post('exresetpassword', [AuthController::class, 'exResetPassword'])->name('exResetPassword');
 Route::post('exlogin', [AuthController::class, 'exLogin'])->name('exLogin');
 Route::get('verifikasiemail',[AuthController::class, 'verifikasi'])->name('verifikasiemail');
@@ -27,6 +31,8 @@ Route::get('suratijinortu/{id}', [FrontpageController::class, 'viewSurat']);
 Route::get('viewlampiran/{id}', [FrontpageController::class, 'viewLampiran']);
 Route::get('buktibayar/{id}', [FrontpageController::class, 'viewBuktiBayar']);
 Route::get('rapot/{id}', [FrontpageController::class, 'viewRapot']);
+Route::get('printmark/{id}', [FrontpageController::class, 'viewPrintWithMark']);
+Route::get('ttdrapot/{id}', [FrontpageController::class, 'viewTtdRapot']);
 Route::get('ceking/{id}', [FrontpageController::class, 'cekingPembayaran']);
 Route::get('karpes/{id}', [FrontpageController::class, 'viewKarpes']);
 Route::get('observasi/{id}', [FrontpageController::class, 'viewObservasi']);
@@ -37,7 +43,11 @@ Route::get('kwitansipsb/{id}', [FrontpageController::class, 'ctkKwitansiPSB']);
 Route::get('ctkkwt/{id}', [FrontpageController::class, 'exKwitansiByID']);
 Route::get('ttdkwitansi/{id}', [FrontpageController::class, 'TtdKwitansi']);
 Route::get('formkesanggupan/{id}', [FrontpageController::class, 'ctkFormkesanggupan']);
-Route::get('trackingid/{id}', [FrontpageController::class, 'viewTrackingbyid']);
+Route::get('ttdproposal/{id}', [FrontpageController::class, 'viewTtdProposal']);
+Route::get('rapotalquran/{id}', [FrontpageController::class, 'viewRapotAlquran']);
+Route::get('hasilujianlisan/{id}', [FrontpageController::class, 'viewHasilUjianLisan']);
+Route::get('labelbuku/{id}', [FrontpageController::class, 'ctkLabelBuku']);
+
 Route::post('tamu/exbukutamu', [FrontpageController::class, 'exbukuTamu'])->name('exbukutamu');
 Route::post('tamu/carilaptamu', [FrontpageController::class, 'exTamucari'])->name('exTamucari');
 Route::post('tamu/bukutamu', [FrontpageController::class, 'bukuTamu'])->name('bukuTamu');
@@ -53,22 +63,34 @@ Route::post('kwitansi/expersetujuanberkas', [FrontpageController::class, 'expers
 Route::post('rapot/getstatkd', [FrontpageController::class, 'jsonStatistikkd'])->name('jsonStatistikkd');
 Route::post('rapot/getstatpermuatan', [FrontpageController::class, 'jsonStatpermuatan'])->name('jsonStatpermuatan');
 
-/////////////////E-COMPLAIN////////////////////////
-Route::get('datakeluhan', [KomplainController::class, 'viewLapKomplain']);
-Route::post('komplain/savekomplain', [KomplainController::class, 'saveKomplain'])->name('savekomplain');
-Route::post('komplain/savetanggapan', [KomplainController::class, 'saveTanggapan'])->name('savetanggapan');
-Route::post('komplain/saverating', [KomplainController::class, 'saveRating'])->name('saverating');
-Route::get('komplain/getkomplainpribadi', [KomplainController::class, 'getKomplainpribadi'])->name('getkomplainpribadi');
-Route::post('komplain/getdatakeluhan', [KomplainController::class, 'getdataKeluhan'])->name('getdatakeluhan');
-Route::get('komplain/statjrating', [KomplainController::class, 'statjRating'])->name('statjrating');
-Route::get('komplain/statunitkerja', [KomplainController::class, 'statUnitkerja'])->name('statunitkerja');
+
+Route::get('trackingid/{id}', [PersuratanController::class, 'viewTrackingbyid']);
+Route::get('ttdsurat/{id}', [PersuratanController::class, 'TtdSurat']);
 
 Route::group([], function () {
-	Route::get('dashbord', [FrontpageController::class, 'index']);
+	/////////////////E-COMPLAIN////////////////////////
+	Route::get('datakeluhan', [KomplainController::class, 'viewLapKomplain']);
+	Route::get('wbs', [KomplainController::class, 'viewWistleBlowSystem']);
+	Route::post('komplain/savekomplain', [KomplainController::class, 'saveKomplain'])->name('savekomplain');
+	Route::post('komplain/savetanggapan', [KomplainController::class, 'saveTanggapan'])->name('savetanggapan');
+	Route::post('komplain/saverating', [KomplainController::class, 'saveRating'])->name('saverating');
+	Route::get('komplain/getkomplainpribadi', [KomplainController::class, 'getKomplainpribadi'])->name('getkomplainpribadi');
+	Route::post('komplain/getdatakeluhan', [KomplainController::class, 'getdataKeluhan'])->name('getdatakeluhan');
+	Route::get('komplain/statjrating', [KomplainController::class, 'statjRating'])->name('statjrating');
+	Route::get('komplain/statunitkerja', [KomplainController::class, 'statUnitkerja'])->name('statunitkerja');
 	
+	Route::get('dashbord', [FrontpageController::class, 'index']);
 	Route::post('surat/chatgetlist', [FrontpageController::class, 'chatGetlist'])->name('chatGetlist');
 	Route::post('surat/catting', [FrontpageController::class, 'cattingSurat'])->name('cattingSurat');
-	
+	Route::get('laporankegiatan/{id}', [FrontpageController::class, 'viewProposal']);
+	Route::post('kalender/tabelbulan', [FrontpageController::class, 'viewTabelBulan'])->name('viewTabelBulan');
+	Route::get('viewalldata', [FrontpageController::class, 'viewBiodataSiswa']);
+
+	Route::get('persuratan', [PersuratanController::class, 'viewIndex']);
+	Route::get('mailbox', [PersuratanController::class, 'viewMailbox']);
+	Route::post('jsondatasurat', [PersuratanController::class, 'jsonDataSurat'])->name('jsonDataSurat');
+	Route::post('surat/expersuratanfunc', [PersuratanController::class, 'exPersuratanFunc'])->name('exPersuratanFunc');
+
 	Route::get('zis', [AdminController::class, 'zis'])->name('zis');
 	Route::get('jrekapthnini', [AdminController::class, 'jrekapthnini']);
 	Route::get('lapamil', [AdminController::class, 'viewAmilZIS']);
@@ -80,8 +102,11 @@ Route::group([], function () {
 	Route::get('presensifinger', [AdminController::class, 'viewPresensiFinger']);
 	Route::get('profilpegawai/{id}', [AdminController::class, 'viewProfilPegawai']);
 
+	Route::get('rekappresensi', [AdminController::class, 'viewPresensiRekapSantri']);
+
 	Route::post('admin/datainduk', [AdminController::class, 'exDatainduk'])->name('exDatainduk');
 	Route::post('admin/upddatainduk', [AdminController::class, 'exupdDatainduk'])->name('exupdDatainduk');
+	Route::post('excutor/upddatapelengkappsb', [AdminController::class, 'exupdDataPSB'])->name('exupdDataPSB');
 	Route::post('excutor/simpanmutasi', [AdminController::class, 'exSimpanmutasi'])->name('exSimpanmutasi');
 	Route::get('json/datainduk', [AdminController::class, 'jsonDatainduk'])->name('jsonDatainduk');
 	Route::post('json/caridatainduk', [AdminController::class, 'jsonCariDatainduk'])->name('jsonCariDatainduk');
@@ -116,6 +141,8 @@ Route::group([], function () {
 	Route::post('admin/manualbyr', [AdminController::class, 'exManualbyr'])->name('exManualbyr');
 	Route::post('admin/editorbyr', [AdminController::class, 'exEditorbyr'])->name('exEditorbyr');
 	Route::get('json/databayar', [AdminController::class, 'jsonDatabayar'])->name('jsonDatabayar');
+	Route::get('json/datatagmanual', [AdminController::class, 'jsonTagihanManual'])->name('jsonTagihanManual');
+
 	Route::post('admin/verifiedpembayaran', [AdminController::class, 'exvVerifiedpembayaran'])->name('exvVerifiedpembayaran');
 	
 	Route::get('laptabungan', [AdminController::class, 'viewLaptabungan']);
@@ -152,7 +179,7 @@ Route::group([], function () {
 	Route::get('minimi', [AdminController::class, 'viewMinimi']);
 	Route::post('admin/exsavebuku', [AdminController::class, 'exSavebuku'])->name('exSavebuku');
 	Route::post('admin/expeminjaman', [AdminController::class, 'exPeminjaman'])->name('exPeminjaman');
-	Route::get('json/jsonbuku', [AdminController::class, 'jsonBuku'])->name('jsonBuku');
+	Route::post('json/jsonbuku', [AdminController::class, 'jsonBuku'])->name('jsonBuku');
 	Route::post('json/jsonbukucari', [AdminController::class, 'jsonBukucari'])->name('jsonBukucari');
 	Route::post('json/jsonpeminjamanbuku', [AdminController::class, 'jsonPeminjaman'])->name('jsonPeminjaman');
 	Route::post('admin/destroyer', [AdminController::class, 'exDestroyer'])->name('exDestroyer');
@@ -205,7 +232,6 @@ Route::group([], function () {
 	Route::post('excutor/simpantransaksi', [AdminController::class, 'simpanTransaksi'])->name('simpanTransaksi');
 	Route::post('excutor/exvalidasikwitansi', [AdminController::class, 'exValidasiKwitansi'])->name('exValidasiKwitansi');
 	
-
 	Route::get('lapekskul', [GuruController::class, 'viewLapekskul']);
 	Route::get('penilaianekskul', [GuruController::class, 'viewNilekskul']);
 	Route::post('json/rincianekskul', [GuruController::class, 'jsonRincianekskul'])->name('jsonRincianekskul');
@@ -213,30 +239,27 @@ Route::group([], function () {
 	
 	Route::get('lapabsen', [GuruController::class, 'viewLapabsen']);
 	Route::get('json/presensiadmin', [GuruController::class, 'jsonPresensi'])->name('jsonPresensi');
-	/*
-	Route::get('settema', [GuruController::class, 'viewSettema']);
-	Route::post('json/jsontema', [GuruController::class, 'jsonTema'])->name('jsonTema');
-	Route::post('guru/simpandatatema', [GuruController::class, 'exSimpandatatema'])->name('exSimpandatatema');
-	Route::post('guru/ubahdatatema', [GuruController::class, 'exUbahdatatema'])->name('exUbahdatatema');
-	*/
-	Route::get('setkkm', [GuruController::class, 'viewSetkkm']);
-	Route::post('json/datakkm', [GuruController::class, 'jsonDatakkm'])->name('jsonDatakkm');
-	Route::post('guru/exdatakkm', [GuruController::class, 'exDatakkm'])->name('exDatakkm');
 	
 	Route::get('setrps', [GuruController::class, 'viewRencanaPembelajaran']);
 	Route::post('json/jsdatarps', [GuruController::class, 'jsonDataRPS'])->name('jsonDataRPS');
-	
-	Route::get('kodekd', [GuruController::class, 'viewKodekd']);
+	Route::post('json/datakkm', [GuruController::class, 'jsonDatakkm'])->name('jsonDatakkm');
+	Route::post('guru/exdatakkm', [GuruController::class, 'exDatakkm'])->name('exDatakkm');
 	Route::post('json/jsdatakd', [GuruController::class, 'jsonDatakd'])->name('jsonDatakd');
 	Route::post('guru/exdatakodekd', [GuruController::class, 'exDatakodekd'])->name('exDatakodekd');
 	Route::post('guru/exjadwalrps', [GuruController::class, 'exJadwalRPS'])->name('exJadwalRPS');
 	Route::post('json/jsjadwalrps', [GuruController::class, 'jsonJadwalRPS'])->name('jsonJadwalRPS');
 	Route::post('json/jssettingnilai', [GuruController::class, 'jsonDataSettingNilai'])->name('jsonDataSettingNilai');
 
+	
 	Route::get('lognilai', [GuruController::class, 'viewLognilai'])->name('lognilai');
 	Route::get('kelas/{id}', [GuruController::class, 'viewGradeperkelas']);
+	Route::get('tahap/{id}', [GuruController::class, 'viewGradeperTahap']);
+	Route::get('ujianlisan/{id}', [GuruController::class, 'viewUjianLisanperkelas']);
 	Route::get('prestasialquran', [GuruController::class, 'viewNgajiDashboard']);
 	Route::get('tahfidz/{id}', [GuruController::class, 'viewNgaji']);
+	Route::post('json/datarpa', [GuruController::class, 'jsonDataRPA'])->name('jsonDataRPA');
+	Route::post('guru/exdatarpa', [GuruController::class, 'exDataRPA'])->name('exDataRPA');
+	Route::post('guru/exinputnilaiujianalquran', [GuruController::class, 'exInputnilaiUA'])->name('exInputnilaiUA');
 
 	Route::get('raportguru', [GuruController::class, 'viewRaportGuru']);
 	
@@ -252,9 +275,7 @@ Route::group([], function () {
 	Route::post('guru/exverpresensi', [GuruController::class, 'exVerpresensi'])->name('exVerpresensi');
 	Route::post('guru/saveabsenall', [GuruController::class, 'exSaveabsenall'])->name('exSaveabsenall');
 	Route::post('guru/saveditnilai', [GuruController::class, 'exSaveditnilai'])->name('exSaveditnilai');
-	Route::post('guru/exmultinaikkls', [GuruController::class, 'exMultinaikkls'])->name('exMultinaikkls');
 	Route::post('guru/savesetguru', [GuruController::class, 'exSavesetguru'])->name('exSavesetguru');
-	Route::post('guru/savenaikkelas', [GuruController::class, 'exSavenaikkelas'])->name('exSavenaikkelas');
 	Route::post('json/datakurikulumkelas', [GuruController::class, 'jsonDatakurikulumkelas'])->name('jsonDatakurikulumkelas');
 	Route::post('json/jsonformatupload', [GuruController::class, 'jsonFormatupload'])->name('jsonFormatupload');
 	Route::post('cetak/biodatarapot', [GuruController::class, 'ctkBiodatarapot'])->name('ctkBiodatarapot');
@@ -274,6 +295,15 @@ Route::group([], function () {
 	Route::get('jrekapkonselingthnini', [GuruController::class, 'jsonKonselingthnini']);	
 	Route::post('guru/exsimpankonseling', [GuruController::class, 'exSimpankonseling'])->name('exSimpankonseling');
 	Route::post('guru/jalldatakonseling', [GuruController::class, 'jsonAlldatakonseling'])->name('jsonAlldatakonseling');
+	
+	Route::get('rencanakegiatan', [GuruController::class, 'viewRencanaKegiatan']);
+	Route::post('guru/jalldatarencanakegiatan', [GuruController::class, 'jsonRencanaKegiatan'])->name('jsonRencanaKegiatan');
+	Route::post('guru/exsimpanrenkegiatan', [GuruController::class, 'exSimpanRK'])->name('exSimpanRK');
+
+	Route::get('beasiswa', [GuruController::class, 'viewBeasiswa']);
+	Route::post('guru/jalldatabeasiswa', [GuruController::class, 'jsonBeasiswa'])->name('jsonBeasiswa');
+	Route::post('guru/exsimpanbeasiswa', [GuruController::class, 'exSimpanBeasiswa'])->name('exSimpanBeasiswa');
+
 	Route::get('banksoal', [BankSoalController::class, 'viewIndex']);
 	Route::get('test', [BankSoalController::class, 'viewPortalUjian'])->name('viewPortalUjian');
 	Route::get('ujiancbt',[BankSoalController::class, 'viewUjianKompetensi'])->name('viewUjianKompetensi');
@@ -299,7 +329,8 @@ Route::group([], function () {
 	Route::post('jsonallinterviewer', [BankSoalController::class, 'jsonallInterviewer'])->name('jsonallinterviewer');
     Route::post('rad-json-pesertates', [BankSoalController::class, 'jsonPesertaTest'])->name('rad-json-pesertates');
     Route::post('rad-json-datausercari', [BankSoalController::class, 'jsonUsercari'])->name('rad-json-datausercari');
-    
+
+
 	Route::get('biodata', [OrtuController::class, 'index']);
 	Route::post('json/viewdatainduk', [OrtuController::class, 'jsonViewDatainduk'])->name('jsonViewDatainduk');
 	Route::post('json/getstatdatakd', [OrtuController::class, 'jsonStatistikDatakd'])->name('jsonStatistikDatakd');
@@ -311,8 +342,8 @@ Route::group([], function () {
 	
 	Route::get('lapnilaiortu', [OrtuController::class, 'viewLapnilaiortu']);
 	Route::get('ortu/nilaisiswa', [OrtuController::class, 'jsonNilaisiswa'])->name('jsonNilaisiswa');
+	Route::post('ortu/statistiknilaisiswa', [OrtuController::class, 'jsonNStatistikilaisiswa'])->name('jsonNStatistikilaisiswa');
 	Route::post('ortu/exsimpanmhnremidi', [OrtuController::class, 'exSimpanmhnremidi'])->name('exSimpanmhnremidi');
-	
 	
 	Route::get('tagihanrutin', [OrtuController::class, 'viewTagihanrutin']);
 	Route::post('ortu/exuploadbuktibyr', [OrtuController::class, 'exUploadbuktibyr'])->name('exUploadbuktibyr');
@@ -328,21 +359,18 @@ Route::group([], function () {
 	
 	Route::get('faqihkecil', [OrtuController::class, 'viewFaqihKecil']);
 	Route::get('dashboardpaguyuban', [OrtuController::class, 'viewDataPaguyuban']);
+	Route::get('kms', [OrtuController::class, 'viewKMS']);
 
 	Route::get('useranyar', [UserController::class, 'viewUser']);
 	Route::post('exusername', [UserController::class, 'exUsername'])->name('exusername');
 	Route::post('exdaftarortu', [UserController::class, 'exDaftarortu'])->name('exDaftarortu');
-	Route::post('user/anyaridata', [UserController::class, 'exProfileupdate'])->name('exProfileupdate');
 	Route::get('getallusername', [UserController::class, 'getAllusername'])->name('getallusername');
 	
     
 	// Account Managemen
 	Route::get('usersadmin',[UserController::class, 'viewUserAdmin'])->name('viewUserAdmin');
-    Route::get('argonuseradmin',[UserController::class, 'viewUserAdminArgonThem'])->name('argonuseradmin');
     Route::get('datauserall', [UserController::class, 'dataUserAll'])->name('dataUserAll');
-	Route::get('/berkaspelamar',[UserController::class, 'viewBerkasPelamar'])->name('viewBerkasPelamar');
     Route::get('/profiluser',[UserController::class, 'viewDataInduk'])->name('viewDataInduk');
-    Route::get('/argonprofil',[UserController::class, 'viewDataIndukArgonThem'])->name('argonprofil');
     Route::post('getnotifcount', [UserController::class, 'cekNotifikasi'])->name('cekNotifikasi');
 	Route::post('exeditprofil', [UserController::class, 'exEditProfil'])->name('exEditProfil');
 	
