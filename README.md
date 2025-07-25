@@ -43,8 +43,9 @@ Aplikasi ini dirancang untuk memudahkan administrasi sekolah dalam mengelola dat
 5. Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database Anda.
 6. Pastikan untuk Email sudah di isikan username dan password dan server SMTP anda (karena default pendaftaran menggunakan email untuk aktivasi)
 7. Jalankan perintah `php artisan key:generate` untuk menghasilkan kunci aplikasi yang unik.
-8. Jalankan perintah `php artisan migrate` untuk menjalankan migrasi dan mempersiapkan basis data (jika gagal import file sql yg ada di folder database/scheme/).
-9. Akses aplikasi melalui browser Anda (Username dan Password Default : simaster@duidev.com | bismillah).
+8. import file sql yg ada di folder database/scheme/.
+9. Jalankan perintah `php artisan config:cache`.
+10. Akses aplikasi melalui browser Anda (Username dan Password Default : simaster@duidev.com | bismillah).
 
 ### Instalasi Local Webserver (XAMPP / Linux dengan Apache/Nginx)
 
@@ -57,7 +58,8 @@ Pastikan Anda telah menginstal XAMPP atau konfigurasi server web yang sesuai di 
 5. Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database Anda.
 6. Pastikan untuk Email sudah di isikan username dan password dan server SMTP anda (karena default pendaftaran menggunakan email untuk aktivasi)
 7. Jalankan perintah `php artisan key:generate` untuk menghasilkan kunci aplikasi yang unik.
-8. Jalankan perintah `php artisan migrate` untuk menjalankan migrasi dan mempersiapkan basis data (jika gagal import file sql yg ada di folder database/scheme/).
+8. import file sql yg ada di folder database/scheme/.
+9. Jalankan perintah `php artisan config:cache`.
 9. Buka web browser Anda dan arahkan ke alamat URL tempat aplikasi telah diinstal (Username dan Password Default : simaster@duidev.com | bismillah).
 
 ## Kontribusi
