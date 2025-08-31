@@ -1,0 +1,82 @@
+# =========================================
+# macOS
+# =========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# =========================================
+# Node.js / NPM / Yarn / Bun
+# =========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+.pnpm-lock.yaml
+
+# =========================================
+# Laravel / PHP
+# =========================================
+/vendor/
+/bootstrap/cache/
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+.env
+
+# =========================================
+# Flutter / Dart
+# =========================================
+/build/
+/. dart_tool/
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/.packages
+.pub-cache/
+/pubspec.lock
+android/.gradle/
+android/.idea/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+macos/Flutter/ephemeral/
+*.lock
+
+# =========================================
+# Python
+# =========================================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+.venv/
+env/
+venv/
+ENV/
+
+# =========================================
+# General IDE / Editor
+# =========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# =========================================
+# Others
+# =========================================
+*.log
+*.tmp
+*.cache

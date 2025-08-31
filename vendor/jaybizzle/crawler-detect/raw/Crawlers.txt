@@ -38,6 +38,7 @@
 ^pnpm\/
 ^RMA\/
 ^Ruby|Ruby\/[0-9]
+^symbolicator\/
 ^Swurl 
 ^TLS tester 
 ^twine\/
@@ -148,6 +149,7 @@ Bad-Neighborhood
 Badass
 baidu\.com
 Bandit
+Barracuda Sentinel \(EE\)
 basicstate
 BatchFTP
 Battleztar Bazinga
@@ -201,6 +203,7 @@ Burf Search
 Butterfly\/
 BuzzSumo
 CAAM\/[0-9]
+caam dot crwlr at gmail dot com
 CakePHP
 Calculon
 Canary%20Mail
@@ -510,7 +513,6 @@ Hardenize
 Hatena
 Havij
 HaxerMen
-HeadlessChrome
 HEADMasterSEO
 HeartRails_Capture
 help@dataminr\.com
@@ -649,6 +651,7 @@ Kml-Google
 knows\.is
 KOCMOHABT
 kouio
+krawler\.dk
 kube-probe
 kubectl
 kulturarw3
@@ -694,6 +697,7 @@ LongURL API
 longurl-r-package
 looid\.com
 looksystems\.net
+lscache_runner
 ltx71
 lua-resty-http
 Lucee \(CFML Engine\)
@@ -706,6 +710,7 @@ LYT\.SR
 L\.webis
 mabontland
 MacOutlook\/
+MagentaNews\/
 Mag-Net
 MagpieRSS
 Mail::STS
@@ -722,6 +727,7 @@ Mass Downloader
 masscan\/
 Mata Hari
 mattermost
+MatchorySearch\/
 Mediametric
 Mediapartners-Google
 mediawords
@@ -760,6 +766,7 @@ monitis
 Monitority\/
 Monit\/
 montastic
+MonSpark
 MonTools
 Moreover
 Morfeus Fucking Scanner
@@ -999,6 +1006,7 @@ ROI Hunter
 RPT-HTTPClient
 RSSMix\/
 RSSOwl
+RuxitSynthetic
 RyowlEngine
 safe-agent-scanner
 SalesIntelligent
@@ -1392,6 +1400,7 @@ YP\.PL
 Zabbix
 Zade
 Zao
+Zapier
 Zauba
 Zemanta Aggregator
 Zend\\Http\\Client
@@ -1405,4 +1414,4 @@ Zombie\.js
 Zoom\.Mac
 ZoteroTranslationServer
 ZyBorg
-[a-z0-9\-_]*(bot|crawl|archiver|transcoder|spider|uptime|validator|fetcher|cron|checker|reader|extractor|monitoring|analyzer|scraper)
+[a-z0-9\-_]*(bot|crawl|headless|archiver|transcoder|spider|uptime|validator|fetcher|cron|checker|reader|extractor|monitoring|analyzer|scraper)

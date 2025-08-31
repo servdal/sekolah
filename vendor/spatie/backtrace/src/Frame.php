@@ -13,6 +13,9 @@ class Frame
     /** @var string */
     public $file;
 
+    /** @var string|null */
+    public $trimmedFilePath;
+
     /** @var int */
     public $lineNumber;
 
@@ -28,6 +31,9 @@ class Frame
     /** @var string|null */
     public $class;
 
+    /** @var object|null */
+    public $object;
+
     /** @var string|null */
     protected $textSnippet;
 
@@ -35,12 +41,16 @@ class Frame
         string $file,
         int $lineNumber,
         ?array $arguments,
-        string $method = null,
-        string $class = null,
+        ?string $method = null,
+        ?string $class = null,
+        ?object $object = null,
         bool $isApplicationFrame = false,
-        ?string $textSnippet = null
+        ?string $textSnippet = null,
+        ?string $trimmedFilePath = null
     ) {
         $this->file = $file;
+
+        $this->trimmedFilePath = $trimmedFilePath;
 
         $this->lineNumber = $lineNumber;
 
@@ -49,6 +59,8 @@ class Frame
         $this->method = $method;
 
         $this->class = $class;
+
+        $this->object = $object;
 
         $this->applicationFrame = $isApplicationFrame;
 
@@ -85,11 +97,11 @@ class Frame
 
     protected function getCodeSnippetProvider(): SnippetProvider
     {
-        if($this->textSnippet) {
+        if ($this->textSnippet) {
             return new LaravelSerializableClosureSnippetProvider($this->textSnippet);
         }
 
-        if(file_exists($this->file)) {
+        if (@file_exists($this->file)) {
             return new FileSnippetProvider($this->file);
         }
 

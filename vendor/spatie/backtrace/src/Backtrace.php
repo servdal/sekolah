@@ -23,6 +23,9 @@ class Backtrace
     /** @var bool */
     protected $withObject = false;
 
+    /** @var bool */
+    protected $trimFilePaths = false;
+
     /** @var string|null */
     protected $applicationPath;
 
@@ -77,9 +80,9 @@ class Backtrace
         return $this;
     }
 
-    public function withObject(): self
+    public function withObject(bool $withObject = true): self
     {
-        $this->withObject = true;
+        $this->withObject = $withObject;
 
         return $this;
     }
@@ -87,6 +90,13 @@ class Backtrace
     public function applicationPath(string $applicationPath): self
     {
         $this->applicationPath = rtrim($applicationPath, '/');
+
+        return $this;
+    }
+
+    public function trimFilePaths(): self
+    {
+        $this->trimFilePaths = true;
 
         return $this;
     }
@@ -139,13 +149,16 @@ class Backtrace
             return $this->throwable->getTrace();
         }
 
-        $options = null;
+        // Omit arguments and object
+        $options = DEBUG_BACKTRACE_IGNORE_ARGS;
 
-        if (! $this->withArguments) {
-            $options = $options | DEBUG_BACKTRACE_IGNORE_ARGS;
+        // Populate arguments
+        if ($this->withArguments) {
+            $options = 0;
         }
 
-        if ($this->withObject()) {
+        // Populate object
+        if ($this->withObject) {
             $options = $options | DEBUG_BACKTRACE_PROVIDE_OBJECT;
         }
 
@@ -183,14 +196,19 @@ class Backtrace
                 $currentLine -= 1;
             }
 
+            if ($this->trimFilePaths && $this->applicationPath) {
+                $trimmedFilePath = str_replace($this->applicationPath, '', $currentFile);
+            }
             $frame = new Frame(
                 $currentFile,
                 $currentLine,
                 $arguments,
                 $rawFrame['function'] ?? null,
                 $rawFrame['class'] ?? null,
+                $rawFrame['object'] ?? null,
                 $this->isApplicationFrame($currentFile),
-                $textSnippet
+                $textSnippet,
+                $trimmedFilePath ?? null,
             );
 
             $frames[] = $frame;
@@ -215,7 +233,10 @@ class Backtrace
             $currentFile,
             $currentLine,
             [],
-            '[top]'
+            '[top]',
+            null,
+            null,
+            $this->isApplicationFrame($currentFile),
         );
 
         $frames = $this->removeBacktracePackageFrames($frames);
@@ -237,6 +258,11 @@ class Backtrace
         }
 
         if (strpos($relativeFile, DIRECTORY_SEPARATOR.'vendor') === 0) {
+            return false;
+        }
+
+        // Edge case for vendor files that typically live in the app code (e.g. Laravel's `artisan` or Statamic's `please`)
+        if (preg_match('/\/(artisan|please)$/', $relativeFile)) {
             return false;
         }
 
