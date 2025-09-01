@@ -23,11 +23,8 @@ yarn.lock
 # Laravel / PHP
 # =========================================
 /vendor/
-/public/adminlte3/
 /public/storage
 /public/hot
-/public/fonts
-/public/plugins
 
 
 /bootstrap/cache/
