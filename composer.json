@@ -15,7 +15,6 @@
         "laravel/passport": "^10.4",
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
-        "laravelcollective/html": "^6.3",
         "munafio/chatify": "^1.5",
         "onecentlin/laravel-adminer": "^6.0",
         "phpoffice/phpspreadsheet": "^1.22",
@@ -25,6 +24,7 @@
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/browsershot": "^3.57",
         "spatie/laravel-backup": "^8.2",
+        "spatie/laravel-html": "^3.5",
         "vedmant/laravel-feed-reader": "^1.5",
         "xendit/xendit-php": "^2.18"
     },
