@@ -9,7 +9,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes">
 		<meta name="csrf-token" content="{{ csrf_token() }}">
         <!-- App favicon -->
-        <link rel="shortcut icon" href="{{ asset('logo.png') }}">
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon" href="favicon.png">
         <!-- App css -->
         @include('adminlte3.css')
     </head>

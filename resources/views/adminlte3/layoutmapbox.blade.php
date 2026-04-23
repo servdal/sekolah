@@ -17,8 +17,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=yes">
 		<meta name="csrf-token" content="{{ csrf_token() }}">
         <!-- App favicon -->
-        <link rel="icon" href="@if (isset($logo01)){{ url('').'/'.$logo01 }}@else{{ asset('duidev-softwarehouse.png') }}@endif">
-        <link rel="apple-touch-icon" href="@if (isset($logo01)){{ url('').'/'.$logo01 }}@else{{ asset('duidev-softwarehouse.png') }}@endif">
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon" href="favicon.png">
         <!-- App css -->
         @include('adminlte3.cssmap')
     </head>

@@ -40,22 +40,6 @@
 									</div>
 								</div>
 							@endforeach
-                                <div class="duidevproduct 100" onClick="selectasvalue('100')">
-									<div class="duidevproduct_image">
-                                        <img src="{{ asset('website.png') }}" /> 
-									</div>
-									<div class="duidevproduct_title title-white">
-										<p>Website</p>
-									</div>
-								</div>
-                                <div class="duidevproduct 101" onClick="selectasvalue('101')">
-									<div class="duidevproduct_image">
-										<img src="{{ asset('webmile.png') }}" /> 
-									</div>
-									<div class="duidevproduct_title title-white">
-										<p>Web Mail</p>
-									</div>
-								</div>
 						</div>
                     </div>
                 </div>
@@ -67,29 +51,21 @@
     <div class="tabel_cetak"></div>		
 </div>
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
-<input type="hidden" name="firebaseid" id="firebaseid" value="{{$firebaseid}}">
+<input type="hidden" name="firebaseid" id="firebaseid" value="{{$firebaseid ?? ''}}">
 @endsection
 @push('script')
 <script>
 	function selectasvalue(id){
-        if (id == '100'){
-            var url = 'https://web.sdtqdu.sch.id';
-            window.location.href = url;
-        } else if (id == '101'){
-            var url = 'https://grace.jagoanhosting.com:2096/cpsess0268424889/3rdparty/roundcube/';
+        var firebaseid = document.getElementById('firebaseid').value;
+        if (firebaseid == '' || firebaseid == null){
+            var url = '{{url('/')}}/frontpage?id='+id;
             window.location.href = url;
         } else {
-            var firebaseid = document.getElementById('firebaseid').value;
-            if (firebaseid == '' || firebaseid == null){
-                var url = '{{url('/')}}/frontpage?id='+id;
-                window.location.href = url;
-            } else {
-                var token=document.getElementById('token').value;
-                $.post('{{ route("exbukutamu") }}', { val01: firebaseid, val02: 'pengecekanfirebase', val03: id, _token: token },
-                function(data){
-                    window.location.href = data;
-                });
-            }
+            var token=document.getElementById('token').value;
+            $.post('{{ route("exbukutamu") }}', { val01: firebaseid, val02: 'pengecekanfirebase', val03: id, _token: token },
+            function(data){
+                window.location.href = data;
+            });
         }
     }
 </script>

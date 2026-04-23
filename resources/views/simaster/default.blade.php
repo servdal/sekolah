@@ -27,52 +27,6 @@
                             <div class="tab-content" id="divawal">
                                 <div class="active tab-pane" id="depan">
                                     <div class="row">
-                                        @if ($id_sekolah == 1)
-                                        @php 
-                                            $frontpage = 'frontpagesdtq.jpg';
-                                        @endphp
-                                        <div class="col-md-4">
-                                            <div class="card-body box-profile">
-                                                <div class="text-center">
-                                                    <a href="ppdb?id=1"><img src="ppdbsdtq.jpg" alt="User profile picture" width="100%" height="60"></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="card-body box-profile">
-                                                <div class="text-center">
-                                                    <a href="frontpage?id=2"><img src="header-matabanew.jpg" alt="User profile picture" width="100%"  height="60"></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @else 
-                                        @php 
-                                            $frontpage = 'frontpagemataba.jpg';
-                                        @endphp
-                                        <div class="col-md-4">
-                                            <div class="card-body box-profile">
-                                                <div class="text-center">
-                                                    <a href="ppdb?id=2"><img src="ppdb-matabanew.jpg" alt="User profile picture" width="100%" height="60"></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="card-body box-profile">
-                                                <div class="text-center">
-                                                    <a href="frontpage?id=1"><img src="headersdtq.jpg" alt="User profile picture" width="100%"  height="60"></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @endif
-                                        <div class="col-md-4">
-                                            <div class="card-body box-profile">
-                                                <div class="text-center">
-                                                    <a href="https://grace.jagoanhosting.com:2096/cpsess0268424889/3rdparty/roundcube/"><img src="webmailnew.jpg" alt="User profile picture" width="100%"  height="60"></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
                                         <div class="col-md-12">
                                             <div class="timeline">
                                                 @if(isset($pengumumans) && !empty($pengumumans))
@@ -222,11 +176,7 @@
                                     <div class="card card-widget widget-user-2">
                                         <div class="widget-user-header">
                                             <div class="widget-user-image">
-                                                @if ($id_sekolah == 1)
-                                                <img class="img-circle elevation-2" src="logo/1715426344logo.png" alt="User Avatar">
-                                                @else
-                                                <img class="img-circle elevation-2" src="logo/1715426234logo.png" alt="User Avatar">
-                                                @endif
+                                                <img class="img-circle elevation-2" src="{{ url('/').'/'.$logo}}" alt="User Avatar">
                                             </div>
                                             <h3 class="widget-user-username">Silahkan Bapak/Ibu Mengisi Buku Tamu</h3>
                                             <h5 class="widget-user-desc">{{ $nama_sekolah }}</h5>
@@ -378,12 +328,8 @@
                             <strong><i class="fa fa-envelope mr-1"></i> Email</strong>
                             <p class="text-muted">{!! $email !!}</p>
                             <hr>
-                            <strong><i class="fa fa-android mr-1"></i> Android APK</strong>
-                            <p class="text-muted"><a href="https://play.google.com/store/apps/details?id=com.duidev.pds">Download</a></p>
                         </div>
-                        <div class="card-body">
-                            <div id="qrcode"></div>
-                        </div>
+                        
                     </div>
                     <div class="card card-danger card-outline bukutamu">
                         <div class="card-body box-profile">
