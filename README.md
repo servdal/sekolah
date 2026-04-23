@@ -1,4 +1,4 @@
-<p align="center"><a href="https://duidev.com" target="_blank"><img src="https://github.com/servdal/sdtq/blob/master/public/header.png" width="400"></a></p>
+<p align="center"><a href="https://duidev.com" target="_blank"><img src="https://github.com/servdal/sekolah/blob/master/public/header.png" width="400"></a></p>
 
 <p align="center">
 <a href="https://amil.sdimohammadhatta.sch.id"><img src="https://simbian.duidev.com/logo/1602884372logo.png" width="35" alt="SDI Mohammad Hatta Malang"></a>
