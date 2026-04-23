@@ -365,8 +365,8 @@ Route::group([], function () {
 	Route::get('/backup/database', [BackupController::class, 'backupDatabase'])->name('backup.database');
 	Route::post('/admin/git-pull', [BackupController::class, 'gitPullMain'])->name('backup.pull');
 
-	Route::get('buatqr', [PostController::class, 'viewBuatqr']);
-	Route::post('excreateqrcode', [PostController::class, 'exCreateqrcode'])->name('exCreateQR');
+	Route::get('buatqr', [GuruController::class, 'viewBuatqr']);
+	Route::post('excreateqrcode', [GuruController::class, 'exCreateqrcode'])->name('exCreateQR');
 
 	Route::get('/ujian', [BankSoalController::class,'viewUjian'])->name('exam.index');
 	Route::get('/ujian/create', [BankSoalController::class,'createUjian'])->name('exam.create');

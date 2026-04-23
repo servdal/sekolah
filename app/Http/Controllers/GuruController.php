@@ -46,6 +46,9 @@ use App\Beasiswa;
 use Validator;
 use Session;
 use DateTime;
+use QrCode;
+use App\QrCodeDatabase;
+use App\Models\ShortLink;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
@@ -13332,5 +13335,89 @@ class GuruController extends Controller
 				}
 			}
 		}
+	}
+	public function viewBuatqr() {
+		$data				= [];
+		$x					= 0;
+		$getallqrcode		= QrCodeDatabase::where('inputor', Session('id'))->orderBy('id', 'DESC')->limit(30)->get();
+		if (!empty($getallqrcode)){
+			foreach($getallqrcode as $rows){
+				if ($rows->jenis == 'Email'){
+					$base64qr = base64_encode(QrCode::format('png')->size(150)->email( $rows->val01 ));
+				} else if ($rows->jenis == 'Telpon'){
+					$base64qr = base64_encode(QrCode::format('png')->size(150)->phoneNumber( $rows->val01 ));
+				} else if ($rows->jenis == 'Geolocation'){
+					$base64qr = base64_encode(QrCode::format('png')->size(150)->geo( $rows->val01, $rows->val02 ));
+				} else if ($rows->jenis == 'VCard'){
+					$getname 	= $rows->val01;
+					$cekarray	= explode(" ", $getname);
+					if (isset($cekarray[1])){
+						$lastname = $cekarray[1];
+						$surename = $cekarray[0];
+					} else {
+						$lastname = '-';
+						$surename = $getname;
+					}
+					$base64qr = base64_encode(QrCode::format('png')->size(150)->encoding('UTF-8')->generate('BEGIN:VCARD\nVERSION:3.0\nN:'.$lastname.';'.$surename.'\nFN:'.$getname.'\nEMAIL:'.$rows->val03.'\nTEL;TYPE=voice,work,pref:'.$rows->val04.'\n ADR;TYPE=intl,work,postal,parcel:;;'.$rows->val02.';Malang;;67252;Indonesia\nEND:VCARD'));
+				} else if ($rows->jenis == 'Wifi'){
+					$base64qr = base64_encode(QrCode::format('png')->size(150)->wiFi([
+						'ssid' 			=> $rows->val01,
+						'encryption' 	=> 'WPA/WEP',
+						'password' 		=> $rows->val02
+					]));
+				} else {
+					$base64qr = base64_encode(QrCode::format('png')->size(150)->generate( $rows->val01 ));
+				}
+				$data['pengumumans'][$x]['id']          =   $rows->id;
+                $data['pengumumans'][$x]['jenis']     	=   $rows->jenis;
+                $data['pengumumans'][$x]['created_at']  =   $rows->created_at;
+                $data['pengumumans'][$x]['val01']    	=   $rows->val01;
+                $data['pengumumans'][$x]['val02']       =   $rows->val02;
+                $data['pengumumans'][$x]['val03']       =   $rows->val03;
+                $data['pengumumans'][$x]['val04']  		=   $rows->val04;
+                $data['pengumumans'][$x]['base64qrcode']=   $base64qr;
+                $x++;
+			}
+		}
+		$data['sidebar']	= 'buatqr';
+    	return view('buatqr', $data);
+    }
+	public function exCreateqrcode(Request $request) {
+		$jenis		= $request->val05;
+		$boleh 		= 'YA';
+		$pesanerror = '';
+		if ($jenis == 'Shortlink'){
+			$cekdulu = ShortLink::where('slug', Str::slug($request->val01))->first();
+			if (isset($cekdulu->id)){
+				$boleh = 'TIDAK';
+				$pesanerror = 'Nama Pendek '.Str::slug($request->val01).' Sudah digunakan untuk link '.$cekdulu->destination_url;
+			} else {
+				ShortLink::create([
+					'slug' => Str::slug($request->val01),
+					'destination_url' => $request->val02
+				]);
+			}
+		}
+		if ($boleh == 'YA'){
+			$input = QrCodeDatabase::create([
+				'inputor'	=> Session('id'),
+				'jenis'		=> $request->input('val05'),
+				'val01'		=> $request->input('val01'),
+				'val02'		=> $request->input('val02'),
+				'val03'		=> $request->input('val03'),
+				'val04'		=> $request->input('val04')
+			]);
+			if ($input){
+				return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Sistem Will Generate '.$request->input('val05').' For 5 Second, Please Wait']);
+				return back();
+			} else {
+				return response()->json(['status' => 'Error', 'message' => 'Sistem Error, Pastikan Semua isian Telah di isi']);
+				return back();
+			}
+		} else {
+			return response()->json(['status' => 'Error', 'message' => $pesanerror]);
+			return back();
+		}
+		
 	}
 }

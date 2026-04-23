@@ -2360,11 +2360,7 @@ class AdminController extends Controller
 						if ($foto == '' OR is_null($foto)){
 							$foto = url("/").'/'.Session('sekolah_logo');
 						} else {
-							if (Storage::disk('local')->exists('/dist/img/foto/' . $foto)) {
-								$foto = url("/").'/dist/img/foto/'.$foto;
-							} else {
-								$foto = url("/").'/'.Session('sekolah_logo');
-							}
+							$foto = url("/").'/dist/img/foto/'.$foto;
 						}
 						$arrsiswa[] = array(
 							'id' 			=> $hasil->id,	
@@ -2659,11 +2655,7 @@ class AdminController extends Controller
 				if ($foto == '' OR is_null($foto)){
 					$lampiran = url("/").'/'.Session('sekolah_logo');
 				} else {
-					if (Storage::disk('local')->exists('/dist/img/foto/' . $foto)) {
-						$lampiran = url("/").'/dist/img/foto/'.$foto;
-					} else {
-						$lampiran = url("/").'/'.Session('sekolah_logo');
-					}
+					$foto = $this->getFotoUrl($foto);
 				}
 				$getdatakeu = Setkuangan::where('noinduk', $noinduk)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
 				if ($getdatakeu !== null) {
