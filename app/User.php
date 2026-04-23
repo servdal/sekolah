@@ -1,51 +1,37 @@
 <?php
 
 namespace App;
-use Laravel\Passport\HasApiTokens;
 
-use Illuminate\Notifications\Notifiable;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class User extends Authenticatable
 {
-    use Notifiable, HasApiTokens;
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
-        'nama',
-        'username',
-        'password',
-        'previlage',
-        'remember_token',
-        'api_token',
-        'fakultas',
-        'fakpanjang',
-        'merangkap',
-        'nip',
-        'golongan',
+        'name',
         'email',
-        'spesial',
-        'tandatangan',
-        'paraf',
-        'firebaseid',
-        'photo',
+        'password',
+        'role_id',
+        'asatidz_id',
+        'akses_modul',
+        'previlage',
         'klsajar',
         'smt',
         'tapel',
-        'nik',
         'semester',
-        'status',
         'id_sekolah',
-        'created_by',
-        'updated_by',
-        'active_status',
-        'avatar',
-        'dark_mode',
-        'messenger_color',
     ];
     public function notifications()
     {
@@ -65,6 +51,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\StudentAnswer::class, 'student_id');
     }
+
     /**
      * The attributes that should be hidden for arrays.
      *

@@ -32,7 +32,7 @@
                 </ul>
                 <ul class="navbar-nav ml-auto">
                     @php
-                        if (Session('previlage') !== null){
+                        if (auth()->user() !== null) {
                             $unreadCount = auth()->user()->notifications()->count();
                         } else {
                             $unreadCount = 0;
@@ -69,7 +69,7 @@
                             <div class="isi-notifications"></div>
                         </div>
                     </li>
-                    @if (Session('previlage') !== null)
+                    @if (auth()->user() !== null)
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url('mailbox') }}" role="button"><i class="fa fa-file-archive-o"></i></a>
                         </li>

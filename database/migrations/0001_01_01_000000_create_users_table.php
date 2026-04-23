@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('role_id')->default(1);
             $table->integer('masjidid')->default(0);
             $table->integer('id_sekolah')->default(0);
+            $table->integer('status')->default(1);
             $table->string('nip', 50)->nullable();
             $table->string('nik', 50)->nullable();
             $table->timestamp('email_verified_at')->nullable();

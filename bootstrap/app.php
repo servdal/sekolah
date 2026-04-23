@@ -16,7 +16,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         ]);
         $middleware->alias([
-            'check.module' => \App\Http\Middleware\CheckModuleAccess::class,
             'core.api_key' => \Core\Http\Middleware\EnsureCoreApiKey::class,
         ]);
     })

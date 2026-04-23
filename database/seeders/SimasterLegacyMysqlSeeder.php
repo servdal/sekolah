@@ -24,6 +24,7 @@ class SimasterLegacyMysqlSeeder extends Seeder
         'db_komponennilai.json' => 'db_komponennilai',
         'db_layanan.json' => 'db_layanan',
         'db_mstsekolah.json' => 'db_mstsekolah',
+        'users.json' => 'users',
     ];
 
     public function run(): void
