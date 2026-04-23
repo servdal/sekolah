@@ -30,7 +30,6 @@ return [
     */
 
     'connections' => [
-
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
@@ -42,7 +41,6 @@ return [
             'synchronous' => null,
             'transaction_mode' => 'DEFERRED',
         ],
-
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
@@ -81,31 +79,6 @@ return [
                 (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-        'simadu' => [
-            'driver'        => 'mysql',
-            'host'          => env('DB_HOST_SQLSIMADU'),
-            'port'          => env('DB_PORT_SQLSIMADU'),
-            'database'      => env('DB_DATABASE_SQLSIMADU'),
-            'username'      => env('DB_USERNAME_SQLSIMADU'),
-            'password'      => env('DB_PASSWORD_SQLSIMADU'),
-        ],
-        'smartsea' => [
-            'driver'        => 'mysql',
-            'host'          => env('DB_HOST_SQLSMARTSEA'),
-            'port'          => env('DB_PORT_SQLSMARTSEA'),
-            'database'      => env('DB_DATABASE_SQLSMARTSEA'),
-            'username'      => env('DB_USERNAME_SQLSMARTSEA'),
-            'password'      => env('DB_PASSWORD_SQLSMARTSEA'),
-        ],
-        'wakepen' => [
-            'driver'        => 'mysql',
-            'host'	        => env('DB_HOST_SQLWAKEPEN'),
-            'port'          => env('DB_PORT_SQLWAKEPEN'),
-            'database'      => env('DB_DATABASE_SQLWAKEPEN'),
-            'username'      => env('DB_USERNAME_SQLWAKEPEN'),
-            'password'      => env('DB_PASSWORD_SQLWAKEPEN'),
-            'strict'        => false,
-        ],
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),
@@ -125,7 +98,6 @@ return [
                 (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),
@@ -140,7 +112,6 @@ return [
             'search_path' => 'public',
             'sslmode' => 'prefer',
         ],
-
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
@@ -155,7 +126,6 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
-
     ],
 
     /*
