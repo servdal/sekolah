@@ -30,7 +30,7 @@ Aplikasi ini dirancang untuk memudahkan administrasi sekolah dalam mengelola dat
 2. Instal aplikasi di perangkat Android Anda.
 3. Buka aplikasi dan ikuti panduan konfigurasi yang disediakan.
 
-**Catatan**: Aplikasi ini menggunakan WebView untuk mengakses aplikasi berbasis web yang terletak di [simbian.duidev.com](https://simbian.duidev.com/), yang dikembangkan oleh [Duidev](https://duidev.com/).
+**Catatan**: Aplikasi ini menggunakan WebView untuk mengakses aplikasi berbasis web yang terletak di [duidev.com](https://duidev.com/), yang dikembangkan oleh [Duidev](https://duidev.com/).
 
 ### Instalasi dari GitHub
 
