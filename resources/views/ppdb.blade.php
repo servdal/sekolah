@@ -11,7 +11,7 @@
 		<meta name="csrf-token" content="{{ csrf_token() }}">
         <!-- App favicon -->
         <link rel="icon" type="image/ico" href="{{ asset('favicon.ico') }}">
-        @include('base.partials.css')
+        @include('adminlte3.css')
 		<link href="{{ asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
 
     </head>
@@ -1113,7 +1113,7 @@
 	<input type="hidden" name="readedfileketerangan" id="readedfileketerangan">
 	<input type="hidden" name="readedfileunggah" id="readedfileunggah">
 
-	@include('base.partials.js')
+	@include('adminlte3.js')
 	<script src="{{ asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
 
 	<script>
