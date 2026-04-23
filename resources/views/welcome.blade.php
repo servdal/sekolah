@@ -23,7 +23,7 @@
         <div class="login-box">
             <div class="card card-outline card-primary">
                 <div class="card-header text-center">
-                    <a href="#" class="h1"><b>PDS</b><br />Daarul Ukhuwwah</a>
+                    <a href="#" class="h1"><b>{{ config('global.Title') }}</b><br />{{ config('global.Title2') }}</a>
                 </div>
                 <div class="card-body">
                     <p class="login-box-msg">Sign in to start your session</p>

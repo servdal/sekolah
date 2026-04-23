@@ -13,7 +13,8 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\ExamController;
 
-
+Route::get('/', [AuthController::class, 'viewAuth']);
+    
 Route::get('/s/{slug}', [FrontpageController::class, 'show']);
 Route::get('cekandroid/{id}', [AuthController::class, 'getFirebaseaccount']);
 Route::get('cekandroid', [AuthController::class, 'goToLogin']);

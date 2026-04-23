@@ -1208,7 +1208,9 @@ class AdminController extends Controller
 		$id 					= $request->input('id');
 		$rsetting				= Sekolah::where('id', $id)->first();
 		if(!$rsetting){
-			return view('accessdenided');	
+			$data['kalimatheader']  	= 'Mohon Maaf';
+			$data['kalimatbody']  		= 'Data Sekolah Tidak di Temukan, Hubungi Tim IT untuk menambahkan minimal 1 Data Sekolah pada tabel db_mstsekolah dengan status 1';
+			return view('errors.notready', $data);
 		}
 		$tasks					= [];		
 		$sekolah 				= $rsetting->nama_sekolah;
