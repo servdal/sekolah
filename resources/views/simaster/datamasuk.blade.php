@@ -1,13 +1,13 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-        <div class="container">
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-7">
+                <div class="col-sm-4">
                     <h1 class="m-0"> Keuangan Sekolah</h1>
                 </div>
-                <div class="col-sm-5">
+                <div class="col-sm-8">
                     <div class="btn-group">
                         <a class="btn btn-app btn-primary" href="{{url('/')}}/lapbayar" data-bs-toggle="tooltip" data-bs-placement="top" title="Seragam, Kegiatan, Peralatan, Buku, SPP, Ekskul, Makan"><i class="fa fa-calculator"></i> SPP</a>
                         <a class="btn btn-app btn-success" href="{{url('/')}}/datakeuhptmasuk" data-bs-toggle="tooltip" data-bs-placement="top" title="Keuangan Sekolah"><i class="fa fa-pencil"></i> Sekolah</a>
@@ -18,8 +18,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row" >
                 <div class="col-md-9">
@@ -29,6 +29,7 @@
                             <ul class="nav nav-pills">
                                 <li class="nav-item"><a class="nav-link active" href="#depan" data-toggle="tab">Data Masuk Bulan Ini</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#formonline" data-toggle="tab">Pinjaman Aktif</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#formrabkegiatan" data-toggle="tab">Pengajuan RAB Kegiatan <span class="badge badge-red float-right">{{$pengajuan}}</span></a></li>
                             </ul>
                         </div>
                         <div class="card-body">
@@ -55,11 +56,25 @@
                                                 </div>
                                             </div>
                                             <div class="col-12">
-                                                <div id="gridreportblnini"></div>
+                                                <div class="card card-warning shadow">
+                                                    <div class="card-body">
+                                                        <div id="gridreportblnini"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="card card-info shadow">
+                                                    <div class="card-header">
+                                                        <h3 class="card-title">Kegiatan Yang Dalam Progres</h3>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div id="gridproggresskegiatan"></div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card card-success" id="modalpemasukan">
+                                    <div class="card card-success shadow" id="modalpemasukan">
                                         <div class="card-header">
                                             <h3 class="card-title">Input Data Penerimaan</h3>
                                             <div class="card-tools">
@@ -174,6 +189,54 @@
                                         <div class="card-footer">
                                             <button type="button" class="btn btn-danger pull-right btnkembali">Batalkan</button>
                                             <button type="button" class="btn btn-primary" id="btnsimpanpengeluaran">SIMPAN</button>
+                                        </div>
+                                    </div>
+                                    <div class="card card-success" id="modalpengeluarankegiatan">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Input Data Untuk Kegiatan</h3>
+                                            <div class="card-tools">
+                                                <button type="button" class="btn btn-tool btnkembali" title="Close"><i class="fa fa-ban"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <label for="outkeg_tanggal">Tanggal</label>
+                                                <div class="input-group date" data-target-input="nearest">
+                                                    <input value="{{date('Y-m-d')}}" type="text" class="form-control" id="outkeg_tanggal" name="outkeg_tanggal" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
+                                                    <div class="input-group-append">
+                                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Nama Kegiatan</label>
+                                                <input type="text" id="outkeg_nama" name="outkeg_nama" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Penerima</label>
+                                                <select id="outkeg_penerima" name="outkeg_penerima" class="form-control">
+                                                    <option value="">Pilih Salah Satu</option>
+                                                    @if(isset($pegawais) && !empty($pegawais))
+                                                        @foreach($pegawais as $jpegub)
+                                                            <option value="{{ $jpegub->niy }}">{{ $jpegub->nama }} ( {{ $jpegub->email }} )</option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Deskripsi</label>
+                                                <input type="text" id="outkeg_deskripsi" name="outkeg_deskripsi" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Total</label>
+                                                <input type="text" id="outkeg_total" name="outkeg_total" class="form-control">			  
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <input type="hidden" id="outkeg_pos" name="outkeg_pos" value="kegiatan">
+                                            <input type="hidden" id="outkeg_idkeg" name="outkeg_idkeg" value="kegiatan">
+                                            <button type="button" class="btn btn-danger pull-right btnkembali">Batalkan</button>
+                                            <button type="button" class="btn btn-primary" id="btnsimpanpengeluaranperkegiatan">SIMPAN</button>
                                         </div>
                                     </div>
                                     <div class="card card-success" id="modaleditor">
@@ -304,7 +367,7 @@
                                                             <option value="{{ $jpegub->id }}">{{ $jpegub->nama }} ( {{ $jpegub->email }} )</option>
                                                         @endforeach
                                                     @endif
-                                                </select>	
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="card-footer">
@@ -315,6 +378,9 @@
                                                         <button type="button" class="btn btn-primary" id="btnctkkwitansi">Cetak Kwitansi</button>
                                                         <button type="button" class="btn btn-info" id="btnkirimpermohonan">Minta Tandatangan</button>
                                                     </div>
+                                                    <div class="col-lg-2 col-md-2">
+                                                        Kirim Ke Penerima Kwitansi
+                                                    </div>
                                                     <div class="col-lg-4 col-md-4">
                                                         <div class="input-group">
                                                             <input type="text" id="validasi_nomor" name="validasi_nomor" class="form-control" placeholder="Nomor Penerima Kwitansi">
@@ -323,7 +389,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-4 col-md-4">
+                                                    <div class="col-lg-2 col-md-2">
                                                         <button type="button" class="btn btn-danger pull-right btnkembali">Batalkan</button>
                                                     </div>
                                                 </div>
@@ -332,7 +398,7 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane" id="formonline">
-                                    <div class="card card-success" id="divawalpeminjaman">
+                                    <div class="card card-success shadow" id="divawalpeminjaman">
                                         <div class="card-header">
                                             <h3 class="card-title">Data Peminjaman Uang Paguyuban</h3>
                                             <div class="card-tools">
@@ -343,7 +409,7 @@
                                             <div id="gridpinjaman"></div>
                                         </div>
                                     </div>
-                                    <div class="card card-success" id="modalbyrhutang">
+                                    <div class="card card-success shadow" id="modalbyrhutang">
                                         <div class="card-header">
                                             <h3 class="card-title">Input Data Pelunasan</h3>
                                             <div class="card-tools">
@@ -375,7 +441,7 @@
                                             <button type="button" class="btn btn-primary" id="btnsimpanpelunasan">SIMPAN</button>
                                         </div>
                                     </div>
-                                    <div class="card card-success" id="modalpinjaman">
+                                    <div class="card card-success shadow" id="modalpinjaman">
                                         <div class="card-header">
                                             <h3 class="card-title">Input Data Pinjaman</h3>
                                             <div class="card-tools">
@@ -463,6 +529,50 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="tab-pane" id="formrabkegiatan">
+                                    <div class="card card-info shadow" id="tabelpenggajuan">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Data Permohonan RAB Kegiatan </h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="gridrabkegiatan"></div>
+                                        </div>
+                                    </div>
+                                    <div class="card card-warning shadow" id="tabelrabkegiatan">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Tabel RAB Kegiatan </h3>
+                                            <div class="card-tools">
+                                                <button type="button" class="btn btn-tool" id="btntutuptabelrabkegiatan"><i class="fa fa-close"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="griddetailrabkegiatan"></div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-6">
+                                                        <input type="text" id="rab_keteranganakhir" name="rab_keteranganakhir" class="form-control" placeholder="Catatan Akhir (Kesimpulan)">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3">
+                                                        <div class="input-group">
+                                                            <select id="rab_persetujuan" name="rab_persetujuan" size="1" class="form-control">
+                                                                <option value="Disetujui">Disetujui</option>
+                                                                <option value="Mohon Diperbaiki">Mohon Diperbaiki</option>
+                                                            </select>
+                                                            <div class="input-group-append">
+                                                                <div class="input-group-text"><i class="fa fa-gavel"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3">
+                                                        <button type="button" class="btn btn-danger pull-right" id="btnsampaikankepengusul">Sampaikan Ke Pengusul</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -485,23 +595,269 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
+</div>
+<div class="modal fade" id="modaltambahanrab">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Form Approval RAB</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="rab_deskripsi">Deskripsi</label>
+                    <input type="text" class="form-control" id="rab_deskripsi" name="rab_deskripsi" disabled="disable">
+                </div>
+                <div class="form-group">
+                    <label for="rab_angggaran">Anggaran</label>
+                    <input type="text" class="form-control" id="rab_angggaran" name="rab_angggaran" disabled="disable">
+                </div>
+                <div class="form-group">
+                    <label for="rab_disetujui">Disetujui (isi 0 "nol" bila tidak disetujui dan beri alasan di bawahnya)</label>
+                    <input type="text" class="form-control" id="rab_disetujui" name="rab_disetujui">
+                </div>
+                <div class="form-group">
+                    <label for="rab_keterangan">Catatan dari Bendahara :</label>
+                    <input type="text" class="form-control" id="rab_keterangan" name="rab_keterangan">
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <input type="hidden" name="id_rab" id="id_rab">
+                <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-success" id="btnsimpanrab">Simpan</button>	
+            </div>
+        </div>
+    </div>
 </div>
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
 </div>
+<input type="hidden" name="id_rencana" id="id_rencana">
 
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 @endsection
 @push('script')
 <script>
-$(function () {
-    $('#in_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
-    $('#out_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
-    $('#pjm_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
-    $('#edit_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
-    $('#byr_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
-});
+    $(function () {
+        $('#in_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
+        $('#out_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
+        $('#pjm_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
+        $('#edit_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
+        $('#byr_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
+        $('#outkeg_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
+    });
+    function opendetailrabkegiatan( jQuery ){
+        var set01=document.getElementById('id_rencana').value;
+        $.post('{{ route("jsonRencanaKegiatan") }}', { jenis: 'getrabkegiatan', tahun: set01, _token: '{{ csrf_token() }}' }, function(data){
+            var sourceDetRABKeg    = {
+                datatype: "json",
+                datafields: [
+                    { name: 'id' },
+                    { name: 'deskripsi', type: 'string' },
+                    { name: 'anggaran', type: 'string' },
+                    { name: 'disetujui', type: 'string' },
+                    { name: 'bendahara', type: 'string' },
+                    { name: 'keterangan', type: 'string' },
+                    { name: 'marking', type: 'string' }
+                ],
+                localData	: data.datarab
+            };
+            var datajsonDetRAB = new $.jqx.dataAdapter(sourceDetRABKeg);
+            $("#griddetailrabkegiatan").jqxGrid({
+                width           : '100%',
+                pageable        : true,
+                autoheight      : true,
+                filterable      : true,
+                showfilterrow   : true,
+                columnsresize   : true,
+                source          : datajsonDetRAB,
+                sortable        : true,
+                altrows         : true,
+                theme           : "energyblue",
+                columns         : [
+                    { text: 'Approval', editable: false, sortable: false, filterable: false, columntype: 'button', width: '10%',  align: 'center', cellsrenderer: function () {
+                        return "Approval";
+                        }, buttonclick: function (row) {
+                            editrow         = row;	
+                            var offset 		= $("#griddetailrabkegiatan").offset();
+                            var dataRecord 	= $("#griddetailrabkegiatan").jqxGrid('getrowdata', editrow);
+                            var angka       = dataRecord.anggaran;
+                            if (!isNaN(angka)) {
+                                var formattedAngka = new Intl.NumberFormat('ms-MY').format(angka);
+                                $('#rab_angggaran').val(formattedAngka);
+                            } else {
+                                $('#rab_angggaran').val(dataRecord.anggaran);
+                            }
+                            $('#id_rab').val(dataRecord.id);
+                            $('#rab_deskripsi').val(dataRecord.deskripsi);
+                            
+                            $('#rab_disetujui').val(dataRecord.disetujui);
+                            $('#rab_keterangan').val(dataRecord.keterangan);
+                            $("#modaltambahanrab").modal('show');
+                        }
+                    },
+                    { text: 'Deskripsi', datafield: 'deskripsi', width: '25%', cellsalign: 'left', align: 'center'  },
+                    { text: 'Angggaran', cellsformat: 'n', datafield: 'anggaran', width: '10%', cellsalign: 'right', align: 'center'  },
+                    { text: 'Acc Keuangan', columngroup: 'groupkeuangan', cellsformat: 'n', datafield: 'disetujui', width: '10%', cellsalign: 'right', align: 'center' },
+                    { text: 'Bendahara', columngroup: 'groupkeuangan', datafield: 'bendahara', width: '15%', cellsalign: 'left', align: 'center' },
+                    { text: 'Keterangan', columngroup: 'groupkeuangan', datafield: 'keterangan', width: '30%', cellsalign: 'left', align: 'center'  },
+                ],
+                columngroups:
+                [
+                    { text: 'Verifikasi Keuangan', align: 'center', name: 'groupkeuangan' }                 
+                ]
+            });
+            return false;
+        });
+    }
+    function openrabkegiatan( jQuery ){
+        $("#tabelrabkegiatan").hide();
+	    $("#tabelpenggajuan").show();
+        var sourceRABKeg= {
+            datatype    : "json",
+            datafields  : [
+                { name: 'id' },
+                { name: 'tahun', type: 'string' },
+                { name: 'perkiraanpelaksanaan', type: 'string' },
+                { name: 'namakegiatan', type: 'string' },
+                { name: 'deskripsi', type: 'string' },
+                { name: 'pengajuan', type: 'string' },
+                { name: 'catatanks', type: 'string' },
+                { name: 'aprovalkeuangan', type: 'string' },
+                { name: 'bendahara', type: 'string' },
+                { name: 'catatanbendahara', type: 'string' },
+                { name: 'saldoakhir', type: 'string' },
+                { name: 'penanggunggjawab', type: 'string' },
+                { name: 'mulai', type: 'string' },
+                { name: 'akhir', type: 'string' },
+                { name: 'niypj', type: 'string' },
+                { name: 'status', type: 'string' },
+                { name: 'markingteksproposal', type: 'string' },
+                { name: 'markingteksrab', type: 'string' },
+                { name: 'created_by', type: 'string' },
+                { name: 'updated_at', type: 'string' },
+                { name: 'marking', type: 'string' },
+                { name: 'id_sekolah', type: 'string' },
+            ],
+            type: 'POST',
+            data: {jenis: 'getpenggajuankegiatan', tahun: '', _token:  '{{ csrf_token() }}'},
+            url : '{{ route("jsonRencanaKegiatan") }}',
+        };
+        var datajsonRAB = new $.jqx.dataAdapter(sourceRABKeg);
+        $("#gridrabkegiatan").jqxGrid({
+            width           : '100%',
+            pageable        : true,
+            autoheight      : true,
+            filterable      : true,
+            showfilterrow   : true,
+            columnsresize   : true,
+            source          : datajsonRAB,
+            sortable        : true,
+            altrows         : true,
+            theme           : "energyblue",
+            columns         : [
+                { text: 'Open RAB', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', cellsrenderer: function () {
+                    return "View";
+                    }, buttonclick: function (row) {
+                        editrow         = row;	
+                        var offset 		= $("#gridrabkegiatan").offset();
+                        var dataRecord 	= $("#gridrabkegiatan").jqxGrid('getrowdata', editrow);
+                        $('#id_rencana').val(dataRecord.id);
+                        $("#tabelrabkegiatan").show();
+	                    $("#tabelpenggajuan").hide();
+                        opendetailrabkegiatan();
+                    }
+                },
+                { text: 'Deskripsi', datafield: 'deskripsi', width: '25%', cellsalign: 'left', align: 'center'  },
+                { text: 'Rencana Pelaksanaan', datafield: 'perkiraanpelaksanaan', width: '15%', cellsalign: 'left', align: 'center'  },
+                { text: 'PJ Kegiatan', datafield: 'penanggunggjawab', width: '15%', cellsalign: 'left', align: 'center' },
+                { text: 'Pengajuan', cellsformat: 'n', datafield: 'pengajuan', width: '10%', cellsalign: 'right', align: 'center'  },
+                { text: 'Acc Keuangan',cellsformat: 'n', datafield: 'aprovalkeuangan', width: '10%', cellsalign: 'right', align: 'center' },
+                { text: 'Tanggal Penggajuan', datafield: 'updated_at', width: '10%', cellsalign: 'left', align: 'center'  },
+                { text: 'Catatan', datafield: 'catatanbendahara', width: '10%', cellsalign: 'left', align: 'center'  },
+            ]
+        });
+        var sourceProgKeg= {
+            datatype    : "json",
+            datafields  : [
+                { name: 'id' },
+                { name: 'tahun', type: 'string' },
+                { name: 'perkiraanpelaksanaan', type: 'string' },
+                { name: 'namakegiatan', type: 'string' },
+                { name: 'deskripsi', type: 'string' },
+                { name: 'pengajuan', type: 'string' },
+                { name: 'catatanks', type: 'string' },
+                { name: 'aprovalkeuangan', type: 'string' },
+                { name: 'bendahara', type: 'string' },
+                { name: 'catatanbendahara', type: 'string' },
+                { name: 'saldoakhir', type: 'string' },
+                { name: 'penanggunggjawab', type: 'string' },
+                { name: 'mulai', type: 'string' },
+                { name: 'akhir', type: 'string' },
+                { name: 'niypj', type: 'string' },
+                { name: 'status', type: 'string' },
+                { name: 'markingteksproposal', type: 'string' },
+                { name: 'markingteksrab', type: 'string' },
+                { name: 'created_by', type: 'string' },
+                { name: 'updated_at', type: 'string' },
+                { name: 'marking', type: 'string' },
+                { name: 'id_sekolah', type: 'string' },
+            ],
+            type: 'POST',
+            data: {jenis: 'getprogresskegiatan', tahun: '', _token:  '{{ csrf_token() }}'},
+            url : '{{ route("jsonRencanaKegiatan") }}',
+        };
+        var datajsonProgRAB = new $.jqx.dataAdapter(sourceProgKeg);
+        var linkgenerator = function (row, column, value) {
+            var id              = $('#gridproggresskegiatan').jqxGrid('getrowdata', row).id;
+            var namakegiatan    = $('#gridproggresskegiatan').jqxGrid('getrowdata', row).namakegiatan;
+            var url             = '<a href="{{url("/")}}/laporankegiatan/'+id+'" target="_blank"><span class="badge badge-primary">'+namakegiatan+'</span></a>';
+            return url;
+        }
+        $("#gridproggresskegiatan").jqxGrid({
+            width           : '100%',
+            pageable        : true,
+            autoheight      : true,
+            filterable      : true,
+            showfilterrow   : true,
+            columnsresize   : true,
+            source          : datajsonProgRAB,
+            sortable        : true,
+            altrows         : true,
+            theme           : "energyblue",
+            columns         : [
+                { text: 'Nama Kegiatan', cellsrenderer: linkgenerator, width: '20%', cellsalign: 'left', align: 'center'  },
+                { text: 'PJ Kegiatan', datafield: 'penanggunggjawab', width: '20%', cellsalign: 'left', align: 'center' },
+                { text: 'Mulai', datafield: 'mulai', width: '10%', cellsalign: 'left', align: 'center'  },
+                { text: 'Akhir', datafield: 'akhir', width: '10%', cellsalign: 'left', align: 'center'  },
+                { text: 'Anggaran',cellsformat: 'n', datafield: 'aprovalkeuangan', width: '10%', cellsalign: 'right', align: 'center' },
+                { text: 'Saldo',cellsformat: 'n', datafield: 'saldoakhir', width: '10%', cellsalign: 'right', align: 'center' },
+                { text: 'Catatan KS', datafield: 'catatanks', width: '15%', cellsalign: 'left', align: 'center'  },
+                { text: 'Input Dana', columntype: 'button', width: '5%', cellsrenderer: function () {
+                    return "Bayar";
+                    }, buttonclick: function (row) {
+                        editrow         = row;
+                        var offset 		= $("#gridproggresskegiatan").offset();
+                        var dataRecord 	= $("#gridproggresskegiatan").jqxGrid('getrowdata', editrow);
+                        $("#outkeg_nama").val(dataRecord.namakegiatan);
+                        $("#outkeg_penerima").val(dataRecord.niypj);
+                        $("#outkeg_idkeg").val(dataRecord.id);
+                        $("#loading").hide();
+                        $("#modalvalidasi").hide();
+                        $("#modalpemasukan").hide();
+                        $("#modalpengeluaran").hide();
+                        $("#modaleditor").hide();
+                        $("#modalpinjaman").hide();
+                        $("#modalpengeluarankegiatan").show();
+                        $("#modalbyrhutang").hide();
+                        $("#divawal").hide();
+                        $("#divawalpeminjaman").hide();
+                    }
+                },
+            ]
+        });
+    }
 $(document).ready(function () {
     $("#loading").hide();
 	$("#modalpemasukan").hide();
@@ -510,10 +866,17 @@ $(document).ready(function () {
 	$("#modalpinjaman").hide();
 	$("#modalbyrhutang").hide();
 	$("#modalvalidasi").hide();
-	$("#in_total").autoNumeric(
+	$("#modalpengeluarankegiatan").hide();
+	$("#rab_disetujui").autoNumeric(
+		'init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'}
+	);
+    $("#in_total").autoNumeric(
 		'init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'}
 	);
 	$("#out_total").autoNumeric(
+		'init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'}
+	);
+    $("#outkeg_total").autoNumeric(
 		'init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'}
 	);
 	$("#pjm_total").autoNumeric(
@@ -541,11 +904,10 @@ $(document).ready(function () {
 			{ name: 'total',type: 'text'},
 			{ name: 'kunci',type: 'text'},
 		],
-		url: 'json/keuangan',
+		url: '{{ route("getDatakeuangan") }}',
 		cache: false,
 	};
 	var datakeuangan = new $.jqx.dataAdapter(sourcekeuangan);
-	var editrow = -1;
 	$("#gridreportblnini").jqxGrid({
 		width: '100%',
 		showfilterrow: true,
@@ -619,7 +981,7 @@ $(document).ready(function () {
 		],
 		columngroups: 
 		[
-			{ text: 'Tanggal', align: 'center', name: 'tglinput' },                
+			{ text: 'Tanggal', align: 'center', name: 'tglinput' },
 		]
 	});
 	var sourcerekap = {
@@ -631,11 +993,10 @@ $(document).ready(function () {
 			{ name: 'saldo',type: 'text'},
 			{ name: 'tahun',type: 'text'},	
 		],
-		url: 'json/rekapsaldo',
+		url: '{{ route("getRekapsaldo") }}',
 		cache: false,
 	};
 	var datasaldo = new $.jqx.dataAdapter(sourcerekap);
-	var editrow = -1;
 	$("#gridsaldotiappos").jqxGrid({
 		width: '100%',		            
 		columnsresize: true,		
@@ -661,11 +1022,10 @@ $(document).ready(function () {
 			{ name: 'deskripsi',type: 'text'},
 			{ name: 'jumlah',type: 'text'},	
 		],
-		url: 'json/rekaphutang',
+		url: '{{ route("getrekapHutang") }}',
 		cache: false,
 	};
 	var datahutang = new $.jqx.dataAdapter(sourcehutang);
-	var editrow = -1;
 	$("#gridpinjaman").jqxGrid({
 		width: '100%',		            
 		columnsresize: true,		
@@ -680,9 +1040,9 @@ $(document).ready(function () {
 			{ text: 'Jumlah', datafield: 'jumlah', width: '30%', cellsalign: 'right', align: 'center' },
 			{ text: 'Lunasi', columntype: 'button', width: '10%', cellsrenderer: function () {
 				return "Bayar";
-				}, buttonclick: function (row) {	
-                    editrow = row;	
-                    var offset 		= $("#gridpinjaman").offset();		
+				}, buttonclick: function (row) {
+                    editrow = row;
+                    var offset 		= $("#gridpinjaman").offset();
                     var dataRecord 	= $("#gridpinjaman").jqxGrid('getrowdata', editrow);
                     $("#byr_deskripsi").val(dataRecord.deskripsi);
                     $("#byr_id").val(dataRecord.id);
@@ -743,6 +1103,7 @@ $(document).ready(function () {
         $("#modalbyrhutang").hide();
         $("#divawal").show();
         $("#divawalpeminjaman").show();
+        $("#modalpengeluarankegiatan").hide();
     });
     $(".btnkembali").click(function(){ 
         $("#loading").hide();
@@ -754,6 +1115,7 @@ $(document).ready(function () {
         $("#modalbyrhutang").hide();
         $("#divawal").show();
         $("#divawalpeminjaman").show();
+        $("#modalpengeluarankegiatan").hide();
     });
 	$("#btnctkkwitansi").click(function(){
 		var val01       = document.getElementById('validasi_id').value;
@@ -762,7 +1124,7 @@ $(document).ready(function () {
         var windowSize 	= "width=800,height=800";
         window.open(url, windowName, windowSize);
 	});
-    $('#btnkirimkwitansi').on('click', function (){		
+    $('#btnkirimkwitansi').on('click', function (){
 		var set01=document.getElementById('validasi_id').value;
 		var set02=document.getElementById('validasi_nomor').value;
 		var token=document.getElementById('token').value;
@@ -794,7 +1156,7 @@ $(document).ready(function () {
 			});	
 		}
 	});
-    $('#btnkirimpermohonan').on('click', function (){		
+    $('#btnkirimpermohonan').on('click', function (){
 		var set01=document.getElementById('validasi_id').value;
 		var set02=document.getElementById('validasi_nama').value;
 		var token=document.getElementById('token').value;
@@ -857,7 +1219,7 @@ $(document).ready(function () {
 		var val07='';
 		var val08='';
 		var token=document.getElementById('token').value;
-		$.post('excutor/simpantransaksi', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
+		$.post('{{ route("simpanTransaksi") }}', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
 		function(data){
             $("#loading").hide();
             $("#divawal").show();
@@ -887,7 +1249,7 @@ $(document).ready(function () {
 		var val07='';
 		var val08='';
 		var token=document.getElementById('token').value;
-		$.post('excutor/simpantransaksi', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
+		$.post('{{ route("simpanTransaksi") }}', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
 		function(data){
             $("#loading").hide();
 			$("#divawal").show();
@@ -916,7 +1278,7 @@ $(document).ready(function () {
 		var val07='';
 		var val08='';
 		var token=document.getElementById('token').value;
-		$.post('excutor/simpantransaksi', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
+		$.post('{{ route("simpanTransaksi") }}', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
 		function(data){		
 			$("#loading").hide();
 			$("#divawal").show();
@@ -928,6 +1290,36 @@ $(document).ready(function () {
 			return false;
 		});	
 	});
+    $("#btnsimpanpengeluaranperkegiatan").click(function(){
+		$("#loading").show();
+        $("#modalvalidasi").hide();
+        $("#modalpemasukan").hide();
+        $("#modalpengeluaran").hide();
+        $("#modaleditor").hide();
+        $("#modalpinjaman").hide();
+        $("#modalbyrhutang").hide();
+		var val01=document.getElementById('outkeg_deskripsi').value;
+		var val02=document.getElementById('outkeg_pos').value;	
+		var val03=document.getElementById('outkeg_tanggal').value;
+		var val04=document.getElementById('outkeg_total').value;
+		var val05='pengeluarankegiatan';
+		var val06=document.getElementById('outkeg_penerima').value;
+		var val07=document.getElementById('outkeg_idkeg').value;
+		var val08='';
+		var token=document.getElementById('token').value;
+		$.post('{{ route("simpanTransaksi") }}', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
+		function(data){		
+			$("#loading").hide();
+			$("#divawal").show();
+            $("#divawalpeminjaman").show();
+			$("#message").html(data);
+			$("html, body").animate({ scrollTop: 0 }, "slow");
+			$("#gridreportblnini").jqxGrid('updatebounddata');
+			$("#gridsaldotiappos").jqxGrid('updatebounddata', 'filter');
+			return false;
+		});	
+	});
+    
 	$("#btnsimpanpinjaman").click(function(){
 		$("#loading").show();
         $("#modalvalidasi").hide();
@@ -945,7 +1337,7 @@ $(document).ready(function () {
 		var val07='';
 		var val08='';
 		var token=document.getElementById('token').value;
-		$.post('excutor/simpantransaksi', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
+		$.post('{{ route("simpanTransaksi") }}', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
 		function(data){
             $("#loading").hide();
 			$("#divawal").show();
@@ -975,7 +1367,7 @@ $(document).ready(function () {
 		var val07=document.getElementById('edit_alasan').value;
 		var val08=document.getElementById('edit_nama').value;
 		var token=document.getElementById('token').value;
-		$.post('excutor/simpantransaksi', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
+		$.post('{{ route("simpanTransaksi") }}', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
 		function(data){
             $("#loading").hide();
 			$("#divawal").show();
@@ -1005,7 +1397,7 @@ $(document).ready(function () {
 		var val07=document.getElementById('edit_alasan').value;
 		var val08=document.getElementById('edit_nama').value;
 		var token=document.getElementById('token').value;
-		$.post('excutor/simpantransaksi', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
+		$.post('{{ route("simpanTransaksi") }}', { _token: token, set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08 },
 		function(data){
             $("#loading").hide();
 			$("#divawal").show();
@@ -1018,6 +1410,123 @@ $(document).ready(function () {
 			return false;
 		});	
 	});
+    $("#btntutuptabelrabkegiatan").click(function(){
+        openrabkegiatan();
+	});
+    openrabkegiatan();
+    $('#btnsimpanrab').click(function () {
+        var set01=document.getElementById('rab_disetujui').value;
+        var set02=document.getElementById('rab_keterangan').value;
+        var set03=document.getElementById('id_rab').value;
+        if (set01 == ''){
+            swal({
+                title	: 'Warning',
+                text	: 'Anggaran yang disetujui wajib di isi, apabila usulan anggaran ini di tolak mohon mengisi dengan angka 0 (nol)',
+                type	: 'error',
+            });
+        } else if (set01 == 0 && set02 == ''){
+            swal({
+                title	: 'Warning',
+                text	: 'Apabila Anggaran ini tidak disetujui mohon menuliskan alasannya',
+                type	: 'error',
+            });
+        } else {
+            var formdata = new FormData();
+                formdata.set('id', set03);
+                formdata.set('disetujui', set01);
+                formdata.set('keterangan', set02);
+                formdata.set('workcode', 'klarifikasidatarab');
+                formdata.set('_token', '{{ csrf_token() }}');
+                $("#modaltambahanrab").modal('hide');
+            $.ajax({
+                url         : '{{ route("exSimpanRK") }}',
+                data        : formdata,
+                type        : 'POST',
+                contentType : false,
+                processData : false,
+                success: function (data) {
+                    var status  = data.status;
+                    var message = data.message;
+                    var warna 	= data.warna;
+                    var icon 	= data.icon;
+                    $.toast({
+                        heading     : status,
+                        text        : message,
+                        position    : 'top-right',
+                        loaderBg    : warna,
+                        icon        : icon,
+                        hideAfter   : 5000,
+                        stack       : 1
+                    });
+                    opendetailrabkegiatan();
+                    return false;
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title	: 'Stop',
+                        text	: xhr.responseText,
+                        type	: 'warning',
+                    })
+                }
+            });
+        }
+    });
+    $('#btnsampaikankepengusul').click(function () {
+        var set01=document.getElementById('rab_keteranganakhir').value;
+        var set02=document.getElementById('rab_persetujuan').value;
+        var set03=document.getElementById('id_rencana').value;
+        if (set01 == '' && set02 == ''){
+            swal({
+                title	: 'Warning',
+                text	: 'Apabila Anggaran ini tidak disetujui mohon menuliskan alasannya',
+                type	: 'error',
+            });
+        } else {
+            var formdata = new FormData();
+                formdata.set('id', set03);
+                formdata.set('bendahara', set02);
+                formdata.set('catatanbendahara', set01);
+                formdata.set('workcode', 'klarifikasibendahara');
+                formdata.set('_token', '{{ csrf_token() }}');
+            var btn = $(this);
+                btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+                
+            $.ajax({
+                url         : '{{ route("exSimpanRK") }}',
+                data        : formdata,
+                type        : 'POST',
+                contentType : false,
+                processData : false,
+                success: function (data) {
+                    var status  = data.status;
+                    var message = data.message;
+                    var warna 	= data.warna;
+                    var icon 	= data.icon;
+                    $.toast({
+                        heading     : status,
+                        text        : message,
+                        position    : 'top-right',
+                        loaderBg    : warna,
+                        icon        : icon,
+                        hideAfter   : 5000,
+                        stack       : 1
+                    });
+                    btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+                    var uri = window.location.href.split("#")[0];
+                    setTimeout(function () { window.location=uri;}, 5000);
+                    return false;
+                },
+                error: function (xhr, status, error) {
+                    btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+                    swal({
+                        title	: 'Stop',
+                        text	: xhr.responseText,
+                        type	: 'warning',
+                    })
+                }
+            });
+        }
+    });
 });
 </script>
 @endpush

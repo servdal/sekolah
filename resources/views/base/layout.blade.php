@@ -50,21 +50,9 @@
         @include('base.partials.css')
     </head>
     <body class="skin-purple sidebar-mini">
-        @php
-			$servername = $_SERVER['SERVER_NAME'];
-			if ($servername == 'https://siapdok.duidev.com' OR $servername == 'http://siapdok.duidev.com' OR $servername == 'siapdok.duidev.com'){
-		@endphp
-			@include('base.partials.sco-header')
-			@include('base.partials.sco-sidebar')
-        @php
-			} else {
-		@endphp
-			@include('base.partials.header')
-			@include('base.partials.sidebar')
-		@php
-			}
-		@endphp
-        @yield('content')  
+        @include('base.partials.header')
+		@include('base.partials.sidebar')
+		@yield('content')  
         <footer class="main-footer">
 			<div class="pull-right hidden-xs">
 			  <b>
@@ -77,7 +65,7 @@
 				@endif
 				</b>
 			</div>
-			<strong>Copyright &copy; 2022 <a href="
+			<strong>Copyright &copy; 2024 <a href="
                 @if (isset($lamanapps01))
                 {{ $lamanapps01 }}
                 @elseif (Session('lamanapps01') !== null)

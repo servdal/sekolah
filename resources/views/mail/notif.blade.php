@@ -377,16 +377,6 @@
         </td>
       </tr>
     
-      {{-- <tr>
-        <td align="left" style="font-size:0px;padding:3px 15px 15px 15px;word-break:break-word;">
-          
-<div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:11px;line-height:1.5;text-align:left;color:#000000;">
-  <p><span style="color: #e03e2d;"><strong><span style="background-color: #7e8c8d; font-size: 14px;">Password: {{$password}} &#xA0;</span></strong></span></p>
-</div>
-
-        </td>
-      </tr> --}}
-    
       <tr>
         <td style="font-size:0px;padding:10px 25px;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:25px;word-break:break-word;">
           
@@ -481,11 +471,10 @@
 <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:11px;line-height:1.2;text-align:left;color:#000000;">
   <p>&#xA0; &#xA0; &#xA0; &#xA0; &#xA0;<strong> Contact</strong></p>
   <ul>
-<li>Phone :  Telp. +62 81359108565</li>
-<li>WA :  http://wa.me/6281359108565</li>
+<li>{{ config('global.nomerinduksekolah') }}</li>
 
-<li>Email: swandhana.fp@ub.ac.id</li>
-<li>Website: duidev.com</li>
+<li>Email: {{ config('global.email') }}</li>
+<li>Website: {{ config('global.homeweb') }}</li>
 </ul>
 </div>
 

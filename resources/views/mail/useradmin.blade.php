@@ -473,11 +473,9 @@
 <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:11px;line-height:1.2;text-align:left;color:#000000;">
   <p>&#xA0; &#xA0; &#xA0; &#xA0; &#xA0;<strong> Contact</strong></p>
   <ul>
-<li>Phone :  Telp. +62 81359108565</li>
-<li>WA :  http://wa.me/6281359108565</li>
-
-<li>Email: swandhana.fp@ub.ac.id</li>
-<li>Website: duidev.com</li>
+  <li>{{ config('global.nomerinduksekolah') }}</li>
+  <li>Email: {{ config('global.email') }}</li>
+  <li>Website: {{ config('global.homeweb') }}</li>
 </ul>
 </div>
 

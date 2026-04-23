@@ -210,7 +210,7 @@
   </tr>
   <tr>
     <td>&nbsp;</td>
-    <td colspan="3" align="center"><span class="isi">{{$tglvalidasi}}</span></td>
+    <td colspan="3" align="center"><span class="isi">{!!$tglvalidasi!!}</span></td>
   </tr>
   <tr>
     <td>&nbsp;</td>

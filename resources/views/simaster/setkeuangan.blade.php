@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0"> Setting Keuangan Siswa</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-            </ol>
-          </div>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Setting Keuangan Siswa</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
@@ -29,59 +29,106 @@
                     @endif
                     <div class="card card-warning shadow">
                         <div class="card-header">
-                            <h3 class="card-title">Silahkan Pilih Siswa Per Kelas Untuk di Tentukan Besaran Biaya Sekolahnya</h3>
+                            <h3 class="card-title">Pilihan Kelas</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse"><i class="fa fa-minus"></i></button>
+                            </div>
                         </div>
                         <div class="card-body">
+                            Silahkan Pilih Siswa Per Kelas Untuk di Tentukan Besaran Biaya Sekolahnya
+						</div>
+                        <div class="card-footer">
                             @if(Session('sekolah_level') == 1)
-                                <a href="#" id="gradekb"  class="btn btn-block btn-social btn-primary">
+                                <!--
+                                <a href="#" id="gradekb"  onClick="jQueryOpenKKM('kb')" class="btn btn-block btn-social btn-primary">
                                     <i class="fa fa-windows"></i> Kelompok Belajar
                                 </a>
-                                <a href="#" id="gradeta"  class="btn btn-block btn-social btn-warning">
+                                <a href="#" id="gradeta"  onClick="jQueryOpenKKM('ta')" class="btn btn-block btn-social btn-warning">
                                     <i class="fa fa-android"></i> Tarbiyatul Athfal
                                 </a>
+                                <a href="#" id="gradeta"  onClick="jQueryOpenKKM('1')" class="btn btn-block btn-social btn-warning">
+                                    <i class="fa fa-android"></i> Tahap 1
+                                </a>
+                                <a href="#" id="gradetb"  onClick="jQueryOpenKKM('2')" class="btn btn-block btn-social btn-success">
+                                    <i class="fa fa-apple"></i> Tahap 2
+                                </a>
+                                -->
+                                @if(isset($kelasrpa) && !empty($kelasrpa))
+                                    @foreach($kelasrpa as $rows)
+                                        <a href="javascript:void(0)" onClick="jQueryOpenKelasQuran('{{$rows['kelas']}}')" class="btn btn-block btn-social btn-success">
+                                            <i class="fa fa-share-square-o"></i> {{$rows['kelas']}}
+                                        </a>
+                                    @endforeach
+                                @endif
                             @elseif (Session('sekolah_level') == 2)
-                                <a href="#" id="grade1"  class="btn btn-block btn-social btn-info">
+                                <a href="#" id="grade1"  onClick="jQueryOpenKKM('1')" class="btn btn-block btn-social btn-info">
                                     <i class="fa fa-windows"></i> Kelas I
                                 </a>
-                                <a href="#" id="grade2"  class="btn btn-block btn-social btn-danger">
+                                <a href="#" id="grade2"  onClick="jQueryOpenKKM('2')" class="btn btn-block btn-social btn-danger">
                                     <i class="fa fa-android"></i> Kelas II
                                 </a>
-                                <a href="#" id="grade3"  class="btn btn-block btn-social btn-success">
+                                <a href="#" id="grade3"  onClick="jQueryOpenKKM('3')" class="btn btn-block btn-social btn-success">
                                     <i class="fa fa-apple"></i> Kelas III
                                 </a>
-                                <a href="#" id="grade4"  class="btn btn-block btn-social btn-primary">
+                                <a href="#" id="grade4"  onClick="jQueryOpenKKM('4')" class="btn btn-block btn-social btn-primary">
                                     <i class="fa fa-facebook"></i> Kelas IV
                                 </a>
-                                <a href="#" id="grade5"  class="btn btn-block btn-social btn-warning">
+                                <a href="#" id="grade5"  onClick="jQueryOpenKKM('5')" class="btn btn-block btn-social btn-warning">
                                     <i class="fa fa-google"></i> Kelas V
                                 </a>
-                                <a href="#" id="grade6"  class="btn btn-block btn-social btn-info">
+                                <a href="#" id="grade6"  onClick="jQueryOpenKKM('6')" class="btn btn-block btn-social btn-info">
                                     <i class="fa fa-twitter"></i> Kelas VI
                                 </a>
                             @elseif (Session('sekolah_level') == 3)
-                                <a href="#" id="grade7"  class="btn btn-block btn-social btn-danger">
+                                <a href="#" id="grade7"  onClick="jQueryOpenKKM('7')" class="btn btn-block btn-social btn-danger">
                                     <i class="fa fa-windows"></i> Kelas I
                                 </a>
-                                <a href="#" id="grade8"  class="btn btn-block btn-social btn-success">
+                                <a href="#" id="grade8"  onClick="jQueryOpenKKM('8')" class="btn btn-block btn-social btn-success">
                                     <i class="fa fa-android"></i> Kelas II
                                 </a>
-                                <a href="#" id="grade9"  class="btn btn-block btn-social btn-primary">
+                                <a href="#" id="grade9"  onClick="jQueryOpenKKM('9')" class="btn btn-block btn-social btn-primary">
                                     <i class="fa fa-apple"></i> Kelas III
                                 </a>
                             @else
-                                <a href="#" id="grade10"  class="btn btn-block btn-social btn-warning">
+                                <a href="#" id="grade10"  onClick="jQueryOpenKKM('10')" class="btn btn-block btn-social btn-warning">
                                     <i class="fa fa-windows"></i> Kelas I
                                 </a>
-                                <a href="#" id="grade11"  class="btn btn-block btn-social btn-info">
+                                <a href="#" id="grade11"  onClick="jQueryOpenKKM('11')" class="btn btn-block btn-social btn-info">
                                     <i class="fa fa-android"></i> Kelas II
                                 </a>
-                                <a href="#" id="grade12"  class="btn btn-block btn-social btn-danger">
+                                <a href="#" id="grade12"  onClick="jQueryOpenKKM('12')" class="btn btn-block btn-social btn-danger">
                                     <i class="fa fa-apple"></i> Kelas III
                                 </a>
                             @endif
                         </div>
+                    </div>
+                    <div class="card card-success shadow">
+                        <div class="card-header">
+                            <h3 class="card-title">Ekstrakulikuler</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" id="btneksul"><i class="fa fa-plus"></i> Tambah Ekskul</button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <label>Status Pendaftaran Ektrakulikuler</label>
+                                        <input type="text" value="{{$ijin}}" class="form-control" disabled="disable">
+                                    </div> 
+                                    <div class="col-sm-4">
+                                        <label>Tombol Kontrol</label>
+                                        @if ($ijin == '')
+                                        <button type="button" class="btn btn-success" id="onoffminat">AKTIF</button>
+                                        @else 
+                                        <button type="button" class="btn btn-danger" id="onoffminat">NONAKTIF</button>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="card-footer">
-                            <button type="button" class="btn btn-info" id="btneksul">Tambah Ekskul</button>		
                             <div id="gridekskul"></div>
                         </div>
                     </div>
@@ -111,7 +158,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div class="modal fade" id="modaleditkeuangan">
     <div class="modal-dialog">
@@ -133,7 +180,7 @@
                             <label>No.Induk</label>
                             <input type="text" id="id_noinduk" name="id_noinduk" class="form-control">
                         </div>
-                    </div>			  			  
+                    </div>
                 </div>
                 <div class="form-group">
                     <div class="row">
@@ -274,14 +321,20 @@
                 </div>
                 <div class="form-group">	
                     <div class="row">
-                        <div class="col-sm-9">
+                        <div class="col-sm-7">
                             <label>Deskripsi</label>
                             <input type="text" id="id_deskripsi" name="id_deskripsi" class="form-control">		
                         </div>
-                        <div class="col-sm-3">
-                            <label>Tenggat</label>
-                            <input type="text" id="id_tengat" name="id_tengat" class="form-control">
+                        <div class="col-lg-5">
+                            <label>Tenggat <font color="red" class="pull-right">*</font></label>
+                            <div class="input-group date" data-target-input="nearest">
+                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="id_tengat" name="id_tengat" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
+                                <div class="input-group-append">
+                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('01')"><i class="fa fa-minus-square"></i></a></div>
+                                </div>
+                            </div>
                         </div>
+                        <p class="text-help">Untuk Menonaktifkan Beri Angka 0 Pada Biaya</p>
                     </div>
                 </div>
             </div>
@@ -307,8 +360,144 @@
 @push('script')
 <script>
 	$(function () {
-		$("#id_tengat").datepicker();
+        $('.datemaskinput').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
 	});
+    function jQueryOpenKelasQuran(set01){
+        var source 	= {
+            datatype: "json",
+            datafields: [
+                { name: 'id'},	
+                { name: 'noinduk', type: 'text'},
+                { name: 'dpp', type: 'text'},
+                { name: 'spp', type: 'text'},
+                { name: 'paguyuban', type: 'text'},
+                { name: 'eksul1', type: 'text'},
+                { name: 'eksul2', type: 'text'},
+                { name: 'eksul3', type: 'text'},
+                { name: 'eksul4', type: 'text'},
+                { name: 'eksul5', type: 'text'},
+                { name: 'nama', type: 'text'},
+            ],
+            type: 'POST',
+            data: {val01:'jilid', val02:set01, _token: '{{ csrf_token() }}'},
+            url: '{{ route("jsonSetkeuangan") }}'
+        };			
+        var dataAdapter = new $.jqx.dataAdapter(source);
+        $('#setperkelas').show(); 
+        $('#gridinsidental').hide(); 
+        $("#gridsetting").jqxGrid({
+            width           : '100%',
+            filterable      : true,
+            pageable        : true,
+            filterable      : true,
+            filtermode      : 'excel',				
+            source          : dataAdapter,
+            columnsresize   : true,
+            theme           : "energyblue",
+            selectionmode   : 'multiplecellsextended',
+            columns         : [				
+                { text: 'Nama', datafield: 'nama', width: '13%', cellsalign: 'left', align: 'center' },
+                { text: 'No.Induk', datafield: 'noinduk', width: '5%', cellsalign: 'center', align: 'center' },
+                { text: 'DPP', datafield: 'dpp', width: '10%', cellsalign: 'right', align: 'center' },
+                { text: 'SPP', datafield: 'spp', width: '7%', cellsalign: 'right', align: 'center' },
+                { text: 'Uang Makan', datafield: 'paguyuban', width: '8%', cellsalign: 'right', align: 'center' },	
+                { text: 'Ekskul 1', datafield: 'eksul1', width: '10%', align: 'center' },
+                { text: 'Ekskul 2', datafield: 'eksul2', width: '10%', align: 'center' },
+                { text: 'Ekskul 3', datafield: 'eksul3', width: '10%', align: 'center' },
+                { text: 'Ekskul 4', datafield: 'eksul4', width: '10%', align: 'center' },
+                { text: 'Ekskul 5', datafield: 'eksul5', width: '10%', align: 'center' },
+                { text: 'UBAH', columntype: 'button', align: 'center', width: '7%', cellsrenderer: function () {
+                    return "Edit";
+                    }, buttonclick: function (row) {	
+                        editrow = row;	
+                        var offset 		= $("#gridsetting").offset();
+                        $('#setperkelas').show(); 
+                        $('#gridinsidental').hide();
+                        var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
+                        $("#id_nama").val(dataRecord.nama);
+                        $("#id_dpp").val(dataRecord.dpp);
+                        $("#id_noinduk").val(dataRecord.noinduk);
+                        $("#id_paguyuban").val(dataRecord.paguyuban);
+                        $("#id_spp").val(dataRecord.spp);
+                        $("#id_eksul1").val(dataRecord.eksul1);
+                        $("#id_eksul2").val(dataRecord.eksul2);
+                        $("#id_eksul3").val(dataRecord.eksul3);
+                        $("#id_eksul4").val(dataRecord.eksul4);
+                        $("#id_eksul5").val(dataRecord.eksul5);
+                        $("#modaleditkeuangan").modal('show');	
+                    }
+                },
+            ]
+        });	
+    }
+    function jQueryOpenKKM(set01){
+        var source 	= {
+            datatype: "json",
+            datafields: [
+                { name: 'id'},	
+                { name: 'noinduk', type: 'text'},
+                { name: 'dpp', type: 'text'},
+                { name: 'spp', type: 'text'},
+                { name: 'paguyuban', type: 'text'},
+                { name: 'eksul1', type: 'text'},
+                { name: 'eksul2', type: 'text'},
+                { name: 'eksul3', type: 'text'},
+                { name: 'eksul4', type: 'text'},
+                { name: 'eksul5', type: 'text'},
+                { name: 'nama', type: 'text'},
+            ],
+            type: 'POST',
+            data: {val01:set01, _token: '{{ csrf_token() }}'},
+            url: '{{ route("jsonSetkeuangan") }}'
+        };			
+        var dataAdapter = new $.jqx.dataAdapter(source);
+        $('#setperkelas').show(); 
+        $('#gridinsidental').hide(); 
+        $("#gridsetting").jqxGrid({
+            width           : '100%',
+            filterable      : true,
+            pageable        : true,
+            filterable      : true,
+            filtermode      : 'excel',				
+            source          : dataAdapter,
+            columnsresize   : true,
+            theme           : "energyblue",
+            selectionmode   : 'multiplecellsextended',
+            columns         : [				
+                { text: 'Nama', datafield: 'nama', width: '13%', cellsalign: 'left', align: 'center' },
+                { text: 'No.Induk', datafield: 'noinduk', width: '5%', cellsalign: 'center', align: 'center' },
+                { text: 'DPP', datafield: 'dpp', width: '10%', cellsalign: 'right', align: 'center' },
+                { text: 'SPP', datafield: 'spp', width: '7%', cellsalign: 'right', align: 'center' },
+                { text: 'Uang Makan', datafield: 'paguyuban', width: '8%', cellsalign: 'right', align: 'center' },	
+                { text: 'Ekskul 1', datafield: 'eksul1', width: '10%', align: 'center' },
+                { text: 'Ekskul 2', datafield: 'eksul2', width: '10%', align: 'center' },
+                { text: 'Ekskul 3', datafield: 'eksul3', width: '10%', align: 'center' },
+                { text: 'Ekskul 4', datafield: 'eksul4', width: '10%', align: 'center' },
+                { text: 'Ekskul 5', datafield: 'eksul5', width: '10%', align: 'center' },
+                { text: 'UBAH', columntype: 'button', align: 'center', width: '7%', cellsrenderer: function () {
+                    return "Edit";
+                    }, buttonclick: function (row) {	
+                        editrow = row;	
+                        var offset 		= $("#gridsetting").offset();
+                        $('#setperkelas').show(); 
+                        $('#gridinsidental').hide();
+                        var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
+                        $("#id_nama").val(dataRecord.nama);
+                        $("#id_dpp").val(dataRecord.dpp);
+                        $("#id_noinduk").val(dataRecord.noinduk);
+                        $("#id_paguyuban").val(dataRecord.paguyuban);
+                        $("#id_spp").val(dataRecord.spp);
+                        $("#id_eksul1").val(dataRecord.eksul1);
+                        $("#id_eksul2").val(dataRecord.eksul2);
+                        $("#id_eksul3").val(dataRecord.eksul3);
+                        $("#id_eksul4").val(dataRecord.eksul4);
+                        $("#id_eksul5").val(dataRecord.eksul5);
+                        $("#modaleditkeuangan").modal('show');	
+                    }
+                },
+            ]
+        });	
+    }
     $(document).ready(function () {
         $("#id_spp").autoNumeric(
             'init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'}
@@ -390,6 +579,7 @@
             datafields: [
                 { name: 'id'},
                 { name: 'namaeksul', type: 'text'},
+                { name: 'status', type: 'text'},
                 { name: 'biaya', type: 'text'},
             ],
             updaterow: function (rowid, rowdata, commit) {
@@ -407,8 +597,9 @@
             selectionmode: 'multiplecellsextended',
             columns: [
                 { text: 'Nama Ekskul', datafield: 'namaeksul', width: '50%', align: 'center', cellsalign: 'left'},
-                { text: 'Biaya', datafield: 'biaya', width: '30%', align: 'center', cellsalign: 'left'},
-                { text: 'Edit', columntype: 'button', align: 'center', width: '20%', cellsrenderer: function () {
+                { text: 'Biaya', datafield: 'biaya', width: '20%', align: 'center', cellsalign: 'left'},
+                { text: 'Status', datafield: 'status', width: '20%', align: 'center', cellsalign: 'left'},
+                { text: 'Edit', columntype: 'button', align: 'center', width: '10%', cellsrenderer: function () {
                     return "Edit";
                     }, buttonclick: function (row) {
                         editrow = row;
@@ -510,973 +701,7 @@
                 return false;
             });
         });
-        $('#gradekb').click(function () {	
-            var set01	='kb';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#gradeta').click(function () {	
-            var set01	='ta';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade1').click(function () {	
-            var set01	='1';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade2').click(function () {	
-            var set01	='2';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade3').click(function () {	
-            var set01	='3';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade4').click(function () {	
-            var set01	='4';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade5').click(function () {
-            var set01	='5';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade6').click(function () {	
-            var set01	='6';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade7').click(function () {	
-            var set01	='7';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade8').click(function () {	
-            var set01	='8';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade9').click(function () {	
-            var set01	='9';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade10').click(function () {	
-            var set01	='10';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade11').click(function () {	
-            var set01	='11';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#grade12').click(function () {	
-            var set01	='12';
-            var source 	= {
-                datatype: "json",
-                datafields: [
-                    { name: 'id'},	
-                    { name: 'noinduk', type: 'text'},
-                    { name: 'dpp', type: 'text'},
-                    { name: 'spp', type: 'text'},
-                    { name: 'paguyuban', type: 'text'},
-                    { name: 'eksul1', type: 'text'},
-                    { name: 'eksul2', type: 'text'},
-                    { name: 'eksul3', type: 'text'},
-                    { name: 'eksul4', type: 'text'},
-                    { name: 'eksul5', type: 'text'},
-                    { name: 'nama', type: 'text'},
-                ],
-                type: 'POST',
-                data: {val01:set01, _token: token},
-                url: "json/setkeuangan"
-            };			
-            var dataAdapter = new $.jqx.dataAdapter(source);
-            $('#setperkelas').show(); 
-            $('#gridinsidental').hide(); 
-            $("#gridsetting").jqxGrid({
-                width: '100%',
-                filterable: true,
-                pageable: true,
-                filterable: true,
-                filtermode: 'excel',				
-                source: dataAdapter,
-                columnsresize: true,
-                theme: "energyblue",
-                selectionmode: 'multiplecellsextended',
-                columns: [				
-                    { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                    { text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-                    { text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-                    { text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-                    { text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-                    { text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-                    { text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-                    { text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-                    { text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-                    { text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
-                        return "Edit";
-                        }, buttonclick: function (row) {	
-                            editrow = row;	
-                            var offset 		= $("#gridsetting").offset();
-                            $('#setperkelas').show(); 
-                            $('#gridinsidental').hide();
-                            var dataRecord 	= $("#gridsetting").jqxGrid('getrowdata', editrow);				
-                            $("#id_nama").val(dataRecord.nama);
-                            $("#id_dpp").val(dataRecord.dpp);
-                            $("#id_noinduk").val(dataRecord.noinduk);
-                            $("#id_paguyuban").val(dataRecord.paguyuban);
-                            $("#id_spp").val(dataRecord.spp);
-                            $("#id_eksul1").val(dataRecord.eksul1);
-                            $("#id_eksul2").val(dataRecord.eksul2);
-                            $("#id_eksul3").val(dataRecord.eksul3);
-                            $("#id_eksul4").val(dataRecord.eksul4);
-                            $("#id_eksul5").val(dataRecord.eksul5);
-                            $("#modaleditkeuangan").modal('show');	
-                        }
-                    },
-                ]
-            });		
-        });
-        $('#btnsavesetting').on('click', function (){		
+        $('#btnsavesetting').on('click', function (){
             var set01=document.getElementById('id_nama').value;
             var set02=document.getElementById('id_noinduk').value;
             var set03=document.getElementById('id_dpp').value;
@@ -1496,7 +721,30 @@
                 $("#gridsetting").jqxGrid("updatebounddata");
                 $("#gridinsidental").jqxGrid("updatebounddata");
             });
-        });	
+        });
+        $('#onoffminat').on('click', function (){
+			var set01='ekstrakulikuler';
+			var token=document.getElementById('token').value;		
+			$.post('admin/onofflayanan', { val01: set01, _token: token },
+			function(data){
+				var status  = data.status;
+				var message = data.message;
+				var warna 	= data.warna;
+				var icon 	= data.icon;
+				$.toast({
+					heading: status,
+					text: message,
+					position: 'top-right',
+					loaderBg: warna,
+					icon: icon,
+					hideAfter: 5000,
+					stack: 1
+				});
+				setTimeout(function () {
+					location.reload();
+				}, 3000);
+			});
+		});
     });
 </script>
 @endpush

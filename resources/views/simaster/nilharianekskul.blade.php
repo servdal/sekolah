@@ -1,25 +1,24 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-            <div class="col-sm-7">
-                <h1 class="m-0"> Ektrakulikuler {{ $namaekskul }}</h1>
-            </div>
-            <div class="col-sm-5">
-				<div class="btn-group">
-                    <a class="btn btn-app btn-primary" id="topbtnpresensi" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Presensi"><i class="fa fa-calculator"></i> Presensi</a>
-				    <a class="btn btn-app btn-success" id="topbtnuts" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Penilaian"><i class="fa fa-pencil"></i> PTS</a>
-				    <a class="btn btn-app btn-danger" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Kenaikan Kelas" id="topbtnuas"><i class="fa fa-trophy"></i> PAS</a>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-7">
+                    <h1 class="m-0"> Ektrakulikuler {{ $namaekskul }}</h1>
+                </div>
+                <div class="col-sm-5">
+                    <div class="btn-group">
+                        <a class="btn btn-app btn-primary" id="topbtnpresensi" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Presensi"><i class="fa fa-calculator"></i> Presensi</a>
+                        <a class="btn btn-app btn-success" id="topbtnuts" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Penilaian"><i class="fa fa-pencil"></i> PTS</a>
+                        <a class="btn btn-app btn-danger" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Kenaikan Kelas" id="topbtnuas"><i class="fa fa-trophy"></i> PAS</a>
+                    </div>
                 </div>
             </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
-            
             <div class="row">
                 <div class="col-lg-3" id="sectionsetting">
                     <div class="card card-danger shadow">
@@ -34,10 +33,7 @@
                             <div class="form-group">
                                 <label>TAPEL</label>
                                 <input type="text" name="tapel" id="tapel" class="form-control" value="{{$tapel}}">
-                            </div>
-                            <div class="form-group">
-                                <label>Kelas</label>
-                                <input type="text" name="id_kelas" id="id_kelas" class="form-control" value="{{$klsajar}}">
+                                <input type="hidden" name="id_kelas" id="id_kelas" class="form-control" value="{{$klsajar}}">
                             </div>
                             <div class="form-group">
                                 <label>Semester</label>
@@ -220,7 +216,7 @@
 													<td>{!! $rsiswa['nama'] !!}</td>
 													<td>{!! $rsiswa['kelas'] !!}</td>
 												<td>
-													<input type="text" name="nilai[{{$i}}][nilainya]" />
+													<input type="text" name="nilai[{{$i}}][nilainya]" class="form-control"  value="{!! $rsiswa['nilairapot'] ?? '' !!}"/>
 													<input type="hidden" name="nilai[{{$i}}][namaekskul]" value="{!! $namaekskul !!}" />
 													<input type="hidden" name="nilai[{{$i}}][nisn]" value="{!! $rsiswa['nisn'] !!}" />
 													<input type="hidden" name="nilai[{{$i}}][alamat]" value="{!! $rsiswa['alamat'] !!}" />
@@ -248,7 +244,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 <input type="hidden" name="idekskul" id="idekskul" value="{{ $idekskul }}">
@@ -359,7 +355,43 @@
         </div>
     </div>
 </div>
-<input type="hidden" id="mas_matkul">
+<div class="modal fade" id="modaleditnilaideskripsi">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Form Edit Nilai</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <label>Nama</label>
+                            <input type="text" id="nildes_nama" name="nildes_nama" class="form-control" disabled="disable">
+                        </div>
+                        <div class="col-lg-4">
+                            <label>NIS</label>
+                            <input type="text" id="nildes_nis" name="nildes_nis" class="form-control" disabled="disable">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi</label>
+                    <input type="text" id="nildes_deskripsi" name="nildes_deskripsi" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <input type="hidden" class="form-control" id="nildes_id" >
+                <input type="hidden" class="form-control" id="nildes_nil" >
+                <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-success" id="simpaneditnilaides">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="mas_matkul" value="{{ $namaekskul }}">
 <input type="hidden" id="mas_semester" name="mas_semester" value="{{ $smt }}">
 <input type="hidden" id="mas_tapel" name="mas_tapel" value="{{ $tapel }}">
 <input type="hidden" id="mas_niyguru" name="mas_niyguru" value="{{ Session('id') }}">
@@ -368,61 +400,13 @@
 <script>
 	$(function () {
 		CKEDITOR.env.isCompatible = true;
-		
 		$('#absen_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
 	});
-	$(document).ready(function () {
-		$('#leboknoabsen').hide();
-		$('#lebokpenilaian').hide();
-		$('#divgriddetailpresensi').hide();
-		$('#datarinciannnilai').hide();
-		$('#divabsen').hide();
-		$('.btnboxkembali').click(function () {
-			$('#leboknoabsen').hide();
-			$('#datanilai').show();
-			$('#lebokpenilaian').hide();
-		});
-		$('#btnclosedetailnilai').click(function () {
-			$('#datarinciannnilai').hide();
-			$('#datanilai').show();
-		});
-		$('#btnclosedetail').click(function () {
-			$('#divgriddetailpresensi').hide();
-			$('#divabsen').show();
-		});
-		$('#btntambahpresensi').click(function () {
-			$('#datanilai').hide();
-			$('#datarinciannnilai').hide();
-			$('#lebokpenilaian').hide();
-			$('#leboknoabsen').show();
-		});
-		$('#topbtnuts').click(function () {
-			$('#datanilai').hide();
-			$('#datarinciannnilai').hide();
-			$('#lebokpenilaian').show();
-			$('#leboknoabsen').hide();
-			$("#nilai_jenis").val('PTS');
-		});
-		$('#topbtnuas').click(function () {
-			$('#datanilai').hide();
-			$('#datarinciannnilai').hide();
-			$('#lebokpenilaian').show();
-			$('#leboknoabsen').hide();
-			$("#nilai_jenis").val('PAS');
-		});
-		$('#btnperbesar').click(function () {
-			$('#sectionsetting').hide();
-			$('#sectionkerja').removeClass('col-lg-9').addClass('col-lg-12');
-			$("#gridlogaktifitas").jqxGrid("updatebounddata");
-		});
-		$('#btnboxrefresh1').click(function () {
-			var uri = window.location.href.split("#")[0];
-			window.location=uri
-		});
-		$('#btnclosedetail').click(function () {
-			$('#divgriddetailpresensi').hide();
-		});
-		var sourcenilai = {
+    function jQueryOpenLOG(){
+        var set01	= document.getElementById('mas_matkul').value;
+        var set02	= document.getElementById('mas_tapel').value;
+        var set03	= document.getElementById('mas_semester').value;
+        var source 	= {
             datatype: "json",
             datafields: [
                 { name: 'id',type: 'text'},
@@ -438,19 +422,21 @@
                 { name: 'jennilai',type: 'text'},
                 { name: 'marking',type: 'text'},
             ],
-            url     : '{{ route("jsonLognilai") }}',
-            cache   : false,
+            type: 'POST',
+            data: {val01:set01, val02:set02, val03:set03, _token: '{{ csrf_token() }}'},
+            url: '{{ route("jsonLognilaiEkskul") }}',
         };
-		var datanilai = new $.jqx.dataAdapter(sourcenilai);
-		$("#gridlogaktifitas").jqxGrid({
+        var dataAdapter = new $.jqx.dataAdapter(source);
+        $("#gridlogaktifitas").jqxGrid({
             width           : '100%',
             columnsresize   : true,
             theme           : "energyblue",
             autoheight      : true,
             altrows         : true,
             filterable      : true,
-            filtermode      : 'excel',
-            source          : datanilai,
+            showfilterrow   : true,
+            pageable        : true,
+            source          : dataAdapter,
             columns         : [
                 { text: 'JENIS', datafield: 'jennilai', width: '18%', cellsalign: 'left', align: 'center'},
                 { text: 'Tanggal', datafield: 'tanggal', width: '10%', align: 'center' },
@@ -467,60 +453,51 @@
                         editrow = row;
                         var offset 		= $("#gridlogaktifitas").offset();
                         var dataRecord 	= $("#gridlogaktifitas").jqxGrid('getrowdata', editrow);
-                        if (dataRecord.jennilai == 'Ekstrakurikuler') {
-                            var sourcerinciannilai = {
-                                datatype: "json",
-                                datafields: [
-                                    { name: 'id',type: 'text'},
-                                    { name: 'nama',type: 'text'},
-                                    { name: 'noinduk',type: 'text'},
-                                    { name: 'kelas',type: 'text'},
-                                    { name: 'nilai',type: 'text'},
-                                    { name: 'deskripsi',type: 'text'},
-                                ],
-                                type: 'POST',
-                                data: {	val01:dataRecord.marking, _token: '{{ csrf_token() }}' },
-                                url : '{{ route("jsonRinciannilai") }}',
-                            };
-                            var datarincianharian = new $.jqx.dataAdapter(sourcerinciannilai);
-                            $("#griddetailnilai").jqxGrid({
-                                width: '100%',
-                                source: datarincianharian,
-                                autoheight: true,
-                                theme: "orange",
-                                columnsresize: true,
-                                selectionmode: 'multiplecellsextended',
-                                columns: [
-                                    { text: 'Nama', datafield: 'nama', width: '30%', align: 'center' },
-                                    { text: 'No.Induk', datafield: 'noinduk', width: '10%', align: 'center' },
-                                    { text: 'Kelas', datafield: 'kelas', width: '10%', align: 'center' },
-                                    { text: 'Kehadiran', datafield: 'nilai', width: '10%', cellsalign: 'center', align: 'center' },
-                                    { text: 'Materi', datafield: 'deskripsi', width: '30%', cellsalign: 'center', align: 'center' },
-                                    { text: 'Edit', columntype: 'button', width: '10%', cellsrenderer: function () {
-                                        return "edit";
-                                        }, buttonclick: function (row) {
-                                            editrow = row;
-                                            var offset 		= $("#griddetailnilai").offset();
-                                            var dataRecord 	= $("#griddetailnilai").jqxGrid('getrowdata', editrow);
-                                            $("#nil_nama").val(dataRecord.nama);
-                                            $("#nil_nis").val(dataRecord.noinduk);
-                                            $("#nil_nil").val(dataRecord.nilai);
-                                            $("#nil_deskripsi").val(dataRecord.deskripsi);
-                                            $("#nil_id").val(dataRecord.id);
-                                            $("#modaleditnilai").modal('show');
-                                        }
-                                    },
-                                ]
-                            });
-                            $('#datanilai').hide();
-                            $('#datarinciannnilai').show();
-                        } else {
-                            swal({
-                                title	: 'Stop',
-                                text	: 'Untuk edit data ini, silahkan ulangi pengisian dari laman Penilaian',
-                                type	: 'error',
-                            })
-                        }
+                        var sourcerinciannilai = {
+                            datatype: "json",
+                            datafields: [
+                                { name: 'id',type: 'text'},
+                                { name: 'nama',type: 'text'},
+                                { name: 'noinduk',type: 'text'},
+                                { name: 'kelas',type: 'text'},
+                                { name: 'posisi',type: 'text'},
+                                { name: 'deskripsi',type: 'text'},
+                            ],
+                            type: 'POST',
+                            data: {	val01:dataRecord.jennilai, tapel:dataRecord.tapel, semester:dataRecord.semester, matpel:dataRecord.matpel, _token: '{{ csrf_token() }}' },
+                            url : '{{ route("jsonRinciannilai") }}',
+                        };
+                        var datarincianharian = new $.jqx.dataAdapter(sourcerinciannilai);
+                        $("#griddetailnilai").jqxGrid({
+                            width: '100%',
+                            source: datarincianharian,
+                            autoheight: true,
+                            theme: "orange",
+                            columnsresize: true,
+                            selectionmode: 'multiplecellsextended',
+                            columns: [
+                                { text: 'Nama', datafield: 'nama', width: '30%', align: 'center' },
+                                { text: 'No.Induk', datafield: 'noinduk', width: '10%', align: 'center' },
+                                { text: 'Kelas', datafield: 'kelas', width: '10%', align: 'center' },
+                                { text: 'Deskripsi', datafield: 'deskripsi', width: '40%', cellsalign: 'center', align: 'center' },
+                                { text: 'Edit', columntype: 'button', width: '10%', cellsrenderer: function () {
+                                    return "edit";
+                                    }, buttonclick: function (row) {
+                                        editrow = row;
+                                        var offset 		= $("#griddetailnilai").offset();
+                                        var dataRecord 	= $("#griddetailnilai").jqxGrid('getrowdata', editrow);
+                                        $("#nildes_nama").val(dataRecord.nama);
+                                        $("#nildes_nis").val(dataRecord.noinduk);
+                                        $("#nildes_nil").val(dataRecord.posisi);
+                                        $("#nildes_deskripsi").val(dataRecord.deskripsi);
+                                        $("#nildes_id").val(dataRecord.id);
+                                        $("#modaleditnilaideskripsi").modal('show');
+                                    }
+                                },
+                            ]
+                        });
+                        $('#datanilai').hide();
+                        $('#datarinciannnilai').show();
                     }
                 },
                 { text: 'Del', editable: false, sortable: false, filterable: false, columntype: 'button', align: 'center', width: '5%', cellsrenderer: function () {
@@ -573,6 +550,58 @@
                 },
             ],
         });
+    }
+	$(document).ready(function () {
+		$('#leboknoabsen').hide();
+		$('#lebokpenilaian').hide();
+		$('#divgriddetailpresensi').hide();
+		$('#datarinciannnilai').hide();
+		$('#divabsen').hide();
+		$('.btnboxkembali').click(function () {
+			$('#leboknoabsen').hide();
+			$('#datanilai').show();
+			$('#lebokpenilaian').hide();
+		});
+		$('#btnclosedetailnilai').click(function () {
+			$('#datarinciannnilai').hide();
+			$('#datanilai').show();
+		});
+		$('#btnclosedetail').click(function () {
+			$('#divgriddetailpresensi').hide();
+			$('#divabsen').show();
+		});
+		$('#btntambahpresensi').click(function () {
+			$('#datanilai').hide();
+			$('#datarinciannnilai').hide();
+			$('#lebokpenilaian').hide();
+			$('#leboknoabsen').show();
+		});
+		$('#topbtnuts').click(function () {
+			$('#datanilai').hide();
+			$('#datarinciannnilai').hide();
+			$('#lebokpenilaian').show();
+			$('#leboknoabsen').hide();
+			$("#nilai_jenis").val('PTS');
+		});
+		$('#topbtnuas').click(function () {
+			$('#datanilai').hide();
+			$('#datarinciannnilai').hide();
+			$('#lebokpenilaian').show();
+			$('#leboknoabsen').hide();
+			$("#nilai_jenis").val('PAS');
+		});
+		$('#btnperbesar').click(function () {
+			$('#sectionsetting').hide();
+			$('#sectionkerja').removeClass('col-lg-9').addClass('col-lg-12');
+			$("#gridlogaktifitas").jqxGrid("updatebounddata");
+		});
+		$('#btnboxrefresh1').click(function () {
+			var uri = window.location.href.split("#")[0];
+			window.location=uri
+		});
+		$('#btnclosedetail').click(function () {
+			$('#divgriddetailpresensi').hide();
+		});
 		$('.btnexport').click(function () {
 			var gridContent = $("#gridnilai").jqxGrid('exportdata', 'json');
 			data = $.parseJSON(gridContent);
@@ -659,12 +688,6 @@
 					text: 'Isi Kolom Semester Terlebih Dahulu',
 					type: 'warning',
 				})
-			} else if (set02 == ''){
-				swal({
-					title: 'Stop',
-					text: 'Isi Kolom Kelas Terlebih Dahulu',
-					type: 'warning',
-				})
 			} else if (set04 == ''){
 				swal({
 					title: 'Stop',
@@ -674,7 +697,19 @@
 			} else {
 				$.post('guru/savesetguru', { val01: set01, val02: set02, val03: set03, val04: set04, _token: '{{ csrf_token() }}' },
 				function(data){
-					location.reload();
+                    var status  = data.status;
+                    var message = data.message;
+                    var warna 	= data.warna;
+                    var icon 	= data.icon;
+                    $("html, body").animate({ scrollTop: 0 }, "slow");
+                    swal({
+                        title	: status,
+                        text	: message,
+                        type	: icon,
+                    })
+					var uri = window.location.href.split("#")[0];
+                    setTimeout(function () { window.location=uri;}, 5000);
+                    return false;
 				});
 			}
 		});
@@ -829,7 +864,8 @@
                             text	: message,
                             type	: icon,
                         })
-                        $("#gridlogaktifitas").jqxGrid('updatebounddata');
+                        var uri = window.location.href.split("#")[0];
+                        setTimeout(function () { window.location=uri;}, 5000);
                         return false;
                     },
                     error: function (xhr, status, error) {
@@ -888,7 +924,8 @@
                             text	: message,
                             type	: icon,
                         })
-                        $("#gridlogaktifitas").jqxGrid('updatebounddata');
+                        var uri = window.location.href.split("#")[0];
+                        setTimeout(function () { window.location=uri;}, 5000);
                         return false;
                     },
                     error: function (xhr, status, error) {
@@ -921,7 +958,8 @@
                 $("#modaleditnilai").modal('hide');
                 $.post('{{ route("exSaveditnilai") }}', { val01: set01, val02: set02, _token: '{{ csrf_token() }}' },
                 function(data){
-                    $("#gridnilai").jqxGrid("updatebounddata");
+                    $("#griddetailpresensi").jqxGrid("updatebounddata");
+                    $("#gridpresensi").jqxGrid("updatebounddata");
                     $("html, body").animate({ scrollTop: 0 }, "slow");
                     var status  = data.status;
                     var message = data.message;
@@ -940,6 +978,40 @@
                 });
             }
         });
+        $('#simpaneditnilaides').click(function () {
+            var set01=document.getElementById('nildes_id').value;
+            var set02=document.getElementById('nildes_nil').value;
+            var set03=document.getElementById('nildes_deskripsi').value;
+            if (set01 == ''){
+                swal({
+                    title: 'Stop',
+                    text: 'Pilih Siswa Terlebih Dahulu',
+                    type: 'warning',
+                })
+            } else {
+                $("#modaleditnilaideskripsi").modal('hide');
+                $.post('{{ route("exSaveditnilai") }}', { val01: 'deksripsi', val02: set02, val03: set03, id: set01, _token: '{{ csrf_token() }}' },
+                function(data){
+                    $("#griddetailnilai").jqxGrid("updatebounddata");
+                    $("html, body").animate({ scrollTop: 0 }, "slow");
+                    var status  = data.status;
+                    var message = data.message;
+                    var warna 	= data.warna;
+                    var icon 	= data.icon;
+                    $.toast({
+                        heading: status,
+                        text: message,
+                        position: 'top-right',
+                        loaderBg: warna,
+                        icon: icon,
+                        hideAfter: 5000,
+                        stack: 1
+                    });
+                    return false;
+                });
+            }
+        });
+        jQueryOpenLOG();
 	});
 </script>
 @endpush

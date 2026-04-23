@@ -1,13 +1,13 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-	<div class="content-header">
-		<div class="container">
+<div class="wrapper">
+	<section class="content-header">
+        <div class="container-fluid">
 			<div class="row mb-2">
-				<div class="col-sm-7">
-					<h1 class="m-0"> Seragam, Kegiatan, Peralatan, Buku, SPP, Ekskul, Makan</h1>
+				<div class="col-sm-4">
+					<h1 class="m-0"> Pembayaran</h1>
 				</div>
-				<div class="col-sm-5">
+				<div class="col-sm-8">
 					<div class="btn-group">
 						<a class="btn btn-app btn-primary" href="{{url('/')}}/lapbayar" data-bs-toggle="tooltip" data-bs-placement="top" title="Seragam, Kegiatan, Peralatan, Buku, SPP, Ekskul, Makan"><i class="fa fa-calculator"></i> SPP</a>
 						<a class="btn btn-app btn-success" href="{{url('/')}}/datakeuhptmasuk" data-bs-toggle="tooltip" data-bs-placement="top" title="Keuangan Sekolah"><i class="fa fa-pencil"></i> Sekolah</a>
@@ -17,14 +17,14 @@
 					</div>
 				</div>
 			</div>
-		</div>
-	</div>
-	<div class="content" >
+        </div>
+    </section>
+    <section class="content">
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-12">
 					<div id="status"></div>
-					<div class="card card-danger shadow">
+					<div class="card card-primary shadow">
 						<div class="card-header">
 							<h3 class="card-title"><i class="fa fa-money"></i> Laporan</h3>
 							<div class="card-tools">
@@ -40,9 +40,16 @@
 									</a>
 								</div>
 								<div class="col-lg-2">
-									<div class="form-group">
-										<label>Master Tanggal *)</label>
-										<input type="text" id="id_mastertgl" name="id_mastertgl" class="form-control" value="{{$tanggal}}" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask />
+									<a href="#" id="btntambahtagihanmanual"  class="btn btn-block btn-social btn-danger">
+										<i class="fa fa-credit-card"></i> Input Tagihan Manual
+									</a>
+								</div>
+								<div class="col-lg-4">
+									<div class="form-group row">
+										<label for="id_mastertgl" class="col-sm-6 col-form-label">Master Tanggal <span class="text-danger">*</span>:</label>
+										<div class="col-sm-6">
+											<input type="text" id="id_mastertgl" name="id_mastertgl" class="form-control" value="{{$tanggal}}" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask />
+										</div>
 									</div>
 								</div>
 								<!--
@@ -66,14 +73,31 @@
 								<div id="griddatabayar"></div>
 							</div>
 							<div class="divrincianortu">
+								<div class="col-lg-3">
+									<a href="#" id="btnkembali"  class="btn btn-block btn-social btn-warning">
+										<i class="fa fa-hand-o-left"></i> Close
+									</a>
+								</div>
 								<div id="gridrincianortu"></div>
 							</div>
+						</div>
+					</div>
+					<div class="card card-danger shadow">
+						<div class="card-header">
+							<h3 class="card-title"><i class="fa fa-money"></i> Tagihan Manual</h3>
+							<div class="card-tools">
+								<button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse"><i class="fa fa-minus"></i></button>
+								<button type="button" class="btn btn-tool" data-card-widget="remove" title="Close"><i class="fa fa-times"></i>
+							</div>
+						</div>
+						<div class="card-body">
+							<div id="griddatatagihanmanual"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	</section>
 </div>
 <div class="modal fade" id="modaleditkeuangan">
 	<div class="modal-dialog">
@@ -307,6 +331,65 @@
 		</div>
 	</div>
 </div>
+<div class="modal fade" id="modaltagihanmanual">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Tagihan Manual</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">			 
+					<label>Nama</label>
+					<select id="manual_nama" name="manual_nama" class="form-control" >
+						<option value="">Pilih Salah Satu</option>
+						@if(isset($datasiswa) && !empty($datasiswa))
+							@foreach($datasiswa as $rsiswa)
+								<option value="{{ $rsiswa['id'] }}">{{ $rsiswa['nama'] }} No.Induk ({{ $rsiswa['noinduk'] }})</option>
+							@endforeach
+						@endif
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Jenis Tagihan</label>
+					<select id="manual_jenis" name="manual_jenis" class="form-control" >
+						<option value="">Pilih Salah Satu</option>
+						<option value="spp">SPP</option>
+						<option value="dpp">DPP</option>
+						<option value="makan">UANG MAKAN</option>
+						<option value="kegiatan">KEGIATAN</option>
+						<option value="peralatan">PERALATAN</option>
+						<option value="ekstrakurikuler">EKSTRAKULIKULER</option>
+						<option value="buku">BUKU</option>
+						<option value="seragam">SERAGAM</option>
+						@foreach($allinsidental as $rowinsidental)
+							<option value="{{ $rowinsidental['deskripsi'] }}">{{ $rowinsidental['deskripsi'] }}</option>
+						@endforeach
+					</select>
+				</div>
+				<div class="form-group">			 
+					<div class="row">
+						<div class="col-lg-6">
+							<label>Tagihan</label>
+							<input type="text" id="manual_nominal" name="manual_nominal" class="form-control">
+						</div>
+						<div class="col-lg-4">
+							<label>Tenggat Waktu</label>
+							<input type="text" id="manual_tanggal" name="manual_tanggal" class="form-control" value="{{date('Y-m-d')}}" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer justify-content-between">
+				<input type="hidden" id="manual_id" name="manual_id" class="form-control">
+				<button type="button" class="btn btn-warning pull-left" data-dismiss="modal">Tutup</button>
+				<button type="button" class="btn btn-info" id="btnsimpantagihanmanual">Simpan</button>
+			</div>
+		</div>
+	</div>
+</div>
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
 </div>
@@ -317,6 +400,7 @@
 <script>
 	$(function () {
         $('#id_mastertgl').inputmask('dd-mm-yyyy', { 'placeholder': 'Tgl bulan Tahun' });
+		$('#manual_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'Tgl bulan Tahun' });
 	});
 	window.opengambar = function(img) {
 		var gambarpreview = img.getAttribute("src");
@@ -337,6 +421,9 @@
 $(document).ready(function () {
 	$('.divrincianortu').hide();
 	$('.overlay').hide();
+	$("#manual_nominal").autoNumeric(
+		'init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'}
+	);
 	$("#biayadpp").autoNumeric(
 		'init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'}
 	);
@@ -361,6 +448,7 @@ $(document).ready(function () {
 	$("#ekskul5").autoNumeric(
 		'init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'}
 	);
+	$("#id_biaya").autoNumeric('init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'});
 	var token = document.getElementById('token').value;
 	$("#topbtncetakmulti").click(function(){
 		var rows = $("#griddatabayar").jqxGrid('selectedrowindexes');
@@ -494,18 +582,18 @@ $(document).ready(function () {
 			source: dataAdapter,
 			selectionmode: 'multiplecellsextended',
 			columns: [
-				{ text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-				{ text: 'No.Induk', datafield: 'noinduk', width: 100, cellsalign: 'center', align: 'center' },
-				{ text: 'Kelas', datafield: 'kelas', width: 100, cellsalign: 'center', align: 'center' },
-				{ text: 'DPP', datafield: 'dpp', width: 100, cellsalign: 'left', align: 'center' },
-				{ text: 'SPP', datafield: 'spp', width: 100, cellsalign: 'left', align: 'center' },
-				{ text: 'Uang Makan', datafield: 'paguyuban', width: 100, cellsalign: 'left', align: 'center' },	
-				{ text: 'Ekskul 1', datafield: 'eksul1', width: 120, align: 'center' },
-				{ text: 'Ekskul 2', datafield: 'eksul2', width: 120, align: 'center' },
-				{ text: 'Ekskul 3', datafield: 'eksul3', width: 120, align: 'center' },
-				{ text: 'Ekskul 4', datafield: 'eksul4', width: 120, align: 'center' },
-				{ text: 'Ekskul 5', datafield: 'eksul5', width: 120, align: 'center' },
-				{ text: 'Bayar', editable: false, sortable: false, filterable: false, columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
+				{ text: 'Nama', datafield: 'nama', width: '13%', cellsalign: 'left', align: 'center' },
+				{ text: 'No.Induk', datafield: 'noinduk', width: '8%', cellsalign: 'center', align: 'center' },
+				{ text: 'Kelas', datafield: 'kelas', width: '8%', cellsalign: 'center', align: 'center' },
+				{ text: 'DPP', datafield: 'dpp', width: '8%', cellsalign: 'left', align: 'center' },
+				{ text: 'SPP', datafield: 'spp', width: '8%', cellsalign: 'left', align: 'center' },
+				{ text: 'Uang Makan', datafield: 'paguyuban', width: '8%', cellsalign: 'left', align: 'center' },	
+				{ text: 'Ekskul 1', datafield: 'eksul1', width: '8%', align: 'center' },
+				{ text: 'Ekskul 2', datafield: 'eksul2', width: '8%', align: 'center' },
+				{ text: 'Ekskul 3', datafield: 'eksul3', width: '8%', align: 'center' },
+				{ text: 'Ekskul 4', datafield: 'eksul4', width: '8%', align: 'center' },
+				{ text: 'Ekskul 5', datafield: 'eksul5', width: '8%', align: 'center' },
+				{ text: 'Bayar', editable: false, sortable: false, filterable: false, columntype: 'button', align: 'center', width: '7%', cellsrenderer: function () {
 					return "Bayar";
 					}, buttonclick: function (row) {
 						editrow = row;
@@ -573,7 +661,6 @@ $(document).ready(function () {
 			return false;
 		});
 	});
-	$("#id_biaya").autoNumeric('init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'});
 	$('#btnkembali').click(function () {
 		$('.divrincianortu').hide();
 		$('.divlaporanbyr').show();
@@ -695,21 +782,21 @@ $(document).ready(function () {
 						columnsresize: true,
 						selectionmode: 'multiplecellsextended',
 						columns: [
-							{ text: 'Nama', datafield: 'nama', width: '25%', align: 'center' },
+							{ text: 'Nama', datafield: 'nama', width: '30%', align: 'center' },
 							{ text: 'No.Induk', datafield: 'noinduk', width: '10%', align: 'center' },
 							{ text: 'Tagihan', datafield: 'rutin', width: '10%', align: 'center' },
 							{ text: 'Biaya', datafield: 'biaya', width: '10%', cellsalign: 'center', align: 'center' },
 							{ text: 'Tgl.Bayar', datafield: 'tanggal', width: '10%', cellsalign: 'center', align: 'center' },
 							{ text: 'Jenis', datafield: 'jenis', width: '10%', cellsalign: 'left', align: 'center' },
 							{ text: 'Inputor', datafield: 'inputor', width: '10%', cellsalign: 'left', align: 'center' },
-							{ text: 'UBAH', columntype: 'button', align: 'center', width: 50, cellsrenderer: function () {
+							{ text: 'UBAH',  editable: false, sortable: false, filterable: false, columntype: 'button', align: 'center', width: '10%', cellsrenderer: function () {
 								return "Edit";
-								}, buttonclick: function (row) {	
-								editrow = row;	
-								$('.divrincianortu').show(); 
-								$('.divlaporanbyr').hide(); 
-								var offset 		= $("#gridrincianortu").offset();		
-								var dataRecord 	= $("#gridrincianortu").jqxGrid('getrowdata', editrow);				
+								}, buttonclick: function (row) {
+								editrow = row;
+								$('.divrincianortu').show();
+								$('.divlaporanbyr').hide();
+								var offset 		= $("#gridrincianortu").offset();
+								var dataRecord 	= $("#gridrincianortu").jqxGrid('getrowdata', editrow);
 									$("#id_nama").val(dataRecord.nama);
 									$("#id_noinduk").val(dataRecord.noinduk);
 									$("#id_jenis").val(dataRecord.jenis);
@@ -723,6 +810,156 @@ $(document).ready(function () {
 				}
 			},
 		],                
+	});
+	$('#btntambahtagihanmanual').click(function () {
+		$('#manual_id').val('new');
+		$("#modaltagihanmanual").modal('show');
+	});
+	$('#btnsimpantagihanmanual').click(function () {
+		var set02=document.getElementById('manual_nominal').value;
+		var set03=document.getElementById('manual_jenis').value;
+		var set04=document.getElementById('manual_nama').value;
+		var set05=document.getElementById('manual_tanggal').value;
+		var set06=document.getElementById('manual_id').value;
+		if (set06 == '' || set02 == '' || set03 == '' || set04 == '' || set05 == ''){
+			swal({
+				title	: 'Warning',
+				text	: 'Lengkapi semua isian pada field yang bertanda bintang, apabila ada data yang memang tidak ada mohon memberikan tanda 0 (nol) atau - (strip)',
+				type	: 'error',
+			});
+		} else {
+			var formdata = new FormData();
+				formdata.set('val01', 'tagihanmanual');
+				formdata.set('val02', set02);
+				formdata.set('val03', set03);
+				formdata.set('val04', set04);
+				formdata.set('val05', set05);
+				formdata.set('val06', set06);
+				formdata.set('_token', '{{ csrf_token() }}');
+				$("#modaltagihanmanual").modal('hide');
+			$.ajax({
+				url         : '{{ route("exEditorbyr") }}',
+				data        : formdata,
+				type        : 'POST',
+				contentType : false,
+				processData : false,
+				success: function (data) {
+					var status  = data.status;
+					var message = data.message;
+					var warna 	= data.warna;
+					var icon 	= data.icon;
+					$.toast({
+						heading     : status,
+						text        : message,
+						position    : 'top-right',
+						loaderBg    : warna,
+						icon        : icon,
+						hideAfter   : 5000,
+						stack       : 1
+					});
+					$("#griddatatagihanmanual").jqxGrid("updatebounddata");		
+					$("html, body").animate({ scrollTop: 0 }, "slow");
+					return false;
+				},
+				error: function (xhr, status, error) {
+					swal({
+						title	: 'Stop',
+						text	: xhr.responseText,
+						type	: 'warning',
+					})
+				}
+			});
+		}
+	});
+	var sourcetagihanmanual = {
+		datatype: "json",
+		datafields: [
+			{ name: 'id',type: 'text'},	
+			{ name: 'idsiswa',type: 'text'},
+			{ name: 'nama',type: 'text'},
+			{ name: 'noinduk',type: 'text'},
+			{ name: 'klspos',type: 'text'},
+			{ name: 'jenis',type: 'text'},
+			{ name: 'biaya',type: 'text'},
+			{ name: 'nominal',type: 'text'},
+			{ name: 'tenggat',type: 'text'},
+			{ name: 'marking',type: 'text'},
+		],
+		url: '{{ route("jsonTagihanManual") }}',
+		cache: false,
+	};
+	var jsonTagihanManual = new $.jqx.dataAdapter(sourcetagihanmanual);
+	$("#griddatatagihanmanual").jqxGrid({
+		width				: '100%',
+		showfilterrow		: true,
+		filterable			: true,
+		columnsresize		: true,
+		autoshowfiltericon	: true,
+		pageable			: true,
+		autoheight			: true,
+		theme				: "energyblue",
+		source				: jsonTagihanManual,
+		columns				: [
+			{ text: 'Nama', datafield: 'nama', width: '20%', align: 'center' },
+			{ text: 'No.Induk', datafield: 'noinduk', width: '10%', align: 'center' },
+			{ text: 'Jenis', datafield: 'jenis', width: '20%', align: 'center' },
+			{ text: 'Nominal', datafield: 'nominal', width: '15%', cellsalign: 'right', align: 'center' },
+			{ text: 'Tenggat', datafield: 'tenggat', width: '15%', cellsalign: 'center', align: 'center' },
+			{ text: 'Edit',  editable: false, sortable: false, filterable: false, columntype: 'button', align: 'center', width: '10%', cellsrenderer: function () {
+				return "Edit";
+				}, buttonclick: function (row) {
+					editrow = row;
+					var offset 		= $("#griddatatagihanmanual").offset();
+					var dataRecord 	= $("#griddatatagihanmanual").jqxGrid('getrowdata', editrow);
+					$("#manual_nama").val(dataRecord.idsiswa);
+					$("#manual_jenis").val(dataRecord.jenis);
+					$("#manual_nominal").val(dataRecord.biaya);
+					$("#manual_tanggal").val(dataRecord.tenggat);
+					$("#manual_id").val(dataRecord.id);
+					$("#modaltagihanmanual").modal('show');	
+				}
+			},
+			{ text: 'Hapus',  editable: false, sortable: false, filterable: false, columntype: 'button', align: 'center', width: '10%', cellsrenderer: function () {
+				return "Hapus";
+				}, buttonclick: function (row) {
+					editrow = row;
+					var offset 		= $("#griddatatagihanmanual").offset();
+					var dataRecord 	= $("#griddatatagihanmanual").jqxGrid('getrowdata', editrow);
+					swal({
+						title			    : "Konfirmasi",
+						text			    : "Data yang akan dihapus tidak bisa di kembalikan lagi (undo). Apakah anda yakin.?",
+						type			    : 'warning',
+						showCancelButton    : true,
+						confirmButtonClass  : 'btn btn-confirm mt-2',
+						cancelButtonClass   : 'btn btn-cancel ml-2 mt-2',
+						confirmButtonText   : 'Yes, Delete'
+					}).then(function () {
+						$.ajax({
+							type		: 'ajax',
+							url			: '{{ route("exDestroyer") }}',
+							method		: 'post',
+							data		: {val01:dataRecord.id, val02:'tagihanmanual',  _token: '{{ csrf_token() }}'},
+							dataType	: 'json',
+							success: function(response, status, xhr) {
+								swal({
+									title	: response.status,
+									text	: response.message,
+									type	: response.icon,
+								});
+								$("#griddatatagihanmanual").jqxGrid("updatebounddata");	
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								swal({
+									title	: textStatus,
+									text	: jqXHR.responseText,
+									type	: 'info',
+								});
+							}
+						});
+					});
+				}
+			},
+		],
 	});
 });
 </script>

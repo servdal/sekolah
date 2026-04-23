@@ -12,8 +12,10 @@
         <!-- App favicon -->
         <link rel="icon" type="image/ico" href="{{ asset('favicon.ico') }}">
         @include('base.partials.css')
+		<link href="{{ asset('plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
+
     </head>
-	<body class="hold-transition skin-purple layout-top-nav" style="background-image: url('{{asset('dist/img/bgub.jpg')}}'); background-repeat: no-repeat; background-position: center;">
+	<body class="hold-transition skin-purple layout-top-nav" style="background-image: url('{{asset('dist/img/mrin/bgimage.png')}}'); background-repeat: no-repeat; background-position: center;">
     <div class="wrapper" >
 		<div class="content-wrapper">
 			<section class="content" >
@@ -117,7 +119,7 @@
 					</div>
 					<div class="col-md-4">
 						<div class="box-body box-profile">
-							<img class="img-responsive" src="{{ asset('wasimong.png') }}" alt="User profile picture">
+							<img class="img-responsive" src="{{ asset('logo.png') }}" alt="User profile picture">
 							<h3 class="profile-username text-center">Terima Kasih Atas Kunjunganya</h3>
 						</div>
 					</div>
@@ -180,6 +182,15 @@
 											<div class="col-lg-3 col-xs-6">
 												<label>TAPEL Diterima *)</label>
 												<input type="text" id="id_tahun" name="id_tahun" class="form-control" value="{!! $pendaftaran !!}" disabled="disable">
+												@php
+													$gettahun = explode('-', $pendaftaran);
+													if (isset($gettahun[1])){
+														$tahun = $gettahun[0];
+													} else {
+														$gettahun = explode('/', $pendaftaran);
+														$tahun = $gettahun[0];
+													}
+												@endphp
 											</div> 
 											<div class="col-lg-3 col-xs-6">
 												<label>Masuk Ke *)</label>
@@ -211,7 +222,7 @@
 												</select>
 												@endif
 											</div>
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>NIK Calon Siswa (Nomor Induk Kependudukan) *)</label>
 												<input type="text" id="id_niksiswa" class="form-control" placeholder="Nomor Induk Kependudukan">
 											</div>
@@ -219,11 +230,11 @@
 									</div>			
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-8 col-xs-12">
+											<div class="col-lg-8">
 												<label>Nama Lengkap *)</label>
 												<input type="text" id="id_nama" class="form-control" placeholder="Nama Lengkap">
 											</div> 
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-4">
 												<label>Nama Panggilan *)</label>
 												<input type="text" id="id_namapanggilan" class="form-control" placeholder="Nama Panggilan">
 											</div>
@@ -231,15 +242,15 @@
 									</div>
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Kota Kelahiran *)</label>
 												<input type="text" id="id_tmplahir" class="form-control" placeholder="Tempat Lahir">
 											</div> 
-											<div class="col-lg-3 col-xs-12">
+											<div class="col-lg-3">
 												<label>Tgl.Lahir *)</label>
-												<input type="text" id="id_tgllahir" class="form-control" placeholder="Tanggal Lahir">
+												<input type="text" class="form-control" id="id_tgllahir" name="id_tgllahir" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask/>
 											</div>
-											<div class="col-lg-3 col-xs-12">
+											<div class="col-lg-3">
 												<label>Umur Per Juli {{ $tahun }} *)</label>
 												<input type="text" id="id_umur" class="form-control" placeholder="Umur">
 											</div>
@@ -247,14 +258,14 @@
 									</div>
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-4">
 												<label>Kelamin *)</label>
 												<select id="id_kelamin" class="form-control" >
 													<option value="L">Laki-Laki</option>
 													<option value="P">Perempuan</option>
 												</select>
 											</div>
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-4">
 												<label>Agama *)</label>
 												<select id="id_agama" class="form-control" >
 													<option value="Islam">Islam</option>
@@ -265,7 +276,7 @@
 													<option value="Konghuchu">Konghuchu</option>
 												</select>
 											</div>
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-4">
 												<label>Kewarganegaraan *)</label>
 												<select id="id_warga" class="form-control" >
 													<option value="WNI">WNI</option>
@@ -276,15 +287,15 @@
 									</div>
 									<div class="form-group">
 										<div class="row">				   
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-4">
 												<label>Tinggi Badan</label>
 												<input type="text" id="id_tinggi" class="form-control" placeholder="Tinggi Badan">
 											</div>
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-4">
 												<label>Berat Badan</label>
 												<input type="text" id="id_berat" class="form-control" placeholder="Berat Badan">
 											</div>
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-4">
 												<label>Gol.Darah</label>
 												<select id="id_darah" class="form-control" >
 													<option value="">Tidak Tahu</option>
@@ -298,11 +309,11 @@
 									</div>
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Bahasa Sehari-hari</label>
 												<input type="text" id="id_bahasa" class="form-control" placeholder="Bahasa Sehari-hari">
 											</div> 
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Penyakit yang pernah di derita</label>
 												<input type="text" id="id_penyakit" class="form-control" placeholder="Penyakit Yang Pernah di Derita">
 											</div>				 
@@ -310,7 +321,7 @@
 									</div>
 									<div class="form-group">
 										<div class="row">	
-											<div class="col-lg-3 col-md-3 col-xs-12">
+											<div class="col-lg-3 col-md-3">
 												<label>Anak Ke *)</label>
 												<select id="id_anakke" class="form-control" >
 													<option value="1">1</option>
@@ -327,7 +338,7 @@
 													<option value="12">12</option>
 												</select>
 											</div>
-											<div class="col-lg-3 col-md-3 col-xs-12">
+											<div class="col-lg-3 col-md-3">
 												<label>Saudara Kandung *)</label>
 												<select id="id_kandung" class="form-control" >
 													<option value="0">0</option>
@@ -345,7 +356,7 @@
 													<option value="12">12</option>
 												</select>
 											</div>
-											<div class="col-lg-3 col-md-3 col-xs-12">
+											<div class="col-lg-3 col-md-3">
 												<label>Saudara Tiri</label>
 												<select id="id_tiri" class="form-control" >
 													<option value="0">0</option>
@@ -363,7 +374,7 @@
 													<option value="12">12</option>
 												</select>
 											</div>
-											<div class="col-lg-3 col-md-3 col-xs-12">
+											<div class="col-lg-3 col-md-3">
 												<label>Saudara Angkat</label>
 												<select id="id_angkat" class="form-control" >
 													<option value="0">0</option>
@@ -385,22 +396,26 @@
 									</div>
 									<div class="form-group">
 										<div class="row">				   
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-3">
 												<label>Jarak Rumah Ke Sekolah *)</label>
 												<input type="text" id="id_jarak" class="form-control" placeholder="Jarak (KM)">
 											</div>
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-3">
 												<label>Email Salah Satu ORTU *)</label>
 												<input type="text" id="id_telpon" class="form-control" placeholder="email@xxx.xxx">
 											</div>
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-3">
 												<label>Tinggal Bersama</label>
 												<select id="id_bersama" class="form-control" >
 													<option value="Orang Tua">Orang Tua</option>
 													<option value="Saudara">Saudara</option>
 												</select>
 											</div>
-										</div>			  
+											<div class="col-lg-3">
+												<label>Bukti Bayar Formulir *)</label>
+												<input type="file" id="file_buktibayarformulir" name="file_buktibayarformulir">
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -417,35 +432,35 @@
 									<div class="small-box bg-blue">Alamat Calon Siswa</div>
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Alamat</label>
 												<input type="text" id="id_alamat" name="id_alamat" class="form-control" placeholder="Nama Jalan dan Nomer Rumah">	
 											</div> 
-											<div class="col-lg-3 col-xs-12">
+											<div class="col-lg-3">
 												<label>RT</label>
 												<input type="text" id="id_rt" name="id_rt" class="form-control" placeholder="RT">
 											</div>
-											<div class="col-lg-3 col-xs-12">
+											<div class="col-lg-3">
 												<label>RW</label>
 												<input type="text" id="id_rw" name="id_rw" class="form-control" placeholder="RW">
 											</div>
 										</div>
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Kelurahan</label>
 												<input type="text" id="id_kel" name="id_kel" class="form-control" placeholder="Kelurahan">	
 											</div> 
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Kecamatan</label>
 												<input type="text" id="id_kec" name="id_kec" class="form-control" placeholder="Kecamatan">
 											</div>				
 										</div>
 										<div class="row">
-											<div class="col-lg-8 col-xs-12">
+											<div class="col-lg-8">
 												<label>Kota</label>
 												<input type="text" id="id_kota" name="id_kota" class="form-control" placeholder="Kota">	
 											</div>				  
-											<div class="col-lg-4 col-xs-12">
+											<div class="col-lg-4">
 												<label>Kode POS</label>
 												<input type="text" id="id_kodepos" name="id_kodepos" class="form-control" placeholder="Kode POS">
 											</div>
@@ -453,11 +468,11 @@
 									</div>
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Nama Ayah</label>
 												<input type="text" id="id_ayah" name="id_ayah" class="form-control" placeholder="Ayah">
 											</div> 
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Nama Ibu</label>
 												<input type="text" id="id_ibu" name="id_ibu" class="form-control" placeholder="Ibu">
 											</div>				 
@@ -465,7 +480,7 @@
 									</div>	
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Pekerjaan Ayah</label>
 												<select id="id_kayah" class="form-control" >
 													<option value="">Pilih Salah Satu</option>
@@ -478,7 +493,7 @@
 													<option value="07 Pedagang">07 Pedagang</option>
 												</select>
 											</div> 
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Pekerjaan Ibu</label>
 												<select id="id_kibu" class="form-control" >
 													<option value="">Pilih Salah Satu</option>
@@ -495,11 +510,11 @@
 									</div>
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Pendidikan Terakhir Ayah</label>
 												<input type="text" id="id_payah" class="form-control" placeholder="Pendidikan Ayah">
 											</div> 
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Pendidikan Terakhir Ibu</label>
 												<input type="text" id="id_pibu" class="form-control" placeholder="Pendidikan Ibu">
 											</div>				 
@@ -507,7 +522,7 @@
 									</div>
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Penghasilan Perbulan Ayah</label>
 												<select id="id_gayah" class="form-control" >
 													<option value="rangegaji1">&lt; Rp. 500.000,00 </option>
@@ -518,7 +533,7 @@
 													<option value="rangegaji6">&gt; Rp. 20.000.000,00</option>
 												</select>
 											</div> 
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Penghasilan Perbulan Ibu</label>
 												<select id="id_gibu" class="form-control">
 													<option value="rangegaji1">&lt; Rp. 500.000,00 </option>
@@ -534,21 +549,21 @@
 									<div class="form-group">
 										<label>Alamat Ayah/Ibu <span style="color: #999">(diisi jika tidak serumah dengan calon siswa)</span></label>
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<input type="text" id="id_aayah" class="form-control" placeholder="Alamat Ayah">
 											</div> 
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<input type="text" id="id_aibu" class="form-control" placeholder="Alamat Ibu">
 											</div>				 
 										</div>			  
 									</div>
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>No. Telpon / HP Ayah</label>
 												<input type="text" id="id_hayah" class="form-control" placeholder="No.HP/Telp Ayah">
 											</div> 
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>No. Telpon / HP IBU</label>
 												<input type="text" id="id_hibu" class="form-control" placeholder="No.HP/Telp Ibu">
 											</div>
@@ -560,11 +575,11 @@
 									</div>
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>No. HP Wali</label>
 												<input type="text" id="id_hapewali" class="form-control" placeholder="No.HP/Telp Wali">
 											</div> 
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Agama dari Wali</label>
 												<select id="id_agamawali" class="form-control" >
 													<option value="Islam">Islam</option>
@@ -579,7 +594,7 @@
 									</div>
 									<div class="form-group">
 										<div class="row">
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Pekerjaan Wali</label>
 												<select id="id_kwali" class="form-control" >
 													<option value="">Pilih Salah Satu</option>
@@ -592,7 +607,7 @@
 													<option value="07 Pedagang">07 Pedagang</option>
 												</select>
 											</div> 
-											<div class="col-lg-6 col-xs-12">
+											<div class="col-lg-6">
 												<label>Hubungan Keluarga</label>
 												<input type="text" id="id_hubwali" class="form-control">
 											</div>				 
@@ -644,7 +659,7 @@
 											</div>
 											<div class="col-lg-3">
 												<label>Tanggal Mendaftar</label>
-												<input type="text" id="id_pindahtanggal" class="form-control" placeholder="Tanggal Pindah">
+												<input type="text" class="form-control" placeholder="Tanggal Pindah" id="id_pindahtanggal" name="id_pindahtanggal" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask/>
 											</div> 
 											<div class="col-lg-3">
 												<label>di Tingkat</label>
@@ -941,19 +956,19 @@
 										</div>
 										<div class="form-group">
 											<label>Akta Kelahiran (Ukuran Maks. 2Mb)</label>
-											<input type="file" id="file_akte" name="file_akte">
+												<input type="file" id="file_akte" name="file_akte" accept="image/jpeg,image/png">
 										</div>
 										<div class="form-group">
 											<label>Scan / Foto Calon Siswa 4x6 (Ukuran Maks. 2Mb)</label>
-											<input type="file" id="file_foto" name="file_foto">
+												<input type="file" id="file_foto" name="file_foto" accept="image/jpeg,image/png">
 										</div>
 										<div class="form-group">
 											<label>Kartu Keluarga (Ukuran Maks. 2Mb)</label>
-											<input type="file" id="file_kk" name="file_kk">
+												<input type="file" id="file_kk" name="file_kk" accept="image/jpeg,image/png">
 										</div>
 										<div class="form-group">
 											<label>Surat Keterangan Lulus (Ukuran Maks. 2Mb)</label>
-											<input type="file" id="file_keterangan" name="file_keterangan">
+												<input type="file" id="file_keterangan" name="file_keterangan" accept="image/jpeg,image/png">
 										</div>
 										<div class="form-group">
 											<a href="#" id="btnuploadfileppdb"  class="btn btn-block btn-social btn-instagram">
@@ -979,7 +994,7 @@
 									<input type="text" class="form-control" placeholder="Ketik NIK (16 digit)" id="berkas_nik">
 									</div> 
 									<div class="col-lg-6">
-									<input type="text" class="form-control" placeholder="dd-mm-yyyy" id="berkas_ttl">
+									<input type="text" class="form-control" id="berkas_ttl" name="berkas_ttl" data-inputmask-alias="datetime" data-inputmask-inputformat="dd-mm-yyyy" data-mask/>
 									</div>
 								</div>
 								<button class="btn btn-info btn-flat" type="button" id="btnlhthasil">Lihat</button>
@@ -1049,8 +1064,10 @@
 											<input type="text" class="form-control" placeholder="Ketik NIK (16 digit)" id="id_masternik" disabled="disable">
 										</div>
 										<div class="form-group">
-											<label id="labelupload"></label><br />
-											<input type="file" id="file_unggah" name="file_unggah">
+											<label id="labelupload"></label>
+										</div>
+										<div class="form-group">
+												<input type="file" id="file_unggah" name="file_unggah" accept="image/jpeg,image/png">
 										</div>
 										<div class="form-group">
 											<input type="hidden" id="file_jenis" name="file_jenis">
@@ -1083,19 +1100,208 @@
 			<div class="pull-right hidden-xs">
 			  <b>{!! config('global.namaapps') !!}</b>
 			</div>
-			<strong>Copyright &copy; 2023 <a href="{!! config('global.homeweb') !!}">{!! config('global.sekolah') !!}</a>.</strong> All rights reserved.
+			<strong>Copyright &copy; 2024 <a href="{!! config('global.homeweb') !!}">{!! config('global.sekolah') !!}</a>.</strong> All rights reserved.
 		</footer>
     </div>
 	<!-- TOKEN -->
 	<input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 	<input type="hidden" name="statppdb" id="statppdb" value="{!! $statppdb !!}">
+	<input type="hidden" name="readedfilebuktibayar" id="readedfilebuktibayar">
+	<input type="hidden" name="readedfileakte" id="readedfileakte">
+	<input type="hidden" name="readedfilefoto" id="readedfilefoto">
+	<input type="hidden" name="readedfilekk" id="readedfilekk">
+	<input type="hidden" name="readedfileketerangan" id="readedfileketerangan">
+	<input type="hidden" name="readedfileunggah" id="readedfileunggah">
+
 	@include('base.partials.js')
+	<script src="{{ asset('plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+
 	<script>
 		$(function () {
-			$("#id_tgllahir").datepicker({format: 'dd-mm-yyyy'});
-			$("#berkas_ttl").datepicker({format: 'dd-mm-yyyy'});
-			$("#id_pindahtanggal").datepicker({format: 'dd-mm-yyyy'});
+			$('#id_tgllahir').inputmask('dd-mm-yyyy', { 'placeholder': 'dd-mm-yyyy' });
+			$('#berkas_ttl').inputmask('dd-mm-yyyy', { 'placeholder': 'dd-mm-yyyy' });
+			$('#id_pindahtanggal').inputmask('dd-mm-yyyy', { 'placeholder': 'dd-mm-yyyy' });
 		});
+		$('#file_buktibayarformulir').change(function () {
+			if(this.files[0].size > 1000000){
+				this.value = "";
+				swal({
+					title	: 'Stop',
+					text	: 'Maksimum file adalah 1Mb',
+					type	: 'warning',
+				})
+			} else {
+				var imgPath = this.value;
+				var ext = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+				if (ext == "PNG" || ext == "png" || ext == "JPG" || ext == "JPEG" || ext == "jpg" || ext == "jpeg") {
+					readURLBuktiBayar(this);
+				} else {
+					swal({
+						title	: 'Stop',
+						text	: 'Please select image file (jpg, jpeg, png).',
+						type	: 'warning',
+					})
+				}
+			}
+		});
+		function readURLBuktiBayar(input) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				reader.readAsDataURL(input.files[0]);
+				reader.onload = function (e) {
+					$('#readedfilebuktibayar').val(e.target.result);
+				};
+			}
+		}
+		$('#file_akte').change(function () {
+			if(this.files[0].size > 1000000){
+				this.value = "";
+				swal({
+					title	: 'Stop',
+					text	: 'Maksimum file adalah 1Mb',
+					type	: 'warning',
+				})
+			} else {
+				var imgPath = this.value;
+				var ext = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+				if (ext == "PNG" || ext == "png" || ext == "JPG" || ext == "JPEG" || ext == "jpg" || ext == "jpeg") {
+					readURLAkte(this);
+				} else {
+					swal({
+						title	: 'Stop',
+						text	: 'Please select image file (jpg, jpeg, png).',
+						type	: 'warning',
+					})
+				}
+			}
+		});
+		function readURLAkte(input) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				reader.readAsDataURL(input.files[0]);
+				reader.onload = function (e) {
+					$('#readedfileakte').val(e.target.result);
+				};
+			}
+		}
+		$('#file_foto').change(function () {
+			if(this.files[0].size > 1000000){
+				this.value = "";
+				swal({
+					title	: 'Stop',
+					text	: 'Maksimum file adalah 1Mb',
+					type	: 'warning',
+				})
+			} else {
+				var imgPath = this.value;
+				var ext = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+				if (ext == "PNG" || ext == "png" || ext == "JPG" || ext == "JPEG" || ext == "jpg" || ext == "jpeg") {
+					readURLFoto(this);
+				} else {
+					swal({
+						title	: 'Stop',
+						text	: 'Please select image file (jpg, jpeg, png).',
+						type	: 'warning',
+					})
+				}
+			}
+		});
+		function readURLFoto(input) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				reader.readAsDataURL(input.files[0]);
+				reader.onload = function (e) {
+					$('#readedfilefoto').val(e.target.result);
+				};
+			}
+		}
+		$('#file_kk').change(function () {
+			if(this.files[0].size > 1000000){
+				this.value = "";
+				swal({
+					title	: 'Stop',
+					text	: 'Maksimum file adalah 1Mb',
+					type	: 'warning',
+				})
+			} else {
+				var imgPath = this.value;
+				var ext = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+				if (ext == "PNG" || ext == "png" || ext == "JPG" || ext == "JPEG" || ext == "jpg" || ext == "jpeg") {
+					readURLKK(this);
+				} else {
+					swal({
+						title	: 'Stop',
+						text	: 'Please select image file (jpg, jpeg, png).',
+						type	: 'warning',
+					})
+				}
+			}
+		});
+		function readURLKK(input) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				reader.readAsDataURL(input.files[0]);
+				reader.onload = function (e) {
+					$('#readedfilekk').val(e.target.result);
+				};
+			}
+		}
+		$('#file_keterangan').change(function () {
+			if(this.files[0].size > 1000000){
+				this.value = "";
+				swal({
+					title	: 'Stop',
+					text	: 'Maksimum file adalah 1Mb',
+					type	: 'warning',
+				})
+			} else {
+				var imgPath = this.value;
+				var ext = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+				if (ext == "PNG" || ext == "png" || ext == "JPG" || ext == "JPEG" || ext == "jpg" || ext == "jpeg") {
+					readURLKet(this);
+				} else {
+					swal({
+						title	: 'Stop',
+						text	: 'Please select image file (jpg, jpeg, png).',
+						type	: 'warning',
+					})
+				}
+			}
+		});
+		function readURLKet(input) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				reader.readAsDataURL(input.files[0]);
+				reader.onload = function (e) {
+					$('#readedfileketerangan').val(e.target.result);
+				};
+			}
+		}
+		$('#file_unggah').change(function () {
+			if(this.files[0].size > 1000000){
+				this.value = "";
+				$('#labelupload').html('<font color="red">File Yang di Perbolehkan Maksimum Berukuran 1Mb</font>');
+			} else {
+				var imgPath = this.value;
+				var ext = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+				if (ext == "PNG" || ext == "png" || ext == "JPG" || ext == "JPEG" || ext == "jpg" || ext == "jpeg") {
+					$('#labelupload').html('<font color="green">File Siap di Unggah</font>');
+					readURLFileLain(this);
+				} else {
+					this.value = "";
+					$('#labelupload').html('<font color="red">File Yang di Perbolehkan Hanya yang Berekstensi (jpg, jpeg, png)</font>');
+				}
+			}
+		});
+		function readURLFileLain(input) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				reader.readAsDataURL(input.files[0]);
+				reader.onload = function (e) {
+					$('#readedfileunggah').val(e.target.result);
+				};
+			}
+		}
 		$(document).ready(function() {
 			var token=document.getElementById('token').value;
 			$('#divpengumuman').hide();
@@ -1205,7 +1411,7 @@
 								{ name: 'isine',type: 'text'},
 							],
 							type: 'POST',
-							data: {	val01:set01, val02:set02, _token: token },
+							data: {	val01:set01, val02:set02, _token: token, id_sekolah:'{{$id_sekolah}}' },
 							url: 'ppdb/datacalonsiswa',
 						};
 						var dataAdapter = new $.jqx.dataAdapter(sumberdatacalon);
@@ -1214,7 +1420,7 @@
 							if (gambar == ''){
 								var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="75" height="75" src="dist/img/logo-gray.jpg"></div>';
 							} else {
-								var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="150" height="150" src="dist/img/' + gambar + '"></div>';
+								var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="150" height="150" src="' + gambar + '"></div>';
 							}							
 							return img;
 						}
@@ -1296,25 +1502,80 @@
 				var set21=document.getElementById('id_jarak').value;
 				var set22=document.getElementById('id_telpon').value;
 				var set23=document.getElementById('id_bersama').value;
-				$.post('ppdb/daftar', { setkerja: kerja, val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06,val07: set07, val08: set08, val09: set09, val10: set10, val11: set11, val12: set12, val13: set13, val14: set14, val15: set15, val16: set16, val17: set17, val18: set18, val19: set19, val20: set20, val21: set21, val22: set22, val23: set23, val24: '', val25: '', val26: '', _token:token,id_sekolah:'{{$id_sekolah}}' },
-				function(data){
-					if (data == 'sukses'){
-						$("#berkas_nik").val(set03);
-						$("#berkas_ttl").val(set07);
-						$('#divstatus').hide();
-						$('#divdatadiri').hide();
-						$('#divdataortu').show();
-						$('#divdatatk').hide();
-						$('#divdatakhusus').hide();
-						$("html, body").animate({ scrollTop: 0 }, "slow");
-						return false;
-					}
-					else {
-						$('#pesan').html(data);
-						$("html, body").animate({ scrollTop: 0 }, "slow");
-						return false;
-					}
-				});
+				var set24=document.getElementById('readedfilebuktibayar').value;
+				if (set01 == '' || set02 == '' || set03 == '' || set04 == '' || set05 == '' || set06 == '' || set07 == '' || set08 == '' || set09 == '' || set10 == '' || set17 == '' || set18 == '' || set20 == '' || set22 == '' || set24 == ''){
+					swal({
+						title	: 'Stop',
+						text	: 'Pastikan yang bertanda bintang sudah Bapak/Ibu lengkapi',
+						type	: 'warning',
+					})
+				} else {
+					var btn = $(this);
+                    btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+					var form_data = new FormData();
+						form_data.set('val01', set01);
+						form_data.set('val02', set02);
+						form_data.set('val03', set03);
+						form_data.set('val04', set04);
+						form_data.set('val05', set05);
+						form_data.set('val06', set06);
+						form_data.set('val07', set07);
+						form_data.set('val08', set08);
+						form_data.set('val09', set09);
+						form_data.set('val10', set10);
+						form_data.set('val11', set11);
+						form_data.set('val12', set12);
+						form_data.set('val13', set13);
+						form_data.set('val14', set14);
+						form_data.set('val15', set15);
+						form_data.set('val16', set16);
+						form_data.set('val17', set17);
+						form_data.set('val18', set18);
+						form_data.set('val19', set19);
+						form_data.set('val20', set20);
+						form_data.set('val21', set21);
+						form_data.set('val22', set22);
+						form_data.set('val23', set23);
+						form_data.set('val24', set24);
+						form_data.set('val25', '');
+						form_data.set('val26', '');
+						form_data.set('id_sekolah', '{{$id_sekolah}}');
+						form_data.set('setkerja', kerja);
+						form_data.set('_token', '{{csrf_token()}}');
+					$.ajax({
+						url			: '{{ route("exPpdb") }}',
+						data		: form_data,
+						type		: 'POST',
+						contentType	: false,
+						processData	: false,
+						success		: function (data) {
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+							if (data == 'sukses'){
+								$("#berkas_nik").val(set03);
+								$("#berkas_ttl").val(set07);
+								$('#divstatus').hide();
+								$('#divdatadiri').hide();
+								$('#divdataortu').show();
+								$('#divdatatk').hide();
+								$('#divdatakhusus').hide();
+								$("html, body").animate({ scrollTop: 0 }, "slow");
+								return false;
+							} else {
+								$('#pesan').html(data);
+								$("html, body").animate({ scrollTop: 0 }, "slow");
+								return false;
+							}
+						},
+						error: function (xhr, status, error) {
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+							swal({
+								title	: textStatus,
+								text	:  jqXHR.responseText,
+								type	: 'info',
+							});
+						}
+					});
+				}
 			});
 			$('#navbtndariortu').click(function () {
 				var kerja='ortu';
@@ -1344,7 +1605,7 @@
 				var set24=document.getElementById('id_kwali').value;
 				var set25=document.getElementById('id_hubwali').value;
 				var set26=document.getElementById('id_niksiswa').value;
-				$.post('ppdb/daftar', { setkerja: kerja, val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06,val07: set07, val08: set08, val09: set09, val10: set10, val11: set11, val12: set12, val13: set13, val14: set14, val15: set15, val16: set16, val17: set17, val18: set18, val19: set19, val20: set20, val21: set21, val22: set22, val23: set23, val24: set24, val25: set25, val26: set26, _token: token ,id_sekolah:'{{$id_sekolah}}'},
+				$.post('{{ route("exPpdb") }}', { setkerja: kerja, val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06,val07: set07, val08: set08, val09: set09, val10: set10, val11: set11, val12: set12, val13: set13, val14: set14, val15: set15, val16: set16, val17: set17, val18: set18, val19: set19, val20: set20, val21: set21, val22: set22, val23: set23, val24: set24, val25: set25, val26: set26, _token: token ,id_sekolah:'{{$id_sekolah}}'},
 				function(data){
 					if (data == 'sukses'){
 						$('#divstatus').hide();
@@ -1376,7 +1637,7 @@
 				var set10=document.getElementById('id_semester3').value;
 				var set11=document.getElementById('id_semester4').value;
 				var set12=document.getElementById('id_semester5').value;
-				$.post('ppdb/daftar', { setkerja: kerja, val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06,val07: set07, val08: set08, val09: set09, val10: set10, val11: set11, val12: set12, val13: '', val14: '', val15: '', val16: '', val17: '', val18: '', val19: '', val20: '', val21: '', val22: '', val23: '', val24: '', val25: '', val26: '', _token:token ,id_sekolah:'{{$id_sekolah}}'},
+				$.post('{{ route("exPpdb") }}', { setkerja: kerja, val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06,val07: set07, val08: set08, val09: set09, val10: set10, val11: set11, val12: set12, val13: '', val14: '', val15: '', val16: '', val17: '', val18: '', val19: '', val20: '', val21: '', val22: '', val23: '', val24: '', val25: '', val26: '', _token:token ,id_sekolah:'{{$id_sekolah}}'},
 				function(data){
 					if (data == 'sukses'){
 						$('#divstatus').hide();
@@ -1416,7 +1677,7 @@
 				$("input[name='tglbersama[]']:checked").each(function(){ARRBERSAMA.push($(this).val());});
 				$("input[name='kegsendiri[]']:checked").each(function(){ARRKEGIATAN.push($(this).val());});
 				$("input[name='sumberinfo[]']:checked").each(function(){ARRSUMBER.push($(this).val());});
-				$.post('ppdb/daftar', { setkerja: kerja, val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06,val07: set07, val08: set08, val09: set09, val10: set10, val11: set11, val12: set12, val13: set13, val14: set14, val15: ARRBERSAMA, val16: ARRKEGIATAN, val17: ARRSUMBER, val18: '', val19: '', val20: '', val21: '', val22: '', val23: '', val24: '', val25: '', val26: '', _token:token ,id_sekolah:'{{$id_sekolah}}'},
+				$.post('{{ route("exPpdb") }}', { setkerja: kerja, val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06,val07: set07, val08: set08, val09: set09, val10: set10, val11: set11, val12: set12, val13: set13, val14: set14, val15: ARRBERSAMA, val16: ARRKEGIATAN, val17: ARRSUMBER, val18: '', val19: '', val20: '', val21: '', val22: '', val23: '', val24: '', val25: '', val26: '', _token:token ,id_sekolah:'{{$id_sekolah}}'},
 				function(data){
 					$("#file_nik").val(set14);
 					if (data != 'gagal'){
@@ -1439,51 +1700,120 @@
 			});
 			$("#btnuploadfileppdb").click(function(){
 				var set01 	= '';
-				var set02	= document.getElementById('file_akte');
-				var set03	= document.getElementById('file_foto');
-				var set04	= document.getElementById('file_kk');
-				var set05	= document.getElementById('file_keterangan');
+				var set02	= document.getElementById('readedfileakte').value;
+				var set03	= document.getElementById('readedfilefoto').value;
+				var set04	= document.getElementById('readedfilekk').value;
+				var set05	= document.getElementById('readedfileketerangan').value;
 				var set06	= document.getElementById('id_niksiswa').value;
+				var set07	= document.getElementById('id_tgllahir').value;
 				var token 	= document.getElementById('token').value;
-				if ($('#file_kk').val() == ''){
+				if (set02 == '' || set03 == '' || set04 == ''){
 					swal({
 						title: 'Stop',
-						text: 'Pilih File KK Ananda',
+						text: 'Wajib Upload Akte, KK dan Foto Ananda',
 						type: 'warning',
 					})
-				}
-				else if ($('#file_akte').val() == ''){
-					swal({
-						title: 'Stop',
-						text: 'Pilih File Akte Kelahiran Ananda',
-						type: 'warning',
-					})
-				}
-				else if ($('#file_foto').val() == ''){
-					swal({
-						title: 'Stop',
-						text: 'Pilih File Foto Ananda',
-						type: 'warning',
-					})
-				}
-				else if (set06 == ''){
+				} else if (set06 == ''){
 					swal({
 						title: 'Stop',
 						text: 'NIK Ananda Tidak Terdeteksi, silahkan upload melalui halaman depan',
 						type: 'warning',
 					})
-				}
-				else {
+				} else {
 					var form_data = new FormData();
-					form_data.append('akte', set02.files[0]);
-					form_data.append('foto', set03.files[0]);
-					form_data.append('ksk', set04.files[0]);
-					form_data.append('keterangan', set05.files[0]);
-					form_data.append('nik', set06);
-					form_data.append('_token', '{{csrf_token()}}');
-					form_data.append('id_sekolah', '{{$id_sekolah}}');
+						form_data.append('akte', set02);
+						form_data.append('nik', set06);
+						form_data.append('tgllahir', set07);
+						form_data.append('_token', '{{csrf_token()}}');
+						form_data.append('id_sekolah', '{{$id_sekolah}}');
+					var btn = $(this);
+                    	btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
 					$.ajax({
-						url: 'ppdb/savefileppdb',
+						url: '{{ route("exSavefileppdb") }}',
+						data: form_data,
+						type: 'POST',
+						contentType: false,
+						processData: false,
+						success: function (data) {
+							var status  = data.status;
+							var message = data.message;
+							var warna 	= data.warna;
+							var icon 	= data.icon;
+							$("#file_akte").val('');
+							$.toast({
+								heading: status,
+								text: message,
+								position: 'top-right',
+								loaderBg: warna,
+								icon: icon,
+								hideAfter: 5000,
+								stack: 1
+							});
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+							$('.infoupload').hide();
+							return false;
+						},
+						error: function (xhr, status, error) {
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+							swal({
+								title: 'Stop',
+								text: xhr.responseText,
+								type: 'warning',
+							})
+						}
+					});
+					var form_data = new FormData();
+						form_data.append('foto', set03);
+						form_data.append('nik', set06);
+						form_data.append('tgllahir', set07);
+						form_data.append('_token', '{{csrf_token()}}');
+						form_data.append('id_sekolah', '{{$id_sekolah}}');
+					var btn = $(this);
+                    	btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+					$.ajax({
+						url: '{{ route("exSavefileppdb") }}',
+						data: form_data,
+						type: 'POST',
+						contentType: false,
+						processData: false,
+						success: function (data) {
+							var status  = data.status;
+							var message = data.message;
+							var warna 	= data.warna;
+							var icon 	= data.icon;
+							$("#file_foto").val('');
+							$.toast({
+								heading: status,
+								text: message,
+								position: 'top-right',
+								loaderBg: warna,
+								icon: icon,
+								hideAfter: 5000,
+								stack: 1
+							});
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+							$('.infoupload').hide();
+							return false;
+						},
+						error: function (xhr, status, error) {
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+							swal({
+								title: 'Stop',
+								text: xhr.responseText,
+								type: 'warning',
+							})
+						}
+					});
+					var form_data = new FormData();
+						form_data.append('ksk', set04);
+						form_data.append('nik', set06);
+						form_data.append('tgllahir', set07);
+						form_data.append('_token', '{{csrf_token()}}');
+						form_data.append('id_sekolah', '{{$id_sekolah}}');
+					var btn = $(this);
+                    	btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+					$.ajax({
+						url: '{{ route("exSavefileppdb") }}',
 						data: form_data,
 						type: 'POST',
 						contentType: false,
@@ -1494,8 +1824,47 @@
 							var warna 	= data.warna;
 							var icon 	= data.icon;
 							$("#file_kk").val('');
-							$("#file_akte").val('');
-							$("#file_foto").val('');
+							$.toast({
+								heading: status,
+								text: message,
+								position: 'top-right',
+								loaderBg: warna,
+								icon: icon,
+								hideAfter: 5000,
+								stack: 1
+							});
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+							$('.infoupload').hide();
+							return false;
+						},
+						error: function (xhr, status, error) {
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+							swal({
+								title: 'Stop',
+								text: xhr.responseText,
+								type: 'warning',
+							})
+						}
+					});
+					var form_data = new FormData();
+						form_data.append('keterangan', set05);
+						form_data.append('nik', set06);
+						form_data.append('tgllahir', set07);
+						form_data.append('_token', '{{csrf_token()}}');
+						form_data.append('id_sekolah', '{{$id_sekolah}}');
+					var btn = $(this);
+                    	btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+					$.ajax({
+						url: '{{ route("exSavefileppdb") }}',
+						data: form_data,
+						type: 'POST',
+						contentType: false,
+						processData: false,
+						success: function (data) {
+							var status  = data.status;
+							var message = data.message;
+							var warna 	= data.warna;
+							var icon 	= data.icon;
 							$("#file_keterangan").val('');
 							$.toast({
 								heading: status,
@@ -1506,10 +1875,12 @@
 								hideAfter: 5000,
 								stack: 1
 							});
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
 							$('.infoupload').hide();
 							return false;
 						},
 						error: function (xhr, status, error) {
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
 							swal({
 								title: 'Stop',
 								text: xhr.responseText,
@@ -1522,23 +1893,23 @@
 			$("#btnuploadberkas").click(function(){
 				var set01 	= document.getElementById('id_masternik').value;
 				var set02	= document.getElementById('file_jenis').value;
-				var set03	= document.getElementById('file_unggah');
-				if ($('#file_unggah').val() == ''){
-					swal({
-						title: 'Stop',
-						text: 'Pilih File Anda',
-						type: 'warning',
-					})
-				}
-				else {
+				var set03	= document.getElementById('readedfileunggah').value;
+				var set04	= document.getElementById('berkas_ttl').value;
+				if (set03 == ''){
+					$('#labelupload').html('<font color="red">File Belum Bapak/Ibu Pilih</font>');
+				} else {
 					var form_data = new FormData();
-					form_data.append('file', set03.files[0]);
-					form_data.append('val01', set01);
-					form_data.append('val02', set02);
-					form_data.append('_token', '{{csrf_token()}}');
-					form_data.append('id_sekolah', '{{$id_sekolah}}');
+						form_data.append('file', set03);
+						form_data.append('val01', set01);
+						form_data.append('val02', set02);
+						form_data.append('val03', set04);
+						form_data.append('_token', '{{csrf_token()}}');
+						form_data.append('id_sekolah', '{{$id_sekolah}}');
+					var btn = $(this);
+                    	btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+					
 					$.ajax({
-						url: 'ppdb/saveberkasppdb',
+						url: '{{ route("exSaveberkasppdb") }}',
 						data: form_data,
 						type: 'POST',
 						contentType: false,
@@ -1561,9 +1932,11 @@
 								hideAfter: 5000,
 								stack: 1
 							});
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
 							return false;
 						},
 						error: function (xhr, status, error) {
+							btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
 							swal({
 								title: 'Stop',
 								text: xhr.responseText,

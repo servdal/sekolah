@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0">  Laporan Ekstrakulikuler</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                </ol>
+<div class="wrapper" >
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Laporan Ekstrakulikuler</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
             </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
@@ -67,17 +67,98 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <div id="status"></div>
                             <div id="gridreport"></div>
 						</div>
                     </div>
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-sm-4">
+                <label>DPP</label>
+                <input type="text" id="id_dpp" name="id_dpp" class="form-control">
+            </div> 
+            <div class="col-sm-4">
+                <label>SPP</label>
+                <input type="text" id="id_spp" name="id_spp" class="form-control">
+            </div>
+            <div class="col-sm-4">
+                <label>Uang Makan</label>
+                <input type="text" id="id_paguyuban" name="id_paguyuban" class="form-control">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modaleditkeuangan">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Form Edit Data Pembayaran</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <label>Nama</label>
+                            <input type="text" id="id_nama" name="id_nama" class="form-control">
+                        </div> 
+                        <div class="col-sm-4">
+                            <label>No.Induk</label>
+                            <input type="text" id="id_noinduk" name="id_noinduk" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Pilih Ekskul Yang Di Ambil</label>
+                    <select id="id_eksul1" name="id_eksul1" class="form-control" >
+                        <option value=""></option>
+                        @foreach($ekstrakulikuler as $rekstra)
+                            <option value="{{ $rekstra['nama'] }}">{{ $rekstra['nama'] }}</option>
+                        @endforeach
+                    </select>
+                    <select id="id_eksul2" name="id_eksul2" class="form-control" >
+                        <option value=""></option>
+                        @foreach($ekstrakulikuler as $rekstra)
+                            <option value="{{ $rekstra['nama'] }}">{{ $rekstra['nama'] }}</option>
+                        @endforeach
+                    </select>
+                    <select id="id_eksul3" name="id_eksul3" class="form-control" >
+                        <option value=""></option>
+                        @foreach($ekstrakulikuler as $rekstra)
+                            <option value="{{ $rekstra['nama'] }}">{{ $rekstra['nama'] }}</option>
+                        @endforeach
+                    </select>
+                    <select id="id_eksul4" name="id_eksul4" class="form-control" >
+                        <option value=""></option>
+                        @foreach($ekstrakulikuler as $rekstra)
+                            <option value="{{ $rekstra['nama'] }}">{{ $rekstra['nama'] }}</option>
+                        @endforeach
+                    </select>
+                    <select id="id_eksul5" name="id_eksul5" class="form-control" >
+                        <option value=""></option>
+                        @foreach($ekstrakulikuler as $rekstra)
+                            <option value="{{ $rekstra['nama'] }}">{{ $rekstra['nama'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <input type="hidden" class="form-control" id="idform" >
+                <button type="button" class="btn btn-info" id="btnsavesetting">Simpan</button>
+                <button type="button" class="btn btn-danger pull-left" data-dismiss="modal">Close</button>	
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 @push('script')
@@ -164,9 +245,11 @@
             var sourcerincianharian = {
                 datatype: "json",
                 datafields: [
-                    { name: 'id'},	
-                    { name: 'kelas', type: 'text'},
+                    { name: 'id'},
                     { name: 'noinduk', type: 'text'},
+                    { name: 'dpp', type: 'text'},
+                    { name: 'spp', type: 'text'},
+                    { name: 'paguyuban', type: 'text'},
                     { name: 'eksul1', type: 'text'},
                     { name: 'eksul2', type: 'text'},
                     { name: 'eksul3', type: 'text'},
@@ -176,25 +259,42 @@
                 ],
                 type: 'POST',
                 data: {	val01: set01, _token:token },
-                url: "json/setkeuangan"
+                url : '{{ route("jsonSetkeuangan") }}'
             };
             var datarincianharian = new $.jqx.dataAdapter(sourcerincianharian);
             $("#gridreport").jqxGrid({
-                width: '100%',
-                source: datarincianharian,
-                autoheight: true,
-                theme: "energyblue",
-                columnsresize: true,
-                selectionmode: 'multiplecellsextended',
-                columns: [
+                width           : '100%',
+                autoheight      : true,
+                source          : datarincianharian,
+                theme           : "energyblue",
+                selectionmode   : 'multiplecellsextended',
+                columns         : [
                     { text: 'Nama', datafield: 'nama', width: '15%', cellsalign: 'left', align: 'center' },
                     { text: 'NIS', datafield: 'noinduk', width: '5%', cellsalign: 'center', align: 'center' },
-                    { text: 'Kelas', datafield: 'kelas', width: '5%', cellsalign: 'center', align: 'center' },
                     { text: 'Ekskul 1', datafield: 'eksul1', width: '15%', align: 'center' },
                     { text: 'Ekskul 2', datafield: 'eksul2', width: '15%', align: 'center' },
                     { text: 'Ekskul 3', datafield: 'eksul3', width: '15%', align: 'center' },
                     { text: 'Ekskul 4', datafield: 'eksul4', width: '15%', align: 'center' },
                     { text: 'Ekskul 5', datafield: 'eksul5', width: '15%', align: 'center' },
+                    { text: 'UBAH', columntype: 'button', align: 'center', width: '5%', cellsrenderer: function () {
+                        return "Edit";
+                        }, buttonclick: function (row) {	
+                            editrow = row;	
+                            var offset 		= $("#gridreport").offset();
+                            var dataRecord 	= $("#gridreport").jqxGrid('getrowdata', editrow);				
+                            $("#id_nama").val(dataRecord.nama);
+                            $("#id_dpp").val(dataRecord.dpp);
+                            $("#id_noinduk").val(dataRecord.noinduk);
+                            $("#id_paguyuban").val(dataRecord.paguyuban);
+                            $("#id_spp").val(dataRecord.spp);
+                            $("#id_eksul1").val(dataRecord.eksul1);
+                            $("#id_eksul2").val(dataRecord.eksul2);
+                            $("#id_eksul3").val(dataRecord.eksul3);
+                            $("#id_eksul4").val(dataRecord.eksul4);
+                            $("#id_eksul5").val(dataRecord.eksul5);
+                            $("#modaleditkeuangan").modal('show');	
+                        }
+                    },
                 ]
             });
         });
@@ -209,17 +309,17 @@
             updaterow: function (rowid, rowdata, commit) {
                 commit(true);
             },
-            url: 'json/ekskul',
-            cache: false
+            url     : '{{ route("jsonEkskul") }}',
+            cache   : false
         };
         var dataekskul = new $.jqx.dataAdapter(sourceeksul);
         $("#gridekskul").jqxGrid({
-            width: '100%',
-            autoheight: true,
-            source: dataekskul,
-            theme: "energyblue",
-            selectionmode: 'multiplecellsextended',
-            columns: [
+            width           : '100%',
+            autoheight      : true,
+            source          : dataekskul,
+            theme           : "energyblue",
+            selectionmode   : 'multiplecellsextended',
+            columns         : [
                 { text: 'Nama Ekskul', datafield: 'namaeksul', width: '50%', align: 'center', cellsalign: 'left'},
                 { text: 'Peminat', datafield: 'peminat', width: '30%', align: 'center', cellsalign: 'left'},
                 { text: 'Detail', columntype: 'button', width: '20%', align: 'center', cellsrenderer: function () {
@@ -241,7 +341,7 @@
                             ],
                             type: 'POST',
                             data: {	val01:goook, _token: token },
-                            url: 'json/rincianekskul',
+                            url : '{{ route("jsonRincianekskul") }}',
                         };
 
                         var datarincianharian = new $.jqx.dataAdapter(sourcerincianharian);
@@ -262,6 +362,27 @@
                     }
                 },
             ]
+        });
+        $('#btnsavesetting').on('click', function (){
+            var set01='ekskulonly';
+            var set02=document.getElementById('id_noinduk').value;
+            var set03='0';
+            var set04='0';
+            var set05='0';
+            var set06=document.getElementById('id_eksul1').value;
+            var set07=document.getElementById('id_eksul2').value;
+            var set08=document.getElementById('id_eksul3').value;
+            var set09=document.getElementById('id_eksul4').value;
+            var set10=document.getElementById('id_eksul5').value;
+            var token=document.getElementById('token').value;
+
+            $.post('admin/simpansetkeuangan', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, val07: set07, val08: set08, val09: set09, val10: set10, _token: token },
+            function(data){	
+                $("#modaleditkeuangan").modal('hide');
+                $('#status').html(data);
+                $("#gridreport").jqxGrid("updatebounddata");
+                $("#gridekskul").jqxGrid("updatebounddata");
+            });
         });
     });
 </script>

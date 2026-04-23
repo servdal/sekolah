@@ -1,76 +1,88 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0"> Laporan Keluhan</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                </ol>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Laporan Kritik dan Saran</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
             </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-12">
-                    <div class="card-box ribbon-box">
-                    <h4 class="ribbon ribbon-success">Control</h4>
-                    <p class="m-b-0"></p>
-                        <div class="form-row">
-                            <div class="col-lg-4">
-                                <div class="card-box">
-                                    <div class="form-row">
-                                        <div class="form-group col-md-6">
-                                            <label for="id_bulan">Bulan</label>
-                                            <select id="id_bulan" class="form-control">
-                                                <option value="ALL">Semua Kegiatan Pertahun</option>
-                                                <option value="01">Januari</option>
-                                                <option value="02">Februari</option>
-                                                <option value="03">Maret</option>
-                                                <option value="04">April</option>
-                                                <option value="05">Mei</option>
-                                                <option value="06">Juni</option>
-                                                <option value="07">Juli</option>
-                                                <option value="08">Agustus</option>
-                                                <option value="09">September</option>
-                                                <option value="10">Oktober</option>
-                                                <option value="11">November</option>
-                                                <option value="12">Desember</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="id_thn1">Tahun</label>
-                                            <input type="text" class="form-control" id="id_thn1" name="id_thn1">
-                                        </div>
-                                    </div>
+                <div class="col-lg-4">
+                    <div class="card card-primary shadow">
+                        <div class="card-header">
+                            <h3 class="card-title">Control</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-primary btn-block" id="btncarikegiatan">Cari Data</button>
+                                        <label for="id_bulan">Bulan</label>
+                                        <select id="id_bulan" class="form-control">
+                                            <option value="ALL">Semua Kegiatan Pertahun</option>
+                                            <option value="01">Januari</option>
+                                            <option value="02">Februari</option>
+                                            <option value="03">Maret</option>
+                                            <option value="04">April</option>
+                                            <option value="05">Mei</option>
+                                            <option value="06">Juni</option>
+                                            <option value="07">Juli</option>
+                                            <option value="08">Agustus</option>
+                                            <option value="09">September</option>
+                                            <option value="10">Oktober</option>
+                                            <option value="11">November</option>
+                                            <option value="12">Desember</option>
+                                        </select>
                                     </div>
+                                </div>
+                                <div class="col-md-6">
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-block btn-info" id="btndldata">Export Excell</button>
+                                        <label for="id_thn1">Tahun</label>
+                                        <input type="text" class="form-control" id="id_thn1" name="id_thn1" value="{{date('Y')}}">
                                     </div>
-                                    <div id='statunit' style="width:100%; height:300px;"></div>
-                                    <div id='statrating' style="width:100%; height:300px;"></div>
                                 </div>
                             </div>
-                            <div class="col-lg-8">
-                                <div id="divawal">
-                                    Guna meningkatkan kepuasan stakeholder, mohon keluhan ini segera dijawab dan ditanggapi. Mengingat data waktu keluhan dan waktu tanggapan yang nantinya akan dihitung otomatis
-                                    <div id="gridkeluhan"></div>
-                                </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary btn-block" id="btncarikegiatan">Cari Data</button>
                             </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-block btn-info" id="btndldata">Export Excell</button>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div id='statunit' style="width:100%; height:300px;"></div>
+                            <div id='statrating' style="width:100%; height:300px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card card-primary shadow">
+                        <div class="card-header">
+                            <h3 class="card-title">Control</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="divawal">
+                                Guna meningkatkan kepuasan stakeholder, mohon kritik dan saran ini segera dijawab dan ditanggapi. Mengingat data waktu kritik dan saran dan waktu tanggapan yang nantinya akan dihitung otomatis
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div id="gridkeluhan"></div>
                         </div>
                     </div>
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
@@ -106,14 +118,14 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Isi Tanggapan/Tindak Lanjut dari Keluhan Tersebut</h4>
+                <h4 class="modal-title">Isi Tanggapan/Tindak Lanjut dari kritik dan saran Tersebut</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Keluhan</label>
+                    <label>kritik dan saran</label>
                     <textarea id="komplain_keluhan" name="komplain_keluhan" rows="10" cols="80" readonly></textarea>
                 </div>
                 <div class="form-group">

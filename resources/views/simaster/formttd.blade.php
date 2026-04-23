@@ -1,4 +1,4 @@
-@extends('adminlte3.layout')
+@extends('adminlte3.layouttop')
 @section('content')
 <div class="content-wrapper" >
     <div class="content-header">
@@ -23,22 +23,25 @@
                         <div class="card card-widget widget-user-2">
                             <div class="widget-user-header bg-success">
                                 <div class="widget-user-image">
-                                <img class="img-circle elevation-2" src="{{asset('agenda.webp')}}" alt="User Avatar">
+                                <img class="img-circle elevation-2" src="{{asset('logo.png')}}" alt="User Avatar">
                                 </div>
                                 <h3 class="widget-user-username">Yth. {{$bendahara}}</h3>
                                 <h5 class="widget-user-desc">Mohon Menggambarkan Tandatangan Bapak/Ibu di Kotak Yang di Sediakan</h5>
                             </div>
                         </div>
                         <div class="card card-body">
-                            {!! $surat !!}
+                            @if ($jenissurat == 'Kwitansi')
+                                {!! $surat !!}
+                            @else
+                                <embed src="{!! $surat !!}" type="application/pdf" width="100%" height="600px" />
+                            @endif
                         </div>
                         <div class="card card-footer">
                             <div class="form-row kotakttd">
-                                <div class="col-lg-4 col-md-4"></div>
                                 <div class="col-lg-4 col-md-4">
                                     <canvas id="signature-pad" class="signature-pad" width=320 height=200></canvas>
                                     <canvas id="signature-blank" width=320 height=200 style='display:none'></canvas>
-                                    <img src="{{ asset('boxed-bg.png') }}" width=320 height=200 />
+                                    <img src="{{ asset('boxed-bg.jpg') }}" width=320 height=200 />
                                 </div>
                                 <div class="col-lg-4 col-md-4"></div>
                             </div>
@@ -146,6 +149,7 @@
     }
 </style>
 @endsection
+
 @push('script')
 <!-- SIGNATURE PAD -->
 <script src="{{ asset('plugins/signature_pad/signature_pad.js') }}"></script>
@@ -157,12 +161,12 @@
     $(document).ready(function () {
         $('#divterimakasih').hide();
         $('#btnclearttd').click(function () {
-                signaturePad.clear();
-            });
-            var signaturePad = new SignaturePad(document.getElementById('signature-pad'), {
+            signaturePad.clear();
+        });
+        var signaturePad = new SignaturePad(document.getElementById('signature-pad'), {
             backgroundColor: 'rgba(0, 0, 0, 0)',
             penColor: 'rgb(0, 0, 0)'
-            });
+        });
         $("#btnsetuju").click(function(){
             var val01	= document.getElementById('idsurat').value;
             var val02 	= signaturePad.toDataURL('image/png');
@@ -172,8 +176,13 @@
             var val04	= document.getElementById('alamatweb').value;
             var val05	= document.getElementById('jenissurat').value;
             var token	= document.getElementById('token').value;
+            var btn = $(this);
+                btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+            
             $.post('{{route("expersetujuanBerkas")}}', { set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, _token: token },
             function(data){
+                btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+                
                 var status  = data.status;
                 var message = data.message;
                 $.toast({
@@ -201,8 +210,13 @@
             if (val03 == '') { alert("Mohon Mengisi Alasan Anda Mengapa Tidak Setuju / Tidak Bersedia"); }
             var val04	= document.getElementById('alamatweb').value;
             var token	= document.getElementById('token').value;
+            var btn = $(this);
+                btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+                
             $.post('{{route("expersetujuanBerkas")}}', { set01: val01, set02: val02, set03: val03, set04: val04, set05: '', _token: token },
             function(data){
+                btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+                        
                 var status  = data.status;
                 var message = data.message;
                 $.toast({

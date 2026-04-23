@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0"> Setting dan Laporan PPDB</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{ url('/') }}">S Id : {{Session('sekolah_id_sekolah')}}</a></li>
-            </ol>
-          </div>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Setting dan Laporan PPDB</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-7">
@@ -151,20 +151,16 @@
 								<input type="text" id="id_spp1" name="id_spp1" class="form-control" value="{!! $setspp1 !!}">
 							</div>
 							<div class="form-group">
-								<label>Pilihan SPP Ke 2</label>
-								<input type="text" id="id_spp2" name="id_spp2" class="form-control" value="{!! $setspp2 !!}">
-							</div>
-							<div class="form-group">
-								<label>Pilihan SPP Ke 3</label>
-								<input type="text" id="id_spp3" name="id_spp3" class="form-control" value="{!! $setspp3 !!}">
-							</div>
-							<div class="form-group">
 								<label>Pilihan DPP Ke 1</label>
 								<input type="text" id="id_dpp1" name="id_dpp1" class="form-control" value="{!! $setdpp1 !!}">
 							</div>
 							<div class="form-group">
 								<label>Pilihan DPP Ke 2</label>
 								<input type="text" id="id_dpp2" name="id_dpp2" class="form-control" value="{!! $setdpp2 !!}">
+							</div>
+                            <div class="form-group">
+								<label>Pilihan DPP Ke 3</label>
+								<input type="text" id="id_spp3" name="id_spp3" class="form-control" value="{!! $setspp3 !!}">
 							</div>
                         </div>
                         <div class="card-footer">
@@ -224,7 +220,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div class="modal fade" id="modaltambahdataujian">
     <div class="modal-dialog modal-xl">
@@ -839,6 +835,11 @@
 </div>
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
+    
+    <div class="form-group">
+        <label>Pilihan SPP Ke 2</label>
+        <input type="text" id="id_spp2" name="id_spp2" class="form-control" value="{!! $setspp2 !!}">
+    </div>
 </div>
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 <input type="hidden" name="getnama" id="getnama" value="{{Session('nama')}}">

@@ -1,4 +1,4 @@
-@extends('adminlte3.layout')
+@extends('adminlte3.layouttop')
 @section('content')
 <div class="content-wrapper" >
     <div class="content-header">

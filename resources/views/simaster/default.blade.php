@@ -1,4 +1,4 @@
-@extends('adminlte3.layout')
+@extends('adminlte3.layouttop')
 @section('content')
 <div class="content-wrapper" >
     <div class="content-header">
@@ -22,15 +22,52 @@
                         </div>
                         <div class="card-body">
                             <div id="loading">
-								<img src="{{ asset('dist/img/loading.gif') }}" class="img-responsive" alt="Photo" width="100%">
+								<img src="{{ asset('dist/img/loading.gif') }}" class="img-responsive" alt="Photo">
 							</div>
                             <div class="tab-content" id="divawal">
                                 <div class="active tab-pane" id="depan">
                                     <div class="row">
+                                        @if ($id_sekolah == 1)
+                                        @php 
+                                            $frontpage = 'frontpagesdtq.jpg';
+                                        @endphp
                                         <div class="col-md-4">
-                                            <div class="card-body box-profile bg-danger">
+                                            <div class="card-body box-profile">
                                                 <div class="text-center">
-                                                    <a href="ppdb?id={{$id_sekolah}}" target="_blank"><img src="{{ asset('dist/img/logokecil.png') }}" alt="User profile picture" width="100%" height="60"></a>
+                                                    <a href="ppdb?id=1"><img src="ppdbsdtq.jpg" alt="User profile picture" width="100%" height="60"></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card-body box-profile">
+                                                <div class="text-center">
+                                                    <a href="frontpage?id=2"><img src="header-matabanew.jpg" alt="User profile picture" width="100%"  height="60"></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @else 
+                                        @php 
+                                            $frontpage = 'frontpagemataba.jpg';
+                                        @endphp
+                                        <div class="col-md-4">
+                                            <div class="card-body box-profile">
+                                                <div class="text-center">
+                                                    <a href="ppdb?id=2"><img src="ppdb-matabanew.jpg" alt="User profile picture" width="100%" height="60"></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card-body box-profile">
+                                                <div class="text-center">
+                                                    <a href="frontpage?id=1"><img src="headersdtq.jpg" alt="User profile picture" width="100%"  height="60"></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        <div class="col-md-4">
+                                            <div class="card-body box-profile">
+                                                <div class="text-center">
+                                                    <a href="https://grace.jagoanhosting.com:2096/cpsess0268424889/3rdparty/roundcube/"><img src="webmailnew.jpg" alt="User profile picture" width="100%"  height="60"></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -139,19 +176,19 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane" id="telemedicine">
-                                    <div class="form-group row">
+                                    <div class="form-group row loginform">
                                         <label for="username" class="col-sm-4 col-form-label">Email <span class="text-danger">*</span>:</label>
                                         <div class="col-sm-8">
                                             <input type="text" name="username" id="username" class="form-control" />
                                         </div>
                                     </div>
-                                    <div class="form-group row">
+                                    <div class="form-group row loginform">
                                         <label for="login_password"  class="col-md-4 col-lg-4 col-form-label">Password <span class="text-danger">*</span>:</label>
                                         <div class="col-lg-8 col-md-8">
                                             <input type="password" name="password" id="login_password" class="form-control" onkeyup="submitForm(event)" />
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group loginform">
                                         <a id="btnlupapassword" href="#" class="btn btn-social btn-danger pull-left">
                                             <i class="fa fa-refresh"></i> I Forgot My Password
                                         </a>
@@ -159,22 +196,20 @@
                                             <i class="fa fa-unlock-alt"></i> Sign In
                                         </a>
                                     </div>
-                                    <div class="form-horizontal" id="divlupapassword">
+                                    <div id="divlupapassword">
                                         <div class="card card-danger">
                                             <div class="card-header">
                                                 <h3 class="card-title">Tuliskan Email Yang Telah di Daftarkan</h3>
                                             </div>
                                             <div class="card-body">
-                                                <div class="form-group row">
-                                                    <label for="lupa_email" class="col-sm-4 col-form-label">Email <span class="text-danger">*</span>:</label>
-                                                    <div class="col-sm-8">
-                                                        <input type="email" name="lupa_email" id="lupa_email" class="form-control" />
-                                                    </div>
+                                                <div class="form-group">
+                                                    <label for="lupa_email">Email :</label>
+                                                    <input type="email" name="lupa_email" id="lupa_email" class="form-control" />
                                                 </div>
                                             </div>
                                             <div class="card-footer">
                                                 <a id="btnkelogin" href="#" class="btn btn-social btn-danger pull-left">
-                                                    <i class="fa fa-refresh"></i> Kembali ke laman login
+                                                    <i class="fa fa-close"></i>
                                                 </a>
                                                 <a id="btnkirimemail" href="#" class="btn btn-social btn-primary pull-right">
                                                     <i class="fa fa-unlock-alt"></i> Kirim Password ke Email
@@ -185,9 +220,13 @@
                                 </div>
                                 <div class="tab-pane" id="aboutme">
                                     <div class="card card-widget widget-user-2">
-                                        <div class="widget-user-header bg-primary">
+                                        <div class="widget-user-header">
                                             <div class="widget-user-image">
-                                                <img class="img-circle elevation-2" src="mascot.png" alt="User Avatar">
+                                                @if ($id_sekolah == 1)
+                                                <img class="img-circle elevation-2" src="logo/1715426344logo.png" alt="User Avatar">
+                                                @else
+                                                <img class="img-circle elevation-2" src="logo/1715426234logo.png" alt="User Avatar">
+                                                @endif
                                             </div>
                                             <h3 class="widget-user-username">Silahkan Bapak/Ibu Mengisi Buku Tamu</h3>
                                             <h5 class="widget-user-desc">{{ $nama_sekolah }}</h5>
@@ -209,12 +248,12 @@
                                                 <div class="form-group">
                                                     <div class="row">
                                                         <div class="col-lg-6">
-                                                            <a href="#" class="btn btn-block btn-social btn-danger" id="btnkembalidrlaporan">
+                                                            <a href="#" class="btn btn-app btn-danger" id="btnkembalidrlaporan">
                                                                 <i class="fa fa-reply-all"></i>Tutup
                                                             </a>
                                                         </div>
                                                         <div class="col-lg-6">
-                                                            <a href="#" class="btn btn-block btn-social btn-success" id="btnexport">
+                                                            <a href="#" class="btn btn-app btn-success" id="btnexport">
                                                                 <i class="fa fa-save"></i> Export
                                                             </a>
                                                         </div>
@@ -249,7 +288,7 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-lg-6">
-                                                            <label for="lihat_email">Email :</label>
+                                                            <label for="lihat_email">Kelompok :</label>
                                                             <input type="text" id="lihat_email" name="lihat_email" class="form-control">
                                                         </div>
                                                         <div class="col-lg-6">
@@ -275,28 +314,33 @@
                                                 <label for="bk_nama">Nama Lengkap:</label>
                                                 <input type="text" id="bk_nama" name="bk_nama" class="form-control">
                                             </div>
-                                            <div class="form-group">
-                                                <label for="bk_instansi">Asal Unit Kerja / Instansi / Alamat:</label>
-                                                <input type="text" id="bk_instansi" name="bk_instansi" class="form-control">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="bk_pejabat">Menemui</label>
-                                                <input type="text" id="bk_pejabat" name="bk_pejabat" class="form-control">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="bk_keperluan">Keperluan :</label>
-                                                <textarea id="bk_keperluan" name="bk_keperluan" style="width: 100%; height: 200px; font-size: 12px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
-                                            </div>
                                             <div class="row">
                                                 <div class="col-lg-6">
-                                                    <label for="bk_email">Email :</label>
-                                                    <input type="text" id="bk_email" name="bk_email" class="form-control">
+                                                    <label for="bk_email">Kelompok Tamu :</label>
+                                                    <select id="bk_email" class="form-control">
+                                                        <option value="UMUM">UMUM</option>
+                                                        <option value="DINAS">DINAS</option>
+                                                        <option value="WALI MURID">WALI MURID</option>
+                                                    </select>
                                                 </div>
                                                 <div class="col-lg-6">
                                                     <label for="bk_hape">HP :</label>
                                                     <input type="text" id="bk_hape" name="bk_hape" class="form-control">
                                                 </div>
                                             </div>
+                                            <div class="form-group">
+                                                <label for="bk_instansi">Asal Unit Kerja / Instansi / Alamat:</label>
+                                                <input type="text" id="bk_instansi" name="bk_instansi" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="bk_pejabat">Menemui / Di Temui Oleh : </label>
+                                                <input type="text" id="bk_pejabat" name="bk_pejabat" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="bk_keperluan">Keperluan :</label>
+                                                <textarea id="bk_keperluan" name="bk_keperluan" style="width: 100%; height: 200px; font-size: 12px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                                            </div>
+                                            
                                             <div class="row">
                                                 <div class="col-lg-6">
                                                     <a href="#" class="btn btn-block btn-social btn-info btnkembalidrlihat">
@@ -319,31 +363,32 @@
                 </div>
                 <div class="col-md-3">
                     <div class="card card-primary card-outline nonbukutamu">
-                        <div class="card-body box-profile bg-primary">
+                        <div class="card-body box-profile">
                             <div class="text-center">
-                                <img src="{{ url('').'/'.$frontpage }}" alt="User profile picture" width="100%">
+                                <img src="{{ url('/').'/'.$frontpage}}" alt="User profile picture" width="100%">
                             </div>
                         </div>
                         <div class="card-body">
                             <strong><i class="fa fa-book mr-1"></i> Website</strong>
-                            <p class="text-muted"><a href="{!! $domain !!}" target="_blank">{!! $domain !!}</a></p>
+                            <p class="text-muted"><a href="{{url('/')}}">{{url('/')}}</a></p>
                             <hr>
                             <strong><i class="fa fa-phone mr-1"></i> Alamat</strong>
                             <p class="text-muted"> {!! $alamat !!}</p>
                             <hr>
                             <strong><i class="fa fa-envelope mr-1"></i> Email</strong>
                             <p class="text-muted">{!! $email !!}</p>
+                            <hr>
+                            <strong><i class="fa fa-android mr-1"></i> Android APK</strong>
+                            <p class="text-muted"><a href="https://play.google.com/store/apps/details?id=com.duidev.pds">Download</a></p>
                         </div>
-                        @if (isset($qrcode))
                         <div class="card-body">
-                            <img src="data:image/png;base64,{!! $qrcode !!}" width="100%" />
+                            <div id="qrcode"></div>
                         </div>
-                        @endif
                     </div>
                     <div class="card card-danger card-outline bukutamu">
-                        <div class="card-body box-profile bg-primary">
+                        <div class="card-body box-profile">
                             <div class="text-center">
-                                <img src="{{ url('').'/'.$frontpage }}" alt="User profile picture" width="100%">
+                                <img src="{{ url('/').'/'.$frontpage }}" alt="User profile picture" width="100%">
                             </div>
                         </div>
                         <div class="card-body">
@@ -377,13 +422,7 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <h3 class="box-title">Statistik Hari Ini</h3>
-                            <div class="text-center">
-                                <div id="timeremaining"></div>
-                            </div>
-                            <a href="bukutamuadmin" class="btn btn-block btn-social btn-warning">
-                                <i class="fa fa-globe"></i> Refresh
-                            </a>
+                            <h3 class="card-title">Statistik Hari Ini</h3>
                             <div id="gridrekap"></div>
                         </div>
                     </div>
@@ -501,8 +540,8 @@
                 var hape 		= $('#griddaftartamu').jqxGrid('getrowdata', row).hape;
                 var email 		= $('#griddaftartamu').jqxGrid('getrowdata', row).email;
                 
-                if (foto == ''){
-                    var foto = 'logo.png';					
+                if (foto == '' || foto == null){
+                    var foto = 'mascot.png';
                 }
                 var img = '<div style="background: white;"><a href="#" id1="'+foto+'" id2="'+nama+'" id3="'+instansi+'"  id4="'+pejabat+'" id5="'+keperluan+'" id6="'+hape+'" id7="'+email+'" class="lihat"><img style="margin:2px; margin-left: 10px;" width="50" height="50" src="' + foto + '"></a></div>';
                         
@@ -535,19 +574,20 @@
                         $("#lihat_pejabat").val(valpejabat);
                         $("#lihat_tombol").val('awal');
                         CKEDITOR.instances['lihat_keperluan'].setData(valkeperluan)
-                        $('#divisi').hide();
+                        $('#divawalbukutamu').hide();
                         $('#divpencarian').hide();
-                        $('#divawal').hide();
+                        $('#divisi').hide();
                         $('#divlihat').show();
                     });
                 },
                 columns: [					
                     { text: 'Photo', editable: false, sortable: false, filterable: false,  width: '8%', cellsrenderer: photorenderer },
+                    { text: 'Kelompok', filtertype: 'checkedlist', datafield: 'email', width: '10%', cellsalign: 'left', align: 'center'  },
                     { text: 'Tanggal', datafield: 'tanggal', filtertype: 'checkedlist', width: '15%', cellsalign: 'left', align: 'center'  },
                     { text: 'Menemui', filtertype: 'checkedlist', datafield: 'pejabat', width: '17%', cellsalign: 'left', align: 'center'  },
                     { text: 'Keperluan', datafield: 'keperluan', width: '20%', cellsalign: 'left', align: 'center'  },
-                    { text: 'Nama', datafield: 'nama', width: '20%', cellsalign: 'left', align: 'center'  },
-                    { text: 'Asal Unit Kerja / Instansi', datafield: 'instansi', width: '20%', cellsalign: 'left', align: 'center'  },
+                    { text: 'Nama', datafield: 'nama', width: '15%', cellsalign: 'left', align: 'center'  },
+                    { text: 'Asal Unit Kerja / Instansi', datafield: 'instansi', width: '15%', cellsalign: 'left', align: 'center'  },
                 ],
             });
         });
@@ -582,8 +622,8 @@
                 var keperluan 	= $('#gridpencarian').jqxGrid('getrowdata', row).keperluan;
                 var hape 		= $('#gridpencarian').jqxGrid('getrowdata', row).hape;
                 var email 		= $('#gridpencarian').jqxGrid('getrowdata', row).email;
-                if (foto == ''){
-                    var foto = 'logo.png';
+                if (foto == '' || foto == null){
+                    var foto = 'mascot.png';
                 }
                 var img = '<div style="background: white;"><a href="#" id1="'+foto+'" id2="'+nama+'" id3="'+instansi+'"  id4="'+pejabat+'" id5="'+keperluan+'" id6="'+hape+'" id7="'+email+'" class="lihat"><img style="margin:2px; margin-left: 10px;" width="50" height="50" src="' + foto + '"></a></div>';
                         
@@ -592,6 +632,7 @@
             $('#divpencarian').show();
             $('#divisi').hide();
             $('#divlihat').hide();
+            $('#divawalbukutamu').hide();
             $("#gridpencarian").jqxGrid({
                 width: '100%',
                 height: 480,
@@ -623,23 +664,28 @@
                         $("#lihat_pejabat").val(valpejabat);
                         $("#lihat_tombol").val('cari');
                         CKEDITOR.instances['lihat_keperluan'].setData(valkeperluan)
-                        $('#divisi').hide();
+                        $('#divawalbukutamu').hide();
                         $('#divpencarian').hide();
-                        $('#divawal').hide();
+                        $('#divisi').hide();
                         $('#divlihat').show();
                     });
                 },
                 columns: [					
-                    { text: 'Photo', editable: false, sortable: false, filterable: false,  width: '10%', cellsrenderer: gambartamu },
+                    { text: 'Photo', editable: false, sortable: false, filterable: false,  width: '8%', cellsrenderer: gambartamu },
                     { text: 'Tanggal', datafield: 'tanggal', filtertype: 'checkedlist', width: '15%', cellsalign: 'left', align: 'center'  },
-                    { text: 'Menemui', filtertype: 'checkedlist', datafield: 'pejabat', width: '25%', cellsalign: 'left', align: 'center'  },
-                    { text: 'Keperluan', datafield: 'keperluan', width: '20%', cellsalign: 'left', align: 'center'  },
-                    { text: 'Nama', datafield: 'nama', width: '25%', cellsalign: 'left', align: 'center'  },
+                    { text: 'Kelompok', filtertype: 'checkedlist', datafield: 'email', width: '12%', cellsalign: 'left', align: 'center'  },
+                    { text: 'Menemui', filtertype: 'checkedlist', datafield: 'pejabat', width: '15%', cellsalign: 'left', align: 'center'  },
+                    { text: 'Keperluan', datafield: 'keperluan', width: '15%', cellsalign: 'left', align: 'center'  },
+                    { text: 'Nama', datafield: 'nama', width: '20%', cellsalign: 'left', align: 'center'  },
                     { text: 'Asal Unit Kerja / Instansi', datafield: 'instansi', width: '15%', cellsalign: 'left', align: 'center'  },
-                    { text: 'Email', datafield: 'email', width: '10%', cellsalign: 'left', align: 'center'  },
-                    { text: 'Handphone', datafield: 'hape', width: '10%', cellsalign: 'left', align: 'center'  },				
                 ],
             });
+        });
+        $('#btnkembalidrlaporan').click(function () {
+            $('#divawalbukutamu').show();
+            $('#divpencarian').hide();
+            $('#divisi').hide();
+            $('#divlihat').hide();
         });
         $('#btnisibukutamu').click(function () {
             $('#divawalbukutamu').hide();
@@ -728,6 +774,9 @@
                         var warna 	= data.warna;
                         var icon 	= data.icon;
                         $('#divawalbukutamu').show();
+                        $('#divpencarian').hide();
+                        $('#divisi').hide();
+                        $('#divlihat').hide();
                         $("#gridrekap").jqxGrid('updatebounddata');
                         $("#griddaftartamu").jqxGrid('updatebounddata');
                         $.toast({
@@ -828,15 +877,19 @@
             return false;
         });
         $('#btncloseterimakasi').click(function () {
+            $('.loginform').show();
             $('#divisian').show();
             $('#divterimakasih').hide();
         });
         $('#btnkelogin').click(function () {
+            $('.loginform').show();
             $('#formisitelemedi').show();
             $('#divlupapassword').hide();
         });
         $('#btnlupapassword').click(function () {
+            $('.loginform').hide();
             $('#formisitelemedi').hide();
+            
             $('#divlupapassword').show();
         });
         $('#btn-pendaftaranortu').click(function () {

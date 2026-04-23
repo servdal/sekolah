@@ -18,6 +18,8 @@ use App\Dataindukstaff;
 use App\Inboxsurat;
 use App\RencanaKegiatan;
 use App\Logstaff;
+use App\Rapotan;
+use App\MushafUjianLisan;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Validator;
@@ -112,7 +114,11 @@ class PersuratanController extends Controller
             $data['logofrontapps01']  	= Session('sekolah_frontpage');
             $data['logo01']  			= url("/").'/'.Session('sekolah_logo');
             $data['sidebar']			= 'mailbox';
-            return view('simaster.mailbox', $data);
+            if (Session('previlage') == 'Waka Kurikulum Al Quran'){
+                return view('simaster.mailboxwaka', $data);
+            } else {
+                return view('simaster.mailbox', $data);
+            }
         } else {
             $data['kalimatheader']  	= 'Mohon Maaf';
             $data['kalimatbody']  		= 'Session Expired, Mohon Relogin';
@@ -151,6 +157,12 @@ class PersuratanController extends Controller
             $totaldata	= $data->total();
             if ($data) {
                 foreach($data as $rows){
+                    $ceksudah = $rows->getTandatangan->xfile;
+                    if (isset($ceksudah->xfile) AND $ceksudah->xfile != ''){
+                        Inboxsurat::where('xmarking', $rows->marking)->update([
+                            'status' => 2
+                        ]);
+                    }
                     $arraysurat[$i] = $rows;
                     $i++;
                 }
@@ -208,10 +220,44 @@ class PersuratanController extends Controller
         } else if ($cari == 'mailbox'){
             $sql 		= Inboxsurat::where('penerima', Session('nip'))->where('status', '1')->where('id_sekolah', session('sekolah_id_sekolah'))->orderBy('id', 'ASC')->get();
 			echo json_encode($sql);
+        } else if ($cari == 'mailboxlainnya' OR $cari == 'mailboxperjuz' OR $cari == 'mailboxuts'  OR $cari == 'mailboxuas'){
+            $arraysurat = [];
+            $i          = 0;
+            $sql 		= Inboxsurat::where('penerima', Session('nip'))->where('status', '1')->where('id_sekolah', session('sekolah_id_sekolah'))->orderBy('id', 'ASC')->get();
+            foreach ($sql as $rows) {
+                $marking    = $rows->xmarking;
+                $arrmarking = explode('-', $marking);
+                if (isset($arrmarking[3])){
+                    $cekmail= $arrmarking[3];
+                    if ($cekmail == 'UTS' AND $cari == 'mailboxuts'){
+                        $arraysurat[$i] = $rows;
+                        $i++;
+                    } else if ($cekmail == 'UAS' AND $cari == 'mailboxuas'){
+                        $arraysurat[$i] = $rows;
+                        $i++;
+                    } else {
+                        if ($cekmail == 'UTS' OR $cekmail == 'UAS'){
+
+                        } else {
+                            if ($cari == 'mailboxperjuz'){
+                                $arraysurat[$i] = $rows;
+                                $i++;
+                            }
+                        }
+                    }  
+                } else {
+                    if ($cari == 'mailboxlainnya'){
+                        $arraysurat[$i] = $rows;
+                        $i++;
+                    }
+                }
+                
+            }
+			echo json_encode($arraysurat);
         } else if ($cari == 'arsipmailbox'){
             $arraysurat = [];
             $i          = 0;
-            $sql        = Inboxsurat::where('penerima', Session('nip'))->where('status', '!=', '1')->where('id_sekolah', session('sekolah_id_sekolah'))->orderBy('id', 'DESC')->get();
+            $sql        = Inboxsurat::where('penerima', Session('nip'))->where('status', '!=', '1')->where('id_sekolah', session('sekolah_id_sekolah'))->where('created_at', '<', Carbon::now()->subDays(90))->orderBy('id', 'DESC')->get();
             $xmarkings  = $sql->pluck('xmarking')->toArray();
             $sudahkah   = XFiles::whereIn('xmarking', $xmarkings)->get()->keyBy('xmarking');
             $updateIds  = [];
@@ -223,9 +269,12 @@ class PersuratanController extends Controller
                     $i++;
                 }
             }
+            
+            //Ini di hapus karena saat rapat sudah di ttd, maka marking permintaan ttd ks dan guru juga akan di hapus
             if (!empty($updateIds)) {
                 Inboxsurat::whereIn('id', $updateIds)->update(['status' => 1]);
             }
+            
             echo json_encode($arraysurat);
         } else {
             if ($jenis != ''){
@@ -586,7 +635,7 @@ class PersuratanController extends Controller
                                 ]
                             );
                             if ($sudahkah){
-                                Inboxsurat::where('id', $id)->update([
+                                Inboxsurat::where('id', $cekinbox->id)->update([
                                     'status'    => 2
                                 ]);
                                 $sukses++;
@@ -605,7 +654,7 @@ class PersuratanController extends Controller
                                         $domain		    = str_replace('.', '', $domain);
                                         $fileserti 	    = $domain.'.crt';
                                         $error		    = '';
-                                        $certificate 	= 'file://'.base_path().'/public/tte/'.$fileserti;
+                                        $certificate 	= 'file://'.base_path().'/public_html/tte/'.$fileserti;
                                         try {
                                             $info = array(
                                                 'Name' 			=> $rom->namapejabat,
@@ -647,10 +696,13 @@ class PersuratanController extends Controller
                                             ]);
                                         }
                                     }
+                                } else {
+                                    Inboxsurat::where('id', $cekinbox->id)->update([
+                                        'penerima'    => 'Arsip'
+                                    ]);
                                 }
-                                
                             }
-                        } elseif ($cekinbox->tabel == 'db_rapotan'){
+                        } else if ($cekinbox->tabel == 'db_rapotan'){
                             $urlsurat   = $cekinbox->urlsurat;
                             $remove     = explode('ttdrapot/', $urlsurat);
                             if (isset($remove[1])){
@@ -662,53 +714,49 @@ class PersuratanController extends Controller
                                     } else {
                                         $marking	= $rapot->tapel.'-'.$rapot->semester.'-'.$rapot->kelas.'-'.$rapot->noinduk.'-'.$rapot->id_sekolah.'-TTDKS';
                                     }
-                                    $rapotkhas		= $rapot->tapel.'-'.$rapot->semester.'-'.$rapot->kelas.'-'.$rapot->noinduk.'-'.$rapot->id_sekolah.'-RapotKhas';
-                                    $rapotdinas		= $rapot->tapel.'-'.$rapot->semester.'-'.$rapot->kelas.'-'.$rapot->noinduk.'-'.$rapot->id_sekolah.'-RapotDinas';
                                     XFiles::updateOrCreate(
                                         [
                                             'xmarking'	=> $marking,
                                         ],
                                         [
-                                            'xtabel'	=> '',
-                                            'xjenis'	=> $rapot->noinduk,
-                                            'xfile'		=> $ttd
+                                            'xtabel'	=> 'db_rapotan',
+                                            'xjenis'	=> Session('sekolah_id_sekolah').';'.$rapot->noinduk,
+                                            'xfile'		=> $tandatangan
                                         ]
                                     );
-                                    $ceksudah1 		= XFiles::where('xmarking', $rapotdinas)->first();
-                                    if (isset($ceksudah1->xfile)){
-                                        $rapotdinas = $ceksudah1->xfile;
-                                        $rapotdinas	= str_replace('[ttdks]', '<img src="'.$ttd.'" height="100">', $rapotdinas);
-                                        XFiles::where('xmarking', $rapotdinas)->update([
-                                            'xfile'	=> $rapotdinas
-                                        ]);
-                                    }
-                                    $ceksudah2 			= XFiles::where('xmarking', $rapotkhas)->first();
-                                    if (isset($ceksudah2->xfile)){
-                                        $rapotkhas	= $ceksudah2->xfile;
-                                        $rapotkhas	= str_replace('[ttdks]', '<img src="'.$ttd.'" height="100">', $rapotkhas);
-                                        XFiles::where('xmarking', $rapotkhas)->update([
-                                            'xfile'	=> $rapotkhas
-                                        ]);
-                                    }
-                                    Inboxsurat::where('id', $id)->update([
-                                        'status'    => 2
+                                    Inboxsurat::where('id', $cekinbox->id)->update([
+                                        'status'    => 2,
+                                        'penerima'    => 'Arsip'
                                     ]);
                                     $sukses++;
                                 } else {
-                                    Inboxsurat::where('id', $id)->update([
-                                        'status'    => 2
+                                    Inboxsurat::where('id', $cekinbox->id)->update([
+                                        'status'    => 2,
+                                        'penerima'  => 'Arsip'
                                     ]);
                                     $gagal = $gagal.' TTE Rapot ID Tidak di Temukan<br />';
                                 }
                             } else {
-                                Inboxsurat::where('id', $id)->update([
-                                    'status'    => 2
+                                Inboxsurat::where('id', $cekinbox->id)->update([
+                                    'status'    => 2,
+                                    'penerima'  => 'Arsip'
                                 ]);
                                 $gagal = $gagal.' TTE Rapot ID Tidak di Temukan<br />';
                             }
+                        } else if ($cekinbox->tabel == 'mushaf_ujianlisan'){
+                            $marking   = $cekinbox->xmarking;
+                            Inboxsurat::where('id', $cekinbox->id)->update([
+                                'status'    => 2,
+                                'penerima'  => 'Arsip'
+                            ]);
+                            $sukses++;
+                            MushafUjianLisan::where('marking', $marking)->update([
+                                'penandatangan' => Session('nama')
+                            ]);
                         } else {
-                            Inboxsurat::where('id', $id)->update([
-                                'status'    => 2
+                            Inboxsurat::where('id', $cekinbox->id)->update([
+                                'status'    => 2,
+                                'penerima'  => 'Arsip'
                             ]);
                             $sukses++;
                         }

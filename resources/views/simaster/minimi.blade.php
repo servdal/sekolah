@@ -1,113 +1,24 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-        <div class="container">
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0"> Perpustakaan Mini</h1>
+                    <h1>Perpustakaan</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                     </ol>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-4">
-                    <div class="card card-info shadow">
-                        <div class="card-header">
-                            <h3 class="card-title">Buku Baru</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse"><i class="fa fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            @if(isset($pengumumans) && !empty($pengumumans))
-								<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-									<ol class="carousel-indicators">
-									@foreach($pengumumans as $pengumuman)
-										<li data-target="#carousel-example-generic" data-slide-to="{!! $pengumuman['urutan'] !!}" class="{!! $pengumuman['setaktif'] !!}"></li>
-									@endforeach
-									</ol>
-									<div class="carousel-inner">
-									@foreach($pengumumans as $pengumuman)
-										<div class="item {!! $pengumuman['setaktif'] !!}">
-											<div class="box box-widget widget-user-2">
-												<div class="widget-user-header bg-{!! $pengumuman['urutanwerno'] !!}">
-												  <div class="widget-user-image">
-													<img class="img-circle" src="{!! $pengumuman['lampiran'] !!}" alt="cover-img">
-												  </div>
-												  <!-- /.widget-user-image -->
-												  <h3 class="widget-user-username">{!! $pengumuman['judul'] !!}</h3>
-												  <h5 class="widget-user-desc">{!! $pengumuman['pengarang'] !!}</h5>
-												</div>
-												<div class="box-footer no-padding">
-												  <ul class="nav nav-stacked">
-													<li><a href="#"><span class="pull-left badge bg-red">{!! $pengumuman['kategori'] !!} </span></a></li>
-													<li><a href="#">{!! $pengumuman['penerbit'] !!} <span class="pull-right badge bg-blue">Penerbit</span></a></li>
-													<li><a href="#">{!! $pengumuman['kota'] !!} <span class="pull-right badge bg-aqua">Kota</span></a></li>
-													<li><a href="#">{!! $pengumuman['tahun'] !!}<span class="pull-right badge bg-green">Tahun</span></a></li>											
-												  </ul>
-												</div>
-												<div class="box-footer">
-												  <div class="form-group">
-													<b>No. ISBN : {!! $pengumuman['isbn'] !!}</b>
-													<p>Rak Buku / Link Download</p>
-													{!! $pengumuman['rakbuku'] !!}<br />
-													{!! $pengumuman['link'] !!}
-												  </div>
-												</div>
-											</div>
-											<div class="carousel-caption">{!! $pengumuman['judul'] !!}</div>
-										</div>
-									@endforeach
-									</div>
-									<a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
-									  <span class="glyphicon glyphicon-chevron-left"></span>
-									</a>
-									<a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
-									  <span class="glyphicon glyphicon-chevron-right"></span>
-									</a>
-								</div>
-							@else
-								<div class="box box-widget widget-user-2">
-									<div class="widget-user-header bg-yellow">
-									  <div class="widget-user-image">
-										<img class="img-circle" src="logo.png" alt="Avatar">
-									  </div>
-									  <h3 class="widget-user-username">Default Value</h3>
-									  <h5 class="widget-user-desc">PERPUS MINI</h5>
-									</div>
-									<div class="box-footer no-padding">
-									  <ul class="nav nav-stacked">
-										<li><a href="#">Silahkan</a></li>
-										<li><a href="#">Tambah</a></li>
-										<li><a href="#">Buku</a></li>											
-									  </ul>
-									 T_T Belum ada Buku yang di masukkan
-									</div>
-								</div>
-							@endif
-                        </div>
-                    </div>
-                    <div class="card card-success shadow">
-                        <div class="card-header">
-                            <h3 class="card-title">Perpustakaan Per Kategori</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse"><i class="fa fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-8">
+                <div class="col-md-12">
                     <div id="message"></div>
                     <div class="card card-danger shadow" id="divawal">
                         <div class="card-header">
@@ -139,13 +50,19 @@
 										<i class="fa fa-tags"></i> Tambah Buku
 									</a>
 								</div>
-							</div><!-- /.row -->
-							<div class="form-group row">
-								<div class="col-lg-12">
-								<div id="gridperpustakaan"></div>
-								</div>
 							</div>
-						</div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="table-responsive p-0">
+                                <table class="table table-striped table-valign-middle" id="tabelperpustakaan">
+                                    <thead>
+                                        <tr>
+                                            <th>List Buku</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                     <div class="card card-primary shadow" id="divlaporan">
                         <div class="card-header">
@@ -239,11 +156,11 @@
 										<div class="row">
 											<div class="col-lg-6">
 												<label for="pinjam_tglpinjam">Tgl. Pinjam</label>
-												<input type="text" id="pinjam_tglpinjam" name="pinjam_tglpinjam" class="form-control" value="{{$tanggal}}">
+                                                <input type="text" class="form-control tanggal" id="pinjam_tglpinjam" name="pinjam_tglpinjam" value="{{$tanggal}}" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
 											</div>
 											<div class="col-lg-6">
 												<label for="pinjam_tglkembali">Tgl. Kembali</label>
-												<input type="text" id="pinjam_tglkembali" name="pinjam_tglkembali" class="form-control" value="{{$kembali}}">
+                                                <input type="text" class="form-control tanggal" id="pinjam_tglkembali" name="pinjam_tglkembali" value="{{$kembali}}" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
 											</div>
 										</div>
 									</div>
@@ -308,7 +225,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div class="modal fade" id="modaltambahbuku">
     <div class="modal-dialog modal-xl">
@@ -409,7 +326,7 @@
                     <div class="row">			  
                     <div class="col-lg-4">
                         <label for="id_tglmasuk">Tgl. Masuk Perpus *)</label>
-                        <input type="text" class="form-control" id="id_tglmasuk">
+                        <input value="{{date('Y-m-d')}}" type="text" class="form-control tanggal" id="id_tglmasuk" name="id_tglmasuk" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
                     </div>			 
                     <div class="col-lg-4">
                         <label for="id_halaman">Halaman</label>
@@ -472,9 +389,7 @@
 @push('script')
 <script>
 	$(function () {
-		$("#id_tglmasuk").datepicker({format: 'dd-mm-yyyy'});
-		$("#pinjam_tglpinjam").datepicker({format: 'yyyy-mm-dd'});
-		$("#pinjam_tglkembali").datepicker({format: 'yyyy-mm-dd'});
+		$('.tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
 	});
 	$('#id_cover').change(function () {
         if(this.files[0].size > 700000){
@@ -507,6 +422,35 @@
                 $('#preview').attr('src', e.target.result);
             };
         }
+    }
+    function btncetaklabel(id){
+        var url 	    = "{{URL::to("/")}}/labelbuku/"+id;
+        var windowName 	= 'Label Buku ID '+id;
+        var windowSize 	= "width=800,height=800";
+        window.open(url, windowName, windowSize);
+        event.preventDefault();
+        return false;
+    }
+    function btnaddpeminjaman(id){
+        var valid		= id;
+        $.post('json/jsonbukucari', { val01: 'perid', val02: valid, _token: '{{ csrf_token() }}' },function(data){
+            var valfoto		= data.gambar;
+            var valjudul	= data.judul;
+            var valpengarang= data.pengarang;
+            var valkodebuku	= data.kodebuku;
+            var valrakbuku	= data.rakbuku;
+            $('#previewbuku').attr('src', valfoto);
+            $("#pinjam_judul").val(valjudul);
+            $("#pinjam_pengarang").val(valpengarang);
+            $("#pinjam_kode").val(valkodebuku);
+            $("#pinjam_rak").val(valrakbuku);
+            $("#pinjam_idbuku").val(valid);
+            $("#pinjam_idne").val('new');
+            $('#divlaporan').hide();
+            $('#divpeminjaman').show();
+            $('#divawal').hide();
+        });
+        
     }
     $(document).ready(function () {
         $('#divlaporan').hide();
@@ -608,7 +552,6 @@
             var newtgl	= moment(tglan).format('YYYY-MM-DD');
             $("#pinjam_tglkembali").val(newtgl);
         });
-        
         $("#pinjam_tarif").autoNumeric('init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'});
         $("#pinjam_denda").autoNumeric('init', {aSep: ',', mDec: '0', vMax: '99999999999999999999999999'});
         $('#btnsimpanajuan').click(function () {
@@ -721,106 +664,6 @@
             });
             return false;
         });
-        var sourcebuku = {
-            datatype: "json",
-            datafields: [
-                { name: 'idne', type: 'text'},
-                { name: 'judul', type: 'text'},
-                { name: 'gambar', type: 'text'},
-                { name: 'link', type: 'text'},
-                { name: 'kodebuku', type: 'text'},
-                { name: 'pengarang', type: 'text'},
-                { name: 'cetakan', type: 'text'},
-                { name: 'kota', type: 'text'},
-                { name: 'penerbit', type: 'text'},
-                { name: 'tahun', type: 'text'},
-                { name: 'ilustrasi', type: 'text'},
-                { name: 'halaman', type: 'text'},
-                { name: 'id_sekolah', type: 'text'},
-                { name: 'isbn', type: 'text'},
-                { name: 'tglmasuk', type: 'text'},
-                { name: 'tahunperolehan', type: 'text'},
-                { name: 'jenisperolehan', type: 'text'},
-                { name: 'rakbuku', type: 'text'},
-                { name: 'kondisi', type: 'text'},
-                { name: 'kategori', type: 'text'},
-                { name: 'inputor', type: 'text'},
-                { name: 'marking', type: 'text'},
-                { name: 'jadwalguna', type: 'text'},
-            ],
-            url: 'json/jsonbuku',
-            cache: false
-        };		
-        var databuku = new $.jqx.dataAdapter(sourcebuku);
-        var gendeskripsi = function (row, column, value) {
-            var judul 		= $('#gridperpustakaan').jqxGrid('getrowdata', row).judul;
-            var link 		= $('#gridperpustakaan').jqxGrid('getrowdata', row).link;
-            var kodebuku 	= $('#gridperpustakaan').jqxGrid('getrowdata', row).kodebuku;
-            var pengarang 	= $('#gridperpustakaan').jqxGrid('getrowdata', row).pengarang;
-            var kota 		= $('#gridperpustakaan').jqxGrid('getrowdata', row).kota;
-            var penerbit 	= $('#gridperpustakaan').jqxGrid('getrowdata', row).penerbit;
-            var idne 		= $('#gridperpustakaan').jqxGrid('getrowdata', row).idne;
-            var isbn 		= $('#gridperpustakaan').jqxGrid('getrowdata', row).isbn;
-            var rakbuku 	= $('#gridperpustakaan').jqxGrid('getrowdata', row).rakbuku;
-            var foto 		= $('#gridperpustakaan').jqxGrid('getrowdata', row).gambar;
-            var marking 	= $('#gridperpustakaan').jqxGrid('getrowdata', row).marking;
-            var link 		= $('#gridperpustakaan').jqxGrid('getrowdata', row).link;
-            var name 		= $('#gridperpustakaan').jqxGrid('getrowdata', row).gambar;
-            if (name != ''){
-                var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="100" src="' + name + '"></div>';
-            } else {
-                var img = '<div style="background: white;"></div>';
-            }
-            if (link == ''){ var tombol = '<button id="'+idne+'" id1="'+foto+'" id2="'+judul+'" id3="'+pengarang+'"  id4="'+kodebuku+'" id5="'+rakbuku+'" class="buy btn-success" style="margin: 15px; width: 150px; left: -60px; position: relative; margin-left: 70%; margin-bottom: 5px;">Pinjam Buku</button>'; }
-            else { var tombol = '<a href="' + link + '" target="_blank"><button class="btn-danger" style="margin: 15px; width: 150px; left: -60px; position: relative; margin-left: 70%; margin-bottom: 5px;">View/Download</button></a>'; }
-            var info = "<div style='margin: 5px; margin-left: 10px; margin-bottom: 3px;'><table class='table table-striped'>";
-                info += "<tr><td rowspan='6'>"+img+"</td><td>Judul</td><td> " + judul + "</td></tr>";
-                info += "<tr><td>Pengarang</td><td> " + pengarang + "</td></tr>";
-                info += "<tr><td>Penerbit</td><td> " + penerbit + "</td></tr>";
-                info += "<tr><td>ISBN</td><td>" + isbn + "</td></tr>";
-                info += "<tr><td>Kode Buku</td><td>" + kodebuku + "</td></tr>";
-                info += "<tr><td>Rak Buku</td><td>" + rakbuku + "</td></tr></table>";
-                info += tombol;
-                info += "</div>";
-            return info;
-        }
-        $("#gridperpustakaan").jqxGrid({
-            width: '100%',					
-            height: 400,
-            filterable: true,
-            showfilterrow: true,
-            autorowheight: true,
-            pageable: true,
-            altrows: true,
-            columnsresize: true,
-            source: databuku,
-            theme: "energyblue",
-            rendered: function () {
-                $( ".buy" ).click( function () {
-                    var valid		= $(this).attr('id');
-                    var valfoto		= $(this).attr('id1');
-                    var valjudul	= $(this).attr('id2');
-                    var valpengarang= $(this).attr('id3');
-                    var valkodebuku	= $(this).attr('id4');
-                    var valrakbuku	= $(this).attr('id5');
-                    $('#preview').attr('src', valfoto);
-                    $("#pinjam_judul").val(valjudul);
-                    $("#pinjam_pengarang").val(valpengarang);
-                    $("#pinjam_kode").val(valkodebuku);
-                    $("#pinjam_rak").val(valrakbuku);
-                    $("#pinjam_idbuku").val(valid);
-                    $("#pinjam_idne").val('new');
-                    $('#divlaporan').hide();
-                    $('#divpeminjaman').show();
-                    $('#divawal').hide();
-            });
-            },
-            columns: [
-                { text: 'Deskripsi', editable: false, sortable: false, filterable: false, cellsrenderer: gendeskripsi, width: '65%', cellsalign: 'left', align: 'center' },
-                { text: 'Kode Buku', datafield: 'kodebuku', width: '15%', cellsalign: 'left', align: 'center' },	
-                { text: 'Kategori', datafield: 'kategori', width: '15%', cellsalign: 'left', align: 'center' },	
-            ],
-        });
         $('#btnshowall').click(function () {
             var set01 	= 'all';
             var token 	= document.getElementById('token').value;
@@ -859,16 +702,17 @@
             $('#divawal').hide();
             var datadetail = new $.jqx.dataAdapter(sourcedetail);
             $("#gridlaporan").jqxGrid({
-                width: '100%',
-                pageable: true,
-                rowsheight: 35,
-                filterable: true,
-                filtermode: 'excel',
-                source: datadetail,
-                theme: "energyblue",
-                selectionmode: 'singlecell',
-                columns: [
-                    { text: 'EDIT', editable: false, sortable: false, filterable: false, width: '10%', align: 'center', columntype: 'button', cellsrenderer: function () {
+                width           : '100%',
+                pageable        : true,
+                autoheight      : true,
+                rowsheight      : 35,
+                filterable      : true,
+                filtermode      : 'excel',
+                source          : datadetail,
+                theme           : "energyblue",
+                selectionmode   : 'singlecell',
+                columns         : [
+                    { text: 'EDIT', editable: false, sortable: false, filterable: false, width: '4%', align: 'center', columntype: 'button', cellsrenderer: function () {
                         return "EDIT";
                         }, buttonclick: function (row) {
                             editrow = row;	
@@ -896,23 +740,23 @@
                             $("#modaltambahbuku").modal('show');
                         }
                     },
-                    { text: 'Cover', datafield: 'gambar', editable: false, width: '8%', cellsalign: 'center', align: 'center' },
-                    { text: 'Kode', datafield: 'kodebuku', editable: false, width: '8%', cellsalign: 'center', align: 'center' },
-                    { text: 'Judul', datafield: 'judul', editable: false, width: '25%', cellsalign: 'center', align: 'center' },
-                    { text: 'Pengarang', datafield: 'pengarang', editable: false, width: '25%', cellsalign: 'left', align: 'center' },
+                    { text: 'Cover', datafield: 'gambar', editable: false, width: '4%', cellsalign: 'center', align: 'center' },
+                    { text: 'Kode', datafield: 'kodebuku', editable: false, width: '6%', cellsalign: 'center', align: 'center' },
+                    { text: 'Judul', datafield: 'judul', editable: false, width: '18%', cellsalign: 'left', align: 'center' },
+                    { text: 'Pengarang', datafield: 'pengarang', editable: false, width: '14%', cellsalign: 'left', align: 'center' },
                     { text: 'CET', datafield: 'cetakan', width: '5%', cellsalign: 'center', align: 'center'},
-                    { text: 'Kota', datafield: 'kota', width: '15%', cellsalign: 'center', align: 'center'},
+                    { text: 'Kota', datafield: 'kota', width: '7%', cellsalign: 'center', align: 'center'},
                     { text: 'Penerbit', datafield: 'penerbit', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Tahun', datafield: 'tahun', width: '8%', cellsalign: 'center', align: 'center'},
-                    { text: 'Ilus', datafield: 'ilustrasi', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Hal', datafield: 'halaman', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'ISBN', datafield: 'isbn', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Tgl. Masuk', datafield: 'tglmasuk', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Tahun Perolehan', datafield: 'tahunperolehan', width: '8%', cellsalign: 'center', align: 'center'},
-                    { text: 'Jenis Perolehan', datafield: 'jenisperolehan', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Rak Buku', datafield: 'rakbuku', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Kondisi', datafield: 'kondisi', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Kategori', datafield: 'kategori', width: '10%', cellsalign: 'center', align: 'center'},
+                    { text: 'Tahun', datafield: 'tahun', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Ilus', datafield: 'ilustrasi', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Hal', datafield: 'halaman', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'ISBN', datafield: 'isbn', width: '8%', cellsalign: 'left', align: 'center'},
+                    { text: 'Tgl. Masuk', datafield: 'tglmasuk', width: '7%', cellsalign: 'center', align: 'center'},
+                    { text: 'Tahun Perolehan', datafield: 'tahunperolehan', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Jenis Perolehan', datafield: 'jenisperolehan', width: '7%', cellsalign: 'center', align: 'center'},
+                    { text: 'Rak Buku', datafield: 'rakbuku', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Kondisi', datafield: 'kondisi', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Kategori', datafield: 'kategori', width: '5%', cellsalign: 'center', align: 'center'},
                     { text: 'Download link', datafield: 'link', width: '10%', cellsalign: 'center', align: 'center'},
                 ]
             });
@@ -964,7 +808,7 @@
                 theme: "energyblue",
                 selectionmode: 'singlecell',
                 columns: [
-                    { text: 'EDIT', editable: false, sortable: false, filterable: false, width: '10%', align: 'center', columntype: 'button', cellsrenderer: function () {
+                    { text: 'EDIT', editable: false, sortable: false, filterable: false, width: '4%', align: 'center', columntype: 'button', cellsrenderer: function () {
                         return "EDIT";
                         }, buttonclick: function (row) {
                             editrow = row;	
@@ -993,23 +837,23 @@
                             $("#modaltambahbuku").modal('show');
                         }
                     },
-                    { text: 'Cover', datafield: 'gambar', editable: false, width: '8%', cellsalign: 'center', align: 'center' },
-                    { text: 'Kode', datafield: 'kodebuku', editable: false, width: '8%', cellsalign: 'center', align: 'center' },
-                    { text: 'Judul', datafield: 'judul', editable: false, width: '25%', cellsalign: 'center', align: 'center' },
-                    { text: 'Pengarang', datafield: 'pengarang', editable: false, width: '25%', cellsalign: 'left', align: 'center' },
+                    { text: 'Cover', datafield: 'gambar', editable: false, width: '4%', cellsalign: 'center', align: 'center' },
+                    { text: 'Kode', datafield: 'kodebuku', editable: false, width: '6%', cellsalign: 'center', align: 'center' },
+                    { text: 'Judul', datafield: 'judul', editable: false, width: '18%', cellsalign: 'left', align: 'center' },
+                    { text: 'Pengarang', datafield: 'pengarang', editable: false, width: '14%', cellsalign: 'left', align: 'center' },
                     { text: 'CET', datafield: 'cetakan', width: '5%', cellsalign: 'center', align: 'center'},
-                    { text: 'Kota', datafield: 'kota', width: '15%', cellsalign: 'center', align: 'center'},
+                    { text: 'Kota', datafield: 'kota', width: '7%', cellsalign: 'center', align: 'center'},
                     { text: 'Penerbit', datafield: 'penerbit', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Tahun', datafield: 'tahun', width: '8%', cellsalign: 'center', align: 'center'},
-                    { text: 'Ilus', datafield: 'ilustrasi', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Hal', datafield: 'halaman', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'ISBN', datafield: 'isbn', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Tgl. Masuk', datafield: 'tglmasuk', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Tahun Perolehan', datafield: 'tahunperolehan', width: '8%', cellsalign: 'center', align: 'center'},
-                    { text: 'Jenis Perolehan', datafield: 'jenisperolehan', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Rak Buku', datafield: 'rakbuku', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Kondisi', datafield: 'kondisi', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Kategori', datafield: 'kategori', width: '10%', cellsalign: 'center', align: 'center'},
+                    { text: 'Tahun', datafield: 'tahun', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Ilus', datafield: 'ilustrasi', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Hal', datafield: 'halaman', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'ISBN', datafield: 'isbn', width: '8%', cellsalign: 'left', align: 'center'},
+                    { text: 'Tgl. Masuk', datafield: 'tglmasuk', width: '7%', cellsalign: 'center', align: 'center'},
+                    { text: 'Tahun Perolehan', datafield: 'tahunperolehan', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Jenis Perolehan', datafield: 'jenisperolehan', width: '7%', cellsalign: 'center', align: 'center'},
+                    { text: 'Rak Buku', datafield: 'rakbuku', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Kondisi', datafield: 'kondisi', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Kategori', datafield: 'kategori', width: '5%', cellsalign: 'center', align: 'center'},
                     { text: 'Download link', datafield: 'link', width: '10%', cellsalign: 'center', align: 'center'},
                 ]
             });
@@ -1061,7 +905,7 @@
                 theme: "energyblue",
                 selectionmode: 'singlecell',
                 columns: [
-                    { text: 'EDIT', editable: false, sortable: false, filterable: false, width: '10%', align: 'center', columntype: 'button', cellsrenderer: function () {
+                    { text: 'EDIT', editable: false, sortable: false, filterable: false, width: '4%', align: 'center', columntype: 'button', cellsrenderer: function () {
                         return "EDIT";
                         }, buttonclick: function (row) {
                             editrow = row;	
@@ -1089,23 +933,23 @@
                             $("#modaltambahbuku").modal('show');
                         }
                     },
-                    { text: 'Cover', datafield: 'gambar', editable: false, width: '8%', cellsalign: 'center', align: 'center' },
-                    { text: 'Kode', datafield: 'kodebuku', editable: false, width: '8%', cellsalign: 'center', align: 'center' },
-                    { text: 'Judul', datafield: 'judul', editable: false, width: '25%', cellsalign: 'center', align: 'center' },
-                    { text: 'Pengarang', datafield: 'pengarang', editable: false, width: '25%', cellsalign: 'left', align: 'center' },
+                    { text: 'Cover', datafield: 'gambar', editable: false, width: '4%', cellsalign: 'center', align: 'center' },
+                    { text: 'Kode', datafield: 'kodebuku', editable: false, width: '6%', cellsalign: 'center', align: 'center' },
+                    { text: 'Judul', datafield: 'judul', editable: false, width: '18%', cellsalign: 'left', align: 'center' },
+                    { text: 'Pengarang', datafield: 'pengarang', editable: false, width: '14%', cellsalign: 'left', align: 'center' },
                     { text: 'CET', datafield: 'cetakan', width: '5%', cellsalign: 'center', align: 'center'},
-                    { text: 'Kota', datafield: 'kota', width: '15%', cellsalign: 'center', align: 'center'},
+                    { text: 'Kota', datafield: 'kota', width: '7%', cellsalign: 'center', align: 'center'},
                     { text: 'Penerbit', datafield: 'penerbit', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Tahun', datafield: 'tahun', width: '8%', cellsalign: 'center', align: 'center'},
-                    { text: 'Ilus', datafield: 'ilustrasi', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Hal', datafield: 'halaman', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'ISBN', datafield: 'isbn', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Tgl. Masuk', datafield: 'tglmasuk', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Tahun Perolehan', datafield: 'tahunperolehan', width: '8%', cellsalign: 'center', align: 'center'},
-                    { text: 'Jenis Perolehan', datafield: 'jenisperolehan', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Rak Buku', datafield: 'rakbuku', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Kondisi', datafield: 'kondisi', width: '10%', cellsalign: 'center', align: 'center'},
-                    { text: 'Kategori', datafield: 'kategori', width: '10%', cellsalign: 'center', align: 'center'},
+                    { text: 'Tahun', datafield: 'tahun', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Ilus', datafield: 'ilustrasi', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Hal', datafield: 'halaman', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'ISBN', datafield: 'isbn', width: '8%', cellsalign: 'left', align: 'center'},
+                    { text: 'Tgl. Masuk', datafield: 'tglmasuk', width: '7%', cellsalign: 'center', align: 'center'},
+                    { text: 'Tahun Perolehan', datafield: 'tahunperolehan', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Jenis Perolehan', datafield: 'jenisperolehan', width: '7%', cellsalign: 'center', align: 'center'},
+                    { text: 'Rak Buku', datafield: 'rakbuku', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Kondisi', datafield: 'kondisi', width: '5%', cellsalign: 'center', align: 'center'},
+                    { text: 'Kategori', datafield: 'kategori', width: '5%', cellsalign: 'center', align: 'center'},
                     { text: 'Download link', datafield: 'link', width: '10%', cellsalign: 'center', align: 'center'},
                 ]
             });
@@ -1152,17 +996,17 @@
             $('#divawal').hide();
             var datadetail = new $.jqx.dataAdapter(sourcedetail);
             $("#gridlaporan").jqxGrid({
-                width: '100%',
-                pageable: true,
-                rowsheight: 35,
-                filterable: true,
-                filtermode: 'excel',
-                source: datadetail,
-                theme: "energyblue",
-                selectionmode: 'singlecell',
-                columns: [
-                    { text: 'EDIT', editable: false, sortable: false, filterable: false, width: '10%', align: 'center', columntype: 'button', cellsrenderer: function () {
-                        return "EDIT";
+                width           : '100%',
+                pageable        : true,
+                rowsheight      : 35,
+                filterable      : true,
+                filtermode      : 'excel',
+                source          : datadetail,
+                theme           : "energyblue",
+                selectionmode   : 'singlecell',
+                columns         : [
+                    { text: 'Pengembalian', editable: false, sortable: false, filterable: false, width: '5%', align: 'center', columntype: 'button', cellsrenderer: function () {
+                        return "Pengembalian";
                         }, buttonclick: function (row) {
                             editrow = row;	
                             var offset = $("#gridlaporan").offset();
@@ -1193,12 +1037,12 @@
                     { text: 'No.Induk', datafield: 'noinduk', width: '10%', cellsalign: 'center', align: 'center'},
                     { text: 'Tgl. Pinjam', datafield: 'tglpinjam', width: '12%', cellsalign: 'center', align: 'center'},
                     { text: 'Tgl. Kembali', datafield: 'tglkembali', width: '12%', cellsalign: 'center', align: 'center'},
-                    { text: 'Cover', datafield: 'gambar', editable: false, width: '8%', cellsalign: 'center', align: 'center' },
-                    { text: 'Kode', datafield: 'kodebuku', editable: false, width: '8%', cellsalign: 'center', align: 'center' },
-                    { text: 'Judul', datafield: 'judul', editable: false, width: '25%', cellsalign: 'center', align: 'center' },
-                    { text: 'Pengarang', datafield: 'pengarang', editable: false, width: '25%', cellsalign: 'left', align: 'center' },
-                    { text: 'Penerbit', datafield: 'penerbit', editable: false, width: '25%', cellsalign: 'left', align: 'center' },
-                    { text: 'ISBN', datafield: 'isbn', editable: false, width: '25%', cellsalign: 'left', align: 'center' },
+                    { text: 'Cover', datafield: 'gambar', editable: false, width: '4%', cellsalign: 'center', align: 'center' },
+                    { text: 'Kode', datafield: 'kodebuku', editable: false, width: '6%', cellsalign: 'center', align: 'center' },
+                    { text: 'Judul', datafield: 'judul', editable: false, width: '18%', cellsalign: 'left', align: 'center' },
+                    { text: 'Pengarang', datafield: 'pengarang', editable: false, width: '14%', cellsalign: 'left', align: 'center' },
+                    { text: 'Penerbit', datafield: 'penerbit', width: '10%', cellsalign: 'center', align: 'center'},
+                    { text: 'ISBN', datafield: 'isbn', width: '8%', cellsalign: 'left', align: 'center'},
                     { text: 'Biaya', datafield: 'biaya', width: '10%', cellsalign: 'center', align: 'center'},
                     { text: 'Denda', datafield: 'denda', width: '10%', cellsalign: 'center', align: 'center'},
                 ]
@@ -1260,17 +1104,124 @@
                     { text: 'No.Induk', datafield: 'noinduk', width: '10%', cellsalign: 'center', align: 'center'},
                     { text: 'Tgl. Pinjam', datafield: 'tglpinjam', width: '12%', cellsalign: 'center', align: 'center'},
                     { text: 'Tgl. Kembali', datafield: 'tglkembali', width: '12%', cellsalign: 'center', align: 'center'},
-                    { text: 'Cover', datafield: 'gambar', editable: false, width: '8%', cellsalign: 'center', align: 'center' },
-                    { text: 'Kode', datafield: 'kodebuku', editable: false, width: '8%', cellsalign: 'center', align: 'center' },
-                    { text: 'Judul', datafield: 'judul', editable: false, width: '25%', cellsalign: 'center', align: 'center' },
-                    { text: 'Pengarang', datafield: 'pengarang', editable: false, width: '25%', cellsalign: 'left', align: 'center' },
-                    { text: 'Penerbit', datafield: 'penerbit', editable: false, width: '25%', cellsalign: 'left', align: 'center' },
-                    { text: 'ISBN', datafield: 'isbn', editable: false, width: '25%', cellsalign: 'left', align: 'center' },
+                    { text: 'Cover', datafield: 'gambar', editable: false, width: '4%', cellsalign: 'center', align: 'center' },
+                    { text: 'Kode', datafield: 'kodebuku', editable: false, width: '6%', cellsalign: 'center', align: 'center' },
+                    { text: 'Judul', datafield: 'judul', editable: false, width: '18%', cellsalign: 'left', align: 'center' },
+                    { text: 'Pengarang', datafield: 'pengarang', editable: false, width: '14%', cellsalign: 'left', align: 'center' },
+                    { text: 'ISBN', datafield: 'isbn', width: '8%', cellsalign: 'left', align: 'center'},
                     { text: 'Biaya', datafield: 'biaya', width: '10%', cellsalign: 'center', align: 'center'},
                     { text: 'Denda', datafield: 'denda', width: '10%', cellsalign: 'center', align: 'center'},
                 ]
             });
         });
+        $('#tabelperpustakaan').DataTable({
+			ajax		: function(data, callback, settings) {
+				$.ajax({
+					url: '{{ route("jsonBuku") }}',
+					data: {
+						limit           : settings._iDisplayLength,
+						page            : Math.ceil(settings._iDisplayStart / settings._iDisplayLength) + 1,
+						search          : data.search.value,
+						_token			: '{{ csrf_token() }}'
+					},
+					type: "POST",
+					success: function(res) {
+						callback({
+							recordsTotal    : res.total,
+							recordsFiltered : res.total,
+							data            : res.data
+						});
+					},
+				})
+			},
+			searching	: true,
+            autoWidth	: false,
+            serverSide  : true,
+			columnDefs	: [
+                {
+					targets				: 0,
+					responsivePriority	: 4,
+					render		: function (data, type, full, meta) {
+                        stateNum    = Math.floor(Math.random() * 6);
+                        states 		= ['success', 'danger', 'warning', 'info', 'primary', 'secondary'];
+						state 		= states[stateNum];
+                        var jenis   = full['kategori'];
+                        var id      = full['id'];
+                        if (jenis == 'E-Book'){
+                            var tombol = '<a href="'+full['link']+'" class="btn btn-'+state+'"><i class="fa fa-download"></i> DOWNLOAD</a>';
+                        } else {
+                            var tombol = '<a href="#" class="btn btn-'+state+'" onClick="btnaddpeminjaman('+id+')"><i class="fa fa-book"></i>Peminjaman</a>';
+                        }
+                        if (stateNum == '5'){
+                            var stateNum = 0;
+                        } else {
+                            var stateNum = stateNum + 1;
+                        }
+                        state 		= states[stateNum];
+                        var tombolcetak = '<a href="#" class="btn btn-'+state+'" onClick="btncetaklabel('+id+')"><i class="fa fa-print"></i> Cetak Label</a>';
+                        var tombollist  = '<div class="btn-group-vertical">'+tombolcetak+tombol+'</div>';
+                        var rawData = '<div class="list-group-item">'+
+                                        '<div class="row">'+
+                                            '<div class="col-auto bg-'+state+'">'+
+                                                '<img class="img-fluid" src="'+full['gambar']+'" alt="Photo" style="max-height: 160px;">'+
+                                            '</div>'+
+                                            '<div class="col px-4">'+
+                                                '<div>'+
+                                                    '<div class="float-right">'+full['created_at']+'</div>'+
+                                                    '<h3>'+full['judul']+'</h3>'+
+                                                    '<div class="row"><div class="col-lg-8"><p class="mb-0">Pengarang : '+full['pengarang']+'</p>'+
+                                                    '<p class="mb-0">Penerbit : '+full['penerbit']+'</p>'+
+                                                    '<p class="mb-0">ISBN : '+full['isbn']+'</p>'+
+                                                    '<p class="mb-0">Kode Buku : '+full['kodebuku']+'</p>'+
+                                                    '<p class="mb-0">Rak Buku : '+full['rakbuku']+'</p></div><div class="col-lg-4">'+tombollist+'</div></div>'+
+                                                '</div>'+
+                                            '</div>'+
+                                        '</div>'+
+                                    '</div>';
+						return rawData;
+					}
+				},
+                
+			],
+            order       : [[ 0, "desc" ]],
+      		dom			: 	'<"row d-flex justify-content-between align-items-center m-1"' +
+        						'<"col-lg-6 d-flex align-items-center"l<"dt-action-buttons text-xl-end text-lg-start text-lg-end text-start "B>>' +
+       							'<"col-lg-6 d-flex align-items-center justify-content-lg-end flex-lg-nowrap flex-wrap pe-lg-1 p-0"f<"invoice_status ms-sm-2">>' +
+        					'>t' +
+        					'<"d-flex justify-content-between mx-2 row"' +
+        						'<"col-sm-12 col-md-6"i>' +
+        						'<"col-sm-12 col-md-6"p>' +
+        					'>',
+            language: {
+                'lengthMenu': 'Display _MENU_',
+            },
+      		responsive: {
+				details: {
+					display	: $.fn.dataTable.Responsive.display.modal({
+						header: function (row) {
+							var data = row.data();
+							return 'Details of ' + data['matpel'];
+						}
+					}),
+					type	: 'column',
+					renderer: function (api, rowIdx, columns) {
+						var data = $.map(columns, function (col, i) {
+						return col.columnIndex !== 2
+							? '<tr data-dt-row="' + col.rowIdx +'" data-dt-column="' + col.columnIndex +'">' +
+								'<td>' +col.title + ':' + '</td> ' +
+								'<td>' +col.data +'</td>' +
+								'</tr>'
+							: '';
+						}).join('');
+						return data ? $('<table class="table"/>').append('<tbody>' + data + '</tbody>') : false;
+					}
+				}
+			},
+			initComplete: function () {
+			},
+			drawCallback: function () {
+			}
+		});
     });
 </script>
 @endpush

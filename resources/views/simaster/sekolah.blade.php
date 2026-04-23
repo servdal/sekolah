@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-        <div class="container">
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0"> Master Data Sekolah</h1>
+                    <h1> Master Data Sekolah</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                     </ol>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
@@ -231,7 +231,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
@@ -392,10 +392,10 @@
                 <div class="form-group">
                     <label>Logo</label>
                     <div class="row">
-                        <div class="col-xs-6">
+                        <div class="col-lg-6">
                             <input type="file" id="edit_logo" name="edit_logo" onchange="edtreadURL(this);" >
                         </div> 
-                        <div class="col-xs-6">
+                        <div class="col-lg-6">
                             <img id="edit_logo_prev" class="img-responsive" />
                         </div>				 
                     </div>			  
@@ -403,10 +403,10 @@
                 <div class="form-group">
                     <label>Logo Grey</label>
                     <div class="row">
-                        <div class="col-xs-6">
+                        <div class="col-lg-6">
                             <input type="file" id="edit_logo_grey" name="edit_logo_grey" onchange="edtreadURLbc(this);"" >
                         </div> 
-                        <div class="col-xs-6">
+                        <div class="col-lg-6">
                             <img id="edit_logo_grey_prev" class="img-responsive" />
                         </div>				 
                     </div>			  
@@ -414,10 +414,10 @@
                 <div class="form-group">
                     <label>Frontpage Logo</label>
                     <div class="row">
-                        <div class="col-xs-6">
+                        <div class="col-lg-6">
                             <input type="file" id="edit_frontpage" name="edit_frontpage" onchange="edtreadURLfront(this);">
                         </div> 
-                        <div class="col-xs-6">
+                        <div class="col-lg-6">
                             <img id="edit_frontpage_prev" class="img-responsive" />
                         </div>				 
                     </div>			  

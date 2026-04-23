@@ -1,13 +1,13 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-        <div class="container">
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-7">
-                    <h1 class="m-0"> Laporan Keuangan</h1>
+                <div class="col-sm-4">
+                    <h1> Laporan Keuangan</h1>
                 </div>
-                <div class="col-sm-5">
+                <div class="col-sm-8">
                     <div class="btn-group">
                         <a class="btn btn-app btn-primary" href="{{url('/')}}/lapbayar" data-bs-toggle="tooltip" data-bs-placement="top" title="Seragam, Kegiatan, Peralatan, Buku, SPP, Ekskul, Makan"><i class="fa fa-calculator"></i> SPP</a>
                         <a class="btn btn-app btn-success" href="{{url('/')}}/datakeuhptmasuk" data-bs-toggle="tooltip" data-bs-placement="top" title="Keuangan Sekolah"><i class="fa fa-pencil"></i> Sekolah</a>
@@ -18,8 +18,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div id="loading">
                 <img src="{{ asset('dist/img/loading.gif') }}" class="img-responsive" alt="Photo">
@@ -58,7 +58,7 @@
                                         <label>Tahun</label>
                                         <input type="number" class="form-control" id="id_tahun" >					
                                     </div>				  
-                                </div>			  
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label>Pilih POS</label>
@@ -313,7 +313,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>

@@ -28,7 +28,7 @@
                             <h5 class="widget-user-desc">{!! session('sekolah_nama_sekolah') !!} {!! session('sekolah_kota') !!}</h5>
                         </div>
                     </div>
-                    <div class="card card-primary direct-chat direct-chat-warning shadow" id="divawal">
+                    <div class="card card-primary shadow" id="divawal">
                         <div class="card-header">
                             <h3 class="card-title">Siswa Yang Terhubung Dengan Anda</h3>
                             <div class="card-tools">
@@ -36,110 +36,142 @@
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse"><i class="fa fa-minus"></i></button>
                             </div>
                         </div>
-                        <div class="card-body">
-                            @if(Session::has('message'))
-                                <div class="alert {{ Session::get('alert-class') }} alert-dismissable">
-                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                                    <h4><i class="icon fa fa-check"></i> {{ Session::get('status') }}</h4>
-                                        {!! Session::get('message') !!}
-                                </div>
-                            @endif
-                            <div id="griddatainduk"></div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="row pengumuman">
-                                <div class="col-md-4">
-                                    <div class="card card-info card-outline" >
-                                        <div class="card-body box-profile bg-info">
-                                            <div class="text-center"><strong><h1>Program Orangtua Asuh</h1></strong></div>
-                                        </div>
-                                        <div class="card-footer box-profile bg-info">
-                                            Program orangtua asuh anak tidak mampu dan reward anak berprestasi adalah cara yang mudah dan efektif untuk membantu mewujudkan masa depan anak-anak sholeh dan sholehah yang lebih baik. 
-                                            Mari investasikan sebagian kelapangan rezeki yang Allah berikan dengan berdonasi sebagai orangtua asuh anak sholeh dan sholehah.
-                                        </div>
-                                        <div class="card-footer box-profile bg-info">
-                                        Dengan menjadi seorang orangtua asuh anak sholeh dan sholehah, Anda turut berkontribusi terhadap pengembangan jangka panjang untuk membantu anak sholeh dan sholehah melalui program pendidikan.
-                                        </div>
-                                        <div class="card-footer box-profile bg-info">
-                                        Anda dapat melakukan donasi mulai dari Rp. 100.000,- per bulan. Donasi yang Anda berikan tidak kami berikan langsung secara tunai kepada anak, namun kami kemas dalam bentuk program pendidikan anak.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card card-warning card-outline" >
-                                        <div class="card-body box-profile bg-warning">
-                                            <div class="text-center"><strong><h1>Bagaimana cara menjadi orangtua asuh</h1></strong></div>
-                                        </div>
-                                        <div class="card-footer box-profile bg-warning">
-                                            <ol>
-                                                <li>Pada layar di samping, terdapat list anak-anak tidak mampu yang belum memiliki orang tua asuh. Silahkan pilih anak-anak yang ingin Bapak/Ibu bantu</li>
-                                                <li>Tombol Profil, berguna bagi bapak ibu yang ingin melihat sepintas terkait perkembangan studinya di {!! session('sekolah_nama_sekolah') !!} </li>
-                                                <li>Apabila Bapak/Ibu telah menentukan anak yang akan di bantu, silahkan klik tombol ajukan permohonan</li>
-                                                <li>Pihak admin akan melakukan klarifikasi dan menghubungi Bapak/Ibu</li>
-                                                <li>Anak yang telah dipilih Bapak/Ibu akan muncul di tabel diatas sebagai bagian dari Tanggung Jawab Bapak/Ibu dalam hal pendidikan Anak tersebut di {!! session('sekolah_nama_sekolah') !!}</li>
-                                                <li>Apabila Bapak/Ibu suatu saat tidak lagi ingin meneruskan program ini, silahkan ajukan pembatalan di tabel di atas</li>
-                                                <li>Pihak admin akan mengubungi Bapak/Ibu untuk klarfikasi</li>
-                                            </ol>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card card-success shadow" >
-                                        <div class="card-body row" id="timeline">
-                                            <div class="col-md-12">
-                                                <!-- The time line -->
-                                                <div class="timeline">
-                                                    <div class="time-label">
-                                                        <span class="bg-primary"> Daftar Anak Asuh</span>
-                                                    </div>
-                                                    <div>
-                                                        @if(isset($anakasuh) && !empty($anakasuh))
-                                                            @php
-                                                                $i = 1;
-                                                            @endphp
-                                                            @foreach($anakasuh as $rows)
-                                                                    <i class="fa fa-plane bg-primary"></i>
-                                                                    <div class="timeline-item">
-                                                                        <span class="time"><i class="fa fa-clock"></i> {{ $rows['tamasuk'] }}</span>
-                                                                        <h3 class="timeline-header">{!! $rows['nama'] !!}</h3>
-                                                                        <div class="timeline-body">
-                                                                            <div class="card-body">
-                                                                                <div class="attachment-block clearfix">
-                                                                                    @if ($rows['foto'] == '')
-                                                                                        <img class="attachment-img" src="dist/img/foto/{{$rows['foto']}}" alt="Attachment Image">
-                                                                                    @else
-                                                                                        <img class="attachment-img" src="mascot.png" alt="Attachment Image">
-                                                                                    @endif
-                                                                                    <div class="attachment-pushed">
-                                                                                        <h4 class="attachment-heading"><a class="btnprofil" href="javascript:;" data-id="{{$rows['noinduk']}}" data-foto="{{$rows['foto']}}">Profil</a></h4>
-                                                                                        <div class="attachment-text">
-                                                                                            <font size="1">{!! $rows['tmplahir'] !!}, {!! $rows['tgllahir'] !!} ( {!! $rows['kelamin'] !!} )<br />
-                                                                                            {!! $rows['alamatortu'] !!}<br />
-                                                                                            Ayah : {!! $rows['namaayah'] !!} ( {!! $rows['kerjaayah'] !!} )<br />
-                                                                                            Ibu : {!! $rows['namaibu'] !!} ( {!! $rows['kerjaibu'] !!} )</font>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <button type="button" class="btn btn-default btn-sm"><a class="btnpengajuan" href="javascript:;" data-noinduk="{{$rows['noinduk']}}" data-id="{{$rows['id']}}"><i class="text-danger fa fa-heart"></i> Ajukan Permohonan Orang Tua Asuh</a></button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                            @endforeach
-                                                        @else
-                                                            <i class="fa fa-plane bg-primary"></i>
-                                                            <div class="timeline-item">
-                                                                <span class="time"><i class="fa fa-clock"></i> now</span>
-                                                                <h3 class="timeline-header">Alhamdulillah</h3>
-                                                                <div class="timeline-body">
-                                                                    Semua anak asuh telah memiliki orang tua asuh, Bapak/Ibu silahkan mengikuti program-program kami yang lain
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                    <div>
-                                                        <i class="fa fa-clock-o bg-gray"></i>
+                        <div class="card-body pb-0">
+                            <div id="listanak" class="row">
+                                @if(isset($datasiswa) && !empty($datasiswa))
+                                    @foreach($datasiswa as $rows)
+                                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                            <div class="card bg-light d-flex flex-fill">
+                                                <div class="card-header text-muted border-bottom-0">
+                                                Kelas {{$rows['klspos']}}
+                                                </div>
+                                                <div class="card-body pt-0">
+                                                    <div class="row">
+                                                        <div class="col-7">
+                                                            <h2 class="lead"><b>{{$rows['nama']}}</b></h2>
+                                                            <p class="text-muted text-sm"><b> {{$rows['alamatortu']}}</b></p>
+                                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                <li class="small"><span class="fa-li"><i class="fa fa-lg fa-user-secret"></i></span>  {{$rows['namaayah']}}</li>
+                                                                <li class="small"><span class="fa-li"><i class="fa fa-lg fa-female"></i></span>  {{$rows['namaibu']}}</li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-5 text-center">
+                                                            @if ($rows['foto'] == null OR $rows['foto'] == '')
+                                                                <img src="{{url('/').'/'.Session('sekolah_logo')}}" alt="user-avatar" class="img-circle img-fluid">
+                                                            @else 
+                                                                <img src="{{url('/')}}/dist/img/foto/{{$rows['foto']}}" alt="user-avatar" class="img-circle img-fluid">
+                                                            @endif
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <div class="card-footer">
+                                                    <div class="text-right">
+                                                        <a href="#" class="btn btn-sm btn-primary btnpill" id="{{$rows['id']}}" foto="{{$rows['foto']}}"><i class="fa fa-trophy"></i> View Profile</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="pengumuman container-fluid h-100">
+                                <div class="card card-row card-primary shadow">
+                                    <div class="card-header">
+                                        <h3 class="card-title"><i class="fa fa-user-plus"></i> Program Orangtua Asuh</h3>
+                                        
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="card card-info card-outline" >
+                                            <div class="card-body box-profile bg-info">
+                                                <div class="text-center"><strong><h1>Program Orangtua Asuh</h1></strong></div>
+                                            </div>
+                                            <div class="card-footer box-profile bg-info">
+                                                Program orangtua asuh anak tidak mampu dan reward anak berprestasi adalah cara yang mudah dan efektif untuk membantu mewujudkan masa depan anak-anak sholeh dan sholehah yang lebih baik. 
+                                                Mari investasikan sebagian kelapangan rezeki yang Allah berikan dengan berdonasi sebagai orangtua asuh anak sholeh dan sholehah.
+                                            </div>
+                                            <div class="card-footer box-profile bg-info">
+                                            Dengan menjadi seorang orangtua asuh anak sholeh dan sholehah, Anda turut berkontribusi terhadap pengembangan jangka panjang untuk membantu anak sholeh dan sholehah melalui program pendidikan.
+                                            </div>
+                                            <div class="card-footer box-profile bg-info">
+                                            Anda dapat melakukan donasi mulai dari Rp. 100.000,- per bulan. Donasi yang Anda berikan tidak kami berikan langsung secara tunai kepada anak, namun kami kemas dalam bentuk program pendidikan anak.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card card-row card-warning shadow">
+                                    <div class="card-header">
+                                        <h3 class="card-title"><i class="fa fa-question-circle"></i> Bagaimana cara menjadi orangtua asuh</h3>
+                                        
+                                    </div>
+                                    <div class="card-body">
+                                        <ol>
+                                            <li>Pada layar di samping, terdapat list anak-anak tidak mampu yang belum memiliki orang tua asuh. Silahkan pilih anak-anak yang ingin Bapak/Ibu bantu</li>
+                                            <li>Tombol Profil, berguna bagi bapak ibu yang ingin melihat sepintas terkait perkembangan studinya di {!! session('sekolah_nama_sekolah') !!} </li>
+                                            <li>Apabila Bapak/Ibu telah menentukan anak yang akan di bantu, silahkan klik tombol ajukan permohonan</li>
+                                            <li>Pihak admin akan melakukan klarifikasi dan menghubungi Bapak/Ibu</li>
+                                            <li>Anak yang telah dipilih Bapak/Ibu akan muncul di tabel diatas sebagai bagian dari Tanggung Jawab Bapak/Ibu dalam hal pendidikan Anak tersebut di {!! session('sekolah_nama_sekolah') !!}</li>
+                                            <li>Apabila Bapak/Ibu suatu saat tidak lagi ingin meneruskan program ini, silahkan ajukan pembatalan di tabel di atas</li>
+                                            <li>Pihak admin akan mengubungi Bapak/Ibu untuk klarfikasi</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="card card-row card-info shadow">
+                                    <div class="card-header">
+                                        <h3 class="card-title"><i class="fa fa-soccer"></i> Daftar Anak Yang Bisa Dinaungi</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="timeline">
+                                            <div class="time-label">
+                                                <span class="bg-primary"> Daftar Anak Asuh</span>
+                                            </div>
+                                            <div>
+                                                @if(isset($anakasuh) && !empty($anakasuh))
+                                                    @php
+                                                        $i = 1;
+                                                    @endphp
+                                                    @foreach($anakasuh as $rows)
+                                                            <i class="fa fa-plane bg-primary"></i>
+                                                            <div class="timeline-item">
+                                                                <span class="time"><i class="fa fa-clock"></i> {{ $rows['tamasuk'] }}</span>
+                                                                <h3 class="timeline-header">{!! $rows['nama'] !!}</h3>
+                                                                <div class="timeline-body">
+                                                                    <div class="card-body">
+                                                                        <div class="attachment-block clearfix">
+                                                                            @if ($rows['foto'] == '')
+                                                                                <img class="attachment-img" src="dist/img/foto/{{$rows['foto']}}" alt="Attachment Image">
+                                                                            @else
+                                                                                <img class="attachment-img" src="mascot.png" alt="Attachment Image">
+                                                                            @endif
+                                                                            <div class="attachment-pushed">
+                                                                                <h4 class="attachment-heading"><a class="btnprofil" href="javascript:;" data-id="{{$rows['noinduk']}}" data-foto="{{$rows['foto']}}">Profil</a></h4>
+                                                                                <div class="attachment-text">
+                                                                                    <font size="1">{!! $rows['tmplahir'] !!}, {!! $rows['tgllahir'] !!} ( {!! $rows['kelamin'] !!} )<br />
+                                                                                    {!! $rows['alamatortu'] !!}<br />
+                                                                                    Ayah : {!! $rows['namaayah'] !!} ( {!! $rows['kerjaayah'] !!} )<br />
+                                                                                    Ibu : {!! $rows['namaibu'] !!} ( {!! $rows['kerjaibu'] !!} )</font>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <button type="button" class="btn btn-default btn-sm"><a class="btnpengajuan" href="javascript:;" data-noinduk="{{$rows['noinduk']}}" data-id="{{$rows['id']}}"><i class="text-danger fa fa-heart"></i> Ajukan Permohonan Orang Tua Asuh</a></button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                    @endforeach
+                                                @else
+                                                    <i class="fa fa-plane bg-primary"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time"><i class="fa fa-clock"></i> now</span>
+                                                        <h3 class="timeline-header">Alhamdulillah</h3>
+                                                        <div class="timeline-body">
+                                                            Semua anak asuh telah memiliki orang tua asuh, Bapak/Ibu silahkan mengikuti program-program kami yang lain
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div>
+                                                <i class="fa fa-clock-o bg-gray"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -560,7 +592,8 @@
                                                     <option value="8">Meninggalkan Sekolah</option>
                                                     <option value="10">Perilaku Siswa</option>
                                                     <option value="11">Laporan Prestasi Siswa</option>
-                                                    <option value="28">Laporan Alquran</option>
+                                                    <option value="28">Laporan Halaqoh Alquran</option>
+                                                    <option value="33">Laporan Ujian Alquran</option>
                                                     <option value="12">Prestasi Belajar Kelas KB</option>
                                                     <option value="13">Prestasi Belajar Kelas TK A</option>
                                                     <option value="14">Prestasi Belajar Kelas TK B</option>
@@ -870,6 +903,149 @@
             return false;
         });
     });
+    $(function () {
+        $('#listanak').on('click', '.btnpill', function () {
+            var set01       = $(this).attr('id');	
+            var set02       = $(this).attr('foto');	
+            if (set02 == '' || set02 == null){
+                var set02   = 'mascot.png';
+            } else {
+                var set02   = '/dist/img/foto/'+set02;
+            }
+            $("#induk_dataview").val('1');
+            $('#picprofile').attr('src', set02);
+            $("#valcari").val(set01);
+            $('#divawal').hide();
+            $('#detailsiswa').show();
+            var sourcegrafik = {
+                datatype: "json",
+                datafields: [
+                    { name: 'jenis' },
+                    { name: 'jumlah' },
+                ],
+                type: 'POST',
+                data: {val01: set01, _token: '{{ csrf_token() }}'},
+                url: 'json/getstatdatakd',
+            };
+            var datajrekap		= new $.jqx.dataAdapter(sourcegrafik);
+            var settinggrafik 	= {
+                title: "Statistik",
+                description: "Penilaian vs Evaluasi",
+                enableAnimations: true,
+                showBorderLine: true,
+                colorScheme: 'scheme03',
+                padding: { left: 5, top: 5, right: 5, bottom: 5 },
+                titlePadding: { left: 0, top: 0, right: 0, bottom: 10 },
+                source: datajrekap,
+                seriesGroups:
+                [
+                    {
+                        type: 'pie',
+                        showLabels: true,
+                        series:
+                        [
+                            {
+                                dataField: 'jumlah',
+                                displayText: 'jenis',
+                                labelRadius: 100,
+                                initialAngle: 15,
+                                radius: 90,
+                                centerOffset: 0,
+                                formatSettings: { decimalPlaces: 1 }
+                            }
+                        ]
+                    }
+                ]
+            };
+            $('#grafiksebaran').jqxChart(settinggrafik);
+            var source2 = {
+                datatype: "json",
+                datafields: [
+                    { name: 'jenis' },
+                    { name: 'jumlah3' },
+                    { name: 'jumlah4' },
+                ],
+                type: 'POST',
+                data: {val01: set01, _token: '{{ csrf_token() }}'},
+                url: 'json/getstatdatapermuatan',
+            };
+            var datajrekap2		= new $.jqx.dataAdapter(source2);
+            var settinggrafik2 = {
+                title: "Statistik",
+                description: "Per Matapelajar",
+                enableAnimations: true,
+                titlePadding: { left: 0, top: 0, right: 0, bottom: 10 },
+                source: datajrekap2,
+                xAxis:
+                    {
+                        dataField: 'jenis',
+                        displayText: 'Matapelajaran',
+                        gridLines: { visible: true },
+                        valuesOnTicks: false
+                    },
+                colorScheme: 'scheme02',
+                columnSeriesOverlap: false,
+                seriesGroups:
+                    [
+                        {
+                            type: 'column',
+                            valueAxis:
+                            {
+                                visible: true,
+                                title: { text: 'Nilai<br>' }
+                            },
+                            series: [
+                                    { dataField : 'jumlah3', displayText: 'Rata-Rata P-E' },
+                                    { dataField : 'jumlah4', displayText: 'Rata-Rata PTS-PAS' },
+                                ]
+                        }
+                    ]
+            };
+            $('#grafiksebaranperjenis').jqxChart(settinggrafik2);
+            var source3 = {
+                datatype: "json",
+                datafields: [
+                    { name: 'jenis' },
+                    { name: 'jumlah' },
+                ],
+                type: 'POST',
+                data: {val01: set01, _token: '{{ csrf_token() }}'},
+                url: 'json/getstatdatakehadiran',
+            };
+            var datajrekap3		= new $.jqx.dataAdapter(source3);
+            var settinggrafik3 = {
+                title: "Statistik",
+                description: "Kehadiran Siswa",
+                enableAnimations: true,
+                titlePadding: { left: 0, top: 0, right: 0, bottom: 10 },
+                source: datajrekap3,
+                xAxis:
+                    {
+                        dataField: 'jenis',
+                        displayText: 'Status',
+                        gridLines: { visible: true },
+                        valuesOnTicks: false
+                    },
+                colorScheme: 'scheme03',
+                columnSeriesOverlap: false,
+                seriesGroups:
+                    [
+                        {
+                            type: 'column',
+                            series: [
+                                { dataField: 'jumlah', displayText: 'Jumlah' },
+                            ]
+                        }
+                    ]
+            };
+            $('#grafikkehadiran').jqxChart(settinggrafik3);
+            $.post('json/viewdatainduk', { val01: '1', val02: set01, _token: '{{ csrf_token() }}' },
+            function(data){
+                $('#divdataview').html(data);
+                return false;
+            });
+        });
+    });
     $(document).ready(function () {
         $('#formtambah').hide();
         $('#btntambah').click(function () { 
@@ -896,7 +1072,9 @@
                     hideAfter: 1000,
                     stack: 1
                 });
-                $("#griddatainduk").jqxGrid('updatebounddata');
+                setTimeout(function () { 
+                    window.location.href = '/biodata';
+                }, 2000);
                 return false;
             });
         });
@@ -965,293 +1143,6 @@
         $('#pengajuan').hide();
         $('#divediting').hide();
         $('#detailsiswa').hide(); 
-        var source = {
-            datatype: "json",
-            datafields: [
-                { name: 'id',type: 'text'},	
-                { name: 'panggilan',type: 'text'},
-                { name: 'agama',type: 'text'},
-                { name: 'bakat',type: 'text'},
-                { name: 'gybljr',type: 'text'},
-                { name: 'gayah',type: 'text'},
-                { name: 'gibu',type: 'text'},
-                { name: 'payah',type: 'text'},
-                { name: 'pibu',type: 'text'},
-                { name: 'panggilan',type: 'text'},	
-                { name: 'agama',type: 'text'},	
-                { name: 'nama',type: 'text'},
-                { name: 'nik',type: 'text'},
-                { name: 'kelamin',type: 'text'},
-                { name: 'tmplahir',type: 'text'},
-                { name: 'tgllahir',type: 'text'},
-                { name: 'noinduk',type: 'text'},
-                { name: 'nisn',type: 'text'},
-                { name: 'tinggi',type: 'text'},
-                { name: 'berat',type: 'text'},
-                { name: 'namaayah',type: 'text'},
-                { name: 'namaibu',type: 'text'},
-                { name: 'kerjaayah',type: 'text'},
-                { name: 'kerjaibu',type: 'text'},
-                { name: 'wali',type: 'text'},
-                { name: 'pekerjaanwali',type: 'text'},
-                { name: 'alamatortu',type: 'text'},
-                { name: 'erte',type: 'text'},
-                { name: 'erwe',type: 'text'},
-                { name: 'kelurahan',type: 'text'},
-                { name: 'kecamatan',type: 'text'},
-                { name: 'kota',type: 'text'},
-                { name: 'kodepos',type: 'text'},
-                { name: 'darah',type: 'text'},			
-                { name: 'klspos',type: 'text'},
-                { name: 'foto',type: 'text'},
-                { name: 'tamasuk',type: 'text'},
-                { name: 'lampiran',type: 'text'},
-                { name: 'hape',type: 'text'},
-                { name: 'mutasi',type: 'text'},
-                { name: 'asal',type: 'text'},
-                { name: 'nokelulusan',type: 'text'},
-                { name: 'jilid',type: 'text'},
-                { name: 'is_asuh',type: 'text'},
-            ],
-            url: 'json/datainduk',
-            cache: false,
-            pager: function (pagenum, pagesize, oldpagenum) {}
-        };
-        var dataAdapter = new $.jqx.dataAdapter(source, { async: false, loadError: function (xhr, status, error) { alert('Error loading "' + source.url + '" : ' + error); } });
-        var editrow = -1;
-        $("#griddatainduk").jqxGrid({
-            width: '100%',
-            showfilterrow: true,
-            rowsheight: 35,
-            filterable: true,                
-            columnsresize: true,
-            autoshowfiltericon: true,
-            pageable: true,
-            autoheight: true,
-            theme: "energyblue",
-            source: dataAdapter,
-            selectionmode: 'multiplecellsextended',
-            columns: [
-                { text: 'VIEW', cellsalign: 'center', align: 'center', editable: false, sortable: false, filterable: false, columntype: 'button', width: 70, cellsrenderer: function () {
-					return "VIEW";
-					}, buttonclick: function (row) {
-						editrow 		= row;
-						var offset 		= $("#griddatainduk").offset();
-						var dataRecord 	= $("#griddatainduk").jqxGrid('getrowdata', editrow);
-						var set01		= dataRecord.noinduk;
-						var set02		= dataRecord.foto;
-						if (set02 == '' || set02 == null){
-                            var set02   = 'mascot.png';
-                        } else {
-                            var set02   = '/dist/img/foto/'+set02;
-                        }
-                        $("#induk_dataview").val('1');
-						$('#picprofile').attr('src', set02);
-						$("#valcari").val(dataRecord.id);
-                        $('#divawal').hide();
-						$('#detailsiswa').show();
-						var sourcegrafik = {
-							datatype: "json",
-							datafields: [
-								{ name: 'jenis' },
-								{ name: 'jumlah' },
-							],
-							type: 'POST',
-							data: {val01: set01, _token: '{{ csrf_token() }}'},
-							url: 'json/getstatdatakd',
-						};
-						var datajrekap		= new $.jqx.dataAdapter(sourcegrafik);
-						var settinggrafik 	= {
-							title: "Statistik",
-							description: "KI3 vs KI4",
-							enableAnimations: true,		
-							showBorderLine: true,
-							colorScheme: 'scheme03',
-							padding: { left: 5, top: 5, right: 5, bottom: 5 },
-							titlePadding: { left: 0, top: 0, right: 0, bottom: 10 },
-							source: datajrekap,
-							seriesGroups:
-							[
-								{
-									type: 'pie',
-									showLabels: true,
-									series:
-									[
-										{
-											dataField: 'jumlah',
-											displayText: 'jenis',
-											labelRadius: 100,
-											initialAngle: 15,
-											radius: 90,
-											centerOffset: 0,
-											formatSettings: { decimalPlaces: 1 }
-										}
-									]
-								}
-							]
-						};
-						$('#grafiksebaran').jqxChart(settinggrafik);
-						var source2 = {
-							datatype: "json",
-							datafields: [
-								{ name: 'jenis' },
-								{ name: 'jumlah3' },
-								{ name: 'jumlah4' },
-							],
-							type: 'POST',
-							data: {val01: set01, _token: '{{ csrf_token() }}'},
-							url: 'json/getstatdatapermuatan',
-						};
-						var datajrekap2		= new $.jqx.dataAdapter(source2);
-						var settinggrafik2 = {
-							title: "Statistik",
-							description: "Per Matapelajar",
-							enableAnimations: true,
-							titlePadding: { left: 0, top: 0, right: 0, bottom: 10 },
-							source: datajrekap2,
-							xAxis:
-								{
-									dataField: 'jenis',
-									displayText: 'Matapelajaran',
-									gridLines: { visible: true },
-									valuesOnTicks: false
-								},
-							colorScheme: 'scheme02',
-							columnSeriesOverlap: false,
-							seriesGroups:
-								[
-									{
-										type: 'column',
-										valueAxis:
-										{
-											visible: true,
-											title: { text: 'Nilai<br>' }
-										},
-										series: [
-												{ dataField: 'jumlah3', displayText: 'Rata-Rata KI3' },	
-												{ dataField: 'jumlah4', displayText: 'Rata-Rata KI4' },
-											]
-									}
-								]
-						};
-						$('#grafiksebaranperjenis').jqxChart(settinggrafik2);
-						var source3 = {
-							datatype: "json",
-							datafields: [
-								{ name: 'jenis' },
-								{ name: 'jumlah' },
-							],
-							type: 'POST',
-							data: {val01: set01, _token: '{{ csrf_token() }}'},
-							url: 'json/getstatdatakehadiran',
-						};
-						var datajrekap3		= new $.jqx.dataAdapter(source3);
-						var settinggrafik3 = {
-							title: "Statistik",
-							description: "Kehadiran Siswa",
-							enableAnimations: true,
-							titlePadding: { left: 0, top: 0, right: 0, bottom: 10 },
-							source: datajrekap3,
-							xAxis:
-								{
-									dataField: 'jenis',
-									displayText: 'Status',
-									gridLines: { visible: true },
-									valuesOnTicks: false
-								},
-							colorScheme: 'scheme03',
-							columnSeriesOverlap: false,
-							seriesGroups:
-								[
-									{
-										type: 'column',
-										series: [
-											{ dataField: 'jumlah', displayText: 'Jumlah' },
-										]
-									}
-								]
-						};
-						$('#grafikkehadiran').jqxChart(settinggrafik3);
-						$.post('json/viewdatainduk', { val01: '1', val02: set01, _token: '{{ csrf_token() }}' },
-						function(data){
-							$('#divdataview').html(data);
-							return false;
-						});
-					}
-				},
-				{ text: 'TA.Masuk',  editable: false, sortable: false, filterable: false, datafield: 'tamasuk', width: 70, cellsalign: 'center', align: 'center' },
-                { text: 'Photo',  editable: false, sortable: false, filterable: false, datafield: 'lampiran', width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'Nama Siswa', datafield: 'nama', width: 150, align: 'center' },
-                { text: 'L/P', datafield: 'kelamin', width: 40, cellsalign: 'center', align: 'center' },
-                { text: 'Kls', datafield: 'klspos', width: 40, cellsalign: 'center', align: 'center' },
-                { text: 'Tinggi Badan', datafield: 'tinggi', width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'Berat Badan', datafield: 'berat', width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'Tempat Lahir', datafield: 'tmplahir', width: 100, cellsalign: 'center', align: 'center' },
-                { text: 'Tanggal lahir', datafield: 'tgllahir', width: 100, cellsalign: 'center', align: 'center' },
-                { text: 'No. Induk',  datafield: 'noinduk', width: 80, cellsalign: 'center', align: 'center' },
-                { text: 'NIK',  datafield: 'nik', width: 180, cellsalign: 'left', align: 'center' },
-                { text: 'No. NISN',  datafield: 'nisn', width: 100, cellsalign: 'center', align: 'center' },
-                { text: 'Nama Ayah',  datafield: 'namaayah', width: 150, cellsalign: 'center', align: 'center' },
-                { text: 'Nama Ibu',  datafield: 'namaibu', width: 150, cellsalign: 'center', align: 'center' },
-                { text: 'Pekerjaan Ayah',  datafield: 'kerjaayah', width: 150, cellsalign: 'center', align: 'center' },
-                { text: 'Pekerjaan Ibu',  datafield: 'kerjaibu', width: 150, cellsalign: 'center', align: 'center' },
-                { text: 'Nama Wali',  datafield: 'wali', width: 150, cellsalign: 'center', align: 'center' },
-                { text: 'Pekerjaan Wali',  datafield: 'pekerjaanwali', width: 150, cellsalign: 'center', align: 'center' },
-                { text: 'No.HP Ortu/Wali',  datafield: 'hape', width: 80, cellsalign: 'center', align: 'center' },
-                { text: 'Alamat Ortu/Wali',  datafield: 'alamatortu', width: 180, cellsalign: 'left', align: 'center' },
-                { text: 'Status Lulus/Mutasi',  datafield: 'nokelulusan', width: 180, cellsalign: 'center', align: 'center' },
-                { text: 'Edit', editable: false, sortable: false, filterable: false, columntype: 'button', width: 50, cellsrenderer: function () {
-                    return "Edit";
-                    }, buttonclick: function (row) {	
-                        editrow = row;	
-                        var offset 		= $("#griddatainduk").offset();		
-                        var dataRecord 	= $("#griddatainduk").jqxGrid('getrowdata', editrow);
-                        $("#id_gayah").val(dataRecord.gayah);
-                        $("#id_gibu").val(dataRecord.gibu);
-                        $("#id_payah").val(dataRecord.pibu);
-                        $("#id_pibu").val(dataRecord.payah);
-                        $("#id_agama").val(dataRecord.agama);
-                        $("#edit_panggilan").val(dataRecord.panggilan);
-                        $("#edit_gayabelajar").val(dataRecord.gybljr);
-                        $("#edit_karakter").val(dataRecord.bakat);
-                        $("#edit_jilid").val(dataRecord.jilid);
-                        $("#edit_idne").val(dataRecord.id);
-                        $("#edit_nama").val(dataRecord.nama);
-                        $("#edit_nik").val(dataRecord.nik);
-                        $("#edit_kelamin").val(dataRecord.kelamin);
-                        $("#edit_darah").val(dataRecord.darah);
-                        $("#edit_tinggi").val(dataRecord.tinggi);
-                        $("#edit_berat").val(dataRecord.berat);
-                        $("#edit_tmplahir").val(dataRecord.tmplahir);
-                        $("#edit_tgllahir").val(dataRecord.tgllahir);
-                        $("#edit_noinduk").val(dataRecord.noinduk);
-                        $("#edit_nisn").val(dataRecord.nisn);
-                        $("#edit_ayah").val(dataRecord.namaayah);
-                        $("#edit_ibu").val(dataRecord.namaibu);
-                        $("#edit_kayah").val(dataRecord.kerjaayah);
-                        $("#edit_kibu").val(dataRecord.kerjaibu);
-                        $("#edit_wali").val(dataRecord.wali);
-                        $("#edit_kwali").val(dataRecord.pekerjaanwali);
-                        $("#edit_alamat").val(dataRecord.alamatortu);
-                        $("#edit_kel").val(dataRecord.kelurahan);
-                        $("#edit_kec").val(dataRecord.kecamatan);
-                        $("#edit_rt").val(dataRecord.erte);
-                        $("#edit_rw").val(dataRecord.erwe);
-                        $("#edit_kota").val(dataRecord.kota);
-                        $("#edit_kodepos").val(dataRecord.kodepos);
-                        $("#edit_hape").val(dataRecord.hape);
-                        $("#edit_tahun").val(dataRecord.tamasuk);
-                        $("#edit_kelas").val(dataRecord.klspos);
-                        $("#edit_mutasi").val(dataRecord.mutasi);
-                        $("#edit_asal").val(dataRecord.asal);
-                        $("#edit_isasuh").val(dataRecord.is_asuh);
-                        $('#divediting').show(); 
-                        $('#divawal').hide(); 
-                    }
-                },
-                
-            ],                
-        });
         $("#induk_dataview").on('change', function () {
             var set01	= $(this).find('option:selected').attr('value');
             var set02	= document.getElementById('valcari').value;
@@ -1294,9 +1185,9 @@
             });
         });
         $('#btnclearttd').click(function () {signaturePad.clear();});
-        var signaturePad = new SignaturePad(document.getElementById('signature-pad'), {
-            backgroundColor: 'rgba(0, 0, 0, 0)',
-            penColor: 'rgb(0, 0, 0)'
+            var signaturePad = new SignaturePad(document.getElementById('signature-pad'), {
+                backgroundColor: 'rgba(0, 0, 0, 0)',
+                penColor: 'rgb(0, 0, 0)'
         });
 	});
 </script>

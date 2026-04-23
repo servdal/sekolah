@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0"> Tagihan Rutin</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-            </ol>
-          </div>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Tagihan Rutin</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row" >
                 <div class="col-md-12">
@@ -37,24 +37,54 @@
                             </ol>
                         </div>
                         <div class="card-footer">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-info"><i class="fa fa-credit-card"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text"><font color=blue>Bank Account<br />{!! Session('sekolah_nama_sekolah') !!}</font></span>
-                                    <span class="info-box-number">{!! $namabank !!}<br />Norek : {!! $norek !!}</span>
-                                </div>
-                            </div>
-                            <div class="btn-group">
-                                <a href="#" id="btnviewbyrspp" class="btn btn-app btn-primary">
-                                    <i class="fa fa-bicycle"></i> SPP dan Ekstrakulikuler
-                                </a>
-                                <a href="#" id="btnviewbyrinsidental" class="btn btn-app btn-success">
-                                    <i class="fa fa-soccer-ball-o"></i> Insidental
-                                </a>
-                                <a href="#" id="btnviewrekap" class="btn btn-app btn-warning">
-                                    <i class="fa fa-suitcase"></i> Riwayat Pembayaran
-                                </a>
-                            </div>
+							<div class="row">
+								<div class="col-sm-5">
+									<div class="info-box">
+										<span class="info-box-icon bg-info"><i class="fa fa-credit-card"></i></span>
+										<div class="info-box-content">
+											<span class="info-box-text"><font color=blue>Bank Account<br />{!! $namapdnorek !!}</font></span>
+											<span class="info-box-number">{!! $namabank !!}<br />Norek : {!! $norek !!}</span>
+										</div>
+									</div>
+									<div class="btn-group">
+										<a href="#" id="btnviewbyrspp" class="btn btn-app btn-primary">
+											<i class="fa fa-bicycle"></i> SPP dan Ekstrakulikuler
+										</a>
+										<a href="#" id="btnviewbyrinsidental" class="btn btn-app btn-success">
+											<i class="fa fa-soccer-ball-o"></i> Insidental
+										</a>
+										<a href="#" id="btnviewrekap" class="btn btn-app btn-warning">
+											<i class="fa fa-suitcase"></i> Riwayat Pembayaran
+										</a>
+									</div>
+								</div>
+								<div class="col-sm-7">
+									<div class="form-group">
+										<label for="rapot_tanggal" class="col-form-label">Tagihan Sebelumnya</label>
+										<table class="table table-striped table-bordered">
+											<thead>
+												<tr><th>Nama</th><th>Jenis Tagihan</th><th>Nominal</th><th>TMT</th></tr>
+											</thead>
+											<tbody>
+											@if(isset($tagihanmanuals) && !empty($tagihanmanuals))
+												@foreach($tagihanmanuals as $rows)
+												<tr>
+													<td>{{$rows['nama']}}</td>
+													<td>{{$rows['jenis']}}</td>
+													<td align="right">
+														@php
+														echo number_format( $rows['biaya'] , 0 , '.' , ',' );
+														@endphp
+													</td>
+													<td>{{$rows['tenggat']}}</td>
+												</tr>
+												@endforeach
+											@endif
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
                         </div>
                     </div>
                     <div class="card card-info shadow" id="divbayarrutin">
@@ -281,7 +311,10 @@
 							</div>
 							<div class="form-group">
 								<label>Foto Bukti Pembayaran</label>
-								<input id="fileinput" type="file" accept="image/gif, image/jpeg, image/png" onchange="readURL(this);" />
+								<div class="custom-file">
+									<input type="file" class="custom-file-input" id="fileinput">
+									<label class="custom-file-label" for="fileinput">File Screenshoot</label>
+								</div>
 							</div>
 							<div class="form-group">
 								<img id="avatar" class="img-responsive" />
@@ -296,7 +329,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 <input type="hidden" id="getnama" value="{!! Session('nama') !!}">
@@ -308,16 +341,58 @@
 @endsection
 @push('script')
 <script type="text/javascript">
-	function readURL(input) {
-		if (input.files && input.files[0]) {
-			var reader = new FileReader();
-			reader.onload = function (e) {
-				$('#avatar').attr('src', e.target.result);
-				$('#getfoto').val(e.target.result);
-			};
-			reader.readAsDataURL(input.files[0]);
-		}
-	}
+	$(function () {
+        bsCustomFileInput.init();
+		window.opengambar = function(img) {
+            var gambarpreview = img.getAttribute("src");
+            var newWindow = window.open('', '', 'width=880, height=500'),
+                document = newWindow.document.open(),
+                pageContent =
+                    '<!DOCTYPE html>\n' +
+                    '<html>\n' +
+                    '<head>\n' +
+                    '<meta charset="utf-8" />\n' +
+                    '<title>Sertifikat</title>\n' +
+                    '</head>\n' +
+                    '<body><img id="gambargede" class="img-responsive" src="' + gambarpreview + '"></body>\n</html>';
+                document.write(pageContent);
+                document.close();
+                return false;
+        }
+	});
+	$('#fileinput').change(function () {
+        if(this.files[0].size > 1000000){
+            this.value = "";
+			swal({
+				title	: 'Stop',
+				text	: 'Maksimum file adalah 1Mb',
+				type	: 'warning',
+			})
+        } else {
+            var imgPath = this.value;
+            var ext     = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+            if(ext == "jpg" || ext == "jpeg" || ext == "png") {
+                readURL(this);
+            } else {
+                swal({
+                    title: 'Stop',
+                    text: 'Please select image file (jpg, jpeg, png).',
+                    type: 'warning',
+                })
+            }
+        }
+    });
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#avatar').attr('src', e.target.result);
+                $('#getfoto').val(e.target.result);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    
+    }
 $(document).ready(function () {
 	$('.overlay').hide();
 	$('#divbayarinsidental').hide();
@@ -361,9 +436,8 @@ $(document).ready(function () {
 		$('#divawal').hide();
 	});
 	var token=document.getElementById('token').value;
-	$('#btnsimpanupload').on('click', function (){		
-		$('.overlay').show();
-		var set01=document.getElementById('upl_marking').value;
+	$('#btnsimpanupload').click(function () {
+        var set01=document.getElementById('upl_marking').value;
 		var set02=document.getElementById('getfoto').value;
 		if (set02 == ''){
 			swal({
@@ -372,22 +446,43 @@ $(document).ready(function () {
 				type	: 'info',
 			})
 		} else {
-			$.post('{{ route("exUploadbuktibyr") }}', { val01: set01, val02: set02, _token: token },
-			function(data){	
-				$('.overlay').hide();
-				$("html, body").animate({ scrollTop: 0 }, "slow");
-				$('#status').html(data);
-				$("#griddatabayar").jqxGrid("updatebounddata");
-				$('#divbayarinsidental').hide();
-				$('#divbayarrutin').hide();
-				$('#divriwayat').hide();
-				$('#divtambahinsidental').hide();
-				$('#divuploadbukti').hide();
-				$('#divawal').show();
+			var btn = $(this);
+				btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+			var formdata = new FormData();
+				formdata.set('_token', '{{ csrf_token() }}');
+				formdata.set('val01', set01);
+				formdata.set('val02', set02);
+			$.ajax({
+				url         : '{{ route("exUploadbuktibyr") }}',
+				data        : formdata,
+				type        : 'POST',
+				contentType : false,
+				processData : false,
+				success: function (data) {
+					btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+					$("html, body").animate({ scrollTop: 0 }, "slow");
+					$('#status').html(data);
+					$("#griddatabayar").jqxGrid("updatebounddata");
+					$('#divbayarinsidental').hide();
+					$('#divbayarrutin').hide();
+					$('#divriwayat').hide();
+					$('#divtambahinsidental').hide();
+					$('#divuploadbukti').hide();
+					$('#divawal').show();
+					return false;
+				},
+				error: function (xhr, status, error) {
+					btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+					swal({
+						title	: 'Stop',
+						text	: xhr.responseText,
+						type	: 'warning',
+					})
+				}
 			});
 		}
 	});
-	$('#bayarrutinan').on('click', function (){		
+	$('#bayarrutinan').on('click', function (){
 		$('.overlay').show();
 		var set01=document.getElementById('id_siswa').value;
 		var set02=document.getElementById('id_bulan').value;
@@ -433,8 +528,8 @@ $(document).ready(function () {
 			$('#divawal').show();
 		});		
 	});
-	$("#id_siswa").on('change', function () {	
-		var dppne = $(this).find('option:selected').attr('id1');	
+	$("#id_siswa").on('change', function () {
+		var dppne = $(this).find('option:selected').attr('id1');
 		var sppne = $(this).find('option:selected').attr('id2');
 		var pagye = $(this).find('option:selected').attr('id3');
 		var skul1 = $(this).find('option:selected').attr('id4');
@@ -460,7 +555,7 @@ $(document).ready(function () {
 		$('#id_nil4').val(biya4);
 		$('#id_ekskul5').val(skul5);
 		$('#id_nil5').val(biya5);
-	});	
+	});
     var sourceinsidental = {
 		datatype: "json",
 		datafields: [
@@ -522,12 +617,14 @@ $(document).ready(function () {
 		pager: function (pagenum, pagesize, oldpagenum) {}
 	};
 	var datapembayaran = new $.jqx.dataAdapter(sourcepembayaran);
-	var editrow = -1;
 	var photorenderer = function (row, column, value) {
-		var no 	= $('#griddatabayar').jqxGrid('getrowdata', row).no;
 		var name = $('#griddatabayar').jqxGrid('getrowdata', row).foto;
-		if (name == ''){ var img = '<div style="background: white;"></div>'; }
-		else { var img = '<div style="background: white;"><a target="_blank" href="{{url('/')}}/buktibayar/' + no + '"><img style="margin:2px; margin-left: 10px;" width="32" height="32" src="' + name + '"></a></div>'; }
+		if (name == ''){
+			var img = '<div style="background: white;"></div>'; 
+		}
+		else { 
+			var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="32" height="32" src="' + name + '" onclick="opengambar(this)"></div>';
+		}
 		return img;
 	}
 	$("#griddatabayar").jqxGrid({
@@ -546,12 +643,13 @@ $(document).ready(function () {
 					editrow 		= row;	
 					var offset 		= $("#griddatabayar").offset();		
 					var dataRecord 	= $("#griddatabayar").jqxGrid('getrowdata', editrow);
-					var gbrkosong	= 'dist/img/default-50x50.gif';
+					var gbrkosong	= 'dist/img/takadagambar.png';
 					var verifi		= dataRecord.verifi;
 					if (verifi == ''){
 						$("#upl_deskripsi").val(dataRecord.rutin);	
 						$("#upl_total").val(dataRecord.total);	
 						$("#upl_marking").val(dataRecord.marking);
+						$("#fileinput").val('');
 						$("#getfoto").val('');
 						$("#avatar").attr("src",gbrkosong);
 						$("#indukinsidental").val(dataRecord.noinduk);	

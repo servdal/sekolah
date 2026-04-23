@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0"> Laporan Konseling Siswa</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-                </ol>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Laporan Konseling Siswa</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
             </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-4 col-md-4">
@@ -39,12 +39,12 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-4">
-                    <div class="box box-solid bg-green-gradient">
-                        <div class="box-header">
-                            <i class="fa fa-mortar-board"></i><h3 class="box-title">Report</h3>
+                    <div class="card card-solid bg-green-gradient">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-mortar-board"></i>Report</h3>
                         </div>
-                        <div class="box-body">
-                            <div class="form-group">  						
+                        <div class="card-body">
+                            <div class="form-group">
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <select id="cekbln" class="form-control">
@@ -150,15 +150,23 @@
                     <div class="form-group col-md-6">
                         <label for="konseling_jenis" class="col-form-label">Jenis Pelanggaran</label>
                         <select id="konseling_jenis" class="form-control">
-                            <option value="MNK">Miras, Narkoba, Kriminal</option>
-                            <option value="BP">Berkelahi dan Pengeroyokan</option>
-                            <option value="BLY">Bullying / Perundungan</option>
-                            <option value="TS">Perilaku Tidak Sopan</option>
-                            <option value="HLS">Hubungan dengan Lawan Jenis</option>
-                            <option value="BLS">Bolos / Terlambat</option>
-                            <option value="MRK">Merokok</option>
-                            <option value="BJR">Masalah Belajar</option>
-                            <option value="HTS">Hubungan dengan Teman Sebaya</option>
+                            <option value="">Pilih Salah Satu</option>
+                            @php
+                                $keys = array_keys($tatiblists);
+                                for($i = 0; $i < count($tatiblists); $i++) {
+                            @endphp
+                                    <optgroup label="{{ $tatibkelompok[$i] }}">
+                                    @php
+                                        foreach($tatiblists[$keys[$i]] as $key => $value) {
+                                    @endphp
+                                        <option value="{{ $value['kode'] }}">{{ $value['deskripsi'] }} ({{ $value['kode'] }} Point {{ $value['point'] }})</option>
+                                    @php
+                                        }
+                                    @endphp
+                                    </optgroup>
+                            @php
+                            }
+                            @endphp
                             <option value="DLL">Masalah Lain - Lain</option>
                         </select>
                     </div>
@@ -341,8 +349,9 @@
 										hideAfter: 5000,
 										stack: 1
 									});
-									$("#tabeldata").jqxGrid('updatebounddata');
-									return false;
+									var uri = window.location.href.split("#")[0];
+                                    setTimeout(function () { window.location=uri;}, 5000);
+                                    return false;
 							});
 						});
 					}
@@ -390,6 +399,8 @@
                     hideAfter: 5000,
                     stack: 1
                 });
+                var uri = window.location.href.split("#")[0];
+                setTimeout(function () { window.location=uri;}, 5000);
                 return false;
             });
         });

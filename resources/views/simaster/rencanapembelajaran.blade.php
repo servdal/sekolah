@@ -1,24 +1,26 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0"> Rencana Pembelajaran</h1>
-            </div>
-            <div class="col-sm-6">
-                <div class="btn-group">
-                    <a class="btn btn-app btn-success btnviewdivjadwal" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Jadwal"><i class="fa fa-calendar-check-o"></i> Jadwal</a>
-				    <a class="btn btn-app btn-info" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Mata Pelajaran dan KKM" id="btnviewdivkkm"><i class="fa fa-file-text"></i> KKM</a>
-                    <a class="btn btn-app btn-warning" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Rencana Pembelajaran" id="btnrps"><i class="fa fa-file-powerpoint-o"></i> RPS</a>
-                    <a class="btn btn-app btn-danger" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Legger Setting" id="btnlegger"><i class="fa fa-file-excel-o"></i> Setting Nilai</a>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0"> Rencana Pembelajaran</h1>
+                </div>
+                <div class="col-sm-6">
+                    <div class="btn-group">
+                        <a class="btn btn-app btn-success btnviewdivjadwal" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Jadwal"><i class="fa fa-calendar-check-o"></i> Jadwal</a>
+                        <a class="btn btn-app btn-info" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Mata Pelajaran dan KKM" id="btnviewdivkkm"><i class="fa fa-file-text"></i> KKM</a>
+                        <a class="btn btn-app btn-warning" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Rencana Pembelajaran" id="btnrps"><i class="fa fa-file-powerpoint-o"></i> RPS</a>
+                        <a class="btn btn-app btn-danger" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Legger Setting" id="btnlegger"><i class="fa fa-file-excel-o"></i> Setting Nilai</a>
+                        <a class="btn btn-app btn-primary" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Template" id="btntemplate"><i class="fa fa-pencil"></i> Template</a>
+
+                    </div>
                 </div>
             </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-3 divawal divrps">
@@ -34,7 +36,7 @@
                                 <div class="form-row">
                                     <label for="add_matkul">Pilih Mata Pelajaran Berdasarkan Data KKM</label>
                                     <div class="input-group">
-                                        <select id="add_matkul" name="add_matkul"  class="form-control">
+                                        <select id="add_matkul" name="add_matkul" class="form-control">
                                             <option value="">Pilih</option>
                                                 @php
                                                     $keys = array_keys($matpels);
@@ -60,54 +62,42 @@
                                 </div>
                                 <div class="form-group">
                                     <div class="row">
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-6">
                                             <label>Semester</label>
                                             <select id="add_semester" name="add_semester"  class="form-control">
                                                 <option value="1">Ganjil</option>
                                                 <option value="2">Genap</option>
                                             </select>
                                         </div> 
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-6">
                                             <label>Tema</label>
                                             <select id="add_tema" name="add_tema"  class="form-control">
                                                 <option value="0">Non Tematik</option>
-                                                <option value="1">1</option>
-                                                <option value="2">2</option>
-                                                <option value="3">3</option>
-                                                <option value="4">4</option>
-                                                <option value="5">5</option>
-                                                <option value="6">6</option>
-                                                <option value="7">7</option>
-                                                <option value="8">8</option>
-                                                <option value="9">9</option>
-                                                <option value="10">10</option>
-                                                <option value="11">11</option>
-                                                <option value="12">12</option>
-                                                <option value="13">13</option>
-                                                <option value="14">14</option>
-                                                <option value="15">15</option>
+                                                @php
+                                                    $angka = 1;
+                                                    while ($angka != 31){
+                                                        echo '<option value="'.$angka.'">'.$angka.'</option>';
+                                                        $angka++;
+                                                    }
+                                                @endphp
                                             </select>
                                         </div>
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-6">
                                             <label>Subtema</label>
                                             <select id="add_subtema" name="add_subtema"  class="form-control">
                                                 <option value="0">Non Tematik</option>
-                                                <option value="1">1</option>
-                                                <option value="2">2</option>
-                                                <option value="3">3</option>
-                                                <option value="4">4</option>
-                                                <option value="5">5</option>
-                                                <option value="6">6</option>
-                                                <option value="7">7</option>
-                                                <option value="8">8</option>
-                                                <option value="9">9</option>
-                                                <option value="10">10</option>
-                                                <option value="11">11</option>
-                                                <option value="12">12</option>
-                                                <option value="13">13</option>
-                                                <option value="14">14</option>
-                                                <option value="15">15</option>
+                                                @php
+                                                    $angka = 1;
+                                                    while ($angka != 31){
+                                                        echo '<option value="'.$angka.'">'.$angka.'</option>';
+                                                        $angka++;
+                                                    }
+                                                @endphp
                                             </select>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <label>Pertemuan Ke</label>
+                                            <input type="number" id="add_pertemuan" class="form-control" placeholder="1-100">
                                         </div>
                                     </div>
                                 </div>
@@ -156,11 +146,11 @@
                                 <table class="table table-striped table-valign-middle" id="tabelrps">
                                     <thead>
                                         <tr>
+                                            <th class="cell-fit">Actions</th>
                                             <th>Mata Pelajaran</th>
                                             <th class="text-truncate">Identitas</th>
                                             <th class="text-truncate">Deskripsi Tema</th>
                                             <th class="text-truncate">Deskripsi KD</th>
-                                            <th class="cell-fit">Actions</th>
                                         </tr>
                                     </thead>
                                 </table>
@@ -199,34 +189,81 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="card-body table-responsive p-0">
-                                <table class="table table-striped table-valign-middle" id="tabellegger">
-                                    <thead>
-                                        <tr>
-                                            <td rowspan="3">Matapelajaran</td>
-                                            <td colspan="10">Penilaian Proses</td>
-                                            <td rowspan="3">PTS</td>
-                                            <td rowspan="3">PAT</td>
-                                            <td rowspan="3">Action</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="5">Penilaian Harian</td>
-                                            <td colspan="5">Evaluasi</td>
-                                        </tr>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>2</td>
-                                            <td>3</td>
-                                            <td>4</td>
-                                            <td>5</td>
-                                            <td>1</td>
-                                            <td>2</td>
-                                            <td>3</td>
-                                            <td>4</td>
-                                            <td>5</td>
-                                        </tr>
-                                    </thead>
-                                </table>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-lg-7">
+                                        <label>Mata Pelajaran</label>
+                                        <select id="legger_filtermatpel" name="legger_filtermatpel" class="form-control">
+                                            <option value="ALL">Semua Matpel</option>
+                                            @if(isset($arraymatpel) && !empty($arraymatpel))
+                                                @foreach($arraymatpel as $rmatpel)
+                                                    <option value="{{$rmatpel['muatan']}}" kkm="{{$rmatpel['kkm']}}">{{$rmatpel['matpel']}}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <label>Kelas</label>
+                                        <select id="legger_filterkelas" name="legger_filterkelas" class="form-control">
+                                            <option value="ALL">Semua Kelas</option>
+                                            @if(Session('sekolah_level') == 1)
+                                                <option value="KB">KB</option>
+                                                <option value="TA">TA</option>
+                                            @elseif (Session('sekolah_level') == 2)
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                            @elseif (Session('sekolah_level') == 3)
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                            @else
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <button type="button" class="btn btn-primary" id="btntambahmultikomponennilai"><i class="fa fa-tasks"></i> Multi Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-body">
+                                <div style="overflow-y: auto; height:1024px;">
+                                    <table class="table table-striped table-valign-middle" id="tabellegger">
+                                        <thead>
+                                            <tr>
+                                                <td rowspan="3">Matapelajaran</td>
+                                                <td colspan="10">Penilaian Proses</td>
+                                                <td rowspan="3">PTS</td>
+                                                <td rowspan="3">PAT</td>
+                                                <td rowspan="3">Action</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="5">Penilaian Harian</td>
+                                                <td colspan="5">Evaluasi</td>
+                                            </tr>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>2</td>
+                                                <td>3</td>
+                                                <td>4</td>
+                                                <td>5</td>
+                                                <td>1</td>
+                                                <td>2</td>
+                                                <td>3</td>
+                                                <td>4</td>
+                                                <td>5</td>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -234,19 +271,26 @@
                 <div class="col-lg-3 divawal divkkm">
                     <div class="card card-success shadow">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fa fa-file-text"></i> Setting Legger Kolom</h3>
+                            <h3 class="card-title"><i class="fa fa-file-text"></i> Silahkan Pilih Kelas Untuk di Tentukan Kurikulum</h3>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse"><i class="fa fa-minus"></i></button>
                             </div>
                         </div>
                         <div class="card-body">
-                            Silahkan Pilih Kelas Untuk di Tentukan Kurikulum 
 							@if(Session('sekolah_level') == 1)
+                                <!--
                                 <a href="#" id="gradekb"  onClick="jQueryOpenKKM('kb')" class="btn btn-block btn-social btn-primary">
                                     <i class="fa fa-windows"></i> Kelompok Belajar
                                 </a>
                                 <a href="#" id="gradeta"  onClick="jQueryOpenKKM('ta')" class="btn btn-block btn-social btn-warning">
                                     <i class="fa fa-android"></i> Tarbiyatul Athfal
+                                </a>
+                                -->
+                                <a href="#" id="grade1"  onClick="jQueryOpenKKM('1')" class="btn btn-block btn-social btn-info">
+                                    <i class="fa fa-windows"></i> Tahap I
+                                </a>
+                                <a href="#" id="grade2"  onClick="jQueryOpenKKM('2')" class="btn btn-block btn-social btn-danger">
+                                    <i class="fa fa-android"></i> Tahap II
                                 </a>
                             @elseif (Session('sekolah_level') == 2)
                                 <a href="#" id="grade1"  onClick="jQueryOpenKKM('1')" class="btn btn-block btn-social btn-info">
@@ -305,6 +349,86 @@
                         <div class="card-footer">
                             <div id="gridkurikulum"></div>
 					    </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 divawal divtemplate">
+                    <div class="card card-success shadow">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-file-text"></i> Silahkan Pilih Kelas</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse"><i class="fa fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+							@if(Session('sekolah_level') == 1)
+                                <!--
+                                <a href="#" id="gradekb"  onClick="jQueryOpenTemplate('kb')" class="btn btn-block btn-social btn-primary">
+                                    <i class="fa fa-windows"></i> Kelompok Belajar
+                                </a>
+                                <a href="#" id="gradeta"  onClick="jQueryOpenTemplate('ta')" class="btn btn-block btn-social btn-warning">
+                                    <i class="fa fa-android"></i> Tarbiyatul Athfal
+                                </a>
+                                -->
+                                <a href="#" id="grade1"  onClick="jQueryOpenTemplate('1')" class="btn btn-block btn-social btn-info">
+                                    <i class="fa fa-windows"></i> Tahap I
+                                </a>
+                                <a href="#" id="grade2"  onClick="jQueryOpenTemplate('2')" class="btn btn-block btn-social btn-danger">
+                                    <i class="fa fa-android"></i> Tahap II
+                                </a>
+                            @elseif (Session('sekolah_level') == 2)
+                                <a href="#" id="grade1"  onClick="jQueryOpenTemplate('1')" class="btn btn-block btn-social btn-info">
+                                    <i class="fa fa-windows"></i> Kelas I
+                                </a>
+                                <a href="#" id="grade2"  onClick="jQueryOpenTemplate('2')" class="btn btn-block btn-social btn-danger">
+                                    <i class="fa fa-android"></i> Kelas II
+                                </a>
+                                <a href="#" id="grade3"  onClick="jQueryOpenTemplate('3')" class="btn btn-block btn-social btn-success">
+                                    <i class="fa fa-apple"></i> Kelas III
+                                </a>
+                                <a href="#" id="grade4"  onClick="jQueryOpenTemplate('4')" class="btn btn-block btn-social btn-primary">
+                                    <i class="fa fa-facebook"></i> Kelas IV
+                                </a>
+                                <a href="#" id="grade5"  onClick="jQueryOpenTemplate('5')" class="btn btn-block btn-social btn-warning">
+                                    <i class="fa fa-google"></i> Kelas V
+                                </a>
+                                <a href="#" id="grade6"  onClick="jQueryOpenTemplate('6')" class="btn btn-block btn-social btn-info">
+                                    <i class="fa fa-twitter"></i> Kelas VI
+                                </a>
+                            @elseif (Session('sekolah_level') == 3)
+                                <a href="#" id="grade7"  onClick="jQueryOpenTemplate('7')" class="btn btn-block btn-social btn-danger">
+                                    <i class="fa fa-windows"></i> Kelas I
+                                </a>
+                                <a href="#" id="grade8"  onClick="jQueryOpenTemplate('8')" class="btn btn-block btn-social btn-success">
+                                    <i class="fa fa-android"></i> Kelas II
+                                </a>
+                                <a href="#" id="grade9"  onClick="jQueryOpenTemplate('9')" class="btn btn-block btn-social btn-primary">
+                                    <i class="fa fa-apple"></i> Kelas III
+                                </a>
+                            @else
+                                <a href="#" id="grade10"  onClick="jQueryOpenTemplate('10')" class="btn btn-block btn-social btn-warning">
+                                    <i class="fa fa-windows"></i> Kelas I
+                                </a>
+                                <a href="#" id="grade11"  onClick="jQueryOpenTemplate('11')" class="btn btn-block btn-social btn-info">
+                                    <i class="fa fa-android"></i> Kelas II
+                                </a>
+                                <a href="#" id="grade12"  onClick="jQueryOpenTemplate('12')" class="btn btn-block btn-social btn-danger">
+                                    <i class="fa fa-apple"></i> Kelas III
+                                </a>
+                            @endif
+						</div>
+                    </div>
+                </div>
+                <div class="col-lg-9 divawal divtemplate">
+                    <div class="card card-warning shadow">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-file-text"></i> Preview</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" title="Print" id="btnexportdatatemplate"><i class="fa fa-print"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="gridtemplate"></div>
+						</div>
                     </div>
                 </div>
                 <div class="col-lg-3 divawal divjadwal">
@@ -390,8 +514,8 @@
                             <form id="formtambahjadwal" enctype="multipart/form-data">
                                 <div class="form-group">
                                     <div class="row">
-                                        <div class="col-lg-8">
-                                            <label for="jadwal_matpel">Pilih Mata Pelajaran sesuai Kelas Masing - Masingg<font color="red" class="pull-right">*</font></label>
+                                        <div class="col-lg-5">
+                                            <label for="jadwal_matpel">Pilih Mata Pelajaran sesuai Kelas Masing - Masing<font color="red" class="pull-right">*</font></label>
                                             <div class="input-group">
                                                 <select id="jadwal_matpel" name="jadwal_matpel" class="form-control">
                                                     <option value="">Pilih</option>
@@ -418,14 +542,24 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>TAPEL <font color="red" class="pull-right">*</font></label>
-                                            <input type="text" id="jadwal_tapel" name="jadwal_tapel" class="form-control" value="{{$tapel}}">
+                                            <label>TAPEL</label>
+                                            <input type="text" id="jadwal_tapel" name="jadwal_tapel" class="form-control" value="{{$tapel}}" readonly>
                                         </div>
                                         <div class="col-lg-2">
-                                            <label>Semester <font color="red" class="pull-right">*</font></label>
-                                            <select id="jadwal_semester" name="jadwal_semester" class="form-control">
-                                                <option value="1">Ganjil</option>
-                                                <option value="2">Genap</option>
+                                            <label>Semester</label>
+                                            <input type="text" id="jadwal_semester" name="jadwal_semester" class="form-control" value="{{$smt}}" readonly>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <label>Guru</label>
+                                            <select id="jadwal_guru01" name="jadwal_guru01" class="form-control">
+                                                <option value="">Pilih Salah Satu</option>
+                                                @foreach($dataguru as $rguru)
+                                                    @if (Session('nip') == $rguru['niy'])
+                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
+                                                    @else
+                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
+                                                    @endif
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -433,25 +567,33 @@
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-lg-2">
-                                            <label>01.Tanggal <font color="red" class="pull-right">*</font></label>
+                                            <label>Hari <font color="red" class="pull-right">*</font></label>
                                             <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal01" name="jadwal_tanggal01" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
+                                                <select id="jadwal_hari01" name="jadwal_hari01" class="form-control">
+                                                    <option value="Mon">Senin</option>
+                                                    <option value="Tue">Selasa</option>
+                                                    <option value="Wed">Rabu</option>
+                                                    <option value="Thu">Kamis</option>
+                                                    <option value="Fri">Jumat</option>
+                                                    <option value="Sat">Sabtu</option>
+                                                    <option value="Sun">Ahad</option>
+                                                </select>
                                                 <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('01')"><i class="fa fa-minus-square"></i></a></div>
+                                                    <div class="input-group-text"><i class="fa fa-calendar-check-o"></i></div>
                                                 </div>
                                             </div>
                                         </div> 
                                         <div class="col-lg-2">
                                             <label>Mulai <font color="red" class="pull-right">*</font></label>
-                                            <input type="text" id="jadwal_mulai01" name="jadwal_mulai01" class="form-control timepicker classjam1">
+                                            <input type="text" id="jadwal_mulai01" name="jadwal_mulai01" class="form-control timepicker">
                                         </div>
                                         <div class="col-lg-2">
                                             <label>Akhir <font color="red" class="pull-right">*</font></label>
-                                            <input type="text" id="jadwal_akhir01" name="jadwal_akhir01" class="form-control timepicker classjam2">
+                                            <input type="text" id="jadwal_akhir01" name="jadwal_akhir01" class="form-control timepicker">
                                         </div>
                                         <div class="col-lg-3">
                                             <label>Ruangan <font color="red" class="pull-right">*</font></label>
-                                            <select id="jadwal_ruangan01" name="jadwal_ruangan01" class="form-control classruang">
+                                            <select id="jadwal_ruangan01" name="jadwal_ruangan01" class="form-control">
                                                 <option value="">Pilih Ruangan</option>
                                                 <option value="Online">Online</option>
                                                 <option value="Outing Class">Outing Class</option>
@@ -461,870 +603,12 @@
                                             </select>
                                         </div>
                                         <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru01" name="jadwal_guru01" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>02.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal02" name="jadwal_tanggal02" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('02')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai02" name="jadwal_mulai02" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir02" name="jadwal_akhir02" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan02" name="jadwal_ruangan02" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru02" name="jadwal_guru02" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>03.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal03" name="jadwal_tanggal03" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('03')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai03" name="jadwal_mulai03" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir03" name="jadwal_akhir03" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan03" name="jadwal_ruangan03" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru03" name="jadwal_guru03" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>04.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal04" name="jadwal_tanggal04" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('04')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai04" name="jadwal_mulai04" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir04" name="jadwal_akhir04" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan04" name="jadwal_ruangan04" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru04" name="jadwal_guru04" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>05.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal05" name="jadwal_tanggal05" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('05')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai05" name="jadwal_mulai05" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir05" name="jadwal_akhir05" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan05" name="jadwal_ruangan05" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru05" name="jadwal_guru05" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>06.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal06" name="jadwal_tanggal06" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('06')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai06" name="jadwal_mulai06" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir06" name="jadwal_akhir06" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan06" name="jadwal_ruangan06" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru06" name="jadwal_guru06" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>07.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal07" name="jadwal_tanggal07" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('07')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai07" name="jadwal_mulai07" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir07" name="jadwal_akhir07" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan07" name="jadwal_ruangan07" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru07" name="jadwal_guru07" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>08.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal08" name="jadwal_tanggal08" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('08')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai08" name="jadwal_mulai08" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir08" name="jadwal_akhir08" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan08" name="jadwal_ruangan08" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div> <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru08" name="jadwal_guru08" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>09.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal09" name="jadwal_tanggal09" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('09')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai09" name="jadwal_mulai09" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir09" name="jadwal_akhir09" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan09" name="jadwal_ruangan09" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru09" name="jadwal_guru09" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>10.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal10" name="jadwal_tanggal10" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('10')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai10" name="jadwal_mulai10" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir10" name="jadwal_akhir10" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan10" name="jadwal_ruangan10" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru10" name="jadwal_guru10" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>11.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal11" name="jadwal_tanggal11" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('11')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai11" name="jadwal_mulai11" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir11" name="jadwal_akhir11" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan11" name="jadwal_ruangan11" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru11" name="jadwal_guru11" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>12.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal12" name="jadwal_tanggal12" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('12')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai12" name="jadwal_mulai12" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir12" name="jadwal_akhir12" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan12" name="jadwal_ruangan12" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru12" name="jadwal_guru12" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>13.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal13" name="jadwal_tanggal13" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('13')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai13" name="jadwal_mulai13" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir13" name="jadwal_akhir13" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan13" name="jadwal_ruangan13" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru13" name="jadwal_guru13" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>14.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal14" name="jadwal_tanggal14" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('14')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai14" name="jadwal_mulai14" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir14" name="jadwal_akhir14" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan14" name="jadwal_ruangan14" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru14" name="jadwal_guru14" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>15.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal15" name="jadwal_tanggal15" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('15')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai15" name="jadwal_mulai15" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir15" name="jadwal_akhir15" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan15" name="jadwal_ruangan15" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru15" name="jadwal_guru15" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>16.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal16" name="jadwal_tanggal16" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('16')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai16" name="jadwal_mulai16" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir16" name="jadwal_akhir16" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan16" name="jadwal_ruangan16" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru16" name="jadwal_guru16" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>17.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal17" name="jadwal_tanggal17" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('17')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai17" name="jadwal_mulai17" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir17" name="jadwal_akhir17" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan17" name="jadwal_ruangan17" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru17" name="jadwal_guru17" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>18.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal18" name="jadwal_tanggal18" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('18')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai18" name="jadwal_mulai18" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir18" name="jadwal_akhir18" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan18" name="jadwal_ruangan18" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru18" name="jadwal_guru18" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>19.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tangggal19" name="jadwal_tangggal19" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('19')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai19" name="jadwal_mulai19" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir19" name="jadwal_akhir19" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan19" name="jadwal_ruangan19" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru19" name="jadwal_guru19" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-2">
-                                            <label>20.Tanggal</label>
-                                            <div class="input-group date" data-target-input="nearest">
-                                                <input value="{{date('Y-m-d')}}" type="text" class="form-control datemaskinput" id="jadwal_tanggal20" name="jadwal_tanggal20" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><a href="#" onClick="jQueryRemoveValJadwal('20')"><i class="fa fa-minus-square"></i></a></div>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                            <label>Mulai</label>
-                                            <input type="text" id="jadwal_mulai20" name="jadwal_mulai20" class="form-control timepicker classjam1">
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <label>Akhir</label>
-                                            <input type="text" id="jadwal_akhir20" name="jadwal_akhir20" class="form-control timepicker classjam2">
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Ruangan</label>
-                                            <select id="jadwal_ruangan20" name="jadwal_ruangan20" class="form-control classruang">
-                                                <option value="">Pilih Ruangan</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Outing Class">Outing Class</option>
-                                                @foreach($ruangans as $rruang)
-                                                    <option value="{{ $rruang['namarg'] }}">{{ $rruang['namarg'] }} ( {{ $rruang['namagd'] }} )</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <label>Guru</label>
-                                            <select id="jadwal_guru20" name="jadwal_guru20" class="form-control classguru">
-                                                <option value="">Pilih Salah Satu</option>
-                                                @foreach($dataguru as $rguru)
-                                                    @if (Session('nip') == $rguru['niy'])
-                                                        <option value="{{ $rguru['niy'] }}" selected>{{ $rguru['nama'] }}</option>
-                                                    @else
-                                                        <option value="{{ $rguru['niy'] }}">{{ $rguru['nama'] }}</option>
-                                                    @endif
-                                                @endforeach
+                                            <label>Setting</label>
+                                            <select id="jadwal_setting" name="jadwal_setting" class="form-control">
+                                                <option value="TIDAK">Tidak di Ijinkan Crash Guru dan Ruang</option>
+                                                <option value="GURU">Ijinkan Crash Guru</option>
+                                                <option value="RUANG">Ijinkan Crash Ruang</option>
+                                                <option value="SEMUA">Ijinkan Crash Guru dan Ruang</option>
                                             </select>
                                         </div>
                                     </div>
@@ -1340,14 +624,14 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <input type="hidden" name="id_kelas" id="id_kelas">
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
 </div>
-<div class="modal fade" id="editorrps">
+<div class="modal fade" id="modaleditorrps">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -1361,54 +645,42 @@
                 </div>
                 <div class="form-group">
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <label>Semester</label>
                             <select id="edit_semester" name="edit_semester" class="form-control">
                                 <option value="1">Ganjil</option>
                                 <option value="2">Genap</option>
                             </select>
                         </div> 
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <label>Tema</label>
                             <select id="edit_tema" name="edit_tema"  class="form-control">
                                 <option value="0">Non Tematik</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
+                                @php
+                                    $angka = 1;
+                                    while ($angka != 31){
+                                        echo '<option value="'.$angka.'">'.$angka.'</option>';
+                                        $angka++;
+                                    }
+                                @endphp
                             </select>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-6">
                             <label>Subtema</label>
                             <select id="edit_subtema" name="edit_subtema"  class="form-control">
                                 <option value="0">Non Tematik</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
+                                @php
+                                    $angka = 1;
+                                    while ($angka != 31){
+                                        echo '<option value="'.$angka.'">'.$angka.'</option>';
+                                        $angka++;
+                                    }
+                                @endphp
                             </select>
+                        </div>
+                        <div class="col-lg-6">
+                            <label>Pertemuan Ke</label>
+                            <input type="number" id="edit_pertemuan" class="form-control" placeholder="1-100">
                         </div>
                     </div>
                 </div>
@@ -1468,6 +740,13 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-lg-4">
+                            <label>Jenis</label>
+                            <select id="id_jenis" name="id_jenis" class="form-control">
+                                <option value="Wajib">Wajib</option>
+                                <option value="Mulok">Mulok</option>
+                            </select>
+                        </div> 
+                        <div class="col-lg-4">
                             <label>KI-3</label>
                             <input type="text" id="id_ki3" class="form-control">
                         </div> 
@@ -1487,6 +766,59 @@
                 <div id="tombolupdate">
                     <button type="button" class="btn btn-info" id="btnubahkkm">Update</button>	
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modaleditortemplate">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Template</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <label>Nama Matpel</label>
+                            <input type="text" id="template_matpel" class="form-control" readonly>
+                        </div> 
+                        <div class="col-lg-2">
+                            <label>Tema</label>
+                            <input type="text" id="template_tema" class="form-control" readonly>
+                            <input type="hidden" id="template_muatan" class="form-control" readonly>
+                        </div>
+                        <div class="col-lg-2">
+                            <label>Kelas</label>
+                            <input type="text" id="template_kelas" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>0-74</label>
+                    <textarea id="template_range01" rows="10" cols="80"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>75-76</label>
+                    <textarea id="template_range02" rows="10" cols="80"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>77-84</label>
+                    <textarea id="template_range03" rows="10" cols="80"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>85-92</label>
+                    <textarea id="template_range04" rows="10" cols="80"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>93-100</label>
+                    <textarea id="template_range05" rows="10" cols="80"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-info" id="btnudatetemplate">Update</button>	
             </div>
         </div>
     </div>
@@ -1522,7 +854,7 @@
                 <div class="form-group">
                     <div class="row">			  
                     <div class="col-lg-4">
-                        <label for="masteredit_tanggal">Tanggal</label>
+                        <label for="masteredit_tanggal">Hari</label>
                         <input type="text" class="form-control" id="masteredit_tanggal" disabled="disable">
                     </div>			 
                     <div class="col-lg-4">
@@ -1557,8 +889,16 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col-lg-2">
-                                <label>Tangggal <font color="red" class="pull-right">*</font></label>
-                                <input type="text" class="form-control" id="editjadwal_tanggal" name="editjadwal_tanggal" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
+                                <label>Hari <font color="red" class="pull-right">*</font></label>
+                                <select id="editjadwal_tanggal" name="editjadwal_tanggal" class="form-control">
+                                    <option value="Mon">Senin</option>
+                                    <option value="Tue">Selasa</option>
+                                    <option value="Wed">Rabu</option>
+                                    <option value="Thu">Kamis</option>
+                                    <option value="Fri">Jumat</option>
+                                    <option value="Sat">Sabtu</option>
+                                    <option value="Sun">Ahad</option>
+                                </select>
                             </div> 
                             <div class="col-lg-2">
                                 <label>Mulai <font color="red" class="pull-right">*</font></label>
@@ -1673,12 +1013,126 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="modaltambahsettingnilaimulti">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Setting Nilai Multi</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Mata Pelajaran</label>
+                    <select id="legger_matpelmulti" name="legger_matpelmulti" class="form-control">
+                        <option value="ALL">Semua Matpel</option>
+                        @if(isset($arraymatpel) && !empty($arraymatpel))
+                            @foreach($arraymatpel as $rmatpel)
+                                <option value="{{$rmatpel['muatan']}}" kkm="{{$rmatpel['kkm']}}">{{$rmatpel['matpel']}}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Kelas</label>
+                    <select id="legger_kelasmulti" name="legger_kelasmulti" class="form-control">
+                        <option value="ALL">Semua Kelas</option>
+                        @if(Session('sekolah_level') == 1)
+                            <option value="KB">KB</option>
+                            <option value="TA">TA</option>
+                        @elseif (Session('sekolah_level') == 2)
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        @elseif (Session('sekolah_level') == 3)
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                        @else
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        @endif
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-9">
+                            <label>Penilaian Harian</label>
+                        </div> 
+                        <div class="col-lg-3">
+                            <select id="legger_penilaianharianmulti" name="legger_penilaianharianmulti" class="form-control">
+                                <option value="5">5 Kali</option>
+                                <option value="4">4 Kali</option>
+                                <option value="3">3 Kali</option>
+                                <option value="2">2 Kali</option>
+                                <option value="1">1 Kali</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-9">
+                            <label>Evaluasi</label>
+                        </div> 
+                        <div class="col-lg-3">
+                            <select id="legger_evaluasimulti" name="legger_evaluasimulti" class="form-control">
+                                <option value="5">5 Kali</option>
+                                <option value="4">4 Kali</option>
+                                <option value="3">3 Kali</option>
+                                <option value="2">2 Kali</option>
+                                <option value="1">1 Kali</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-success" id="btntambahsetlegggermulti">Simpan</button>	
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 @push('script')
 <script>
     $(function () {
 		CKEDITOR.env.isCompatible = true;
-		CKEDITOR.replace( 'add_kompetensi', {
+		CKEDITOR.replace( 'template_range01', {
+			toolbarGroups: [{"name":"basicstyles","groups":["basicstyles"]}],
+			removeButtons: 'Strike',
+			width: '100%',
+			height: 90
+		});
+        CKEDITOR.replace( 'template_range02', {
+			toolbarGroups: [{"name":"basicstyles","groups":["basicstyles"]}],
+			removeButtons: 'Strike',
+			width: '100%',
+			height: 90
+		});
+        CKEDITOR.replace( 'template_range03', {
+			toolbarGroups: [{"name":"basicstyles","groups":["basicstyles"]}],
+			removeButtons: 'Strike',
+			width: '100%',
+			height: 90
+		});
+        CKEDITOR.replace( 'template_range04', {
+			toolbarGroups: [{"name":"basicstyles","groups":["basicstyles"]}],
+			removeButtons: 'Strike',
+			width: '100%',
+			height: 90
+		});
+        CKEDITOR.replace( 'template_range05', {
+			toolbarGroups: [{"name":"basicstyles","groups":["basicstyles"]}],
+			removeButtons: 'Strike',
+			width: '100%',
+			height: 90
+		});
+        CKEDITOR.replace( 'add_kompetensi', {
 			toolbarGroups: [{"name":"basicstyles","groups":["basicstyles"]}],
 			removeButtons: 'Strike',
 			width: '100%',
@@ -1804,11 +1258,8 @@
                     datatype: "json",
                     datafields: [
                         { name: 'id' },
-                        { name: 'tanggal', type: 'string' },
                         { name: 'jammulai', type: 'string' },
                         { name: 'jamakhir', type: 'string' },
-                        { name: 'mulai', type: 'string' },
-                        { name: 'akhir', type: 'string' },
                         { name: 'hari', type: 'string' },
                         { name: 'ruang', type: 'string' },
                         { name: 'idmatpel'},
@@ -1856,164 +1307,39 @@
                     source          : dataAdapter,
                     sortable        : true,
                     columnsresize   : true,
+                    altrows         : true,
                     theme           : "energyblue",
                     columns: [
-                        { text: 'Detail', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', cellsrenderer: function () {
-                            return "Detail";
+                        { text: 'Edit', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', cellsrenderer: function () {
+                            return "Edit";
                             }, buttonclick: function (row) {	
                                 editrow = row;	
                                 var offset 		= $("#gridjadwaltabel").offset();		
                                 var dataRecord 	= $("#gridjadwaltabel").jqxGrid('getrowdata', editrow);
-                                var source      = {
-                                    datatype: "json",
-                                    datafields: [
-                                        { name: 'id' },
-                                        { name: 'tanggal', type: 'string' },
-                                        { name: 'jammulai', type: 'string' },
-                                        { name: 'jamakhir', type: 'string' },
-                                        { name: 'mulai', type: 'string' },
-                                        { name: 'akhir', type: 'string' },
-                                        { name: 'hari', type: 'string' },
-                                        { name: 'ruang', type: 'string' },
-                                        { name: 'idmatpel'},
-                                        { name: 'matapelajaran', type: 'string' },
-                                        { name: 'kelas', type: 'string' },
-                                        { name: 'semester', type: 'string' },
-                                        { name: 'tapel', type: 'string' },
-                                        { name: 'marking', type: 'string' },
-                                        { name: 'guruterjadwal', type: 'string' },
-                                        { name: 'materi', type: 'string' },
-                                        { name: 'tglkehadiran', type: 'date' },
-                                        { name: 'guruyanghadir', type: 'string' },
-                                        { name: 'k1', type: 'string' },
-                                        { name: 'k2', type: 'string' },
-                                        { name: 'k3', type: 'string' },
-                                        { name: 'k4', type: 'string' },
-                                        { name: 'k5', type: 'string' },
-                                        { name: 'k6', type: 'string' },
-                                        { name: 'k7', type: 'string' },
-                                        { name: 'k8', type: 'string' },
-                                        { name: 'k9', type: 'string' },
-                                        { name: 'k10', type: 'string' },
-                                        { name: 'k11', type: 'string' },
-                                        { name: 'k12', type: 'string' },
-                                        { name: 'k13', type: 'string' },
-                                        { name: 'k14', type: 'string' },
-                                        { name: 'k15', type: 'string' },
-                                        { name: 'k16', type: 'string' },
-                                        { name: 'k17', type: 'string' },
-                                        { name: 'k18', type: 'string' },
-                                        { name: 'k19', type: 'string' },
-                                        { name: 'k20', type: 'string' },
-                                    ],
-                                    type: 'POST',
-                                    data: {val01: dataRecord.marking, val02: '', val03: 'detailtabel', _token: '{{ csrf_token() }}' },
-                                    url : '{{ route("jsonJadwalRPS") }}'
-                                };
-                                $(".divjadwalawal").hide();
-                                $(".divgriddetail").show();
-                                $(".divjadwalviewtabel").hide();
-                                $(".modaladdmatkul").hide();
-                                $(".divcatatanjadwal").hide();
-                                var dataAdapter = new $.jqx.dataAdapter(source);
-                                $("#griddetail").jqxGrid({
-                                    width           : '100%',
-                                    filterable      : true,
-                                    filtermode      : 'excel',
-                                    source          : dataAdapter,
-                                    columnsresize   : true,
-                                    theme           : "orange",
-                                    sortable        : true,		
-                                    autoheight      : true,
-                                    selectionmode   : 'multiplecellsextended',
-                                    columns         : [	
-                                        { text: 'Edit', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', cellsrenderer: function () {
-                                            return "Edit";
-                                            }, buttonclick: function (row) {	
-                                                editrow = row;	
-                                                var offset 		= $("#griddetail").offset();
-                                                var dataRecord 	= $("#griddetail").jqxGrid('getrowdata', editrow);
-                                                $("#editjad_id").val(dataRecord.id);
-                                                $("#masteredit_matkul").val(dataRecord.matapelajaran);
-                                                $("#masteredit_kelas").val(dataRecord.kelas);
-                                                $("#masteredit_semester").val(dataRecord.semester);
-                                                $("#masteredit_tapel").val(dataRecord.tapel);
-                                                $("#masteredit_tanggal").val(dataRecord.tanggal);
-                                                $("#masteredit_jam").val(dataRecord.jammulai+'-'+dataRecord.jamakhir);
-                                                $("#masteredit_ruang").val(dataRecord.ruang);
-                                                $("#editjadwal_tanggal").val(dataRecord.tanggal);
-                                                $("#editjadwal_mulai").val(dataRecord.jammulai);
-                                                $("#editjadwal_akhir").val(dataRecord.jamakhir);
-                                                $("#editjadwal_ruangan").val(dataRecord.ruang);
-                                                $("#editjadwal_guru").val(dataRecord.guruterjadwal);
-                                                $("#editjadwal_guruhadir").val(dataRecord.guruyanghadir);
-                                                $("#editmat_materi").val(dataRecord.materi);
-                                                $('.modalbodyeditwaktu').hide();
-                                                $('.modalbodyeditsemester').hide();
-                                                $('.modalbodyeditdosen').hide();
-                                                $('.modalbodyeditjenis').hide();
-                                                $('.modalbodyeditmateri').hide();
-                                                $("#modalawal").show();
-                                                $("#modaleditjadwal").modal('show');
-                                            }
-                                        },
-                                        { text: 'Hari', filtertype: 'checkedlist', datafield: 'hari', width: '6%', cellsalign: 'center', align: 'center' },
-                                        { text: 'Tanggal', datafield: 'tanggal', width: '9%', cellsalign: 'left', align: 'center'  },
-                                        { text: 'Start', filtertype: 'checkedlist', datafield: 'jammulai', width: '6%', cellsalign: 'center', align: 'center' },
-                                        { text: 'End', filtertype: 'checkedlist', datafield: 'jamakhir', width: '6%', cellsalign: 'center', align: 'center' },
-                                        { text: 'Ruang', datafield: 'ruang', width: '8%', cellsalign: 'left', align: 'center' },
-                                        { text: 'Mata Pelajaran', datafield: 'matapelajaran', width: '20%', cellsalign: 'left', align: 'center'  },
-                                        { text: 'Kelas', datafield: 'kelas', width: '6%', cellsalign: 'center', align: 'center'  },
-                                        { text: 'Guru Terjadwal', datafield: 'guruterjadwal', width: '15%', cellsalign: 'center', align: 'center'  },
-                                        { text: 'Guru Hadir', datafield: 'guruyanghadir', width: '15%', cellsalign: 'center', align: 'center'  },
-                                        { text: 'Tgl. Kehadiran', datafield: 'tglkehadiran', width: '9%', cellsalign: 'left', align: 'center'  },
-                                        { text: 'Materi yang disampaikan', datafield: 'materi', width: '14%', cellsalign: 'left', align: 'center'  },
-                                        { text: 'Delete', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', cellsrenderer: function () {
-                                            return "Delete";
-                                            }, buttonclick: function (row) {
-                                                editrow         = row;	
-                                                var offset 		= $("#griddetail").offset();
-                                                var dataRecord 	= $("#griddetail").jqxGrid('getrowdata', editrow);
-                                                swal({
-                                                    title			    : "Konfirmasi",
-                                                    text			    : "Data yang akan dihapus tidak bisa di kembalikan lagi (undo). Apakah anda yakin.?",
-                                                    type			    : 'warning',
-                                                    showCancelButton    : true,
-                                                    confirmButtonClass  : 'btn btn-confirm mt-2',
-                                                    cancelButtonClass   : 'btn btn-cancel ml-2 mt-2',
-                                                    confirmButtonText   : 'Yes, Delete'
-                                                }).then(function () {
-                                                    $.ajax({
-                                                        type		: 'ajax',
-                                                        url			: '{{ route("exJadwalRPS") }}',
-                                                        method		: 'post',
-                                                        data		: {kerja:'removejadwalbyid', val02:dataRecord.id,  _token: '{{ csrf_token() }}'},
-                                                        dataType	: 'json',
-                                                        success: function(response, status, xhr) {
-                                                            swal({
-                                                                title	: response.status,
-                                                                text	: response.message,
-                                                                type	: response.icon,
-                                                            });
-                                                            $("#griddetail").jqxGrid("updatebounddata");	
-                                                        },
-                                                        error: function(jqXHR, textStatus, errorThrown) {
-                                                            swal({
-                                                                title	: textStatus,
-                                                                text	: jqXHR.responseText,
-                                                                type	: 'info',
-                                                            });
-                                                        }
-                                                    });
-                                                });
-                                            }
-                                        },
-                                    ]
-                                });	
+                                var sesi        = "{{Session('previlage')}}";
+                                if (sesi == 'Waka Kurikulum' || sesi == 'level1'){
+                                    $("#modaleditjadwal").modal('show');
+                                    $('#masteredit_matkul').val(dataRecord.matapelajaran);
+                                    $('#masteredit_kelas').val(dataRecord.kelas);
+                                    $('#masteredit_semester').val(dataRecord.semester);
+                                    $('#masteredit_tapel').val(dataRecord.tapel);
+                                    $('#masteredit_tanggal').val(dataRecord.hari);
+                                    $('#masteredit_jam').val(dataRecord.jammulai+'s/d'+dataRecord.jamakhir);
+                                    $('#masteredit_ruang').val(dataRecord.ruang);
+                                    $('#editjad_id').val(dataRecord.id);
+                                    $("#modalawal").show();
+                                    $("#modalbodyeditwaktu").hide();
+                                    $("#modalbodyeditmateri").hide();
+                                } else {
+                                    swal({
+                                        title	: 'Warning',
+                                        text	: 'Akses Terbatas Untuk Waka Kurikulum',
+                                        type	: 'error',
+                                    });
+                                }
                             }
                         },
                         { text: 'Hari', filtertype: 'checkedlist', datafield: 'hari', width: '6%', cellsalign: 'center', align: 'center' },
-                        { text: 'Tanggal', datafield: 'tanggal', width: '8%', cellsalign: 'center', align: 'center'  },
                         { text: 'Start', filtertype: 'checkedlist', datafield: 'jammulai', width: '6%', cellsalign: 'center', align: 'center' },
                         { text: 'End', filtertype: 'checkedlist', datafield: 'jamakhir', width: '6%', cellsalign: 'center', align: 'center' },
                         { text: 'Ruang', datafield: 'ruang', width: '8%', cellsalign: 'left', align: 'center' },
@@ -2021,45 +1347,54 @@
                         { text: 'Kelas', filtertype: 'checkedlist', datafield: 'kelas', width: '6%', cellsalign: 'center', align: 'center'  },
                         { text: 'Tapel', filtertype: 'checkedlist', datafield: 'tapel', width: '9%', cellsalign: 'center', align: 'center' },
                         { text: 'Semester', filtertype: 'checkedlist', datafield: 'semester', width: '6%', cellsalign: 'center', align: 'center' },
-                        { text: 'Ploting', datafield: 'guruterjadwal', width: '12%', cellsalign: 'left', align: 'center'  },
+                        { text: 'Ploting', datafield: 'guruterjadwal', width: '20%', cellsalign: 'left', align: 'center'  },
                         { text: 'Delete', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', cellsrenderer: function () {
                             return "Delete";
                             }, buttonclick: function (row) {
                                 editrow         = row;	
                                 var offset 		= $("#gridjadwaltabel").offset();
                                 var dataRecord 	= $("#gridjadwaltabel").jqxGrid('getrowdata', editrow);
-                                swal({
-                                    title			    : "Konfirmasi",
-                                    text			    : "Data yang akan dihapus tidak bisa di kembalikan lagi (undo). Apakah anda yakin.?",
-                                    type			    : 'warning',
-                                    showCancelButton    : true,
-                                    confirmButtonClass  : 'btn btn-confirm mt-2',
-                                    cancelButtonClass   : 'btn btn-cancel ml-2 mt-2',
-                                    confirmButtonText   : 'Yes, Delete'
-                                }).then(function () {
-                                    $.ajax({
-                                        type		: 'ajax',
-                                        url			: '{{ route("exJadwalRPS") }}',
-                                        method		: 'post',
-                                        data		: {kerja:'removejadwalbymarking', val02:dataRecord.marking,  _token: '{{ csrf_token() }}'},
-                                        dataType	: 'json',
-                                        success: function(response, status, xhr) {
-                                            swal({
-                                                title	: response.status,
-                                                text	: response.message,
-                                                type	: response.icon,
-                                            });
-                                            $("#gridjadwaltabel").jqxGrid("updatebounddata");	
-                                        },
-                                        error: function(jqXHR, textStatus, errorThrown) {
-                                            swal({
-                                                title	: textStatus,
-                                                text	: jqXHR.responseText,
-                                                type	: 'info',
-                                            });
-                                        }
+                                var sesi        = "{{Session('previlage')}}";
+                                if (sesi == 'Waka Kurikulum' || sesi == 'level1'){
+                                    swal({
+                                        title			    : "Konfirmasi",
+                                        text			    : "Data yang akan dihapus tidak bisa di kembalikan lagi (undo). Apakah anda yakin.?",
+                                        type			    : 'warning',
+                                        showCancelButton    : true,
+                                        confirmButtonClass  : 'btn btn-confirm mt-2',
+                                        cancelButtonClass   : 'btn btn-cancel ml-2 mt-2',
+                                        confirmButtonText   : 'Yes, Delete'
+                                    }).then(function () {
+                                        $.ajax({
+                                            type		: 'ajax',
+                                            url			: '{{ route("exJadwalRPS") }}',
+                                            method		: 'post',
+                                            data		: {kerja:'removejadwalbymarking', val02:dataRecord.marking,  _token: '{{ csrf_token() }}'},
+                                            dataType	: 'json',
+                                            success: function(response, status, xhr) {
+                                                swal({
+                                                    title	: response.status,
+                                                    text	: response.message,
+                                                    type	: response.icon,
+                                                });
+                                                $("#gridjadwaltabel").jqxGrid("updatebounddata");	
+                                            },
+                                            error: function(jqXHR, textStatus, errorThrown) {
+                                                swal({
+                                                    title	: textStatus,
+                                                    text	: jqXHR.responseText,
+                                                    type	: 'info',
+                                                });
+                                            }
+                                        });
                                     });
-                                });
+                                } else {
+                                    swal({
+                                        title	: 'Warning',
+                                        text	: 'Akses Terbatas Untuk Waka Kurikulum',
+                                        type	: 'error',
+                                    });
+                                }
                             }
                         },
                     ],
@@ -2083,7 +1418,7 @@
                     type	: data.icon,
                 });
             } else {
-                $("#editorrps").modal('show');
+                $("#modaleditorrps").modal('show');
                 $('#edit_matkul').val(data.matpel);
                 $('#edit_semester').val(data.semester);
                 $('#edit_tema').val(data.tema);
@@ -2171,13 +1506,6 @@
             });
         });
     }
-    function jQueryRemoveValJadwal(id){
-        $("#jadwal_tanggal"+id).val('0000-00-00');
-        $("#jadwal_mulai"+id).val('00:00:00');
-        $("#jadwal_akhir"+id).val('00:00:00');
-        $("#jadwal_ruangan"+id).val('');
-        $("#jadwal_guru"+id).val('');
-    }
     function jQueryOpenKKM(set01){
         $("#id_kelas").val(set01);
         var source = {
@@ -2189,6 +1517,7 @@
                 { name: 'muatan', type: 'text'},
                 { name: 'kitiga', type: 'text'},
                 { name: 'kiempat', type: 'text'},
+                { name: 'jenis', type: 'text'},
                 { name: 'idne', type: 'text'},
             ],
             type: 'POST',
@@ -2206,12 +1535,13 @@
             theme           : "energyblue",
             selectionmode   : 'multiplecellsextended',
             columns         : [
-                { text: 'Kelas', datafield: 'kelas', width: '10%', cellsalign: 'center', align: 'center' },
-                { text: 'Muatan Mata Pelajaran', datafield: 'matpel', width: '35%', cellsalign: 'left', align: 'center' },
-                { text: 'Kode', datafield: 'muatan', width: '15%', cellsalign: 'center', align: 'center' },
-                { text: 'KI-3', datafield: 'kitiga', width: '10%', cellsalign: 'center', align: 'center' },
-                { text: 'KI-4', datafield: 'kiempat', width: '10%', cellsalign: 'center', align: 'center' },
-                { text: 'UBAH', ditable: false, sortable: false, filterable: false, columntype: 'button', align: 'center', width: '10%', cellsrenderer: function () {
+                { text: 'Kelas', datafield: 'kelas', width: '5%', cellsalign: 'center', align: 'center' },
+                { text: 'Muatan Mata Pelajaran', datafield: 'matpel', width: '40%', cellsalign: 'left', align: 'center' },
+                { text: 'Kode', datafield: 'muatan', width: '20%', cellsalign: 'center', align: 'center' },
+                { text: 'Jenis', datafield: 'jenis', width: '15%', cellsalign: 'center', align: 'center' },
+                { text: 'KI-3', datafield: 'kitiga', width: '5%', cellsalign: 'center', align: 'center' },
+                { text: 'KI-4', datafield: 'kiempat', width: '5%', cellsalign: 'center', align: 'center' },
+                { text: 'UBAH', ditable: false, sortable: false, filterable: false, columntype: 'button', align: 'center', width: '5%', cellsrenderer: function () {
                     return "Edit";
                     }, buttonclick: function (row) {
                         editrow = row;
@@ -2222,12 +1552,13 @@
                         $("#id_ki4").val(dataRecord.kiempat);
                         $("#id_muatan").val(dataRecord.muatan);
                         $("#id_matpel").val(dataRecord.matpel);
+                        $("#id_jenis").val(dataRecord.jenis);
                         $('#tomboltambah').hide();
                         $('#tombolupdate').show();
                         $("#modaltambahkkm").modal('show');
                     }
                 },
-                { text: 'Del', editable: false, sortable: false, filterable: false, columntype: 'button', width: '10%', cellsrenderer: function () {
+                { text: 'Del', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', cellsrenderer: function () {
                     return "Del";
                     }, buttonclick: function (row) {
                         editrow = row;	
@@ -2247,7 +1578,7 @@
                             var set03		= '';
                             var token		= document.getElementById('token').value;
                             $.post('{{ route("exDestroyer") }}', { val01: set01, val02: set02, val03: '', _token: token },
-                                function(data){					
+                                function(data){
                                     var status  = data.status;
                                     var message = data.message;
                                     var warna 	= data.warna;
@@ -2270,6 +1601,67 @@
             ]
         });
     }
+    function jQueryOpenTemplate(set01){
+        $("#id_kelas").val(set01);
+        var source = {
+            datatype: "json",
+            datafields: [
+                { name: 'id', type: 'text'},
+                { name: 'kelas', type: 'text'},
+                { name: 'matpel', type: 'text'},
+                { name: 'muatan', type: 'text'},
+                { name: 'tema', type: 'text'},
+                { name: 'deskripsitema', type: 'text'},
+                { name: 'template01', type: 'text'},
+                { name: 'template02', type: 'text'},
+                { name: 'template03', type: 'text'},
+                { name: 'template04', type: 'text'},
+                { name: 'template05', type: 'text'},
+            ],
+            type: 'POST',
+            data: {val01:'groupbytema', val02:set01, _token: '{{ csrf_token() }}'},
+            url : '{{ route("jsonDatakkm") }}'
+        };
+        var dataAdapter = new $.jqx.dataAdapter(source);
+        $("#gridtemplate").jqxGrid({
+            width           : '100%',
+            pageable        : false,
+            filterable      : true,
+            source          : dataAdapter,
+            showfilterrow   : true,
+            columnsresize   : true,
+            theme           : "energyblue",
+            selectionmode   : 'multiplecellsextended',
+            columns         : [
+                { text: 'Muatan', datafield: 'matpel', width: '18%', cellsalign: 'left', align: 'center' },
+                { text: 'Tema', datafield: 'tema', width: '5%', cellsalign: 'center', align: 'center' },
+                { text: 'Deskripsi Tema', datafield: 'deskripsitema', width: '12%', cellsalign: 'center', align: 'center' },
+                { text: '0-74', datafield: 'template01', width: '12%', cellsalign: 'center', align: 'center' },
+                { text: '75-76', datafield: 'template02', width: '12%', cellsalign: 'center', align: 'center' },
+                { text: '77-84', datafield: 'template03', width: '12%', cellsalign: 'center', align: 'center' },
+                { text: '85-92', datafield: 'template04', width: '12%', cellsalign: 'center', align: 'center' },
+                { text: '92-100', datafield: 'template05', width: '12%', cellsalign: 'center', align: 'center' },
+                { text: 'UBAH', ditable: false, sortable: false, filterable: false, columntype: 'button', align: 'center', width: '5%', cellsrenderer: function () {
+                    return "Edit";
+                    }, buttonclick: function (row) {
+                        editrow = row;
+                        var offset 		= $("#gridtemplate").offset();
+                        var dataRecord 	= $("#gridtemplate").jqxGrid('getrowdata', editrow);
+                        $("#template_matpel").val(dataRecord.matpel);
+                        $("#template_muatan").val(dataRecord.muatan);
+                        $("#template_kelas").val(dataRecord.kelas);
+                        $("#template_tema").val(dataRecord.tema);
+                        CKEDITOR.instances['template_range01'].setData(dataRecord.template01)
+                        CKEDITOR.instances['template_range02'].setData(dataRecord.template02)
+                        CKEDITOR.instances['template_range03'].setData(dataRecord.template03)
+                        CKEDITOR.instances['template_range04'].setData(dataRecord.template04)
+                        CKEDITOR.instances['template_range05'].setData(dataRecord.template05)
+                        $("#modaleditortemplate").modal('show');
+                    }
+                },
+            ]
+        });
+    }
     $(document).ready(function () {
         $(".divawal").hide();
         $(".divjadwal").show();
@@ -2278,6 +1670,71 @@
         $(".divjadwalawal").show();
         $(".divcatatanjadwal").hide();
         $(".divjadwalviewtabel").hide();
+        $('#btnudatetemplate').click(function () {
+            var set02=document.getElementById('template_matpel').value;
+            var set03=document.getElementById('template_muatan').value;
+            var set01=document.getElementById('template_kelas').value;
+            var set04=CKEDITOR.instances['template_range01'].getData()
+            var set05=CKEDITOR.instances['template_range02'].getData()
+            var set06=CKEDITOR.instances['template_range03'].getData()
+            var set08=CKEDITOR.instances['template_range04'].getData()
+            var set09=CKEDITOR.instances['template_range05'].getData()
+            if (set01 == '' || set02 == '' || set03 == '' || set04 == '' || set05 == '' || set06 == '' || set09 == '' || set08 == ''){
+                swal({
+                    title	: 'Warning',
+                    text	: 'Lengkapi semua isian pada field',
+                    type	: 'error',
+                });
+            } else {
+                $("#modaleditortemplate").modal('hide');
+                var formdata = new FormData();
+                    formdata.set('val01', set01);
+                    formdata.set('val02', set02);
+                    formdata.set('val03', set03);
+                    formdata.set('val04', set04);
+                    formdata.set('val05', set05);
+                    formdata.set('val06', 'updatetemplate');
+                    formdata.set('val07', set06);
+                    formdata.set('val08', set08);
+                    formdata.set('val09', set09);
+                    formdata.set('val10', document.getElementById('template_tema').value);
+                    formdata.set('_token', '{{ csrf_token() }}');
+                $.ajax({
+                    url         : '{{ route("exDatakkm") }}',
+                    data        : formdata,
+                    type        : 'POST',
+                    contentType : false,
+                    processData : false,
+                    success: function (data) {
+                        var status  = data.status;
+                        var message = data.message;
+                        var warna 	= data.warna;
+                        var icon 	= data.icon;
+                        $("html, body").animate({ scrollTop: 0 }, "slow");
+                        $.toast({
+                            heading     : status,
+                            text        : message,
+                            position    : 'top-right',
+                            loaderBg    : warna,
+                            icon        : icon,
+                            hideAfter   : 5000,
+                            stack       : 1
+                        });
+                        $("#gridtemplate").jqxGrid("updatebounddata", "filter");
+                        return false;
+                    },
+                    error: function (xhr, status, error) {
+                        var response = xhr.responseJSON || {};
+						var traceText = response.trace ? JSON.stringify(response.trace) : null;
+						swal({
+							title	: response.message || 'Terjadi kesalahan',
+							text	: traceText || xhr.responseText,
+							type	: 'error',
+						})
+                    }
+                });
+            }
+        });
         $('.btnviewdivjadwal').click(function () {
             $(".divawal").hide();
             $(".divjadwal").show();
@@ -2293,20 +1750,29 @@
             openjadviewTabel();
         });
         $('#btnaddmatkul').click(function () {
-            $(".divawal").hide();
-            $(".divjadwal").show();
-            $(".divcatatanjadwal").hide();
-            $(".divgriddetail").hide();
-            $(".modaladdmatkul").show();
-            $(".divjadwalawal").hide();
-            $('#jadwal_idne').val('new');
+            var sesi ="{{Session('previlage')}}";
+            if (sesi == 'Waka Kurikulum' || sesi == 'level1'){
+                $(".divawal").hide();
+                $(".divjadwal").show();
+                $(".divcatatanjadwal").hide();
+                $(".divgriddetail").hide();
+                $(".modaladdmatkul").show();
+                $(".divjadwalawal").hide();
+                $('#jadwal_idne').val('new');
+            } else {
+                swal({
+                    title	: 'Warning',
+                    text	: 'Akses Terbatas Untuk Waka Kurikulum',
+                    type	: 'error',
+                });
+            }
         });
         $('#btntambahmatkul').click(function () {
             var set01=document.getElementById('jadwal_matpel').value;
             var set02=document.getElementById('jadwal_tapel').value;
             var set03=document.getElementById('jadwal_semester').value;
             var set04=document.getElementById('jadwal_ruangan01').value;
-            var set05=document.getElementById('jadwal_tanggal01').value;
+            var set05=document.getElementById('jadwal_hari01').value;
             var set06=document.getElementById('jadwal_mulai01').value;
             var set07=document.getElementById('jadwal_akhir01').value;
             if (set01 == '' || set02 == '' || set03 == '' || set04 == '' || set05 == '' || set06 == '' || set07 == ''){
@@ -2338,11 +1804,13 @@
                         return false;
                     },
                     error: function (xhr, status, error) {
-                        swal({
-                            title	: 'Stop',
-                            text	: xhr.responseText,
-                            type	: 'warning',
-                        })
+                        var response    = xhr.responseJSON || {};
+						var traceText   = response.trace ? JSON.stringify(response.trace) : null;
+						swal({
+							title	: response.message || 'Terjadi kesalahan',
+							text	: traceText || xhr.responseText,
+							type	: 'error',
+						})
                     }
                 });
             }
@@ -2350,6 +1818,10 @@
         $('#btnclosedivdetail').click(function () {
             $(".divgriddetail").hide();
             $(".divjadwalviewtabel").show();
+        });
+        $('#btntemplate').click(function () {
+            $(".divawal").hide();
+            $(".divtemplate").show();
         });
         $('#btnviewdivkkm').click(function () {
             $(".divawal").hide();
@@ -2388,8 +1860,21 @@
             autoWidth	: false,
             serverSide  : true,
 			columnDefs	: [
+                {
+					targets		: 0,
+					title		: 'Actions',
+					width		: '80px',
+					orderable	: false,
+					render		: function (data, type, full, meta) {
+						var $id 	= full['id'];
+						return (
+						    '<a class="btn btn-app" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit" onClick="editorrps('+$id+')"><i class="fa fa-edit"></i></a>' +
+						    '<a class="btn btn-app" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit" onClick="removerps('+$id+')"><i class="fa fa-trash"></i></a>'
+						);
+					}
+				},
 				{
-					targets				: 0,
+					targets				: 1,
 					responsivePriority	: 4,
 					width				: '270px',
 					render		: function (data, type, full, meta) {
@@ -2400,22 +1885,23 @@
 					}
 				},
                 {
-					targets				: 1,
+					targets				: 2,
 					responsivePriority	: 4,
 					width				: '270px',
 					render		: function (data, type, full, meta) {
-						var kelas   = full['kelas'],
-                            tema    = full['tema'],
-                            subtema = full['subtema'],
-                            semester= full['semester'],
-                            kodekd  = full['kodekd'],
-                            kkm     = full['kkm'];
-						var $rowOutput 	= 'Kelas/Smt:'+kelas+' ( '+semester+' )<br />Tema / Sub Tema :'+tema+'/'+subtema+'<br />Kode and KKM : '+kodekd+'( '+kkm+' )';
+						var kelas       = full['kelas'],
+                            tema        = full['tema'],
+                            subtema     = full['subtema'],
+                            semester    = full['semester'],
+                            kodekd      = full['kodekd'],
+                            kkm         = full['kkm'];
+						    pertemuanke = full['pertemuanke'];
+						var $rowOutput 	= 'Kelas/Smt:'+kelas+' ( '+semester+' )<br />Tema / Sub Tema :'+tema+'/'+subtema+'<br />Kode and KKM : '+kodekd+'( '+kkm+' )'+'<br />Pertemuan Ke : '+pertemuanke;
 						return $rowOutput;
 					}
 				},
                 {
-					targets				: 2,
+					targets				: 3,
 					responsivePriority	: 4,
 					width				: '540px',
 					render		: function (data, type, full, meta) {
@@ -2424,7 +1910,7 @@
 					}
 				},
                 {
-					targets				: 3,
+					targets				: 4,
 					responsivePriority	: 4,
 					width				: '540px',
 					render		: function (data, type, full, meta) {
@@ -2437,20 +1923,8 @@
                         }
                         return $rowOutput;
 					}
-				},
-                {
-					targets		: -1,
-					title		: 'Actions',
-					width		: '80px',
-					orderable	: false,
-					render		: function (data, type, full, meta) {
-						var $id 	= full['id'];
-						return (
-						    '<a class="btn btn-app" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit" onClick="editorrps('+$id+')"><i class="fa fa-edit"></i></a>' +
-						    '<a class="btn btn-app" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit" onClick="removerps('+$id+')"><i class="fa fa-trash"></i></a>'
-						);
-					}
 				}
+                
 			],
             order		: [[1, 'desc']],
       		dom			: 	'<"row d-flex justify-content-between align-items-center m-1"' +
@@ -2533,6 +2007,8 @@
 						page            : Math.ceil(settings._iDisplayStart / settings._iDisplayLength) + 1,
 						semester        : document.getElementById('set_semester').value,
                         tapel           : document.getElementById('set_tapel').value,
+                        matpel          : document.getElementById('legger_filtermatpel').value,
+						kelas           : document.getElementById('legger_filterkelas').value,
 						jenis           : 'belumtersimpan',
                         search          : data.search.value,
 						_token			: '{{ csrf_token() }}'
@@ -2581,6 +2057,8 @@
 						page            : Math.ceil(settings._iDisplayStart / settings._iDisplayLength) + 1,
 						semester        : document.getElementById('set_semester').value,
                         tapel           : document.getElementById('set_tapel').value,
+						matpel          : document.getElementById('legger_filtermatpel').value,
+						kelas           : document.getElementById('legger_filterkelas').value,
 						jenis           : 'tersimpan',
                         search          : data.search.value,
 						_token			: '{{ csrf_token() }}'
@@ -2822,100 +2300,6 @@
         $("#add_matkul").on('change', function () {
             $("#tabelrps").DataTable().ajax.reload();
         });
-        $("#jadwal_tanggal01").on('change', function () {
-            var val01       = document.getElementById('jadwal_tanggal01').value;
-            var tglan02 	= moment(val01).add(+7, 'days');
-		    var newtgl02	= moment(tglan02).format('YYYY-MM-DD');
-            $("#jadwal_tanggal02").val(newtgl02);
-            
-            var tglan03 	= moment(newtgl02).add(+7, 'days');
-		    var newtgl03	= moment(tglan03).format('YYYY-MM-DD');
-            $("#jadwal_tanggal03").val(newtgl03);
-            
-            var tglan04 	= moment(newtgl03).add(+7, 'days');
-		    var newtgl04	= moment(tglan04).format('YYYY-MM-DD');
-            $("#jadwal_tanggal04").val(newtgl04);
-
-            var tglan05 	= moment(newtgl04).add(+7, 'days');
-		    var newtgl05	= moment(tglan05).format('YYYY-MM-DD');
-            $("#jadwal_tanggal05").val(newtgl05);
-
-            var tglan06 	= moment(newtgl05).add(+7, 'days');
-		    var newtgl06	= moment(tglan06).format('YYYY-MM-DD');
-            $("#jadwal_tanggal06").val(newtgl06);
-
-            var tglan07 	= moment(newtgl06).add(+7, 'days');
-		    var newtgl07	= moment(tglan07).format('YYYY-MM-DD');
-            $("#jadwal_tanggal07").val(newtgl07);
-
-            var tglan08 	= moment(newtgl07).add(+7, 'days');
-		    var newtgl08	= moment(tglan08).format('YYYY-MM-DD');
-            $("#jadwal_tanggal08").val(newtgl08);
-
-            var tglan09 	= moment(newtgl08).add(+7, 'days');
-		    var newtgl09	= moment(tglan09).format('YYYY-MM-DD');
-            $("#jadwal_tanggal09").val(newtgl09);
-
-            var tglan10 	= moment(newtgl09).add(+7, 'days');
-		    var newtgl10	= moment(tglan10).format('YYYY-MM-DD');
-            $("#jadwal_tanggal10").val(newtgl10);
-
-            var tglan11 	= moment(newtgl10).add(+7, 'days');
-		    var newtgl11	= moment(tglan11).format('YYYY-MM-DD');
-            $("#jadwal_tanggal11").val(newtgl11);
-
-            var tglan12 	= moment(newtgl11).add(+7, 'days');
-		    var newtgl12	= moment(tglan12).format('YYYY-MM-DD');
-            $("#jadwal_tanggal12").val(newtgl12);
-
-            var tglan13 	= moment(newtgl12).add(+7, 'days');
-		    var newtgl13	= moment(tglan13).format('YYYY-MM-DD');
-            $("#jadwal_tanggal13").val(newtgl13);
-
-            var tglan14 	= moment(newtgl13).add(+7, 'days');
-		    var newtgl14	= moment(tglan14).format('YYYY-MM-DD');
-            $("#jadwal_tanggal14").val(newtgl14);
-
-            var tglan15 	= moment(newtgl14).add(+7, 'days');
-		    var newtgl15	= moment(tglan15).format('YYYY-MM-DD');
-            $("#jadwal_tanggal15").val(newtgl15);
-
-            var tglan16 	= moment(newtgl15).add(+7, 'days');
-		    var newtgl16	= moment(tglan16).format('YYYY-MM-DD');
-            $("#jadwal_tanggal16").val(newtgl16);
-
-            var tglan17 	= moment(newtgl16).add(+7, 'days');
-		    var newtgl17	= moment(tglan17).format('YYYY-MM-DD');
-            $("#jadwal_tanggal17").val(newtgl17);
-
-            var tglan18 	= moment(newtgl17).add(+7, 'days');
-		    var newtgl18	= moment(tglan18).format('YYYY-MM-DD');
-            $("#jadwal_tanggal18").val(newtgl18);
-
-            var tglan19 	= moment(newtgl18).add(+7, 'days');
-		    var newtgl19	= moment(tglan19).format('YYYY-MM-DD');
-            $("#jadwal_tanggal19").val(newtgl19);
-
-            var tglan20 	= moment(newtgl19).add(+7, 'days');
-		    var newtgl20	= moment(tglan20).format('YYYY-MM-DD');
-            $("#jadwal_tanggal20").val(newtgl20);
-        });
-        $("#jadwal_ruangan01").on('change', function () {
-            var set01=document.getElementById('jadwal_ruangan01').value;
-            $(".classruang").val(set01);
-        });
-        $("#jadwal_guru01").on('change', function () {
-            var set01=document.getElementById('jadwal_guru01').value;
-            $(".classguru").val(set01);
-        });
-        $("#jadwal_mulai01").on('change', function () {
-            var set01=document.getElementById('jadwal_mulai01').value;
-            $(".classjam1").val(set01);
-        });
-        $("#jadwal_akhir01").on('change', function () {
-            var set01=document.getElementById('jadwal_akhir01').value;
-            $(".classjam2").val(set01);
-        });
         $("#btneditmateri").click(function(){
             $('.modalbodyeditmateri').show();
             $('#modalawal').hide();
@@ -3003,6 +2387,7 @@
             var set07=document.getElementById('edit_kodekd').value;
             var set08=document.getElementById('edit_nilai').value;
             var set09=document.getElementById('edit_materi').value;
+            var set11=document.getElementById('edit_pertemuan').value;
             if (set01 == '' || set02 == '' || set03 == '' || set04 == '' || set05 == '' || set07 == '' || set08 == ''){
                 swal({
                     title	: 'Warning',
@@ -3010,8 +2395,8 @@
                     type	: 'error',
                 });
             } else {
-                $("#editorrps").modal('hide');
-                $.post('{{ route("exDatakodekd") }}', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, val07: set07, val08: set08, val09: set09, _token: '{{ csrf_token() }}' },
+                $("#modaleditorrps").modal('hide');
+                $.post('{{ route("exDatakodekd") }}', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, val07: set07, val08: set08, val09: set09, val11: set11, _token: '{{ csrf_token() }}' },
                 function(data){
                     $("#tabelrps").DataTable().ajax.reload();
                     $("html, body").animate({ scrollTop: 0 }, "slow");
@@ -3043,6 +2428,7 @@
             var set08=document.getElementById('add_nilai').value;
             var set09=document.getElementById('add_matkul').value;
             var set10=document.getElementById('add_materi').value;
+            var set11=document.getElementById('add_pertemuan').value;
             if (set01 == '' || set02 == '' || set03 == '' || set04 == '' || set05 == '' || set07 == '' || set08 == '' || set09 == ''){
                 swal({
                     title	: 'Warning',
@@ -3051,9 +2437,8 @@
                 });
             } else {
                 var btn = $(this);
-				    btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
-			
-                $.post('{{ route("exDatakodekd") }}', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, val07: set07, val08: set08, val09: set09, val10: set10, _token: '{{ csrf_token() }}' },
+                    btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+                $.post('{{ route("exDatakodekd") }}', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, val07: set07, val08: set08, val09: set09, val10: set10, val11: set11, _token: '{{ csrf_token() }}' },
                 function(data){
                     btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
                     $("#tabelrps").DataTable().ajax.reload();
@@ -3074,7 +2459,6 @@
                     return false;
                 });
             }
-            
         });
         $('#btntambahsetleggger').click(function () {
             var set02=document.getElementById('settingnilai_id').value;
@@ -3088,7 +2472,7 @@
                 });
             } else {
                 var btn = $(this);
-				    btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+                    btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
                 $.post('{{ route("exDatakodekd") }}', { val01: 'settingnilai', val02: set02, val03: set03, val04: set04, _token: '{{ csrf_token() }}' },
                 function(data){
                     btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
@@ -3106,6 +2490,52 @@
                         stack: 1
                     });
                     $("#modaltambahsettingnilai").modal('hide');
+                    $("#tabelunsignkodekd").DataTable().ajax.reload();
+                    $("#tabellegger").DataTable().ajax.reload();
+                    $("html, body").animate({ scrollTop: 0 }, "slow");
+                    return false;
+                });
+            }
+        });
+        $("#legger_matpelmulti").on('change', function () {
+            $("#tabelunsignkodekd").DataTable().ajax.reload();
+            $("#tabellegger").DataTable().ajax.reload();
+        });
+        $("#legger_kelasmulti").on('change', function () {
+            $("#tabelunsignkodekd").DataTable().ajax.reload();
+            $("#tabellegger").DataTable().ajax.reload();
+        });
+        $('#btntambahsetlegggermulti').click(function () {
+            var set02=document.getElementById('legger_matpelmulti').value;
+            var set03=document.getElementById('legger_penilaianharianmulti').value;
+            var set04=document.getElementById('legger_evaluasimulti').value;
+            var set05=document.getElementById('legger_kelasmulti').value;
+            if (set03 == '' || set04 == ''){
+                swal({
+                    title	: 'Warning',
+                    text	: 'Lengkapi semua isian pada field ini, apabila ada data yang memang tidak ada mohon memberikan tanda 0 (nol) atau - (strip)',
+                    type	: 'error',
+                });
+            } else {
+                var btn = $(this);
+                    btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+                $.post('{{ route("exDatakodekd") }}', { val01: 'settingnilaimulti', val02: set02, val03: set03, val04: set04, val05: set05, _token: '{{ csrf_token() }}' },
+                function(data){
+                    btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+                    var status  = data.status;
+                    var message = data.message;
+                    var warna 	= data.warna;
+                    var icon 	= data.icon;
+                    $.toast({
+                        heading: status,
+                        text: message,
+                        position: 'top-right',
+                        loaderBg: warna,
+                        icon: icon,
+                        hideAfter: 5000,
+                        stack: 1
+                    });
+                    $("#modaltambahsettingnilaimulti").modal('hide');
                     $("#tabelunsignkodekd").DataTable().ajax.reload();
                     $("#tabellegger").DataTable().ajax.reload();
                     $("html, body").animate({ scrollTop: 0 }, "slow");
@@ -3174,30 +2604,9 @@
                                 if (isi == null){
                                     td.innerHTML = '';
                                 } else {
-                                    var isi2 	= isi.toString();
-                                    var pjg 	= isi2.length;
-                                    if (pjg > 8){
-                                        if (pjg == 9 || pjg == 10){
-                                            if( isi2.indexOf(',') != -1 ){
-                                                var res = isi2.replace(/,/g, "");
-                                                td.innerHTML = res;
-                                            }
-                                            else {
-                                                var res = isi2;
-                                                td.setAttribute('style', 'mso-number-format: "\@";');
-                                                td.innerHTML = res;
-                                            }
-                                        }
-                                        else { 
-                                            var res = isi2;
-                                            td.setAttribute('style', 'mso-number-format: "\@";');
-                                            td.innerHTML = res;
-                                        }						
-                                    } else {
-                                        var res = isi2.replace(/,/g, "");
-                                        td.innerHTML = res;
-                                    }
-                                }   
+                                    td.setAttribute('style', 'mso-number-format: "\@";');
+                                    td.innerHTML = isi;
+                                }
                                 bRow.appendChild(td);
                             }
                             tBody.appendChild(bRow)
@@ -3222,6 +2631,7 @@
             var set04=document.getElementById('id_ki3').value;
             var set05=document.getElementById('id_ki4').value;
             var set06='baru';
+            var set07=document.getElementById('id_jenis').value;
             if (set01 == '' || set02 == '' || set03 == '' || set04 == '' || set05 == ''){
                 swal({
                     title	: 'Warning',
@@ -3229,22 +2639,22 @@
                     type	: 'error',
                 });
             } else {
-                $.post('{{ route("exDatakkm") }}', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, _token: '{{ csrf_token() }}' },
+                $("#modaltambahkkm").modal('hide');
+                $.post('{{ route("exDatakkm") }}', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, val07: set07, _token: '{{ csrf_token() }}' },
                 function(data){	
-                    $("#modaltambahkkm").modal('hide');
                     $("#gridkurikulum").jqxGrid("updatebounddata");
                     var status  = data.status;
                     var message = data.message;
                     var warna 	= data.warna;
                     var icon 	= data.icon;
                     $.toast({
-                        heading: status,
-                        text: message,
-                        position: 'top-right',
-                        loaderBg: warna,
-                        icon: icon,
-                        hideAfter: 5000,
-                        stack: 1
+                        heading     : status,
+                        text        : message,
+                        position    : 'top-right',
+                        loaderBg    : warna,
+                        icon        : icon,
+                        hideAfter   : 5000,
+                        stack       : 1
                     });
                     $("html, body").animate({ scrollTop: 0 }, "slow");
                     return false;
@@ -3258,6 +2668,7 @@
             var set04=document.getElementById('id_ki3').value;
             var set05=document.getElementById('id_ki4').value;
             var set06=document.getElementById('id_idne').value;
+            var set07=document.getElementById('id_jenis').value;
             if (set01 == '' || set02 == '' || set03 == '' || set04 == '' || set05 == ''){
                 swal({
                     title	: 'Warning',
@@ -3265,22 +2676,22 @@
                     type	: 'error',
                 });
             } else {
-                $.post('{{ route("exDatakkm") }}', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, _token: '{{ csrf_token() }}' },
+                $("#modaltambahkkm").modal('hide');
+                $.post('{{ route("exDatakkm") }}', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, val07: set07, _token: '{{ csrf_token() }}' },
                 function(data){	
-                    $("#modaltambahkkm").modal('hide');
                     $("#gridkurikulum").jqxGrid("updatebounddata");
                     var status  = data.status;
                     var message = data.message;
                     var warna 	= data.warna;
                     var icon 	= data.icon;
                     $.toast({
-                        heading: status,
-                        text: message,
-                        position: 'top-right',
-                        loaderBg: warna,
-                        icon: icon,
-                        hideAfter: 5000,
-                        stack: 1
+                        heading     : status,
+                        text        : message,
+                        position    : 'top-right',
+                        loaderBg    : warna,
+                        icon        : icon,
+                        hideAfter   : 5000,
+                        stack       : 1
                     });
                     $("html, body").animate({ scrollTop: 0 }, "slow");
                     return false;
@@ -3298,12 +2709,6 @@
                     text: 'Isi Kolom Semester Terlebih Dahulu',
                     type: 'warning',
                 })
-            } else if (set02 == ''){
-                swal({
-                    title: 'Stop',
-                    text: 'Isi Kolom Kelas Terlebih Dahulu',
-                    type: 'warning',
-                })
             } else if (set04 == ''){
                 swal({
                     title: 'Stop',
@@ -3313,7 +2718,22 @@
             } else {
                 $.post('{{ route("exSavesetguru") }}', { val01: set01, val02: set02, val03: set03, val04: set04, _token: '{{ csrf_token() }}' },
                 function(data){
-                    location.reload();
+                    var status  = data.status;
+                    var message = data.message;
+                    var warna 	= data.warna;
+                    var icon 	= data.icon;
+                    $.toast({
+                        heading     : status,
+                        text        : message,
+                        position    : 'top-right',
+                        loaderBg    : warna,
+                        icon        : icon,
+                        hideAfter   : 5000,
+                        stack       : 1
+                    });
+                    var uri = window.location.href.split("#")[0];
+					setTimeout(function () { window.location=uri;}, 5000);
+					return false;
                 });
             }
         });
@@ -3352,31 +2772,12 @@
                     for (var j = 0; j < col.length; j++) {
                         var td 		= document.createElement("td");
                         var isi 	= data[i][col[j]];
-                        var isi2 	= isi.toString();
-                        var pjg 	= isi2.length;
-                        if (pjg > 8){
-                            if (pjg == 9 || pjg == 10){
-                                if( isi2.indexOf(',') != -1 ){
-                                    var res = isi2.replace(/,/g, "");
-                                    td.innerHTML = res;
-                                }
-                                else {
-                                    var res = isi2;
-                                    td.setAttribute('style', 'mso-number-format: "\@";');
-                                    td.innerHTML = res;
-                                }
-                            }
-                            else { 
-                                var res = isi2;
-                                td.setAttribute('style', 'mso-number-format: "\@";');
-                                td.innerHTML = res;
-                            }						
+                        if (isi == null){
+                            td.innerHTML = '';
+                        } else {
+                            td.setAttribute('style', 'mso-number-format: "\@";');
+                            td.innerHTML = isi;
                         }
-                        else {
-                            var res = isi2.replace(/,/g, "");
-                            td.innerHTML = res;
-                        }
-                            
                         bRow.appendChild(td);
                     }
                     tBody.appendChild(bRow)
@@ -3433,30 +2834,9 @@
                             if (isi == null){
                                 td.innerHTML = '';
                             } else {
-                                var isi2 	= isi.toString();
-                                var pjg 	= isi2.length;
-                                if (pjg > 8){
-                                    if (pjg == 9 || pjg == 10){
-                                        if( isi2.indexOf(',') != -1 ){
-                                            var res = isi2.replace(/,/g, "");
-                                            td.innerHTML = res;
-                                        }
-                                        else {
-                                            var res = isi2;
-                                            td.setAttribute('style', 'mso-number-format: "\@";');
-                                            td.innerHTML = res;
-                                        }
-                                    }
-                                    else { 
-                                        var res = isi2;
-                                        td.setAttribute('style', 'mso-number-format: "\@";');
-                                        td.innerHTML = res;
-                                    }						
-                                } else {
-                                    var res = isi2.replace(/,/g, "");
-                                    td.innerHTML = res;
-                                }
-                            }   
+                                td.setAttribute('style', 'mso-number-format: "\@";');
+                                td.innerHTML = isi;
+                            }
                             bRow.appendChild(td);
                         }
                         tBody.appendChild(bRow)
@@ -3516,29 +2896,8 @@
                                 if (isi == null){
                                     td.innerHTML = '';
                                 } else {
-                                    var isi2 	= isi.toString();
-                                    var pjg 	= isi2.length;
-                                    if (pjg > 8){
-                                        if (pjg == 9 || pjg == 10){
-                                            if( isi2.indexOf(',') != -1 ){
-                                                var res = isi2.replace(/,/g, "");
-                                                td.innerHTML = res;
-                                            }
-                                            else {
-                                                var res = isi2;
-                                                td.setAttribute('style', 'mso-number-format: "\@";');
-                                                td.innerHTML = res;
-                                            }
-                                        }
-                                        else { 
-                                            var res = isi2;
-                                            td.setAttribute('style', 'mso-number-format: "\@";');
-                                            td.innerHTML = res;
-                                        }						
-                                    } else {
-                                        var res = isi2.replace(/,/g, "");
-                                        td.innerHTML = res;
-                                    }
+                                    td.setAttribute('style', 'mso-number-format: "\@";');
+                                    td.innerHTML = isi;
                                 }   
                                 bRow.appendChild(td);
                             }
@@ -3601,29 +2960,8 @@
                                 if (isi == null){
                                     td.innerHTML = '';
                                 } else {
-                                    var isi2 	= isi.toString();
-                                    var pjg 	= isi2.length;
-                                    if (pjg > 8){
-                                        if (pjg == 9 || pjg == 10){
-                                            if( isi2.indexOf(',') != -1 ){
-                                                var res = isi2.replace(/,/g, "");
-                                                td.innerHTML = res;
-                                            }
-                                            else {
-                                                var res = isi2;
-                                                td.setAttribute('style', 'mso-number-format: "\@";');
-                                                td.innerHTML = res;
-                                            }
-                                        }
-                                        else { 
-                                            var res = isi2;
-                                            td.setAttribute('style', 'mso-number-format: "\@";');
-                                            td.innerHTML = res;
-                                        }						
-                                    } else {
-                                        var res = isi2.replace(/,/g, "");
-                                        td.innerHTML = res;
-                                    }
+                                    td.setAttribute('style', 'mso-number-format: "\@";');
+                                    td.innerHTML = isi;
                                 }   
                                 bRow.appendChild(td);
                             }
@@ -3642,7 +2980,9 @@
                 });
             }
         });
-        
+        $('#btntambahmultikomponennilai').click(function () {
+            $("#modaltambahsettingnilaimulti").modal('show');
+        });
         openjadviewKalender();
     });
 </script>

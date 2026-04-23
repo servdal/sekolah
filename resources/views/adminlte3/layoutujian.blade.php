@@ -20,11 +20,7 @@
                 <a href="/" class="navbar-brand">
                     <img src="{{ asset('logo.png') }}" alt="{!! config('global.Title2') !!} Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                     <span class="brand-text font-weight-light">
-                    @if(Session('namaaplikasi') !== null)
-                        {!! Session('namaaplikasi') !!}
-                    @else 
-                        {!! config('global.Title2') !!}
-                    @endif
+                    {!! config('global.Title2') !!}
                     </span>
                 </a>
                 <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,38 +43,31 @@
                         @if (Session('id') !== null)
                             <li class="nav-item dropdown user-menu">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-                                    <img src="{!! Session('photo') !!}" class="user-image img-circle elevation-2" alt="User Image">
+                                    <img src="{!! Session('avatar') !!}" class="user-image img-circle elevation-2" alt="User Image">
                                 <span class="d-none d-md-inline">{!! Session('nama') !!}</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                                 <li class="user-header bg-primary">
-                                    <img src="{!! Session('photo') !!}" class="img-circle elevation-2" alt="User Image">
-
+                                    <img src="{!! Session('avatar') !!}" class="img-circle elevation-2" alt="User Image">
                                     <p>
                                     {!! Session('nama') !!}
-                                    <small>{!! Session('previlage') !!} -  {!! Session('fakultas') !!}</small>
+                                    <small>{!! Session('previlage') !!}</small>
                                     </p>
                                 </li>
-                                
                                 <li class="user-footer">
-                                    @if(Session('previlage') == 'mahasiswa' OR Session('previlage') == 'mahasiswa magister' OR Session('previlage') == 'mahasiswa doktoral')
-                                        <a href="{{ url('profileuser') }}" class="btn btn-default btn-flat">Profile</a>
-                                    @else
-                                        <a href="{{ url('profile') }}" class="btn btn-default btn-flat">Profile</a>
-                                    @endif
-                                    <a href="{{ route('logout') }}" class="btn btn-default btn-flat float-right">Sign out</a>
+                                    <a href="#" class="btn btn-default btn-flat float-right btnlogout">Akhiri Ujian</a>
                                 </li>
                                 </ul>
                             </li>
                         @else
                             <li class="nav-item dropdown user-menu">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-                                    <img src="{{ asset('mascot.png') }}" class="user-image img-circle elevation-2" alt="User Image">
+                                    <img src="{{ config('global.logoapss') }}" class="user-image img-circle elevation-2" alt="User Image">
                                     <span class="d-none d-md-inline">{!! config('global.Title2') !!}</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                                 <li class="user-header bg-primary">
-                                    <img src="{{ asset('mascot.png') }}" class="img-circle elevation-2" alt="User Image">
+                                    <img src="{{ config('global.logoapss') }}" class="img-circle elevation-2" alt="User Image">
                                     <p>
                                     {!! config('global.Title2') !!}
                                     <small>{!! config('global.sekolah') !!}</small>
@@ -92,19 +81,15 @@
             </nav>
             <aside class="main-sidebar sidebar-dark-primary elevation-4">
                 <a href="/" class="brand-link">
-                    <img src="{{ asset('logo-ub.png') }}" alt="{!! config('global.Title2') !!} Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                    <img src="{{ asset('logo.png') }}" alt="{!! config('global.Title2') !!} Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                     <span class="brand-text font-weight-light">
-                    @if(Session('namaaplikasi') !== null)
-                        {!! Session('namaaplikasi') !!}
-                    @else 
-                        {!! config('global.Title2') !!}
-                    @endif
+                    {!! config('global.Title2') !!}
                     </span>
                 </a>
                 <div class="sidebar">
                     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                         <div class="info">
-                            <a href="#" class="d-block">Semoga Sukses</a>
+                            <a href="#" class="d-block" data-widget="pushmenu" href="#" role="button">Semoga Sukses</a>
                         </div>
                     </div>
                 </div>

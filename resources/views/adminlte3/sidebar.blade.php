@@ -26,6 +26,7 @@
         <ul class="nav nav-treeview">
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'rencanapembelajaran' ? 'active' : '' }}" href="{{ url('setrps') }}"><i class="fa fa-circle-o nav-icon"></i> Kurikulum</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'banksoal' ? 'active' : '' }}" href="{{ url('banksoal') }}"><i class="fa fa-circle-o nav-icon"></i> Bank Soal</a></li>
+            <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'exam.index' ? 'active' : '' }}" href="{{ route('exam.index') }}"><i class="fa fa-circle-o nav-icon"></i> Manajemen Ujian</a></li>
             <li class="nav-item dropdown">
                 <a href="#" class="nav-link"><i class="nav-icon fa fa-graduation-cap"></i><p>Ruang Guru<i class="right fa fa-angle-left"></i></p></a>
                 <ul class="nav nav-treeview">
@@ -237,7 +238,7 @@
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'persuratan' ? 'active' : '' }}" href="{{ url('persuratan') }}"><i class="fa fa-circle-o nav-icon"></i> Persuratan</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'sarpras' ? 'active' : '' }}" href="{{ url('sarpras') }}"><i class="fa fa-circle-o nav-icon"></i> Sarana dan Prasarana</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'minimi' ? 'active' : '' }}" href="{{ url('minimi') }}"><i class="fa fa-circle-o nav-icon"></i>  Perpustakaan</a></li>
-            <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'datakeluhan' ? 'active' : '' }}" href="{{ url('datakeluhan') }}"><i class="fa fa-circle-o nav-icon"></i> Kritik dan Keluhan</a></li>
+            <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'datakeluhan' ? 'active' : '' }}" href="{{ url('datakeluhan') }}"><i class="fa fa-circle-o nav-icon"></i> Kritik dan Saran</a></li>
         </ul>
     </li>
     <li class="nav-item dropdown">
@@ -247,6 +248,9 @@
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'pengumuman' ? 'active' : '' }}" href="{{ url('pengumuman') }}"><i class="fa fa-circle-o nav-icon"></i>  Pengumuman</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'setting' ? 'active' : '' }}" href="{{ url('setting') }}"><i class="fa fa-circle-o nav-icon"></i> Setting</a></li>
         </ul>
+    </li>
+    <li class="{{ isset($sidebar) && $sidebar == 'buatqr' ? 'active' : '' }} nav-item">
+        <a class="nav-link" href="{{ url('buatqr') }}"><i class="nav-icon fa fa-qrcode text-warning"></i> <p>QrCode Creator</p></a>
     </li>
 @elseif(Session('previlage') == 'Waka Kurikulum')
     <li class="nav-item">
@@ -265,6 +269,7 @@
         <ul class="nav nav-treeview">
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'rencanapembelajaran' ? 'active' : '' }}" href="{{ url('setrps') }}"><i class="fa fa-circle-o nav-icon"></i> Kurikulum</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'banksoal' ? 'active' : '' }}" href="{{ url('banksoal') }}"><i class="fa fa-circle-o nav-icon"></i> Bank Soal</a></li>
+            <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'exam.index' ? 'active' : '' }}" href="{{ route('exam.index') }}"><i class="fa fa-circle-o nav-icon"></i> Manajemen Ujian</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'lognilai' ? 'active' : '' }}" href="{{ url('lognilai') }}"><i class="fa fa-circle-o nav-icon"></i>  Log Perubahan Nilai</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'konseling' ? 'active' : '' }}" href="{{ url('konseling') }}"><i class="fa fa-circle-o nav-icon"></i> Data Bimbingan dan Konseling</a></li>
             @if(Session('sekolah_level') == 1)
@@ -431,6 +436,9 @@
             @endif
         </ul>
     </li>
+    <li class="{{ isset($sidebar) && $sidebar == 'buatqr' ? 'active' : '' }} nav-item">
+        <a class="nav-link" href="{{ url('buatqr') }}"><i class="nav-icon fa fa-qrcode text-warning"></i> <p>QrCode Creator</p></a>
+    </li>
 @elseif(Session('previlage') == 'Waka Kesiswaan')
     <li class="nav-item">
         <a class="nav-link {{ isset($sidebar) && $sidebar == 'dashbord' ? 'active' : '' }}" href="/" role="button"><i class="nav-icon fa fa-tachometer"></i><p>Dashboard</p></a>
@@ -456,6 +464,7 @@
         <ul class="nav nav-treeview">
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'rencanapembelajaran' ? 'active' : '' }}" href="{{ url('setrps') }}"><i class="fa fa-circle-o nav-icon"></i> Kurikulum</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'banksoal' ? 'active' : '' }}" href="{{ url('banksoal') }}"><i class="fa fa-circle-o nav-icon"></i> Bank Soal</a></li>
+            <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'exam.index' ? 'active' : '' }}" href="{{ route('exam.index') }}"><i class="fa fa-circle-o nav-icon"></i> Manajemen Ujian</a></li>
             @if(Session('sekolah_level') == 1)
                 <!--
                 <li class="nav-item dropdown">
@@ -619,6 +628,9 @@
                 </li>
             @endif
         </ul>
+    </li>
+    <li class="{{ isset($sidebar) && $sidebar == 'buatqr' ? 'active' : '' }} nav-item">
+        <a class="nav-link" href="{{ url('buatqr') }}"><i class="nav-icon fa fa-qrcode text-warning"></i> <p>QrCode Creator</p></a>
     </li>
 @elseif(Session('previlage') == 'Waka Kurikulum Al Quran')
     <li class="nav-item">
@@ -644,6 +656,7 @@
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'konseling' ? 'active' : '' }}" href="{{ url('konseling') }}"><i class="fa fa-circle-o nav-icon"></i> Data Bimbingan dan Konseling</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'rencanapembelajaran' ? 'active' : '' }}" href="{{ url('setrps') }}"><i class="fa fa-circle-o nav-icon"></i> Kurikulum</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'banksoal' ? 'active' : '' }}" href="{{ url('banksoal') }}"><i class="fa fa-circle-o nav-icon"></i> Bank Soal</a></li>
+            <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'exam.index' ? 'active' : '' }}" href="{{ route('exam.index') }}"><i class="fa fa-circle-o nav-icon"></i> Manajemen Ujian</a></li>
             @if(Session('sekolah_level') == 1)
                 <!--
                 <li class="nav-item dropdown">
@@ -807,6 +820,9 @@
                 </li>
             @endif
         </ul>
+    </li>
+    <li class="{{ isset($sidebar) && $sidebar == 'buatqr' ? 'active' : '' }} nav-item">
+        <a class="nav-link" href="{{ url('buatqr') }}"><i class="nav-icon fa fa-qrcode text-warning"></i> <p>QrCode Creator</p></a>
     </li>
 @elseif(Session('previlage') == 'level2')
     <li class="nav-item">
@@ -831,6 +847,7 @@
         <ul class="nav nav-treeview">
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'rencanapembelajaran' ? 'active' : '' }}" href="{{ url('setrps') }}"><i class="fa fa-circle-o nav-icon"></i> Kurikulum</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'banksoal' ? 'active' : '' }}" href="{{ url('banksoal') }}"><i class="fa fa-circle-o nav-icon"></i> Bank Soal</a></li>
+            <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'exam.index' ? 'active' : '' }}" href="{{ route('exam.index') }}"><i class="fa fa-circle-o nav-icon"></i> Manajemen Ujian</a></li>
             @if(Session('sekolah_level') == 1)
                 <!--
                 <li class="nav-item dropdown">
@@ -994,6 +1011,9 @@
                 </li>
             @endif
         </ul>
+    </li>
+    <li class="{{ isset($sidebar) && $sidebar == 'buatqr' ? 'active' : '' }} nav-item">
+        <a class="nav-link" href="{{ url('buatqr') }}"><i class="nav-icon fa fa-qrcode text-warning"></i> <p>QrCode Creator</p></a>
     </li>
 @elseif(Session('previlage') == 'level3')
     <li class="nav-item">
@@ -1010,6 +1030,7 @@
         <ul class="nav nav-treeview">
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'rencanapembelajaran' ? 'active' : '' }}" href="{{ url('setrps') }}"><i class="fa fa-circle-o nav-icon"></i> Kurikulum</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'banksoal' ? 'active' : '' }}" href="{{ url('banksoal') }}"><i class="fa fa-circle-o nav-icon"></i> Bank Soal</a></li>
+            <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'exam.index' ? 'active' : '' }}" href="{{ route('exam.index') }}"><i class="fa fa-circle-o nav-icon"></i> Manajemen Ujian</a></li>
             @if(Session('sekolah_level') == 1)
                 <!--
                 <li class="nav-item dropdown">
@@ -1173,6 +1194,9 @@
                 </li>
             @endif
         </ul>
+    </li>
+    <li class="{{ isset($sidebar) && $sidebar == 'buatqr' ? 'active' : '' }} nav-item">
+        <a class="nav-link" href="{{ url('buatqr') }}"><i class="nav-icon fa fa-qrcode text-warning"></i> <p>QrCode Creator</p></a>
     </li>
 @elseif(Session('previlage') == 'level4')
     <li class="nav-item">
@@ -1208,7 +1232,7 @@
                 </ul>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ isset($sidebar) && $sidebar == 'prestasialquran' ? 'active' : '' }}" href="{{ url('prestasialquran') }}" role="button"> <i class="nav-icon fa fa-book"></i><p>Cetak Raport Al Quran</p></a>
+                <a class="nav-link {{ isset($sidebar) && $sidebar == 'cetakrapot' ? 'active' : '' }}" href="{{ url('cetakrapot') }}" role="button"> <i class="nav-icon fa fa-book"></i><p>Cetak Raport</p></a>
             </li>
         </ul>
     </li>
@@ -1219,6 +1243,9 @@
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'pengumuman' ? 'active' : '' }}" href="{{ url('pengumuman') }}"><i class="fa fa-circle-o nav-icon"></i>  Pengumuman</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'setting' ? 'active' : '' }}" href="{{ url('setting') }}"><i class="fa fa-circle-o nav-icon"></i> Setting</a></li>
         </ul>
+    </li>
+    <li class="{{ isset($sidebar) && $sidebar == 'buatqr' ? 'active' : '' }} nav-item">
+        <a class="nav-link" href="{{ url('buatqr') }}"><i class="nav-icon fa fa-qrcode text-warning"></i> <p>QrCode Creator</p></a>
     </li>
 @elseif(Session('previlage') == 'level5')
     <li class="nav-item">
@@ -1235,6 +1262,9 @@
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'laptabungan' ? 'active' : '' }}" href="{{ url('laptabungan') }}"><i class="fa fa-circle-o nav-icon"></i> Laporan Tabungan</a></li>
         </ul>
     </li>
+    <li class="{{ isset($sidebar) && $sidebar == 'buatqr' ? 'active' : '' }} nav-item">
+        <a class="nav-link" href="{{ url('buatqr') }}"><i class="nav-icon fa fa-qrcode text-warning"></i> <p>QrCode Creator</p></a>
+    </li>
 @elseif(Session('previlage') == 'Guru Ekstrakurikuler')
     <li class="nav-item">
         <a class="nav-link {{ isset($sidebar) && $sidebar == 'dashbord' ? 'active' : '' }}" href="/" role="button"><i class="nav-icon fa fa-tachometer"></i><p>Dashboard</p></a>
@@ -1245,6 +1275,9 @@
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'penilaianekskul' ? 'active' : '' }}" href="{{ url('penilaianekskul') }}"><i class="fa fa-circle-o nav-icon"></i>  Penilaian Ekstrakulikuler</a></li>
             <li class="nav-item"><a class="nav-link {{ isset($sidebar) && $sidebar == 'prestasisiswa' ? 'active' : '' }}" href="{{ url('prestasisiswa') }}"><i class="fa fa-circle-o nav-icon"></i> Laporan Prestasi Siswa</a></li>
         </ul>
+    </li>
+    <li class="{{ isset($sidebar) && $sidebar == 'buatqr' ? 'active' : '' }} nav-item">
+        <a class="nav-link" href="{{ url('buatqr') }}"><i class="nav-icon fa fa-qrcode text-warning"></i> <p>QrCode Creator</p></a>
     </li>
 @elseif(Session('previlage') == 'Guru AlQuran')
     <li class="nav-item">
@@ -1390,6 +1423,9 @@
             </ul>
         </li>
     @endif
+    <li class="{{ isset($sidebar) && $sidebar == 'buatqr' ? 'active' : '' }} nav-item">
+        <a class="nav-link" href="{{ url('buatqr') }}"><i class="nav-icon fa fa-qrcode text-warning"></i> <p>QrCode Creator</p></a>
+    </li>
 @elseif(Session('previlage') == 'ortu')
     <li class="nav-item">
         <a class="nav-link {{ isset($sidebar) && $sidebar == 'dashbord' ? 'active' : '' }}" href="/" role="button"><i class="nav-icon fa fa-tachometer"></i><p>Dashboard</p></a>

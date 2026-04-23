@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0"> Pendaftaran Ekstrakulikuler</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-            </ol>
-          </div>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Pendaftaran Ekstrakulikuler</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row" >
                 <div class="col-md-8">
@@ -69,7 +69,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <input type="hidden" id="getaktif" value="{!! $ijin !!}">
 <input type="hidden" id="getfoto">
@@ -82,7 +82,7 @@
 <script type="text/javascript">
     function openedpage( jQuery ){
         var set01=document.getElementById('getaktif').value;
-        if (set01 == ''){
+        if (set01 == 'Di Buka'){
             var token=document.getElementById('token').value;
             var source = {
                 datatype: "json",

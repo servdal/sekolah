@@ -1,13 +1,13 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-        <div class="container">
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-7">
-                    <h1 class="m-0"> TABUNGAN</h1>
+                <div class="col-sm-4">
+                    <h1> TABUNGAN</h1>
                 </div>
-                <div class="col-sm-5">
+                <div class="col-sm-8">
                     <div class="btn-group">
                         <a class="btn btn-app btn-primary" href="{{url('/')}}/lapbayar" data-bs-toggle="tooltip" data-bs-placement="top" title="Seragam, Kegiatan, Peralatan, Buku, SPP, Ekskul, Makan"><i class="fa fa-calculator"></i> SPP</a>
                         <a class="btn btn-app btn-success" href="{{url('/')}}/datakeuhptmasuk" data-bs-toggle="tooltip" data-bs-placement="top" title="Keuangan Sekolah"><i class="fa fa-pencil"></i> Sekolah</a>
@@ -18,8 +18,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
@@ -64,7 +64,7 @@
                         </div>
                         <div class="card-body">
                             <div class="form-group">  
-                                <div class="row">			  
+                                <div class="row">
                                     <div class="input-group margin">
                                         <input type="text" class="form-control" placeholder="Tanggal" id="id_tglcari" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask />
                                         <span class="input-group-btn">
@@ -106,7 +106,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div class="modal fade" id="modalnabung">
     <div class="modal-dialog">
@@ -355,6 +355,7 @@
                 autoheight: true,
                 source: dataAdapter,
                 altrows: true,		
+                theme: "orange",
                 selectionmode: 'singlecell',
                 columns: [			
                     { text: 'Tanggal', datafield: 'marking', width: '10%', align: 'center' },

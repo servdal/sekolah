@@ -79,3 +79,6 @@
 <script src="{{ asset('adminlte3/plugins/autoNumeric/autoNumeric.js') }}" type="text/javascript"></script>
 <script src="{{ asset('plugins/bootstrap-timepicker/bootstrap-timepicker.js') }}"></script>
 <script src="{{ asset('plugins/clockpicker/js/bootstrap-clockpicker.min.js') }}"></script>
+<script src="{{ asset('plugins/qrcode/qrcode.min.js') }}"></script>
+<!--<script src="{{ asset('plugins/pusher.min.js') }}"></script>-->
+<script src="//js.pusher.com/3.1/pusher.min.js"></script>

@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-        <div class="container">
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0"> Setting</h1>
+                    <h1> Setting</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                     </ol>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
@@ -181,6 +181,20 @@
                             {!! Session::get('message') !!}
                         </div>
                     @endif
+					@if(Session::has('success'))
+                        <div class="alert success alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h4><i class="icon fa fa-check"></i>Sukses</h4>
+                            <pre>{{ session('success') }}</pre>
+                        </div>
+                    @endif
+					@if(Session::has('error'))
+                        <div class="alert danger alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h4><i class="icon fa fa-ban"></i>Error</h4>
+                            <pre>{{ session('error') }}</pre>
+                        </div>
+                    @endif
                     <div class="card card-danger shadow">
                         <div class="card-header">
                             <h3 class="card-title">Preview</h3>
@@ -245,21 +259,6 @@
 							</table>
                         </div>
                     </div>
-                    <div class="card card-primary shadow">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fa fa-map-marker"></i> Aktifkan Laman Pendaftaran Ekstrakulikuler</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse"><i class="fa fa-minus"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            @if ($ijin == '')
-                            <button type="button" class="btn btn-success" id="onoffminat">AKTIF</button>
-                            @else 
-                            <button type="button" class="btn btn-danger" id="onoffminat">NONAKTIF</button>
-                            @endif
-                        </div>
-                    </div>
                     <div class="card card-warning shadow">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fa fa-map-marker"></i> Aktifkan Laman Pembayaran ZIS</h3>
@@ -317,6 +316,19 @@
 										<a href="/backup/database"><button type="button" class="btn btn-primary"><i class="fa fa-database"></i></button></a>
 										<a href="/backup/public"><button type="button" class="btn btn-danger"><i class="fa fa-file"></i></button></a>
 									</div>
+                                </dd>
+								<dt>Pull Update</dt>
+                                <dd>Perintah ini berfungsi untuk update aplikasi melalui github</dd>
+                                <dd>
+									<form method="POST" action="/admin/git-pull">
+										@csrf
+										<button
+											onclick="return confirm('Yakin mau git pull?')"
+											class="btn btn-danger"
+										>
+											Git Pull
+										</button>
+									</form>
                                 </dd>
                             </dl>
                         </div>
@@ -440,7 +452,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>

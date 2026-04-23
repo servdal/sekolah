@@ -11,7 +11,7 @@
 		border: thin solid #000;
 	}
 	table.background { 
-		background: url("dist/img/logo-gray.jpg") no-repeat;	
+		background: url("{{$logo_grey") no-repeat;	
 		background-position:center;
 	}
 	</style>

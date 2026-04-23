@@ -6,13 +6,41 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Backup\Tasks\Backup\DbDumperFactory;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+
 use Session;
 
 class BackupController extends Controller
 {
+    public function gitPullMain()
+    {
+        $commands = [
+            ['git', 'pull', 'origin', 'main'],
+            ['php', 'artisan', 'config:cache'],
+        ];
+
+        $output = '';
+
+        foreach ($commands as $command) {
+            $process = new Process($command, base_path());
+            $process->setTimeout(300); // 5 menit
+            $process->run();
+
+            $output .= '$ ' . implode(' ', $command) . PHP_EOL;
+            $output .= $process->getOutput();
+            $output .= $process->getErrorOutput();
+
+            if (!$process->isSuccessful()) {
+                return back()->with('error', $output);
+            }
+        }
+
+        return back()->with('success', $output);
+    }
     public function backupPublicFolder()
     {
-        if (Session('previlage') == 'level1'){
+        if (Session('previlage') == 'level1' OR Session('previlage') == 'level0'){
             $backupFolderPath = storage_path('app/backup');
             if (!file_exists($backupFolderPath)) {
                 mkdir($backupFolderPath, 0755, true);
@@ -33,7 +61,7 @@ class BackupController extends Controller
     }
     public function backupDatabase()
     {
-        if (Session('previlage') == 'level1'){
+        if (Session('previlage') == 'level1' OR Session('previlage') == 'level0'){
             $backupFolderPath = storage_path('app/backup');
             if (!file_exists($backupFolderPath)) {
                 mkdir($backupFolderPath, 0755, true);

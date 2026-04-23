@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Filesystem\Filesystem;
 use App\Sekolah;
 use App\Layanan;
 use App\Pengumuman;
+use App\XFiles;
 use App\Models\User;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
@@ -25,6 +27,7 @@ use PDFCREATOR;
 use DateTime;
 use FeedReader;
 use Redirect;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -34,26 +37,26 @@ class AuthController extends Controller
 		if (isset($cekteks[1])){
 			$domain	= $cekteks[0];
 		}
-		
         $previlage  = Session('previlage');
 		if ($previlage !== null){
-			$url = 'https://'.$domain.'/dashbord';
-			return Redirect::to($url);
+			return redirect('/dashbord');
 		} else {
 			$sql = Sekolah::where('status',1)->get();
 			if(!$sql){
-				return view('accessdenided');	
+				$data['kalimatheader']  	= 'Mohon Maaf';
+				$data['kalimatbody']  		= 'Data Sekolah Tidak di Temukan, Hubungi Tim IT untuk menambahkan minimal 1 Data Sekolah pada tabel db_mstsekolah dengan status 1';
+				return view('errors.notready', $data);
 			}
 			$cekjumlah 			= count($sql);
 			if ($cekjumlah == 1){
 				$sql = Sekolah::where('status',1)->first();
-				$url = 'https://'.$domain.'/frontpage?id='.$sql->id;
-				return Redirect::to($url);
+				return redirect('/frontpage?id='.$sql->id);
 			} else {
 				$data				= [];
 				$data['sidebar']	= 'frontpage';
 				$data['data']		= $sql;
-				return view('landingpage', $data);
+				$data['firebaseid']	= '';
+				return view('frontpage', $data);
 			}
 		}
     }
@@ -107,61 +110,43 @@ class AuthController extends Controller
     	return view('ubah_pass', $data);
     }
 	public function proses_forget(Request $request){
-        $email = $request->input('set01');
-        $ceksek = explode('@', $email);
-		if (isset($ceksek[1])){
-			$cekuser = User::where('username', $email)->first();
-			if (isset($cekuser->id)){
-				$password 	= time();
-				$update = User::where('id', $cekuser->id)->update([
-					'password' 	=>  bcrypt($password),
-				]);
-				if ($update){
-					SendMail::kirimUser($cekuser->nama, $email, $cekuser->username, $password, true);
-					return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Informasi Username dan Password Telah Kami Kirimkan ke Email Anda']);
-					return back();
-				} else {
-					return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Reset Gagal, Silahkan Hubungi Admin']);
-					return back();
-				}
-			} else {
-				$cekemail = User::where('email', $email)->count();
-				if ($cekemail != 0){
-					$password 	= time();
-					$update 	= User::where('email', $email)->update([
-						'password' =>  bcrypt($password),
-					]);
-					if ($update){
-						SendMail::kirimUser($email, $email, 'Sesuai dengan Email yang tersimpan', $password, true);
-						return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Informasi Username dan Password Telah Kami Kirimkan ke Email Anda']);
-						return back();
-					} else {
-						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Reset Gagal, Silahkan Hubungi Admin']);
-						return back();
-					}
-				} else {
-					return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Email Tidak di Temukan dalam database SCO, mohon coba cek email atau coba login sekali lagi']);
-					return back();
-				}	
-			}
-		} else {
-			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Email Tidak Valid, pastikan informasi email ditulis lengkap']);
-			return back();
+        $request->validate([
+			'set01' => ['required', 'email'],
+		]);
+
+		$email = $request->input('set01');
+		$user = User::where('email', $email)->orWhere('username', $email)->first();
+		if ($user && $user->previlage !== 'Arsip') {
+			SendMail::kirim($user->nama, $user->email, true);
 		}
+
+		return response()->json([
+			'icon' => 'success',
+			'warna' => '#5ba035',
+			'status' => 'Sukses',
+			'message' => 'Jika email terdaftar, tautan ubah password akan dikirim.',
+		]);
     }
 	public function exDaftarBaru(Request $request){
+		$request->validate([
+			'val01' => ['required', 'string', 'max:255'],
+			'val02' => ['required', 'string', 'max:100'],
+			'val03' => ['required', 'email', 'max:255'],
+			'val04' => ['nullable', 'string', 'max:50'],
+			'val05' => ['required'],
+		]);
 		$username 	= $request->input('val02');
 		$email 		= $request->input('val03');
 		$nohape 	= $request->input('val04');
-		$fakultas 	= $request->input('val05');
+		$idsekolah 	= $request->input('val05');
 		$cekdomain 	= explode('@', $email);
 		if (isset($cekdomain[1])){
 			$emaildomain = $cekdomain[1];
 		} else {
 			$emaildomain = '';
 		}
-		if ($emaildomain == 'yahoo.com' or $emaildomain == 'yahoo.co.id' OR $emaildomain == 'gmail.com' OR $emaildomain == 'sdtq-daarulukhuwwah.sch.id'){
-			$ceksek 	= Sekolah::where('id', $fakultas)->first();
+		if ($emaildomain == 'yahoo.com' or $emaildomain == 'yahoo.co.id' OR $emaildomain == 'gmail.com' OR $emaildomain == 'sdtqdu.sch.id'){
+			$ceksek 	= Sekolah::where('id', $idsekolah)->first();
 			if (isset($ceksek->id)){
 				$tes1 = User::where('username', $email)->count();
 				if ($tes1 != 0){
@@ -175,31 +160,28 @@ class AuthController extends Controller
 					} else {
 						try {
 							DB::beginTransaction();
-							$user = User::create([
+							$user = User::where('username', $username)->update([
 								'nama'      => $request->input('val01'),
-								'username'  => $email,
 								'email'     => $email,
 								'nip'     	=> $request->input('val04'),
 								'nik'     	=> $request->input('val02'),
 								'firebaseid'=> $request->input('firebaseid'),
-								'password'  => bcrypt(time()),
+									'password'  => bcrypt(Str::random(40)),
 								'fakultas'  => $ceksek->kode_sekolah,
 								'fakpanjang'=> $ceksek->nama_sekolah,
 								'previlage' => 'ortu',
-								'merangkap' => '',
-								'status'	=> 0,
 								'id_sekolah'=> $ceksek->id
 							]);
 							DB::commit();
 							$response = [
-								'status'	=> 'User Created Successfull',
+								'status'	=> 'User Updated Successfull',
 								'message'	=> 'Silahkan Melanjutkan ke Email Anda Untuk Aktivasi',
 								'warna'		=> 'success',
 								'icon'		=> 'fa fa-check',
 							];
-							$tuliskirim = 'Mari Sambut Saudara '.$request->input('val01').' Yang Hari Ini Bergabung';
+							$tuliskirim = 'an '.$request->input('val01').' memperbaharui pendaftaran akunnya, mohon sampaikan ke yang bersangkutan untuk cek email untuk proses pembuatan passwordnya';
 							SendMail::kirim($request->input('val03'),$request->input('val03'));
-							SendMail::mobilenotif($ceksek->kode_sekolah,'all','Admin FireBase',$tuliskirim);
+							event(new \App\Events\NotifController($tuliskirim));
 							return response()->json($response, 201);
 						} catch (\Exception $e) {
 							DB::rollback();
@@ -219,7 +201,7 @@ class AuthController extends Controller
 							'email'     => $email,
 							'nip'     	=> $request->input('val04'),
 							'nik'     	=> $request->input('val02'),
-							'password'  => bcrypt(time()),
+								'password'  => bcrypt(Str::random(40)),
 							'fakultas'  => $ceksek->nama_sekolah,
 							'fakpanjang'=> $ceksek->nama_yayasan,
 							'firebaseid'=> $request->input('firebaseid'),
@@ -228,16 +210,16 @@ class AuthController extends Controller
 							'status'	=> 0,
 							'id_sekolah'=> $ceksek->id
 						]);
-						SendMail::kirim($request->input('val03'),$request->input('val03'));
 						DB::commit();
+						SendMail::kirim($request->input('val03'),$request->input('val03'));
+						$tuliskirim = 'Mari Sambut Saudara '.$request->input('val01').' Yang Hari Ini Bergabung';
+						SendMail::mobilenotif($ceksek->id,'all','Admin FireBase',$tuliskirim);
 						$response = [
 							'status'	=> 'User Created Successfull',
 							'message'	=> 'Silahkan Melanjutkan ke Email Anda Untuk Aktivasi',
 							'warna'		=> 'success',
 							'icon'		=> 'fa fa-check',
 						];
-						$tuliskirim = 'Mari Sambut Saudara '.$request->input('val01').' Yang Hari Ini Bergabung';
-						SendMail::mobilenotif($ceksek->id,'all','Admin FireBase',$tuliskirim);
 						return response()->json($response, 201);
 					} catch (\Exception $e) {
 						DB::rollback();
@@ -247,12 +229,6 @@ class AuthController extends Controller
 						];
 						return response()->json($response, 200);
 					}
-					DB::rollback();
-					$response = [
-						'status'   	=> 'Transaction DB Error',
-						'message'  	=> 'An Error Occured'
-					];
-					return response()->json($response, 200);
 				}
 			} else {
 				$response = [
@@ -270,85 +246,109 @@ class AuthController extends Controller
 		}
     }
 	public function exResetPassword(Request $request){
-        $email 		= $request->input('email');
-		$homebase	= url("/");
-		if ($email == 'setpassword'){
+        $mode 		= $request->input('email');
+		if ($mode == 'setpassword'){
 			$password1 	= $request->input('val02');
 			$password2 	= $request->input('val03');
 			$email 		= $request->input('val04');
-			if ($user = User::where('email',$email)->orderBy('id', 'DESC')->first()) {
-				if ($user->username == 'admin'){
-					$response = [
-						'message'       => 'Admin tidak boleh diubah passwordnya',
-					];
-					return response()->json($response, 200);
-				} else {
-					$input = User::where('id',$user->id)->update([
-						'password'  => bcrypt($password1),
-						'status'	=> 1
-					]);
-					$pesan = 'Verifikasi dan setting password telah disimpan';
-					$response = [
-						'message'		=> $pesan,
-					];
-					return response()->json($response,200);
-				}
-			} else {
-				$response = [
-					'message'       => 'Username/Email yang dimasukkan tidak ditemukan',
-				];
-				return response()->json($response, 200);
+			$token      = $request->input('val05');
+			$purpose    = $request->input('val06', 'verify');
+
+			$validated = validator([
+				'password' => $password1,
+				'password_confirmation' => $password2,
+				'email' => $email,
+				'token' => $token,
+				'purpose' => $purpose,
+			], [
+				'password' => ['required', 'string', 'min:8', 'confirmed'],
+				'email' => ['required', 'email'],
+				'token' => ['required', 'string'],
+				'purpose' => ['required', 'in:verify,reset'],
+			]);
+
+			if ($validated->fails()) {
+				return response()->json([
+					'message' => $validated->errors()->first(),
+				], 422);
 			}
+
+			$user = User::where('email',$email)->orderBy('id', 'DESC')->first();
+			if (! $user) {
+				return response()->json([
+					'message' => 'Token reset password tidak valid atau sudah kedaluwarsa.',
+				], 422);
+			}
+
+			$tokenRow = DB::table('user_action_tokens')
+				->where('email', $email)
+				->where('purpose', $purpose)
+				->where('token_hash', hash('sha256', $token))
+				->whereNull('used_at')
+				->where('expires_at', '>=', now())
+				->latest('id')
+				->first();
+
+			if (! $tokenRow) {
+				return response()->json([
+					'message' => 'Token reset password tidak valid atau sudah kedaluwarsa.',
+				], 422);
+			}
+
+			User::where('id',$user->id)->update([
+				'password'  => bcrypt($password1),
+				'status'	=> 1,
+				'remember_token' => Str::random(60),
+			]);
+
+			DB::table('user_action_tokens')
+				->where('id', $tokenRow->id)
+				->update([
+					'used_at' => now(),
+					'updated_at' => now(),
+				]);
+
+			return response()->json([
+				'message' => 'Password berhasil disimpan. Silahkan login.',
+			],200);
 		} else {
 			$email = $request->input('val01');
-			if ($user = User::where('email',$email)->first()) {
-				if($user->previlage=='pendaftar'){
-					return response()->json([
-						'message'	=> 'User belum aktif/belum terverifikasi.',
-					], 404);
+			if ($email && ($user = User::where('email',$email)->first())) {
+				if($user->previlage !== 'Arsip'){
+					SendMail::kirim($user->nama,$user->email,true);
 				}
-				if($user->previlage=='Arsip'){
-					return response()->json([
-						'message'	=> 'User Telah di Block. Hubungi Dinas terkait untuk mengaktifkan kembali',
-					], 404);
-				}
-				SendMail::kirim($user->nama,$user->email,true);
-				$response = [
-					'message'		=> 'Verifikasi ubah password telah dikirim ke email',
-				];
-				return response()->json($response,200);
-			} else {
-				$response = [
-					'message'       => 'Username/Email yang dimasukkan tidak ditemukan',
-				];
-				return response()->json($response, 404);        	
 			}
-			$response = [
-				'message'			=> 'An Error Occured'
-			];
-			return response()->json($response, 500);
+
+			return response()->json([
+				'message' => 'Jika email terdaftar, tautan ubah password akan dikirim.',
+			],200);
 		}
     }
 	public function verifikasi(Request $request){
-        $key    	= $request->input('key');
+        $token    	= $request->input('token');
+		$email      = $request->input('email');
+		$purpose    = $request->input('purpose', 'verify');
 		$nama 		= '';
-		$email 		= '';
 		$homebase	= url("/");
 		$foto		= $homebase.'/mascot.png';
-        if ($key == '' OR is_null($key)){
+        if ($token == '' || is_null($token) || $email == '' || is_null($email)){
             $validasi 		= false;
-            $message 		= 'Invalid Key';
+            $message 		= 'Token tidak valid.';
         } else {
-            $decrip = SendMail::dekrip($key);
-            if($decrip==false){
+			$user = User::where('email',$email)->orderBy('id', 'DESC')->first();
+			$tokenRow = DB::table('user_action_tokens')
+				->where('email', $email)
+				->where('purpose', $purpose)
+				->where('token_hash', hash('sha256', $token))
+				->whereNull('used_at')
+				->where('expires_at', '>=', now())
+				->latest('id')
+				->first();
+
+            if(! $user || ! $tokenRow){
                 $validasi 	= false;
-                $message 	= 'Invalid Key';
-            }else{
-                $data 		= explode('|', $decrip);
-                $email 		= $data[0]; 
-                $datetime 	= $data[1];
-                $ver 		= $data[2];
-                $user 		= User::where('email',$email)->orderBy('id', 'DESC')->first();
+                $message 	= 'Token tidak valid atau sudah kedaluwarsa.';
+            } else {
                 $nama 		= $user->nama;
 				if (is_null($user->photo)){
 					$foto = $homebase.'/mascot.png';
@@ -362,34 +362,28 @@ class AuthController extends Controller
 						$foto = $homebase.'/mascot.png';
 					}
 				}
-				if($ver=='VER'){
-                    if($user->status == '1'){
-						return redirect('/');
-					}
-                    $datenow    = date('YmdHis');
-                    $now        = strtotime($datenow);
-                    $time       = strtotime($datetime);
-                    $res_time   = $now-$time;
-                    $bataswaktu = 60*7;
-					User::where('id',$user->id)->update(['status' => '1']);
-					$validasi   = true;
-                    $message    = 'Username/Email '.$email.' telah berhasil diverifikasi';
-                }else{
-                    $validasi = false;
-                    $message = 'Invalid Key';
-                }
+				$validasi   = true;
+                $message    = $purpose === 'reset'
+					? 'Silahkan buat password baru Anda.'
+					: 'Silahkan verifikasi akun dengan membuat password baru.';
             }
         }
         $data = array(
             'foto' 		=> $foto,
             'email' 	=> $email,
-            'nama' 		=> $nama,
+			'nama' 		=> $nama,
             'validasi' 	=> $validasi,
             'message' 	=> $message,
+			'token'     => $token,
+			'purpose'   => $purpose,
         );
-    	return view('user_verifikasi-rita', $data);
+    	return view('user_verifikasi', $data);
     }
 	public function exLogin(Request $request){
+		$request->validate([
+			'email' => ['required', 'email'],
+			'password' => ['required', 'string'],
+		]);
         $email    		= $request->input('email');
 		$password   	= $request->input('password');
 		$remember   	= $request->input('remember');
@@ -406,17 +400,17 @@ class AuthController extends Controller
 		} else {
 			$firebase   = '';
 		}
-		$user 		= User::where('email', $email)->where('id_sekolah', $id_sekolah)->first();       
+		$user 		= User::where('email', $email)->first();
 		if ($user) {
 			if (!Hash::check($password, $user->password)) {
 				return response()->json([
-					'message' => 'Password yang dimasukkan salah',
-				], 500);
+					'message' => 'Email atau password tidak valid.',
+				], 422);
 			}
 			if($user->previlage=='Arsip'){
 				return response()->json([
-					'message' => 'User telah di block. Silahkan hubungi administrator',
-				], 500);
+					'message' => 'Email atau password tidak valid.',
+				], 422);
 			}
 			if (isset($remember) OR $remember == 1){
 				$remember = true;
@@ -424,6 +418,7 @@ class AuthController extends Controller
 				$remember = false;
 			}
 			Auth::login($user, $remember);
+			$request->session()->regenerate();
 			$theme01			= 'Admin LT3';
 			$namaapps01  		= config('global.Title2');
 			$domainapps01  		= config('global.yayasan');
@@ -444,19 +439,8 @@ class AuthController extends Controller
 			$sekolah_telp		= '';
 			$sekolah_slogan		= '';
 			$sekolah_logo		= '';
-			$foto 				= $user->photo;
-			if ($foto == '' OR $foto == null){
-				$foto = url("/").'/mascot.png';
-			} else {
-				if (File::exists(public_path() ."/images/pegawai/". $foto)) {
-					$foto = url("/").'/images/pegawai/'.$foto;
-				} else if (File::exists(public_path() ."/dist/img/foto/". $foto)) {
-					$foto = url("/").'/dist/img/foto/'.$foto;
-				} else {
-					$foto = url("/").'/mascot.png';
-				}
-			}
-			$sql = Sekolah::where('id', $id_sekolah)->first();
+			
+			$sql = Sekolah::where('id', $user->id_sekolah)->first();
 			if ($sql){
 				$sekolah_level			= $sql->level;
 				$domainapps01			= $sql->nama_yayasan;
@@ -508,6 +492,12 @@ class AuthController extends Controller
 			} else {
 				$firebaseid = $user->firebaseid;
 			}
+			$cekidmark1 		= XFiles::where('xmarking', 'Foto-'.$user->username)->first();
+			if (isset($cekidmark1->xfile)){
+				$foto 			= $cekidmark1->xfile;
+			} else {
+				$foto 			= url('/').'/'.$logo01;
+			}
 			session([
 				'id'						=> $user->id,
 				'nama' 	    				=> $user->nama,
@@ -521,7 +511,7 @@ class AuthController extends Controller
 				'fbid'		    			=> $firebaseid,
 				'avatar'        			=> $foto,
 				'sekolah_nama_aplikasi'  	=> $namaapps01,
-				'sekolah_id_sekolah'  		=> $id_sekolah,
+				'sekolah_id_sekolah'  		=> $user->id_sekolah,
 				'sekolah_level'  			=> $sekolah_level,
 				'sekolah_nama_yayasan'		=> $domainapps01,
 				'sekolah_nama_sekolah'  	=> $subsubdomainapps01,
@@ -538,7 +528,7 @@ class AuthController extends Controller
 				'sekolah_frontpage'			=> $logofrontapps01,
 				'sekolah_logo'				=> $logo01,
 			]);
-			
+			Session::save();
 			$response = [
 				'message'       => 'User SignIn',
 				'user'          => $user,
@@ -546,26 +536,15 @@ class AuthController extends Controller
 			return response()->json($response, 200);
 		} else {
 			$response = [
-				'message'       => 'Email/Username ('.$email.') yang dimasukkan tidak ditemukan'.$id_sekolah,
+				'message'       => 'Email atau password tidak valid.',
 			];
-			return response()->json($response, 500);
+			return response()->json($response, 422);
 		}
 	
         $response = [
             'message'       => 'An Error Occured'
         ];
         return response()->json($response, 500);  
-    }
-	public function exLogout(Request $request){
-		$idsekolah = session('sekolah_id_sekolah');
-        Auth::logout();
-        $request->session()->regenerate();
-		$request->session()->flush();
-		if ($idsekolah == ''){
-			return redirect('/');
-		} else {
-			return redirect('/frontpage?id='.$idsekolah);
-		}
     }
 	public function getFirebaseaccount($id){
 		$homebase	= url("/");
@@ -574,257 +553,10 @@ class AuthController extends Controller
 			$url = $homebase.'/dashbord';
 			return Redirect::to($url);
 		} else {
-			$firebaseid = $id;
-			$domain 	= parse_url(request()->root())['host'];
-			$cekteks 	= explode("/", $domain);
-			if (isset($cekteks[1])){
-				$domain	= $cekteks[0];
-			}
-			$getdomainid 	= DB::table('app_menu')->where('domain', $domain)->first();
-			if (isset($getdomainid->id)){
-				$ceklaman 			= $getdomainid->sequence;
-				if ($ceklaman == 2){
-					$lamanportal	= $getdomainid->route.$getdomainid->created_by.$getdomainid->updated_at;
-				} else if ($ceklaman == 1){
-					$lamanportal	= $getdomainid->route.$getdomainid->updated_at;
-				} else {
-					$lamanportal	= $getdomainid->route;
-				}
-				$namaapps01  		= $getdomainid->name;
-				$domainapps01  		= $getdomainid->domainapps;
-				$subdomainapps01  	= $getdomainid->subdomainapps;
-				$subsubdomainapps01 = $getdomainid->subsubdomainapps;
-				$addressapps01  	= $getdomainid->addressapps;
-				$kota01  			= $getdomainid->kota;
-				$emailapps01  		= $getdomainid->emailapps;
-				$lamanapps01  		= $getdomainid->route;
-				$logofrontapps01  	= $getdomainid->logofrontapps;
-				$lamanportal		= $lamanportal;
-				$id_sekolah			= 1;
-			} else {
-				$namaapps01  		= config('global.Title2');
-				$domainapps01  		= config('global.yayasan');
-				$subdomainapps01  	= config('global.singkatan');
-				$subsubdomainapps01 = config('global.sekolah');
-				$addressapps01  	= config('global.alamat');
-				$kota01  			= config('global.kota');
-				$emailapps01  		= config('global.email');
-				$lamanapps01  		= config('global.homeweb');
-				$logofrontapps01  	= config('global.logosimaster');
-				$lamanportal		= config('global.homeweb');
-				$logo01				= config('global.logoapss');
-				$id_sekolah			= config('global.id_sekolah');
-			}
-			$fakpanjang			= $subsubdomainapps01;
-			$fakultas   		= $subdomainapps01;
-			$sekolah_level 		= 2;
-			$sekolah_nama_kasek	= '';
-			$sekolah_nis		= '';
-			$sekolah_nss		= '';
-			$sekolah_npsn		= '';
-			$sekolah_telp		= '';
-			$sekolah_slogan		= '';
-			$sekolah_logo		= '';
-			$sql = Sekolah::where('id', $id_sekolah)->first();
-			if ($sql){
-				$sekolah_level			= $sql->level;
-				$domainapps01			= $sql->nama_yayasan;
-				$subsubdomainapps01		= $sql->nama_sekolah;
-				$subdomainapps01		= $sql->kode_sekolah;
-				$sekolah_nama_kasek		= $sql->id_kepala_sekolah;
-				$sekolah_nis			= $sql->nis;
-				$sekolah_nss			= $sql->nss;
-				$sekolah_npsn			= $sql->npsn;
-				$addressapps01			= $sql->alamat;
-				$kota01					= $sql->kota;
-				$sekolah_telp			= $sql->telp;
-				$emailapps01			= $sql->email;
-				$sekolah_slogan			= $sql->slogan;
-				$logo01					= $sql->logo;
-				$logofrontapps01		= $sql->frontpage;
-				$user  		 	= User::where('firebaseid', $firebaseid)->first();
-				if (isset($user->id)){
-					Auth::login($user, true);
-					$theme01			= 'Admin LT3';
-					$foto 				= $user->photo;
-					if ($foto == '' OR is_null($foto)){
-						$foto = url("/").'/mascot.png';
-					} else {
-						if (File::exists(public_path() ."/images/pegawai/". $foto)) {
-							$foto = url("/").'/images/pegawai/'.$foto;
-						} else if (File::exists(public_path() ."/dist/img/foto/". $foto)) {
-							$foto = url("/").'/dist/img/foto/'.$foto;
-						} else {
-							$foto = url("/").'/mascot.png';
-						}
-					}
-					session([
-						'id'						=> $user->id,
-						'nama' 	    				=> $user->nama,
-						'username'					=> $user->username,
-						'previlage'        			=> $user->previlage,
-						'fakultas'					=> $subdomainapps01,
-						'fakpanjang'				=> $subsubdomainapps01,
-						'email'		    			=> $user->email,
-						'nip'		    			=> $user->nip,
-						'spesial'		   	 		=> $user->spesial,
-						'fbid'		    			=> $user->firebaseid,
-						'avatar'        			=> $foto,
-						'sekolah_nama_aplikasi'  	=> $namaapps01,
-						'sekolah_id_sekolah'  		=> $id_sekolah,
-						'sekolah_level'  			=> $sekolah_level,
-						'sekolah_nama_yayasan'		=> $domainapps01,
-						'sekolah_nama_sekolah'  	=> $subsubdomainapps01,
-						'sekolah_kode_sekolah'  	=> $subdomainapps01,
-						'sekolah_nama_kasek'  		=> $sekolah_nama_kasek,
-						'sekolah_nis'  				=> $sekolah_nis,
-						'sekolah_nss'  				=> $sekolah_nss,
-						'sekolah_npsn'				=> $sekolah_npsn,
-						'sekolah_alamat'			=> $addressapps01,
-						'sekolah_kota'				=> $kota01,
-						'sekolah_telp'				=> $sekolah_telp,
-						'sekolah_email'				=> $emailapps01,
-						'sekolah_slogan'			=> $sekolah_slogan,
-						'sekolah_frontpage'			=> $logofrontapps01,
-						'sekolah_logo'				=> $logo01,
-					]);
-					$url = 'https://'.$domain.'/dashbord';
-					return Redirect::to($url);
-				} else {
-					$profile 				= '';
-					$visimisi 				= '';
-					$strukturorganisasi 	= '';
-					$pendidik 				= '';
-					$jadwal 				= '';
-					$kontak 				= '';
-					$sertamerta 			= '';
-					$setiapsaat 			= '';
-					$pengumuman 			= '';
-					$getdata 				= Layanan::orderBy('layanan', 'ASC')->where('id_sekolah',$id_sekolah)->get();
-					if (!empty($getdata)){
-						foreach ($getdata as $rlayanan){
-							$status 		= $rlayanan->status;
-							$layanan 		= $rlayanan->layanan;
-							if ($layanan == 'profile') { $profile = $status; }
-							if ($layanan == 'visimisi') { $visimisi = $status; }
-							if ($layanan == 'strukturorganisasi') { $strukturorganisasi = $status; }
-							if ($layanan == 'pendidik') { $pendidik = $status; }
-							if ($layanan == 'jadwal') { $jadwal = $status; }
-							if ($layanan == 'kontak') { $kontak = $status; }
-							if ($layanan == 'sertamerta') { $sertamerta = $status; }
-							if ($layanan == 'setiapsaat') { $setiapsaat = $status; }
-						}
-					}
-					$groups     = Pengumuman::where('id_sekolah', $id_sekolah)->select('tanggal')->groupBy('tanggal')->orderBy('tanggal', 'DESC')->limit(30)->get();
-					$y      	= 0;
-					$x      	= 0;
-					foreach ($groups as $group) {
-						$tanggal    = $group->tanggal;
-						$rsurat     = Pengumuman::where('id_sekolah', $id_sekolah)->where('tanggal', 'like', '%'. $tanggal . '%')->orderBy('id', 'DESC')->limit(30)->get();
-						foreach ($rsurat as $rowpeng) {
-							$id             =   $rowpeng->id;
-							$jenis          =   $rowpeng->jenis;
-							$siapa          =   $rowpeng->siapa;
-							$nim            =   $rowpeng->nim;
-							$pengumuman     =   $rowpeng->pengumuman;   
-							$created_at     =   $rowpeng->kapan;
-							$kapan          =   SendMail::timeago($created_at);
-							if ($jenis == 'mahasiswa') { 
-								$nama 		= $siapa.'('.$nim.')';
-								$iconne 	= 'fa-user';
-								$jencolor 	= 'green';
-							} else { 
-								$nama 		= $siapa; 
-								$iconne 	= 'fa-bullhorn';
-								$jencolor 	= 'red';
-							}
-							$data['pengumumans'][$x]['id']          =   $id;
-							$data['pengumumans'][$x]['tanggal']     =   $tanggal;
-							$data['pengumumans'][$x]['kapan']       =   $kapan;
-							$data['pengumumans'][$x]['jencolor']    =   $jencolor;
-							$data['pengumumans'][$x]['jenis']       =   $jenis;
-							$data['pengumumans'][$x]['siapa']       =   $siapa;
-							$data['pengumumans'][$x]['pengumuman']  =   $pengumuman;
-							$data['pengumumans'][$x]['icon']        =   $iconne;
-							$data['pengumumans'][$x]['urutanwerno'] =   $urutanwerno[$y];
-							$data['pengumumans'][$x]['urutanbg'] 	=   $urutanbg[$y];
-							if ($y == 9) {
-								$y = 0; 
-							} else {
-								$y++; 
-							}
-							$x++;
-						}
-					}
-					$data['firebaseid']			= $firebaseid;
-					$data['sidebar']			= 'frontpage';
-					$data['profile']			= $profile;
-					$data['visimisi']			= $visimisi;
-					$data['strukturorganisasi']	= $strukturorganisasi;
-					$data['pendidik']			= $pendidik;
-					$data['jadwal']				= $jadwal;
-					$data['kontak']				= $kontak;
-					$data['sertamerta']			= $sertamerta;
-					$data['setiapsaat']			= $setiapsaat;
-					$data['pengumuman']			= $pengumuman;
-					$data['id_sekolah']			= $id_sekolah;
-					$data['nama_yayasan']		= $sql->nama_yayasan;
-					$data['nama_sekolah']		= $sql->nama_sekolah;
-					$data['kode_sekolah']		= $sql->kode_sekolah;
-					$data['nis']				= $sql->nis;
-					$data['nss']				= $sql->nss;
-					$data['npsn']				= $sql->npsn;
-					$data['alamat']				= $sql->alamat;
-					$data['kota']				= $sql->kota;
-					$data['telp']				= $sql->telp;
-					$data['email']				= $sql->email;
-					$data['slogan']				= $sql->slogan;
-					$data['logo']				= $sql->logo;
-					$data['frontpage']			= $sql->frontpage;
-					$data['domain']				= $sql->domain;
-					return view('simaster.default', $data);
-				}
-			} else {
-				return redirect('/');
-			}
-		}
-    }
-	public function authenticatekhusus($id){
-		$data		= [];
-        $user 		= User::where('email', $id)->orWhere('username', $id)->first();       
-		$domain		= parse_url(request()->root())['host'];
-		$cekteks	= explode("/", $domain);
-		$homebase	= url("/");
-		if (isset($cekteks[1])){
-			$domain	= $cekteks[0];
-		}
-		$theme01			= 'Admin LT3';
-		$namaapps01  		= config('global.Title2');
-		$domainapps01  		= config('global.yayasan');
-		$subdomainapps01  	= config('global.singkatan');
-		$subsubdomainapps01 = config('global.sekolah');
-		$addressapps01  	= config('global.alamat');
-		$kota01  			= config('global.kota');
-		$emailapps01  		= config('global.email');
-		$lamanapps01  		= config('global.homeweb');
-		$logofrontapps01  	= config('global.logosimaster');
-		$lamanportal		= config('global.homeweb');
-		$logo01				= config('global.logoapss');
-		$sekolah_level 		= 2;
-		$sekolah_nama_kasek	= '';
-		$sekolah_nis		= '';
-		$sekolah_nss		= '';
-		$sekolah_npsn		= '';
-		$sekolah_telp		= '';
-		$sekolah_slogan		= '';
-		$sekolah_logo		= '';
-		if (isset($user->previlage) AND Session('id') == '1') {
-			Auth::logout();
-			Auth::login($user, true);
-			$user 				= $request->user();
-			$tokenResult   	 	= $user->createToken('Personal Access Token');
-			$token          	= $tokenResult->token;
-			$theme01			= 'Admin LT3';
+			$domain				= str_replace('http://', '', $homebase);
+			$domain				= str_replace('https://', '', $domain);
+			$domain				= str_replace('/', '', $domain);
+			$firebaseid 		= $id;
 			$namaapps01  		= config('global.Title2');
 			$domainapps01  		= config('global.yayasan');
 			$subdomainapps01  	= config('global.singkatan');
@@ -836,7 +568,10 @@ class AuthController extends Controller
 			$logofrontapps01  	= config('global.logosimaster');
 			$lamanportal		= config('global.homeweb');
 			$logo01				= config('global.logoapss');
-			$sekolah_level 		= 2;
+			$id_sekolah			= config('global.id_sekolah');
+			$fakpanjang			= $subsubdomainapps01;
+			$fakultas   		= $subdomainapps01;
+			$sekolah_level 		= config('global.level_sekolah');
 			$sekolah_nama_kasek	= '';
 			$sekolah_nis		= '';
 			$sekolah_nss		= '';
@@ -844,99 +579,101 @@ class AuthController extends Controller
 			$sekolah_telp		= '';
 			$sekolah_slogan		= '';
 			$sekolah_logo		= '';
-			$foto 				= $user->photo;
-			if ($foto == '' OR is_null($foto)){
-				$foto = url("/").'/mascot.png';
-			} else {
-				if (File::exists(public_path() ."/images/pegawai/". $foto)) {
-					$foto = url("/").'/images/pegawai/'.$foto;
-				} else if (File::exists(public_path() ."/dist/img/foto/". $foto)) {
-					$foto = url("/").'/dist/img/foto/'.$foto;
+			$user  		 		= User::where('firebaseid', $firebaseid)->first();
+			if (isset($user->id)){
+				Auth::login($user, true);
+				$sql = Sekolah::where('id', $user->id_sekolah)->first();
+				if ($sql){
+					$id_sekolah				= $sql->id;
+					$sekolah_level			= $sql->level;
+					$domainapps01			= $sql->nama_yayasan;
+					$subsubdomainapps01		= $sql->nama_sekolah;
+					$subdomainapps01		= $sql->kode_sekolah;
+					$sekolah_nama_kasek		= $sql->id_kepala_sekolah;
+					$sekolah_nis			= $sql->nis;
+					$sekolah_nss			= $sql->nss;
+					$sekolah_npsn			= $sql->npsn;
+					$addressapps01			= $sql->alamat;
+					$kota01					= $sql->kota;
+					$sekolah_telp			= $sql->telp;
+					$emailapps01			= $sql->email;
+					$sekolah_slogan			= $sql->slogan;
+					$logo01					= $sql->logo;
+					$logofrontapps01		= $sql->frontpage;
+				}
+				$theme01			= 'Admin LT3';
+				$cekidmark1 		= XFiles::where('xmarking', 'Foto-'.$user->username)->first();
+				if (isset($cekidmark1->xfile)){
+					$foto 			= $cekidmark1->xfile;
 				} else {
-					$foto = url("/").'/mascot.png';
+					$foto 			= url('/').'/'.$logo01;
 				}
-			}
-			$token->expires_at 	= Carbon::now()->addDay(1);
-			$token->save();
-			$sql = Sekolah::where('id', $idsekolah)->first();
-			if ($sql){
-				$sekolah_level			= $sql->level;
-				$domainapps01			= $sql->nama_yayasan;
-				$subsubdomainapps01		= $sql->nama_sekolah;
-				$subdomainapps01		= $sql->kode_sekolah;
-				$sekolah_nama_kasek		= $sql->id_kepala_sekolah;
-				$sekolah_nis			= $sql->nis;
-				$sekolah_nss			= $sql->nss;
-				$sekolah_npsn			= $sql->npsn;
-				$addressapps01			= $sql->alamat;
-				$kota01					= $sql->kota;
-				$sekolah_telp			= $sql->telp;
-				$emailapps01			= $sql->email;
-				$sekolah_slogan			= $sql->slogan;
-				$logo01					= $sql->logo;
-				$logofrontapps01		= $sql->frontpage;
+				session([
+					'id'						=> $user->id,
+					'nama' 	    				=> $user->nama,
+					'username'					=> $user->username,
+					'previlage'        			=> $user->previlage,
+					'fakultas'					=> $user->fakultas,
+					'fakpanjang'				=> $user->fakpanjang,
+					'email'		    			=> $user->email,
+					'nip'		    			=> $user->nip,
+					'spesial'		   	 		=> $user->spesial,
+					'fbid'		    			=> $user->firebaseid,
+					'avatar'        			=> $foto,
+					'sekolah_nama_aplikasi'  	=> $namaapps01,
+					'sekolah_id_sekolah'  		=> $id_sekolah,
+					'sekolah_level'  			=> $sekolah_level,
+					'sekolah_nama_yayasan'		=> $domainapps01,
+					'sekolah_nama_sekolah'  	=> $subsubdomainapps01,
+					'sekolah_kode_sekolah'  	=> $subdomainapps01,
+					'sekolah_nama_kasek'  		=> $sekolah_nama_kasek,
+					'sekolah_nis'  				=> $sekolah_nis,
+					'sekolah_nss'  				=> $sekolah_nss,
+					'sekolah_npsn'				=> $sekolah_npsn,
+					'sekolah_alamat'			=> $addressapps01,
+					'sekolah_kota'				=> $kota01,
+					'sekolah_telp'				=> $sekolah_telp,
+					'sekolah_email'				=> $emailapps01,
+					'sekolah_slogan'			=> $sekolah_slogan,
+					'sekolah_frontpage'			=> $logofrontapps01,
+					'sekolah_logo'				=> $logo01,
+				]);
+				Session::save();
+				$url = 'https://'.$domain.'/dashbord';
+				return Redirect::to($url);
 			} else {
-				$getdomainid 		= DB::table('app_menu')->where('domain', $domain)->first();
-				if (isset($getdomainid->id)){
-					$ceklaman 					= $getdomainid->sequence;
-					if ($ceklaman == 2){
-						$lamanportal			= $getdomainid->route.$getdomainid->created_by.$getdomainid->updated_bt.$firebaseid;
-					} else if ($ceklaman == 1){
-						$lamanportal			= $getdomainid->route.$getdomainid->updated_bt.$firebaseid;
-					} else {
-						$lamanportal			= $getdomainid->route;
-					}
-					$namaapps01  		= $getdomainid->name;
-					$domainapps01  		= $getdomainid->domainapps;
-					$subdomainapps01  	= $getdomainid->subdomainapps;
-					$subsubdomainapps01 = $getdomainid->subsubdomainapps;
-					$addressapps01  	= $getdomainid->addressapps;
-					$kota01  			= $getdomainid->kota;
-					$emailapps01  		= $getdomainid->emailapps;
-					$lamanapps01  		= $getdomainid->route;
-					$logofrontapps01  	= $getdomainid->logofrontapps;
-					$theme01  			= $getdomainid->theme;
-					$logo01  			= $getdomainid->logo;
-					$lamanportal		= $lamanportal;
+				$sql 			= Sekolah::where('status',1)->get();
+				$cekjumlah		= count($sql);
+				if ($cekjumlah == 0){
+					$data['kalimatheader']  	= 'Mohon Maaf';
+					$data['kalimatbody']  		= 'Data Sekolah Tidak di Temukan, Hubungi Tim IT untuk menambahkan minimal 1 Data Sekolah pada tabel db_mstsekolah dengan status 1';
+					return view('errors.notready', $data);
+				} else if ($cekjumlah == 1){
+					$sql = Sekolah::where('status',1)->first();
+					$url = 'https://'.$domain.'/frontpage?id='.$sql->id;
+					return Redirect::to($url);
+				} else {
+					$data				= [];
+					$data['sidebar']	= 'frontpage';
+					$data['data']		= $sql;
+					$data['firebaseid']	= $firebaseid;
+					//return view('frontpage', $data); kalau google playstore harus lsg ke login
+					return view('welcome', $data);
 				}
 			}
-			session([
-				'id'						=> $user->id,
-				'nama' 	    				=> $user->nama,
-				'username'					=> $user->username,
-				'previlage'        			=> $previlage,
-				'fakultas'					=> $subdomainapps01,
-				'fakpanjang'				=> $subsubdomainapps01,
-				'email'		    			=> $user->email,
-				'nip'		    			=> $user->nip,
-				'spesial'		   	 		=> $user->spesial,
-				'fbid'		    			=> $user->firebaseid,
-				'avatar'        			=> $foto,
-				'sekolah_nama_aplikasi'  	=> $namaapps01,
-				'sekolah_id_sekolah'  		=> $idsekolah,
-				'sekolah_level'  			=> $sekolah_level,
-				'sekolah_nama_yayasan'		=> $domainapps01,
-				'sekolah_nama_sekolah'  	=> $subsubdomainapps01,
-				'sekolah_kode_sekolah'  	=> $subdomainapps01,
-				'sekolah_nama_kasek'  		=> $sekolah_nama_kasek,
-				'sekolah_nis'  				=> $sekolah_nis,
-				'sekolah_nss'  				=> $sekolah_nss,
-				'sekolah_npsn'				=> $sekolah_npsn,
-				'sekolah_alamat'			=> $addressapps01,
-				'sekolah_kota'				=> $kota01,
-				'sekolah_telp'				=> $sekolah_telp,
-				'sekolah_email'				=> $emailapps01,
-				'sekolah_slogan'			=> $sekolah_slogan,
-				'sekolah_logo'				=> $logo01,
-				'sekolah_frontpage'			=> $logofrontapps01,
-				'token'						=> $tokenResult->accessToken,
-			]);
-			return redirect('/');
-		} else {
-			$data['judulpesan']			= 'Gagal Render';
-			$data['kalimatheader']		= 'Mohon Maaf';
-			$data['kalimatbody']		= 'ID :'.$id.' / '.Session('id').' FILE TIDAK DITEMUKAN, SILAHKAN HUBUNGI ADMIN / REFRESH HALAMAN INI';
-			return view('errors.pesanerror', $data);
 		}
-	}
+    }
+	public function goToLogin(){
+		$previlage  = Session('previlage');
+		if ($previlage !== null){
+			$url = url('/').'/dashbord';
+			return Redirect::to($url);
+		} else {
+			$data				= [];
+			$data['sidebar']	= 'frontpage';
+			$data['firebaseid']	= '';
+			return view('welcome', $data);
+		}
+		
+    }
 }

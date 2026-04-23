@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-        <div class="container">
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0"> Pengumuman</h1>
+                    <h1> Pengumuman</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                     </ol>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
@@ -59,6 +59,7 @@
                                                 <h3 class="timeline-header">{!! $pengumuman['siapa'] !!}</h3>
                                                 <div class="timeline-body">
                                                     {!! $pengumuman['pengumuman'] !!}
+                                                    <a href="javascript:void(0)" onClick="btnDelPengumuman('{{$pengumuman['id']}}')" class="product-title"><span class="badge badge-danger float-right">Delete</span></a>
                                                 </div>
                                             </div>
                                         </div>
@@ -89,7 +90,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
@@ -103,6 +104,43 @@
         CKEDITOR.env.isCompatible = true;
         CKEDITOR.replace( 'id_pengumuman');
     });
+    function btnDelPengumuman(id){
+        swal({
+            title			    : "Konfirmasi",
+            text			    : "Data yang akan dihapus tidak bisa di kembalikan lagi (undo). Apakah anda yakin.?",
+            type			    : 'warning',
+            showCancelButton    : true,
+            confirmButtonClass  : 'btn btn-confirm mt-2',
+            cancelButtonClass   : 'btn btn-cancel ml-2 mt-2',
+            confirmButtonText   : 'Yes, Delete'
+        }).then(function () {
+            $.ajax({
+                type		: 'ajax',
+                url			: '{{ route("exDestroyer") }}',
+                method		: 'post',
+                data		: {val01:id, val02:'pengumuman',  _token: '{{ csrf_token() }}'},
+                dataType	: 'json',
+                success: function(response, status, xhr) {
+                    swal({
+                        title	: response.status,
+                        text	: response.message,
+                        type	: response.icon,
+                    });
+                    setTimeout(function () { 
+                        window.location.href = '/pengumuman';
+                    }, 2000);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    swal({
+                        title	: textStatus,
+                        text	: jqXHR.responseText,
+                        type	: 'info',
+                    });
+                }
+            });
+        });
+    }
+    
     $(document).ready(function () {
         $('.delpengumuman').on('click', function (){
             var set01	=$(this).attr('id');

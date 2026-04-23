@@ -18,7 +18,7 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="card card-widget widget-user-2">
                         <div class="widget-user-header bg-success">
                             <div class="widget-user-image">
@@ -50,59 +50,132 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-7">
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Pengumuman</h3>
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header p-2">
+                            <ul class="nav nav-pills">
+                                <li class="nav-item"><a class="nav-link navlinkother active" href="#depan" data-toggle="tab">Pengumuman</a></li>
+                                <li class="nav-item"><a class="nav-link navlinkother" href="#formonline" data-toggle="tab">Kalender Akademik</a></li>
+                            </ul>
                         </div>
-                        <div class="card-body row">
-                            <div class="col-md-12">
-                                <!-- The time line -->
-                                <div class="timeline">
-                                @if(isset($pengumumans) && !empty($pengumumans))
-                                    @foreach($pengumumans as $pengumuman)
-                                        <div class="time-label">
-                                            <span class="bg-{{ $pengumuman['urutanwerno'] }}"> {!! $pengumuman['tanggal'] !!}</span>
+                        <div class="card-body">
+                            <div class="tab-content">
+                                <div class="active tab-pane" id="depan">
+                                    <div class="card card-primary">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Pengumuman</h3>
                                         </div>
-                                        <div>
-                                            <i class="{{ $pengumuman['jenis'] }} bg-{{ $pengumuman['urutanwerno'] }}"></i>
-                                            <div class="timeline-item">
-                                                <span class="time"><i class="fa fa-clock"></i> {{ $pengumuman['kapan'] }}</span>
-                                                <h3 class="timeline-header">{!! $pengumuman['siapa'] !!}</h3>
-                                                <div class="timeline-body">
-                                                    {!! $pengumuman['pengumuman'] !!}
+                                        <div class="card-body row">
+                                            <div class="col-md-12">
+                                                <div class="timeline">
+                                                @if(isset($pengumumans) && !empty($pengumumans))
+                                                    @foreach($pengumumans as $pengumuman)
+                                                        <div class="time-label">
+                                                            <span class="bg-{{ $pengumuman['urutanwerno'] }}"> {!! $pengumuman['tanggal'] !!}</span>
+                                                        </div>
+                                                        <div>
+                                                            <i class="{{ $pengumuman['jenis'] }} bg-{{ $pengumuman['urutanwerno'] }}"></i>
+                                                            <div class="timeline-item">
+                                                                <span class="time"><i class="fa fa-clock"></i> {{ $pengumuman['kapan'] }}</span>
+                                                                <h3 class="timeline-header">{!! $pengumuman['siapa'] !!}</h3>
+                                                                <div class="timeline-body">
+                                                                    {!! $pengumuman['pengumuman'] !!}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <div class="time-label">
+                                                        <span class="bg-primary"> {{ date("Y-m-d H:i:s") }}</span>
+                                                    </div>
+                                                    <div>
+                                                        <i class="fa fa-android bg-primary"></i>
+                                                        <div class="timeline-item">
+                                                            <span class="time"><i class="fa fa-clock"></i> now</span>
+                                                            <h3 class="timeline-header">Welcome</h3>
+                                                            <div class="timeline-body">
+                                                                <h2>{{ $namaapps01 }}</h2>
+                                                                <h5>{{ $subsubdomainapps01 }}</h5>
+                                                                <strong>{{ $addressapps01 }}</strong>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                    <div>
+                                                        <i class="fa fa-clock-o bg-gray"></i>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    @endforeach
-                                @else
-                                    <div class="time-label">
-                                        <span class="bg-primary"> {{ date("Y-m-d H:i:s") }}</span>
-                                    </div>
-                                    <div>
-                                        <i class="fa fa-android bg-primary"></i>
-                                        <div class="timeline-item">
-                                            <span class="time"><i class="fa fa-clock"></i> now</span>
-                                            <h3 class="timeline-header">Welcome</h3>
-                                            <div class="timeline-body">
-                                                <h2>{{ $namaapps01 }}</h2>
-                                                <h5>{{ $subsubdomainapps01 }}</h5>
-                                                <strong>{{ $addressapps01 }}</strong>
-                                            </div>
+                                        <div class="card-footer">
                                         </div>
                                     </div>
-                                @endif
-                                    <div>
-                                        <i class="fa fa-clock-o bg-gray"></i>
+                                </div>
+                                <div class="tab-pane" id="formonline">
+                                    <div class="card card-primary shadow">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Kalender Pendidikan</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <div class="card bg-gradient-info">
+                                                        <div class="card-header">
+                                                            <h3 class="card-title"><i class="fa fa-clipboard mr-1"></i>Bulan dan Tahun</h3>
+                                                            <div class="card-tools">
+                                                                <div class="btn-group">
+                                                                    <select id="bulan" name="bulan" class="form-control">
+                                                                        <option value="latest">Pilih Bulan</option>
+                                                                        <option value="01">Januari</option>
+                                                                        <option value="02">Februari</option>
+                                                                        <option value="03">Maret</option>
+                                                                        <option value="04">April</option>
+                                                                        <option value="05">Mei</option>
+                                                                        <option value="06">Juni</option>
+                                                                        <option value="07">Juli</option>
+                                                                        <option value="08">Agustus</option>
+                                                                        <option value="09">September</option>
+                                                                        <option value="10">Oktober</option>
+                                                                        <option value="11">November</option>
+                                                                        <option value="12">Desember</option>
+                                                                    </select>
+                                                                    <select id="tahun" name="tahun" size="1" class="form-control">
+                                                                        @php
+                                                                            $tahun = date('Y');
+                                                                            $limtahunlalu = $tahun - 5;
+                                                                            while ($limtahunlalu != $tahun){
+                                                                                echo '<option value="'.$limtahunlalu.'">'.$limtahunlalu.'</option>';
+                                                                                $limtahunlalu++;
+                                                                            }
+                                                                            echo '<option value="'.$tahun.'" selected>'.$tahun.'</option>';
+                                                                        @endphp
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card-body table-responsive p-0">
+                                                            <div id="tabelkalender"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-8">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h3 class="card-title" id="judul"></h3>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div id="gridjadwalharian"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer">
-                        </div>
                     </div>
                 </div>
-                
             </div>
         </div>
     </section>
@@ -116,27 +189,53 @@
 
 @push('script')
 <script type="text/javascript">
+    var notificationsWrapper   = $('.dropdown-notifications');
+    var notificationsToggle    = notificationsWrapper.find('a[data-toggle]');
+    var notificationsCountElem = notificationsToggle.find('i[data-count]');
+    var notificationsCount     = parseInt(notificationsCountElem.data('count'));
+    var notifications          = $('.isi-notifications');
+    if (notificationsCount <= 0) {
+        notificationsWrapper.hide();
+    }
+    var pusher = new Pusher('461fe095afe037987c11', {
+        encrypted   : true,
+        cluster     : 'ap1'
+    });
+    var channel = pusher.subscribe('my-channel');
+    channel.bind('my-event', function(data) {
+        console.log(data);
+        var existingNotifications   = notifications.html();
+        var newNotificationHtml     = `<a href="#" class="dropdown-item"><i class="fa fa-commenting-o mr-2"></i>`+data.message+`</a><div class="dropdown-divider"></div>`;
+        notifications.html(newNotificationHtml + existingNotifications);
+        notificationsCount += 1;
+        notificationsCountElem.attr('data-count', notificationsCount);
+        notificationsWrapper.find('.notif-count').text(notificationsCount);
+        notificationsWrapper.show();
+    });
     function openedpage( jQuery ){
 		var token=document.getElementById('token').value;
-		$.post('surat/chatgetlist', { _token: token},
+		$.post('{{ route("chatGetlist") }}', { _token: token},
 		function(data){
 			$('#chatbody').html(data);
 		});
 	}
-	window.onload = openedpage;
+    function generateKalender( jQuery ){
+		var bulan=document.getElementById('bulan').value;
+        var tahun=document.getElementById('tahun').value;
+        var token=document.getElementById('token').value;
+        $('#judul').html(bulan+' '+tahun);
+		$.post('{{ route("viewTabelBulan") }}', { month: bulan, year: tahun, bentuk: 'kalender', _token: token},
+		function(data){
+			$('#tabelkalender').html(data);
+		});
+        $.post('{{ route("viewTabelBulan") }}', { month: bulan, year: tahun, bentuk: 'listkalender', _token: token},
+		function(data){
+			$('#gridjadwalharian').html(data);
+		});
+	}
 	setTimeout(function () { 
       openedpage();
     }, 60 * 10000);
-    $('#sendpesan').on('click', function (){
-		var kirim   = document.getElementById('kirimpsn').value;
-		var nama    = '';
-		var foto    = '';
-		var token   = document.getElementById('token').value;
-		$.post('surat/catting', { val01: kirim, val02: nama, val03: foto, _token: token },
-		function(data){
-			$('#chatbody').html(data);
-		});
-	});
     var start = new Date();
     CountDownTimer(start, 'timeremaining');
     function CountDownTimer(dt, id)
@@ -167,7 +266,28 @@
         timer = setInterval(showRemaining, 1000);
     }
     $(document).ready(function () {
-        
+        $("#bulan").on('change', function () {
+            generateKalender();
+        });
+        $("#tahun").on('change', function () {
+            generateKalender();
+        });
+        $('#sendpesan').on('click', function (){
+            var kirim   = document.getElementById('kirimpsn').value;
+            var nama    = '';
+            var foto    = '';
+            var token   = document.getElementById('token').value;
+            var btn = $(this);
+                btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+            $.post('surat/catting', { val01: kirim, val02: nama, val03: foto, _token: token },
+            function(data){
+                $('#kirimpsn').val('');
+                btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+                $('#chatbody').html(data);
+            });
+        });
+        openedpage();
+        generateKalender();
 	});
     
 </script>

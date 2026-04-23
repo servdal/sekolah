@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0"> Welcome {!! $user->nama !!} </h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-            </ol>
-          </div>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Welcome {!! $user->nama !!} </h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row" >
 				<div class="col-md-3">
@@ -88,7 +88,7 @@
                                     <button type="button" class="btn btn-success" id="updatebiodata">Update</button>
                                 </div>
                             </div>
-                        </div><!-- /kiri -->
+                        </div>
                         <div class="col-md-5 col-lg-5">
                             <div class="card card-danger">
                                 <div class="card-header">
@@ -101,10 +101,10 @@
                                 </div>
                                 <div class="card-body">
                                 	<div class="form-group">
-                                        @if(isset($datastaf->foto))
-                                            <img src="{!!$datastaf->foto!!}" alt="image" width="100%" id="preview">
+                                        @if(isset($foto) AND $foto != '')
+                                            <img src="{!!$foto!!}" alt="image" width="100%" id="preview">
                                         @else
-                                            <img src="dist/img/foto/{!!$user->photo!!}" alt="image" width="100%" id="preview">
+                                            <img src="dist/img/takadagambar.png" alt="image" width="100%" id="preview">
                                         @endif
                                         <input type="file" id="id_fotoprofile" style="display: none;"/>
                                         <button type="button" class="btn btn-danger btn-block" id="btnuploadfoto">&nbsp;&nbsp;Upload Pas Foto&nbsp;&nbsp;</button></p>
@@ -122,23 +122,27 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <img src="{!!$user->tandatangan!!}" alt="image" width="100%" id="previewttd">
+                                        @if(isset($tandatangan) AND $tandatangan != '')
+                                            <img src="{!!$tandatangan!!}" alt="image" width="100%" id="previewttd">
+                                        @else
+                                            <img src="dist/img/takadagambar.png" alt="image" width="100%" id="previewttd">
+                                        @endif
                                         <input type="file" id="id_tandatangan" style="display: none;"/>
                                         <button type="button" class="btn btn-info btn-block" id="btnuploadtandatangan">&nbsp;&nbsp;Upload Tandatangan&nbsp;&nbsp;</button></p>
                                     </div>
                                 </div>
                             </div>
-                        </div><!-- /kanan -->
-                    </div><!-- /batas halaman muka -->
+                        </div>
+                    </div>
                     <div id="halamanubahpassword">
                         <div class="card card-primary card-outline" >
                             <div class="card-body box-profile">
                                 <div class="text-center">
-                                    @if(isset($datastaf->foto))
-                                    <img class="profile-user-img img-fluid img-circle" src="{!!$datastaf->foto!!}" alt="User profile picture">
+                                    @if(isset($foto) AND $foto != '')
+                                        <img src="{!!$foto!!}" class="profile-user-img img-fluid img-circle" alt="User profile picture">
                                     @else
-                                        <img class="profile-user-img img-fluid img-circle" src="dist/img/foto/{!!$user->photo!!}" alt="User profile picture">
-                                  @endif
+                                        <img src="dist/img/takadagambar.png" class="profile-user-img img-fluid img-circle" alt="User profile picture">
+                                    @endif
                                 </div>
                                 <h3 class="profile-username text-center">Ubah Password</h3>
                                 <p class="text-muted text-center">{!! $user->name !!}</p>
@@ -163,7 +167,7 @@
 								</div>
                             </div>
                         </div>
-                    </div><!-- /batas halaman Pendidikan -->
+                    </div>
 					<div id="halamanquiz">
 						<div class="card card-warning direct-chat direct-chat-warning shadow">
 							<div class="card-header">
@@ -173,14 +177,14 @@
 								</div>
 							</div>
 							<div class="card-body">
-                                <iframe src="/chatify" width="100%" height="780" style="border: none;"></iframe>
+                                <!-- <iframe src="/chatify" width="100%" height="780" style="border: none;"></iframe> -->
 							</div>
 						</div>
-                    </div><!-- /batas halaman Quiz -->
+                    </div>
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div class="modal modal-info" id="modaluploader">
 	<div class="modal-dialog">
@@ -236,7 +240,8 @@
 </div>
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 <input type="hidden" name="jenisujian" id="jenisujian" value="{{ Session('previlage') }}">
-
+<input type="hidden" id="getfoto" value="{!! $foto !!}">
+<input type="hidden" id="gettandatangan" value="{!! $tandatangan !!}">
 @endsection
 @push('script')
 <script>
@@ -244,11 +249,11 @@
 		bsCustomFileInput.init();
 	});
 	$('#id_fotoprofile').change(function () {
-        if(this.files[0].size > 3000000){
+        if(this.files[0].size > 1000000){
             this.value = "";
 			swal({
 				title	: 'Stop',
-				text	: 'Maksimum file adalah 3Mb',
+				text	: 'Maksimum file adalah 1Mb',
 				type	: 'warning',
 			})
         } else {
@@ -271,15 +276,17 @@
             reader.readAsDataURL(input.files[0]);
             reader.onload = function (e) {
                 $('#preview').attr('src', e.target.result);
+                $('#getfoto').val(e.target.result);
+
             };
         }
     }
 	$('#id_tandatangan').change(function () {
-        if(this.files[0].size > 3000000){
+        if(this.files[0].size > 1000000){
             this.value = "";
 			swal({
 				title	: 'Stop',
-				text	: 'Maksimum file adalah 3Mb',
+				text	: 'Maksimum file adalah 1Mb',
 				type	: 'warning',
 			})
         } else {
@@ -302,6 +309,7 @@
             reader.readAsDataURL(input.files[0]);
             reader.onload = function (e) {
                 $('#previewttd').attr('src', e.target.result);
+                $('#gettandatangan').val(e.target.result);
             };
         }
     }
@@ -329,8 +337,8 @@
             var set04=document.getElementById('id_previlage').value;
             var set05=document.getElementById('id_unitkerja').value;
             var set06=document.getElementById('id_email').value;
-            var set07=document.getElementById('id_fotoprofile');
-            var set08=document.getElementById('id_tandatangan');
+            var set07=document.getElementById('getfoto').value;
+            var set08=document.getElementById('gettandatangan').value;
             if (set02 == ''){ 
                 swal({
                     title	: 'Stop',
@@ -351,14 +359,14 @@
                 })
             } else {
                 var form_data = new FormData();
-                    form_data.append('file', set07.files[0]);
-                    form_data.append('tandatangan', set08.files[0]);
                     form_data.append('val01', set01);
                     form_data.append('val02', set02);
                     form_data.append('val03', set03);
                     form_data.append('val04', set04);
                     form_data.append('val05', set05);
                     form_data.append('val06', set06);
+                    form_data.append('val07', set07);
+                    form_data.append('val08', set08);
                     form_data.append('_token', '{{csrf_token()}}');
                 $.ajax({
                     url: '{{ route("exEditProfil") }}',
@@ -377,7 +385,7 @@
                     error: function (xhr, status, error) {
                         swal({
                             title   : status,
-                            text    :  xhr.responseText,
+                            text    : xhr.responseText,
                             type    : 'info',
                         });
                     }

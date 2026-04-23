@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\NewMessageNotification;
+use App\Http\Controllers\SendMail;
 use App\Keluhan;
 use App\Models\User;
 use App\Dataindukstaff;
@@ -38,10 +41,33 @@ class KomplainController extends Controller
 			return view('errors.gakboleh', $data);
 		}
     }
+	public function viewWistleBlowSystem() {
+		$data 		= [];
+		$previlage  =  Session('previlage');
+		if ($previlage == null OR $previlage == ''){
+			return redirect('/');
+		} else {
+			$tahun						= date("Y");
+			$urutanwerno				= array('red','green','blue','yellow','navy','teal','orange','maroon','black','aqua');
+			$urutanbg					= array('primary','success','warning','info','danger','secondary','primary','success','warning','info');
+			$data['namaapps01']  		= Session('sekolah_nama_aplikasi');
+			$data['domainapps01']  		= Session('sekolah_nama_yayasan');
+			$data['subdomainapps01']  	= Session('sekolah_nama_sekolah');
+			$data['subsubdomainapps01'] = Session('sekolah_kode_sekolah');
+			$data['addressapps01']  	= Session('sekolah_alamat');
+			$data['emailapps01']  		= Session('sekolah_email');
+			$data['lamanapps01']  		= parse_url(request()->root())['host'];
+			$data['logofrontapps01']  	= Session('sekolah_frontpage');
+			$data['logo01']  			= url("/").'/'.Session('sekolah_logo');
+			$data['sidebar']		    = 'wbs';
+			return view('simaster.wbs', $data);
+			
+		}
+    }
     public function getKomplainpribadi(Request $request) {
-    	$nohape		= $request->input('set01');
+    	$nip		= $request->input('set01');
 		$arraysurat	= array();
-		$jprestasi	= Keluhan::where('nip', $nohape)->where('rating', '=', '')->orderBy('created_at', 'ASC')->get();
+		$jprestasi	= Keluhan::where('jenis', $nip)->where('rating', '=', '')->orderBy('created_at', 'ASC')->get();
 		foreach ($jprestasi as $rpeg) {
 			$arraysurat[] = array(
 				'id' 		=> $rpeg->id,
@@ -159,9 +185,9 @@ class KomplainController extends Controller
 			$useragent 		= $agent1.' '.$agent2;
 			$input 			= Keluhan::create([
 				'dari'		=> $nama, 
-				'hostname'	=> $useragent, 
+				'hostname'	=> $useragent,
 				'statuser'	=> $status, 
-				'jenis'		=> 'NIM', 
+				'jenis'		=> Session('nip'), 
 				'nip'		=> $nim, 
 				'nama'		=> $nama, 
 				'kepada'	=> $jenis, 
@@ -177,20 +203,26 @@ class KomplainController extends Controller
 			$idne = $input->id;
 			if ($input){
 				if ($request->hasFile('file')) {
-					$jenfile	= $request->file->getClientOriginalExtension();
-					$jenfile	= strtolower($jenfile);
-					if ($jenfile == 'jpeg' OR $jenfile == 'jpg' ){
-						$file   	= time().'.'.$request->file->getClientOriginalExtension();
+					$jenfile	= $request->file('file')->getClientOriginalExtension();
+					if (strtolower($jenfile) == 'jpeg' OR strtolower($jenfile) == 'jpg' ){
+						$filename   	= Session('sekolah_id_sekolah').'-'.time().'.'.$jenfile;
 						$uploadedFile 	= $request->file('file');
-						Storage::putFileAs('images/komplain/',$uploadedFile,$file);
-						$filename 	= $file;
+						Storage::disk('local')->putFileAs('images/komplain/'.date('Y').'/',$uploadedFile, $filename);
 						Keluhan::where('id', $idne)->update([
-							'gambar'	=> $filename,
-							'extension'	=> $request->file->getClientOriginalExtension(), 
+							'gambar'	=> 'images/komplain/'.date('Y').'/'.$filename,
+							'extension'	=> $jenfile, 
 						]);
 					}
 				}
-				event(new \App\Events\NotifikasiPengguna('Keluhan Dari '.$nama.' terkait '.$tentang.' Sudah Masuk, Mohon segera ditindaklanjuti'));
+				$tuliskirim = 'Keluhan Dari '.$nama.' terkait '.$tentang.' Sudah Masuk, Mohon segera ditindaklanjuti';
+				$getuser    = User::where('id_sekolah', Session('sekolah_id_sekolah'))->where('previlage', 'level1')->orderBy('id', 'DESC')->first();
+				if (isset($getuser->id)){
+					Notification::send($getuser, new NewMessageNotification($tuliskirim));
+					SendMail::notif($getuser->nama, $getuser->email, 'Keluhan', $tuliskirim);
+					SendMail::mobilenotif($getuser->nip, 'perseorangan', $getuser->nama, $tuliskirim);
+				}
+				return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Saved']);
+				return back();
 			} else {
 				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Error, Pastikan Semua Isian Anda Isi. Bila Masih Mendapati Kesulitan Silahkan Hubungi Pihak Admin PSIK Untuk Info Lebih Lanjut.']);
 				return back();
@@ -218,7 +250,7 @@ class KomplainController extends Controller
 				if ($jenfile == 'jpeg' OR $jenfile == 'jpg' ){
 					$file   		= time().'.'.$request->file->getClientOriginalExtension();
 					$uploadedFile 	= $request->file('file');
-					Storage::putFileAs('images/komplain/',$uploadedFile,$file);
+					Storage::disk('local')->putFileAs('images/komplain/',$uploadedFile,$file);
 						
 					$filename 		= $file;
 					Keluhan::where('id', $idne)->update([

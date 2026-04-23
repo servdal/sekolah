@@ -1,13 +1,13 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-		<div class="container">
-			<div class="row mb-2">
-				<div class="col-sm-7">
-					<h1 class="m-0"> Laporan Amil Zakat, Infaq dan Shodaqoh</h1>
-				</div>
-				<div class="col-sm-5">
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-4">
+                    <h1> Laporan ZIS</h1>
+                </div>
+                <div class="col-sm-8">
 					<div class="btn-group">
 						<a class="btn btn-app btn-primary" href="{{url('/')}}/lapbayar" data-bs-toggle="tooltip" data-bs-placement="top" title="Seragam, Kegiatan, Peralatan, Buku, SPP, Ekskul, Makan"><i class="fa fa-calculator"></i> SPP</a>
 						<a class="btn btn-app btn-success" href="{{url('/')}}/datakeuhptmasuk" data-bs-toggle="tooltip" data-bs-placement="top" title="Keuangan Sekolah"><i class="fa fa-pencil"></i> Sekolah</a>
@@ -16,13 +16,13 @@
 						<a class="btn btn-app btn-danger" href="{{url('/')}}/laporankeuhpt" data-bs-toggle="tooltip" data-bs-placement="top" title="Laporan Keuangan"><i class="fa fa-file-excel-o"></i> Laporan</a>
 					</div>
 				</div>
-			</div>
-		</div>
-    </div>
-    <div class="content" >
+            </div>
+        </div>
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-2 col-md-2">
                     <div class="small-box bg-blue">
                         <div class="inner">
                             <h3>{{ $totalzakat }}</h3>
@@ -32,7 +32,7 @@
                         <a href="#" id="topbtnzakatsaja" class="small-box-footer">View Detail <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-2 col-md-2">
                     <div class="small-box bg-yellow">
                         <div class="inner">
                             <h3>{{ $totalmaal }}</h3>
@@ -52,16 +52,15 @@
                         <a href="#" id="topbtnshodaqohsaja" class="small-box-footer">View Detail <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div><!-- ./col -->
-                <div class="col-lg-4" id="sectionutama">
-                    <div class="box box-solid bg-green-gradient">
-                        <div class="box-header">
-                            <i class="fa fa-mortar-board"></i>
-                            <h3 class="box-title">Report</h3>
+                <div class="col-lg-6" id="sectionutama">
+                    <div class="card card-solid bg-orange">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-mortar-board"></i> Report</h3>
                         </div>
-                        <div class="box-body">
+                        <div class="card-body">
                             <div class="form-group">  						
                                 <div class="row">
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-2">
                                         <select id="cekjenis" class="form-control">
                                             <option value="All">ALL</option>
                                             <option value="Fitrah">Fitrah</option>
@@ -69,7 +68,7 @@
                                             <option value="Shodaqoh">Shodaqoh</option>
                                         </select>
                                     </div>
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-2">
                                         <select id="cekbln" class="form-control">
                                             <option value="01">Jan</option>
                                             <option value="02">Feb</option>
@@ -86,16 +85,16 @@
                                             <option value="ALL">ALL</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="input-group margin">
-                                        <input type="text" class="form-control" id="cekthn" value="{{ $tahunne }}">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-warning btn-flat" type="button" id="btnviewdata">View</button>
-                                            <button class="btn btn-danger btn-flat" type="button" id="btnexport">Export</button>
-                                            <button class="btn btn-info btn-flat" type="button" id="btnaddnew">Tambah Data Baru</button>
-                                        </span>				
-                                    </div>	
+									<div class="col-lg-2">
+										<input type="text" class="form-control" id="cekthn" value="{{ date('Y') }}">
+                                    </div>
+									<div class="col-lg-6">
+										<div class="btn-group">
+											<button class="btn btn-warning btn-flat" type="button" id="btnviewdata">View</button>
+											<button class="btn btn-danger btn-flat" type="button" id="btnexport">Export</button>
+											<button class="btn btn-info btn-flat" type="button" id="btnaddnew">Tambah Data Baru</button>
+										</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -110,9 +109,7 @@
                             <div id='grafiksebaran' style="width:100%; height:320px;"></div>
                         </div>
                         <div class="card-footer">
-                            <button class="btn btn-danger btn-block" type="button" id="btntambahdatausername">Tambah Akun Admin</button>
-							<div id="gridusername"></div>
-					    </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-8" id="sectionaksi">
@@ -134,7 +131,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div class="modal fade" id="modalpengguna">
     <div class="modal-dialog">
@@ -600,96 +597,6 @@ $(document).ready(function () {
 	$('#btntambahdatausername').click(function () {
 		$("#user_idne").val('new');
 		$("#modalpengguna").modal('show');
-	});
-	$('#btnsimpanusername').click(function () {
-		var set01=document.getElementById('user_idne').value;
-		var set02=document.getElementById('user_nama').value;
-		var set03=document.getElementById('user_password').value;
-		var set04=document.getElementById('user_username').value;
-		var set05=document.getElementById('user_password').value;
-		var set06='adminzis';
-		var token=document.getElementById('token').value;
-		$.post('exusername', { val01: set01, val02: set02, val03: set03, val04: set04, val05: set05, val06: set06, _token: token },
-		function(data){	
-			$("#modalpengguna").modal('hide');
-			$("#gridusername").jqxGrid("updatebounddata", "filter");
-			$("html, body").animate({ scrollTop: 0 }, "slow");
-			var status  = data.status;
-			var message = data.message;
-			var warna 	= data.warna;
-			var icon 	= data.icon;
-			$.toast({
-				heading: status,
-				text: message,
-				position: 'top-right',
-				loaderBg: warna,
-				icon: icon,
-				hideAfter: 5000,
-				stack: 1
-			});
-			return false;
-		});
-	});
-	$('#btnhapusdatausername').click(function () {
-		var set01=document.getElementById('user_idne').value;
-		var set02=document.getElementById('user_nama').value;
-		var set03=document.getElementById('user_password').value;
-		var set04='hapus';
-		var token=document.getElementById('token').value;
-		$.post('exusername', { val01: set01, val02: set02, val03: set03, val04: set04, val05: '', val06: '',_token: token },
-		function(data){	
-			$("#modalpengguna").modal('hide');
-			$("#gridusername").jqxGrid("updatebounddata", "filter");			
-			$("html, body").animate({ scrollTop: 0 }, "slow");
-			var status  = data.status;
-			var message = data.message;
-			var warna 	= data.warna;
-			var icon 	= data.icon;
-			$.toast({
-				heading: status,
-				text: message,
-				position: 'top-right',
-				loaderBg: warna,
-				icon: icon,
-				hideAfter: 5000,
-				stack: 1
-			});
-			return false;
-		});
-	});
-	var sourcebuku = {
-		datatype: "json",
-		datafields: [
-			{ name: 'idne'},
-			{ name: 'nama', type: 'text'},
-			{ name: 'username', type: 'text'},
-		],
-		url: 'getallusername',
-		cache: false
-	};		
-	var databuku = new $.jqx.dataAdapter(sourcebuku);
-	$("#gridusername").jqxGrid({
-		width: '100%',
-		autoheight: true,
-		source: databuku,
-		theme: "energyblue",
-		selectionmode: 'multiplecellsextended',
-		columns: [			
-			{ text: 'Nama',  datafield: 'nama', width: '40%', align: 'center' },
-			{ text: 'Username', datafield: 'username', width: '40%', align: 'center' },
-			{ text: 'Edit', columntype: 'button', width: '20%', cellsrenderer: function () {
-				return "Edit";
-				}, buttonclick: function (row) {
-					editrow = row;	
-					var offset 		= $("#gridusername").offset();
-					var dataRecord 	= $("#gridusername").jqxGrid('getrowdata', editrow);
-					$("#user_idne").val(dataRecord.idne);
-					$("#user_nama").val(dataRecord.nama);
-					$("#user_username").val(dataRecord.username);
-					$("#modalpengguna").modal('show');
-				}
-			},
-		]
 	});
 	$('#btnsimpanverifikasi').click(function () {
 		var set01=document.getElementById('ver_idne').value;

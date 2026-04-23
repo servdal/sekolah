@@ -129,13 +129,119 @@
                                         <select id="id_tipe" class="form-control">
                                             <option value="choice">Multiple Choice</option>
                                             <option value="esay">Esay (Option A as Key)</option>
+                                            <option value="memasangkan">Memasangkan</option>
+                                            <option value="benarsalah">Benar Salah</option>
+                                            <option value="centang">Centang Jawaban</option>
+                                            <option value="narasi">Narasi Saja</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group deskripsisoal">
                                 <label for="id_deskripsi">Case Deskription</label>
                                 <textarea id="id_deskripsi" rows="15" cols="20"></textarea>
+                            </div>
+                            <div class="form-group memasangkansoal">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="deksripsipasangan01">Deskripsi 01</label>
+                                        <input type="text" class="form-control" placeholder="Kosongkan Bila tidak diperlukan" id="deksripsipasangan01">
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="isipasangan01">Pasangan Deskripsi 01</label>
+                                        <input type="text" class="form-control" placeholder="Wajib terisi bila samping di isi" id="isipasangan01">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="deksripsipasangan02">Deskripsi 02</label>
+                                        <input type="text" class="form-control" placeholder="Kosongkan Bila tidak diperlukan" id="deksripsipasangan02">
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="isipasangan02">Pasangan Deskripsi 02</label>
+                                        <input type="text" class="form-control" placeholder="Wajib terisi bila samping di isi" id="isipasangan02">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="deksripsipasangan03">Deskripsi 03</label>
+                                        <input type="text" class="form-control" placeholder="Kosongkan Bila tidak diperlukan" id="deksripsipasangan03">
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="isipasangan03">Pasangan Deskripsi 03</label>
+                                        <input type="text" class="form-control" placeholder="Wajib terisi bila samping di isi" id="isipasangan03">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="deksripsipasangan04">Deskripsi 04</label>
+                                        <input type="text" class="form-control" placeholder="Kosongkan Bila tidak diperlukan" id="deksripsipasangan04">
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="isipasangan04">Pasangan Deskripsi 04</label>
+                                        <input type="text" class="form-control" placeholder="Wajib terisi bila samping di isi" id="isipasangan04">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="deksripsipasangan05">Deskripsi 05</label>
+                                        <input type="text" class="form-control" placeholder="Kosongkan Bila tidak diperlukan" id="deksripsipasangan05">
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="isipasangan05">Pasangan Deskripsi 05</label>
+                                        <input type="text" class="form-control" placeholder="Wajib terisi bila samping di isi" id="isipasangan05">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="deksripsipasangan06">Deskripsi 06</label>
+                                        <input type="text" class="form-control" placeholder="Kosongkan Bila tidak diperlukan" id="deksripsipasangan06">
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="isipasangan06">Pasangan Deskripsi 06</label>
+                                        <input type="text" class="form-control" placeholder="Wajib terisi bila samping di isi" id="isipasangan06">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="deksripsipasangan07">Deskripsi 07</label>
+                                        <input type="text" class="form-control" placeholder="Kosongkan Bila tidak diperlukan" id="deksripsipasangan07">
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="isipasangan07">Pasangan Deskripsi 07</label>
+                                        <input type="text" class="form-control" placeholder="Wajib terisi bila samping di isi" id="isipasangan07">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="deksripsipasangan08">Deskripsi 08</label>
+                                        <input type="text" class="form-control" placeholder="Kosongkan Bila tidak diperlukan" id="deksripsipasangan08">
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="isipasangan08">Pasangan Deskripsi 08</label>
+                                        <input type="text" class="form-control" placeholder="Wajib terisi bila samping di isi" id="isipasangan08">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="deksripsipasangan09">Deskripsi 09</label>
+                                        <input type="text" class="form-control" placeholder="Kosongkan Bila tidak diperlukan" id="deksripsipasangan09">
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="isipasangan09">Pasangan Deskripsi 09</label>
+                                        <input type="text" class="form-control" placeholder="Wajib terisi bila samping di isi" id="isipasangan09">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="deksripsipasangan10">Deskripsi 10</label>
+                                        <input type="text" class="form-control" placeholder="Kosongkan Bila tidak diperlukan" id="deksripsipasangan10">
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <label for="isipasangan10">Pasangan Deskripsi 10</label>
+                                        <input type="text" class="form-control" placeholder="Wajib terisi bila samping di isi" id="isipasangan10">
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group choice">
                                 <div class="row">
@@ -176,7 +282,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group gambarsoal">
                                 <div class="row">
                                     <div class="col-sm-2" >
                                         <button class="btn btn-success pull-right" type="button" id="btnopenimage1"><i class="fa fa-instagram"></i></button>
@@ -224,7 +330,6 @@
                             </div>
                             <div class="form-group" id="divpreviewdraftsoal">
                                 <button class="btn btn-danger pull-right" type="button" id="btnclosedraftpreviewimage"><i class="fa fa-close"></i></button>
-                                        
                                 <img class="media-object" id="previewdraftsoal" src="{{ url('/') }}//dist/img/takadagambar.png" />
                             </div>
                             <div class="form-group">
@@ -1213,6 +1318,8 @@
                 $('#table_list').dataTable().fnDraw();
             });
             $("#id_tipe").on('change', function () {
+                $('.gambarsoal').show();
+                $('.deskripsisoal').show();
                 var pilihan 	      = $(this).find('option:selected').attr('value');
                 if (pilihan == 'choice'){
                     $('#divopsia').removeClass('col-lg-12 col-md-12').addClass('col-lg-4 col-md-4');
@@ -1232,6 +1339,10 @@
                     $('.esay').hide();
                     $('.choice').show();
                     $("#id_keys").val('A');
+                } else if (pilihan == 'memasangkan'){
+                    $('.gambarsoal').hide();
+                    $('.choice').hide();
+                    
                 } else {
                     $('.colkeys').hide();
                     $("#id_keys").val('LABEL');

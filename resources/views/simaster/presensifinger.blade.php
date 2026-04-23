@@ -30,13 +30,13 @@
                                     <li class="item">
                                         <div class="product-img">
                                             @if ($rguru['foto'] == '' OR $rguru['foto'] == null)
-                                            <a href="javascript:void(0)" onClick="selectasvalue('{{ $rguru['id'] }}')"><img src="{{url('/')}}/{{Session('sekolah_logo')}}" alt="{{ $rguru['nama'] }}" class="img-circle img-size-32 mr-2"></a>
+                                            <a href="javascript:void(0)" onClick="selectasvalue('{{ $rguru['niy'] }}')"><img src="{{url('/')}}/{{Session('sekolah_logo')}}" alt="{{ $rguru['nama'] }}" class="img-circle img-size-32 mr-2"></a>
                                             @else 
-                                            <a href="javascript:void(0)" onClick="selectasvalue('{{ $rguru['id'] }}')"><img src="{{url('/')}}/dist/img/foto/{{ $rguru['foto'] }}" alt="{{ $rguru['nama'] }}" class="img-circle img-size-32 mr-2"></a>
+                                            <a href="javascript:void(0)" onClick="selectasvalue('{{ $rguru['niy'] }}')"><img src="{{url('/')}}/dist/img/foto/{{ $rguru['foto'] }}" alt="{{ $rguru['nama'] }}" class="img-circle img-size-32 mr-2"></a>
                                             @endif
                                         </div>
                                         <div class="product-info">
-                                            <a href="javascript:void(0)" class="product-title" onClick="selectasvalue('{{ $rguru['id'] }}')">{{$rguru['nama']}}
+                                            <a href="javascript:void(0)" class="product-title" onClick="selectasvalue('{{ $rguru['niy'] }}')">{{$rguru['nama']}}
                                             <span class="badge badge-warning float-right">{{$rguru['idfinger']}}</span></a>
                                             <span class="product-description">
                                                 {{$rguru['jabatan']}}
@@ -103,7 +103,12 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <div id="gridarea"></div>
+                            <div class="card-body">
+                                <div id="gridarea"></div>
+                            </div>
+                            <div class="card-body" id="divpencarian">
+                                <div id="gridareapencarian"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -122,11 +127,140 @@
         bsCustomFileInput.init();
 	});
     function selectasvalue(id){
-        var url = '{{url('/')}}/profilpegawai/'+id;
-        window.location=url;
+        var set01=document.getElementById('tapel').value;
+        var set02=document.getElementById('id_semester').value;
+        var formdata = new FormData();
+            formdata.append('file', null);
+            formdata.set('tapel',set01);
+            formdata.set('semester',set02);
+            formdata.set('id',id);
+            formdata.set('_token','{{ csrf_token() }}');
+        url='{{ route("exPresFinger") }}';
+        $.ajax({
+            type        : 'ajax',
+            url         : url,
+            method      : 'post',
+            data        : formdata,
+            cache       : false,
+            contentType : false,
+            processData : false,
+            dataType    : 'json',
+            success: function(response, status, xhr) {
+                $('#loading').hide();
+                var status  = response.status;
+                var message = response.message;
+                var warna 	= response.warna;
+                var icon 	= response.icon;
+                $.toast({
+                    heading     : status,
+                    text        : message,
+                    position    : 'top-right',
+                    loaderBg    : warna,
+                    icon        : icon,
+                    hideAfter   : 5000,
+                    stack       : 1
+                });
+                var source = {
+                    datatype: "json",
+                    datafields: [
+                        { name: 'tanggal', type: 'string' },
+                        { name: 'jam1', type: 'string' },
+                        { name: 'jam2', type: 'string' },
+                        { name: 'jam3', type: 'string' },
+                        { name: 'pin' },
+                        { name: 'nip', type: 'string' },
+                        { name: 'nama', type: 'string' },
+                        { name: 'jabatan', type: 'string' },
+                        { name: 'departemen', type: 'string' },
+                        { name: 'kantor', type: 'string' },
+                        { name: 'catatan', type: 'string' },
+                        { name: 'status', type: 'string' },
+                    ],
+                    id			: 'id',
+                    localData	: response.data
+                };
+                var dataAdapter = new $.jqx.dataAdapter(source);
+                $("#gridarea").jqxGrid({
+                    width           : '100%',
+                    pageable        : true,
+                    autoheight      : true,
+                    filterable      : true,
+                    showfilterrow   : true,
+                    source          : dataAdapter,
+                    sortable        : true,
+                    columnsresize   : true,
+                    theme           : "energyblue",
+                    columns: [
+                        { text: 'Tanggal', datafield: 'tanggal', width: '10%', cellsalign: 'center', align: 'center'  },
+                        { text: 'Scan 1', datafield: 'jam1', width: '8%', cellsalign: 'center', align: 'center' },
+                        { text: 'Scan 2', datafield: 'jam2', width: '8%', cellsalign: 'center', align: 'center' },
+                        { text: 'Scan 3', datafield: 'jam3', width: '8%', cellsalign: 'center', align: 'center' },
+                        { text: 'PIN', datafield: 'pin', width: '6%', cellsalign: 'center', align: 'center' },
+                        { text: 'Nama', datafield: 'nama', width: '25%', cellsalign: 'left', align: 'center' },
+                        { text: 'Jabatan', datafield: 'jabatan', width: '20%', cellsalign: 'left', align: 'center'  },
+                        { text: 'TAPEL', filtertype: 'checkedlist', datafield: 'departemen', width: '8%', cellsalign: 'center', align: 'center'  },
+                        { text: 'Semester', filtertype: 'checkedlist', datafield: 'kantor', width: '7%', cellsalign: 'center', align: 'center' },
+                        
+                    ]
+                });
+                var sourcepresensikelas = {
+                    datatype: "json",
+                    datafields: [
+                        { name: 'tanggal', type: 'string' },
+                        { name: 'mulai', type: 'string' },
+                        { name: 'akhir', type: 'string' },
+                        { name: 'jammulai', type: 'string' },
+                        { name: 'jamakhir', type: 'string' },
+                        { name: 'hari', type: 'string' },
+                        { name: 'ruang', type: 'string' },
+                        { name: 'matapelajaran', type: 'string' },
+                        { name: 'kelas', type: 'string' },
+                        { name: 'semester', type: 'string' },
+                        { name: 'tapel', type: 'string' },
+                        { name: 'guruyanghadir', type: 'string' },
+                        { name: 'materi', type: 'string' },
+                    ],
+                    localData	: response.datapresensikelas
+                };
+                var dataJson = new $.jqx.dataAdapter(sourcepresensikelas);
+                $('#divpencarian').show();
+                $("#gridareapencarian").jqxGrid({
+                    width           : '100%',
+                    pageable        : true,
+                    autoheight      : true,
+                    filterable      : true,
+                    showfilterrow   : true,
+                    columnsresize   : true,
+                    source          : dataJson,
+                    sortable        : true,
+                    columnsresize   : true,
+                    theme           : "energyblue",
+                    columns: [
+                        { text: 'Tanggal', datafield: 'tanggal', width: '10%', cellsalign: 'center', align: 'center'  },
+                        { text: 'Mulai', datafield: 'jammulai', width: '8%', cellsalign: 'center', align: 'center' },
+                        { text: 'Akhir', datafield: 'jamakhir', width: '8%', cellsalign: 'center', align: 'center' },
+                        { text: 'Ruang', datafield: 'ruang', width: '8%', cellsalign: 'center', align: 'center' },
+                        { text: 'Kelas', datafield: 'kelas', width: '6%', cellsalign: 'center', align: 'center' },
+                        { text: 'Nama', datafield: 'guruyanghadir', width: '25%', cellsalign: 'left', align: 'center' },
+                        { text: 'Mata Pelajaran', datafield: 'matapelajaran', width: '20%', cellsalign: 'left', align: 'center'  },
+                        { text: 'Materi', datafield: 'materi', width: '15%', cellsalign: 'center', align: 'center'  },
+                    ]
+                });
+                return false;
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                $('#loading').hide();
+                swal({
+                    title	: textStatus,
+                    text	:  jqXHR.responseText,
+                    type	: 'info',
+                });
+            }
+        });
     }
     $(document).ready(function () {
         $('#loading').hide();
+        $('#divpencarian').hide();
         $('.btnrefresh').click(function () {
             var uri = window.location.href.split("#")[0];
             window.location=uri
@@ -182,20 +316,16 @@
                         var source = {
                             datatype: "json",
                             datafields: [
-                                { name: 'tanggalscan', type: 'string' },
                                 { name: 'tanggal', type: 'string' },
-                                { name: 'jam', type: 'string' },
+                                { name: 'jam1', type: 'string' },
+                                { name: 'jam2', type: 'string' },
+                                { name: 'jam3', type: 'string' },
                                 { name: 'pin' },
                                 { name: 'nip', type: 'string' },
                                 { name: 'nama', type: 'string' },
                                 { name: 'jabatan', type: 'string' },
                                 { name: 'departemen', type: 'string' },
                                 { name: 'kantor', type: 'string' },
-                                { name: 'verifikasi' },
-                                { name: 'deviceio', type: 'string' },
-                                { name: 'workcode' },
-                                { name: 'serialnumber', type: 'string' },
-                                { name: 'namamesin', type: 'string' },
                                 { name: 'catatan', type: 'string' },
                                 { name: 'status', type: 'string' },
                             ],
@@ -215,12 +345,13 @@
                             columnsresize   : true,
                             theme           : "energyblue",
                             columns: [
-                                { text: 'Tanggal Scan', datafield: 'tanggalscan', width: '12%', cellsalign: 'center', align: 'center' },
-                                { text: 'Tanggal', datafield: 'tanggal', width: '8%', cellsalign: 'center', align: 'center'  },
-                                { text: 'Jam', datafield: 'jam', width: '6%', cellsalign: 'center', align: 'center' },
-                                { text: 'PIN', datafield: 'pin', width: '6%', cellsalign: 'center', align: 'center' },
+                                { text: 'Tanggal', datafield: 'tanggal', width: '10%', cellsalign: 'center', align: 'center'  },
+                                { text: 'Scan 1', datafield: 'jam1', width: '6%', cellsalign: 'center', align: 'center' },
+                                { text: 'Scan 2', datafield: 'jam2', width: '6%', cellsalign: 'center', align: 'center' },
+                                { text: 'Scan 3', datafield: 'jam3', width: '6%', cellsalign: 'center', align: 'center' },
+                                { text: 'PIN', datafield: 'pin', width: '5%', cellsalign: 'center', align: 'center' },
                                 { text: 'Nama', datafield: 'nama', width: '20%', cellsalign: 'left', align: 'center' },
-                                { text: 'Jabatan', datafield: 'jabatan', width: '13%', cellsalign: 'left', align: 'center'  },
+                                { text: 'Jabatan', datafield: 'jabatan', width: '12%', cellsalign: 'left', align: 'center'  },
                                 { text: 'TAPEL', filtertype: 'checkedlist', datafield: 'departemen', width: '8%', cellsalign: 'center', align: 'center'  },
                                 { text: 'Semester', filtertype: 'checkedlist', datafield: 'kantor', width: '7%', cellsalign: 'center', align: 'center' },
                                 { text: 'Status', filtertype: 'checkedlist', datafield: 'status', width: '7%', cellsalign: 'center', align: 'center' },

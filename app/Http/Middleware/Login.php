@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Carbon\Carbon;
+use Session;
 
 class Login
 {
@@ -16,33 +16,19 @@ class Login
      */
     public function handle($request, Closure $next)
     {
-        $response = $next($request);
+        $response   =   $next($request);
+        $allowedEmails = ['servdal@gmail.com', 'swandhana17@gmail.com', 'info@sdtqdu.sch.id']; // Tambahkan email yang diizinkan
+
+        // Cek apakah email pengguna yang login ada dalam daftar yang diizinkan
+        if (!in_array(Session('email'), $allowedEmails)) {
+            $data['kalimatheader']  	= 'Mohon Maaf';
+        	$data['kalimatbody']  		= Session('email').' Laman ini menggunakan hak akses spesial';
+            return view('errors.notready', $data);
+        }
+        if ( Session('id') != 2 ) {
+            return redirect('/');
+        }
 
         return $response;
-    }
-
-    public function terminate($request, $response)
-    {
-        if (! \Auth::check())
-            return;
-
-        $user = \Auth::user();
-
-        if (!$user->session_id) {
-            $user->session_id = \Session::getId();
-            $user->last_activity = Carbon::now();
-            $user->save();
-        } else {
-            $last_session = \Session::getHandler()->read($user->session_id);
-            if ($last_session) {
-                \Auth::logout();
-                \Session::getHandler()->destroy(\Session::getId());
-                \Session::flash('session', 'Someone already logged in.');
-                $tasks['judulpesan']	= 'Session Not Valid';
-				$tasks['kalimatheader']	= 'Mohon Relogin';
-				$tasks['kalimatbody']	= 'Someone already logged in.';
-				return view('errors.pesanerror', $tasks);
-            }
-        }
     }
 }

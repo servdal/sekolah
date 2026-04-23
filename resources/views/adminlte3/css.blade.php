@@ -33,4 +33,3 @@
 <link rel="stylesheet" href="{{ asset('adminlte3/plugins/summernote/summernote-bs4.min.css') }}" type="text/css" />
 <link href="{{ asset('plugins/bootstrap-timepicker/bootstrap-timepicker.min.css') }}" rel="stylesheet">
 <link href="{{ asset('plugins/clockpicker/css/bootstrap-clockpicker.min.css') }}" rel="stylesheet">
-<link rel="stylesheet" href="{{ asset('dist/css/mushaf.css') }}" type="text/css" />

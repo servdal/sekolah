@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0"> Data Induk Staff</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-            </ol>
-          </div>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Data Induk Staff</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row" >
                 <div class="col-md-4">
@@ -25,7 +25,7 @@
                             <h3 class="card-title">Input Data Staff Baru</h3>
                         </div>
                         <form id="kt_form" enctype="multipart/form-data">
-						<div class="card-body">
+                        <div class="card-body">
                             <div class="form-group">
                                 <label>Nama Lengkap *)</label>
                                 <input type="text" id="id_nama" name="id_nama" class="form-control">
@@ -85,6 +85,7 @@
                                             <option value="PTY">Pegawai Tetap Yayasan</option>
                                             <option value="PTT">Pegawai Tidak Tetap</option>
                                             <option value="Pengabdian">Pengabdian</option>
+                                            <option value="Guru Ekstrakulikuler">Guru Ekstrakulikuler</option>
                                         </select>
                                     </div>
                                 </div>			  
@@ -94,37 +95,46 @@
                                 <div class="row">
                                     <div class="col-sm-8">
                                         <select id="id_jabatan" name="id_jabatan" class="form-control" >
-                                        <option value=""></option>
-                                        <option value="Kepala Sekolah">Kepala Sekolah</option>
-                                        <option value="Waka Kesiswaan">Waka Kesiswaan</option>
-                                        <option value="Waka Kurikulum">Waka Kurikulum</option>
-                                        <option value="Wali Kelas">Wali Kelas</option>
-                                        <option value="Guru Kelas">Guru Kelas</option>
-                                        <option value="Guru PAI">Guru PAI</option>
-                                        <option value="Guru PJOK">Guru PJOK</option>
-                                        <option value="Guru Pendamping Khusus (GPK)">Guru Pendamping Khusus (GPK)</option>
-                                        <option value="Staf TU">Staf TU</option>
-                                        <option value="Pustakawan">Pustakawan</option>
-                                        <option value="Koperasi">Koperasi</option>
-                                        <option value="Security">Security</option>
-                                        <option value="Cleanning Service">Cleanning Service</option>
+                                            <option value=""></option>
+                                            <option value="Kepala Sekolah">Kepala Sekolah</option>
+                                            <option value="Waka Kesiswaan">Waka Kesiswaan</option>
+                                            <option value="Waka Kurikulum">Waka Kurikulum</option>
+                                            <option value="Waka AlQuran">Waka AlQuran</option>
+                                            <option value="Wali Kelas">Wali Kelas</option>
+                                            <option value="Guru Kelas">Guru Kelas</option>
+                                            <option value="Guru PAI">Guru PAI</option>
+                                            <option value="Guru AlQuran">Guru AlQuran</option>
+                                            <option value="Guru PJOK">Guru PJOK</option>
+                                            <option value="Guru Pendamping Khusus (GPK)">Guru Pendamping Khusus (GPK)</option>
+                                            <option value="Staf TU">Staf TU</option>
+                                            <option value="Bendahara">Bendahara</option>
+                                            <option value="Fasilitator Level 1a">Fasilitator Level 1a</option>
+                                            <option value="Fasilitator Level 1b">Fasilitator Level 1b</option>
+                                            <option value="Fasilitator Level 2">Fasilitator Level 2</option>
+                                            <option value="Fasilitator Level 3">Fasilitator Level 3</option>
+                                            <option value="Fasilitator Level 4">Fasilitator Level 4</option>
+                                            <option value="Fasilitator Level 5">Fasilitator Level 5</option>
+                                            <option value="Pustakawan">Pustakawan</option>
+                                            <option value="Koperasi">Koperasi</option>
+                                            <option value="Security">Security</option>
+                                            <option value="Cleanning Service">Cleanning Service</option>
                                         </select>
                                     </div> 
                                     <div class="col-sm-4">
                                         <select id="id_ijasah" name="id_ijasah" class="form-control" >
-                                        <option value=""></option>
-                                        <option value="S3">S3</option>
-                                        <option value="S2">S2</option>
-                                        <option value="S1">S1</option>
-                                        <option value="DIII">DIII</option>
-                                        <option value="DII">DII</option>
-                                        <option value="DI">DI</option>
-                                        <option value="SMA">SMA</option>
-                                        <option value="SMK">SMK</option>
-                                        <option value="STM">STM</option>
-                                        <option value="SMEA">SMEA</option>
-                                        <option value="SMP">SMP</option>
-                                        <option value="SD">SD</option>
+                                            <option value=""></option>
+                                            <option value="S3">S3</option>
+                                            <option value="S2">S2</option>
+                                            <option value="S1">S1</option>
+                                            <option value="DIII">DIII</option>
+                                            <option value="DII">DII</option>
+                                            <option value="DI">DI</option>
+                                            <option value="SMA">SMA</option>
+                                            <option value="SMK">SMK</option>
+                                            <option value="STM">STM</option>
+                                            <option value="SMEA">SMEA</option>
+                                            <option value="SMP">SMP</option>
+                                            <option value="SD">SD</option>
                                         </select>
                                     </div>
                                 </div>
@@ -153,7 +163,7 @@
                             <button type="button" class="btn btn-primary" id="btnsimpansiswa">
                                 <i class="fa fa-save"></i>
                             </button>
-					    </div>
+                        </div>
                         </form>
                     </div>
                 </div>
@@ -174,8 +184,8 @@
                     </div>
                 </div>
             </div>
-		</div>
-	</div>
+        </div>
+    </section>
 </div>
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 <div class="modal fade" id="editdatainduk">
@@ -248,6 +258,8 @@
                                 <option value="PTY">Pegawai Tetap Yayasan</option>
                                 <option value="PTT">Pegawai Tidak Tetap</option>
                                 <option value="Pengabdian">Pengabdian</option>
+                                <option value="Guru Ekstrakulikuler">Guru Ekstrakulikuler</option>
+                                <option value="Non Aktif">Pensiun / Meninggal / Menggundurkan Diri</option>
                             </select>
                         </div>
                     </div>
@@ -261,12 +273,21 @@
                                 <option value="Kepala Sekolah">Kepala Sekolah</option>
                                 <option value="Waka Kesiswaan">Waka Kesiswaan</option>
                                 <option value="Waka Kurikulum">Waka Kurikulum</option>
+                                <option value="Waka AlQuran">Waka AlQuran</option>
                                 <option value="Wali Kelas">Wali Kelas</option>
                                 <option value="Guru Kelas">Guru Kelas</option>
                                 <option value="Guru PAI">Guru PAI</option>
+                                <option value="Guru AlQuran">Guru AlQuran</option>
                                 <option value="Guru PJOK">Guru PJOK</option>
                                 <option value="Guru Pendamping Khusus (GPK)">Guru Pendamping Khusus (GPK)</option>
                                 <option value="Staf TU">Staf TU</option>
+                                <option value="Bendahara">Bendahara</option>
+                                <option value="Fasilitator Level 1a">Fasilitator Level 1a</option>
+                                <option value="Fasilitator Level 1b">Fasilitator Level 1b</option>
+                                <option value="Fasilitator Level 2">Fasilitator Level 2</option>
+                                <option value="Fasilitator Level 3">Fasilitator Level 3</option>
+                                <option value="Fasilitator Level 4">Fasilitator Level 4</option>
+                                <option value="Fasilitator Level 5">Fasilitator Level 5</option>
                                 <option value="Pustakawan">Pustakawan</option>
                                 <option value="Koperasi">Koperasi</option>
                                 <option value="Security">Security</option>
@@ -332,7 +353,6 @@
 <script>
 $(document).ready(function () {
     $('.datemaskinput').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
-
 	$('#exportgrid').click(function(){
 		var gridContent = $("#griddatainduk").jqxGrid('exportdata', 'json');
 		data = $.parseJSON(gridContent);
@@ -465,24 +485,25 @@ $(document).ready(function () {
 			{ text: 'Edit', editable: false, sortable: false, filterable: false, columntype: 'button', width: 50, cellsrenderer: function () {
 				return "Edit";
 				}, buttonclick: function (row) {
-						editrow = row;
-						var offset 		= $("#griddatainduk").offset();		
-						var dataRecord 	= $("#griddatainduk").jqxGrid('getrowdata', editrow);
-						$("#edit_idne").val(dataRecord.id);
-						$("#edit_tmt").val(dataRecord.tmt);
-						$("#edit_finger").val(dataRecord.idfinger);
-						$("#edit_nama").val(dataRecord.nama);
-						$("#edit_ttl").val(dataRecord.ttl);
-						$("#edit_nuptk").val(dataRecord.nuptk);
-						$("#edit_niy").val(dataRecord.niy);
-						$("#edit_kelamin").val(dataRecord.kelamin);
-						$("#edit_agama").val(dataRecord.agama);
-						$("#edit_status").val(dataRecord.statpeg);
-						$("#edit_jabatan").val(dataRecord.jabatan);
-						$("#edit_ijasah").val(dataRecord.ijasah);
-						$("#edit_alamat").val(dataRecord.alamat);
-						$("#edit_hape").val(dataRecord.notelp);
-						$("#editdatainduk").modal('show');	
+                    editrow = row;
+                    var offset 		= $("#griddatainduk").offset();
+                    var dataRecord 	= $("#griddatainduk").jqxGrid('getrowdata', editrow);
+                    $("#edit_idne").val(dataRecord.id);
+                    $("#edit_tmt").val(dataRecord.tmt);
+                    $("#edit_finger").val(dataRecord.idfinger);
+                    $("#edit_nama").val(dataRecord.nama);
+                    $("#edit_ttl").val(dataRecord.ttl);
+                    $("#edit_nuptk").val(dataRecord.nuptk);
+                    $("#edit_niy").val(dataRecord.niy);
+                    $("#edit_kelamin").val(dataRecord.kelamin);
+                    $("#edit_agama").val(dataRecord.agama);
+                    $("#edit_status").val(dataRecord.statpeg);
+                    $("#edit_jabatan").val(dataRecord.jabatan);
+                    $("#edit_ijasah").val(dataRecord.ijasah);
+                    $("#edit_alamat").val(dataRecord.alamat);
+                    $("#edit_hape").val(dataRecord.notelp);
+                    $("#edit_foto").val('');
+                    $("#editdatainduk").modal('show');	
 				}
 			},
 		],                
@@ -490,6 +511,8 @@ $(document).ready(function () {
     $('#btnsimpansiswa').click(function () {
         var formdata = new FormData($('#kt_form')[0]);
             formdata.set('_token', '{{ csrf_token() }}');
+        var btn = $(this);
+            btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
         $.ajax({
             url         : '{{ route("exDataindukstaf") }}',
             data        : formdata,
@@ -512,9 +535,13 @@ $(document).ready(function () {
                 });
                 $("html, body").animate({ scrollTop: 0 }, "slow");
                 $("#griddatainduk").jqxGrid("updatebounddata");
+                btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+
                 return false;
             },
             error: function (xhr, status, error) {
+                btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+
                 swal({
                     title   : 'Stop',
                     text    : xhr.responseText,

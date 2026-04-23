@@ -1,67 +1,142 @@
-@extends('layout.master')
-
-@section('subheader')
-	<div class="kt-subheader   kt-grid__item" id="kt_subheader">
-		<div class=" kt-container  d-flex align-items-stretch justify-content-between ">
-			<div class="kt-subheader__main">
-				<h3 class="kt-subheader__title">
-					Verifikasi User </h3>
-				{{-- <div class="kt-subheader__breadcrumbs">
-					<a href="#" class="kt-subheader__breadcrumbs-home"><i class="flaticon2-shelter"></i></a>
-					<span class="kt-subheader__breadcrumbs-separator"></span>
-					<a href="" class="kt-subheader__breadcrumbs-link">
-						Main Dashboard </a>
-				</div> --}}
-			</div>
-			{{-- <div class="kt-subheader__toolbar">
-				<div class="kt-subheader__wrapper">
-					<a href="#" class="btn kt-subheader__btn-secondary">
-						Pengajuan Penelitian
-					</a>
-				</div>
-			</div> --}}
-		</div>
-	</div>
-@endsection
-
+@extends('adminlte3.layoutstandart')
 @section('content')
-<div class="row">
-    <div class="col-lg-2"></div>
-    <div class="col-lg-8">
-
-        <!--begin::Portlet-->
-        <div class="kt-portlet">
-            <div class="kt-portlet__head">
-                <div class="kt-portlet__head-label">
-                    <h3 class="kt-portlet__head-title">
-                        Aktivasi User <small>Verifikasi dan aktivasi user</small>
-                    </h3>
+<div class="content-wrapper" >
+    <div class="content-header">
+        <div class="container">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0"> Ubah Password</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                    </ol>
                 </div>
             </div>
-
-            <div class="kt-portlet__body">
-                <div class="kt-demo-icon">
-                    <div class="kt-demo-icon__preview">
-                        @if ($validasi)	
-                            <i class="flaticon2-checkmark"></i>
-                        @else
-                            <i class="flaticon2-cancel"></i>	
-                        @endif
-                    </div>
-                    <div class="kt-demo-icon__class">
-                        {{$message}} </div>
-                </div>
-            </div>
-            
-            <!--end::Form-->
         </div>
-
-        <!--end::Portlet-->
     </div>
-    <div class="col-lg-2"></div>
-
+    <div class="content" >
+        <div class="container-fluid">
+            <div class="row" >
+                <div class="col-md-12">
+                    <div id="loading">
+                        <img src="{{ asset('dist/img/loading.gif') }}" class="img-responsive" alt="Photo">
+                    </div>
+                    <div class="card card-primary card-outline" >
+                        <div class="card-body box-profile">
+                            <div class="text-center">
+                                <img class="profile-user-img img-fluid img-circle" src="{!! $foto !!}" alt="User profile picture">
+                            </div>
+                            <h3 class="profile-username text-center">Form Ubah Password</h3>
+                            <p class="text-muted text-center">Input new password</p>
+                        </div>
+                        <div class="card-footer" id="divisian">
+                            <div class="form-group row">
+                                <label for="lupa_password1" class="col-sm-4 col-form-label">Password <span class="text-danger">*</span>:</label>
+                                <div class="col-sm-8">
+                                    <input type="password" name="lupa_password1" id="lupa_password1" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="lupa_password2" class="col-sm-4 col-form-label">Konfirmasi Password <span class="text-danger">*</span>:</label>
+                                <div class="col-sm-8">
+                                    <input type="password" name="lupa_password2" id="lupa_password2" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <a id="btnkirimpassword" href="#" class="btn btn-social btn-primary pull-right">
+                                    <i class="fa fa-unlock-alt"></i> Set Password Login
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-footer" id="divterimakasih">
+                            <div class="card card-danger">
+                                <div class="card-header">
+                                    <h3 class="card-title" id="status">Notif</h3>
+                                </div>
+                                <div class="card-footer">
+                                    <span id="pesan"><a href="{{ url('/') }}">Password Telah di Ubah Klik di Sini Untuk Ke Laman Awal</a></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
+<input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+<input type="hidden" name="email" id="email" value="{{ $email }}">
+<input type="hidden" name="reset_token" id="reset_token" value="{{ $token ?? '' }}">
+<input type="hidden" name="purpose" id="purpose" value="{{ $purpose ?? 'verify' }}">
 @endsection
-
-
+@push('script')
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#loading').hide();
+    $('#divterimakasih').hide();
+    $('#btnkirimpassword').click(function () {
+        var set01=document.getElementById('lupa_password1').value;
+        var set02=document.getElementById('lupa_password2').value;
+        var set03=document.getElementById('email').value;
+        var set04=document.getElementById('reset_token').value;
+        var set05=document.getElementById('purpose').value;
+        var token=document.getElementById('token').value;
+        if (set01 == ''){
+            swal({
+                title: 'Mohon lengkapi',
+                text: 'Password wajib diisi',
+                type: 'info',
+            });
+        } else if (set01 !== set02) {
+            swal({
+                title: 'Mohon cek lagi',
+                text: 'Konfirmasi password tidak sama',
+                type: 'info',
+            });
+        } else {
+            var formdata = new FormData();
+                formdata.set('email','setpassword');
+                formdata.set('val02',set01);
+                formdata.set('val03',set02);
+                formdata.set('val04',set03);
+                formdata.set('val05',set04);
+                formdata.set('val06',set05);
+                formdata.set('_token',token);
+            url='{{ route("exResetPassword") }}';
+            $('#loading').show();
+            $('#divisian').hide();
+            $.ajax({
+                type        : 'ajax',
+                url         : url,
+                method      : 'post',
+                data        : formdata,
+                cache       : false,
+                contentType : false,
+                processData : false,
+                dataType    : 'json',
+                success: function(response, status, xhr) {
+                    var pesan = response.message;
+                    if (pesan == null || pesan == ''){
+                        $('#pesan').html('Password Gagal di Ubah. Klik di Sini Untuk Ke Laman Awal');
+                    } else {
+                        $('#pesan').html(response.message);
+                    }
+                    $('#divterimakasih').show();
+                    $('#loading').hide();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    swal({
+                        title: textStatus,
+                        text:  errorThrown,
+                        type: 'info',
+                    });
+                    $('#loading').hide();
+    
+                }
+            });
+        }
+    });
+});
+</script>
+@endpush

@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-        <div class="container">
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0"> Laporan Prestasi Siswa</h1>
+                    <h1> Laporan Prestasi Siswa</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                     </ol>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-3 col-md-3">
@@ -49,15 +49,14 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3">
-                    <div class="box box-solid bg-green-gradient">
-                        <div class="box-header">
-                            <i class="fa fa-mortar-board"></i>
-                            <h3 class="box-title">Report</h3>
+                    <div class="card card-solid bg-green-gradient">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-mortar-board"></i> Report</h3>
                         </div>
-                        <div class="box-body">
-                            <div class="form-group">  						
+                        <div class="card-body">
+                            <div class="form-group">
                                 <div class="row">
-                                    <div class="col-lg-12">
+                                    <div class="col-lg-6">
                                         <select id="cekbln" class="form-control">
                                             <option value="01">Jan</option>
                                             <option value="02">Feb</option>
@@ -74,12 +73,12 @@
                                             <option value="ALL">ALL</option>
                                         </select>
                                     </div>
-                                    <div class="col-lg-12">
+                                    <div class="col-lg-6">
                                         <div class="input-group margin">
                                             <input type="text" class="form-control" id="cekthn" value="{{ $tahunne }}">
                                             <span class="input-group-btn">
                                                 <button class="btn btn-warning btn-flat" type="button" id="btnviewdata">View</button>
-                                            </span>				
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -130,7 +129,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
@@ -171,6 +170,13 @@
                             <option value="Juara II">Juara II</option>
                             <option value="Juara III">Juara III</option>
                             <option value="Finalis">Finalis</option>
+                            <option value="Favorit">Favorit</option>
+                            <option value="Harapan 1">Harapan 1</option>
+                            <option value="Harapan 2">Harapan 2</option>
+                            <option value="Harapan 3">Harapan 3</option>
+                            <option value="Harapan 4">Harapan 4</option>
+                            <option value="Harapan 5">Harapan 5</option>
+                            <option value="Lainnya">Lainnya</option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
@@ -191,6 +197,7 @@
                     <div class="form-group col-md-5">
                         <label for="prestasi_tingkat">Tingkat</label>
                         <select id="prestasi_tingkat" class="form-control">
+                            <option value="Sekolah">Sekolah</option>
                             <option value="Regional">Regional (Kota - Provinsi)</option>
                             <option value="Nasional">Nasional</option>
                             <option value="Internasional">Internasional</option>
@@ -253,28 +260,52 @@
 <input type="hidden" name="setbulan" id="setbulan" value="ALL">
 <input type="hidden" name="settahun" id="settahun" value="TAHUNINI">
 <input type="hidden" name="setjenis" id="setjenis" value="ALL">
+<input type="hidden" id="getfoto">
 @endsection
 @push('script')
 <script type="text/javascript">
     $(function () {
         $('.datemaskinput').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
+        window.opengambar = function(img) {
+            var gambarpreview = img.getAttribute("src");
+            var newWindow = window.open('', '', 'width=880, height=500'),
+                document = newWindow.document.open(),
+                pageContent =
+                    '<!DOCTYPE html>\n' +
+                    '<html>\n' +
+                    '<head>\n' +
+                    '<meta charset="utf-8" />\n' +
+                    '<title>Sertifikat</title>\n' +
+                    '</head>\n' +
+                    '<body><img id="gambargede" class="img-responsive" src="' + gambarpreview + '"></body>\n</html>';
+                document.write(pageContent);
+                document.close();
+                return false;
+        }
     });
     function addFoto() {
 		$('#addfoto').click();
 	}
     $('#addfoto').change(function () {
-        var imgPath = this.value;
-        var ext = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
-        if(ext == 'pdf') {
-            $('#preview').attr('src', 'dist/img/pdf.png');
-        } else if(ext == "jpg" || ext == "jpeg" || ext == "png") {
-            readURL(this);
-        } else {
-            swal({
-				title: 'Stop',
-				text: 'Please select image file (jpg, jpeg, pdf).',
-				type: 'warning',
+        if(this.files[0].size > 1000000){
+            this.value = "";
+			swal({
+				title	: 'Stop',
+				text	: 'Maksimum file adalah 1Mb',
+				type	: 'warning',
 			})
+        } else {
+            var imgPath = this.value;
+            var ext     = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+            if(ext == "jpg" || ext == "jpeg" || ext == "png") {
+                readURL(this);
+            } else {
+                swal({
+                    title: 'Stop',
+                    text: 'Please select image file (jpg, jpeg, png).',
+                    type: 'warning',
+                })
+            }
         }
     });
     function readURL(input) {
@@ -282,9 +313,11 @@
             var reader = new FileReader();
             reader.onload = function (e) {
                 $('#preview').attr('src', e.target.result);
+                $('#getfoto').val(e.target.result);
             };
             reader.readAsDataURL(input.files[0]);
         }
+    
     }
     function openedpage( jQuery ){
         var set01=document.getElementById('setbulan').value;
@@ -315,17 +348,13 @@
             url: 'admin/jalldataprestasi',
         };
         var photorenderer = function (row, column, value) {
-            var name = $('#tabeldata').jqxGrid('getrowdata', row).sertifikat;
-            var type = $('#tabeldata').jqxGrid('getrowdata', row).typefile;
-			if (name == ''){
-				var img = '<div style="background: white;"><div>';
-			} else {
-				if(type == 'pdf') {
-					var img = '<div style="background: white;"><a href="'+name+'"><img style="margin:2px; margin-left: 10px;" width="32" height="32" src="dist/img/pdf.png"></a></div>';
-				} else {
-					var img = '<div style="background: white;"><a href="'+name+'"><img style="margin:2px; margin-left: 10px;" width="32" height="32" src="' + name + '"></a></div>';
-				}
-			}
+            var name = $('#tabeldata').jqxGrid('getrowdata', row).nmfile;
+            if (name == ''){
+                var img = '<div style="background: white;"></div>'; 
+            }
+            else { 
+                var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="32" height="32" src="' + name + '" onclick="opengambar(this)"></div>';
+            }
             return img;
         }
         var dataAdapter = new $.jqx.dataAdapter(source);
@@ -370,6 +399,8 @@
                         $("#prestasi_tanggal").val(dataRecord.tanggal1);
                         $("#prestasi_tanggal2").val(dataRecord.tanggal2);
                         $("#prestasi_tempat").val(dataRecord.zakatmaal);
+                        $("#getfoto").val('');
+                        $('#preview').attr('src', 'dist/img/takadagambar.png');
                         $("#modaltambahdata").modal('show');
                     }
                 },
@@ -382,7 +413,7 @@
             width: '100%'
         });
         $("#btnsimpan").click(function(){
-            var set01	= document.getElementById('addfoto');
+            var set01	= document.getElementById('getfoto').value;
             var set02	= document.getElementById('prestasi_siswa').value;
             var set03	= document.getElementById('prestasi_namakegiatan').value;
             var set04	= document.getElementById('prestasi_peringkat').value;
@@ -427,7 +458,7 @@
                 })
             } else {
                 var form_data = new FormData();
-                    form_data.append('file', set01.files[0]);
+                    form_data.append('val01', set01);
                     form_data.append('val02', set02);
                     form_data.append('val03', set03);
                     form_data.append('val04', set04);
@@ -462,6 +493,8 @@
                             hideAfter   : 5000,
                             stack       : 1
                         });
+                        var uri = window.location.href.split("#")[0];
+                        setTimeout(function () { window.location=uri;}, 5000);
                         return false;
                     },
                     error: function (xhr, status, error) {
@@ -476,8 +509,10 @@
         });
         $('#btnaddnew').click(function () {
             $("#prestasi_idne").val('new');
+            $("#getfoto").val('');
             $("#addfoto").val('');
             $("#modaltambahdata").modal('show');
+            $('#preview').attr('src', 'dist/img/takadagambar.png');
         });
         $('#btnhapus').click(function () {
             var set01	= '';
@@ -510,10 +545,12 @@
                     hideAfter: 5000,
                     stack: 1
                 });
+                var uri = window.location.href.split("#")[0];
+                setTimeout(function () { window.location=uri;}, 5000);
                 return false;
             });
         });
-        $('#btnexport').click(function(){			
+        $('#btnexport').click(function(){
             var gridContent = $("#tabeldata").jqxGrid('exportdata', 'json');
             data = $.parseJSON(gridContent);
             var noOfContacts = data.length;

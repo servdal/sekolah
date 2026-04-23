@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0"> Presensi Siswa</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-            </ol>
-          </div>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Presensi Siswa</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row" >
                 <div class="col-md-4">
@@ -73,6 +73,21 @@
 								<canvas id="id_ttd" class="signature-pad" width=320 height=200></canvas>
 								<canvas id="id_ttdblank" class="signature-pad" width=320 height=200 style='display:none'></canvas>
 							</div>
+							<div class="form-group"> 
+								<div class="row">
+									<div class="col-lg-6">
+										<label>Surat Keterangan Dokter</label>
+										<div class="custom-file">
+											<input type="file" class="custom-file-input" id="berkas_file">
+											<label class="custom-file-label" for="berkas_file">Foto Surat Dokter</label>
+										</div>
+									</div>
+									<div class="col-lg-6">
+										<img id="preview" style="margin:2px; margin-left: 10px;" width="100%" src="dist/img/takadagambar.png">
+									</div>
+								</div>
+								
+							</div>
                         </div>
                         <div class="card-footer">
                             <button type="button" class="btn btn-info" id="btnclearttd">Clear</button>
@@ -81,7 +96,7 @@
                     </div>
                 </div>
                 <div class="col-md-8">
-                    <div class="card card-danger shadow">
+                    <div class="card card-danger shadow" id="divawalpresensi">
                         <div class="card-header">
                             <h3 class="card-title">Data Presensi Siswa</h3>
                         </div>
@@ -98,10 +113,22 @@
                             </div>
                         </div>
                     </div>
+					<div class="card direct-chat direct-chat-warning shadow" id="divdetailmateri">
+                        <div class="card-header">
+                            <h3 class="card-title" id="judul">Materi</h3>
+							<div class="card-tools">
+                                <button type="button" class="btn btn-tool" title="Export" id="btnexport"><i class="fa fa-file-excel-o"></i></button>
+                                <button type="button" class="btn btn-tool btnkembali"><i class="fa fa-close"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="gridviewmateri"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <style>
     .kotakttd {
@@ -123,6 +150,12 @@
         height:200px;
     }
 </style>
+<div id="tempatctk" style="overflow: hidden; display: none;">
+	<div id="tabel_cetak"></div>
+</div>
+<input type="hidden" name="mas_noinduk" id="mas_noinduk">
+<input type="hidden" id="getfoto" value="">
+<input type="hidden" name="mas_noinduk" id="mas_noinduk">
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
 @endsection
 @push('script')
@@ -137,18 +170,166 @@
 			height: 90	
 		});
 		$('#id_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
+		bsCustomFileInput.init();
 	});
+	function openedpage( jQuery ){
+        var noinduk	    = document.getElementById('mas_noinduk').value;
+        var formdata = new FormData();
+            formdata.set('val02', 'persiswa');
+            formdata.set('val01', noinduk);
+            formdata.set('_token', '{{ csrf_token() }}');
+        $.ajax({
+            url         : '{{ route("jsonPresensicari") }}',
+            data        : formdata,
+            type        : 'POST',
+            contentType : false,
+            processData : false,
+            success: function (data) {
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                viewdatadetail	= '<ul class="products-list product-list-in-card pl-2 pr-2">';
+                states          = ['info', 'primary', 'warning', 'info', 'primary', 'secondary'];
+				if (Array.isArray(data) && data.length > 0) {
+					for (let i = 0; i < data.length; i++) {
+                        let id = data[i].id;
+						let foto = data[i].foto;
+						let tanggal = data[i].tanggal;
+						let alasan = data[i].alasan;
+						let surat = data[i].surat;
+						let status = data[i].status;
+						let btnsurat = surat === '' ? '' : '<a href="{{url("/")}}/suratijinortu/' + id + '" class="btn btn-sm btn-info" target="_blank">View Surat Ijin</a>';
+						if (status == '1'){
+							if (foto == '' || foto == null){
+								foto = '<img src="{{url("/")}}/dist/img/takadagambar.png" alt="image" class="img-circle img-size-32 mr-2">';
+							} else {
+								foto = '<img src="{{url("/")}}/dist/img/foto/' + data[i].foto + '" alt="image" class="img-circle img-size-32 mr-2">';
+							}
+							kehadiran = '<span class="badge badge-success float-right">HADIR</span>';
+						} else if (status == '2'){
+							foto = '<img src="{{url("/")}}/dist/img/takadagambar.png" alt="image" class="img-circle img-size-32 mr-2">';
+							kehadiran = '<span class="badge badge-warning float-right">IJIN</span>';
+						} else if (status == '3'){
+							foto = '<img src="{{url("/")}}/dist/img/takadagambar.png" alt="image" class="img-circle img-size-32 mr-2">';
+							kehadiran = '<span class="badge badge-info float-right">SAKIT</span>';
+						} else {
+							foto = '<img src="{{url("/")}}/dist/img/takadagambar.png" alt="image" class="img-circle img-size-32 mr-2">';
+							if (alasan == ''){
+								kehadiran = '<span class="badge badge-danger float-right">ALPHA</span>';
+							} else {
+								kehadiran = alasan;
+							}
+							
+						}
+						viewdatadetail 	= viewdatadetail +'<li class="item">'+
+											'<div class="product-img">'+foto+'</div>'+
+											'<div class="product-info"><a href="#" class="product-title" onClick="viewMateri('+id+')">Tanggal '+tanggal+' '+kehadiran+'</a>'+
+											'<span class="product-description"><a href="#" class="btn btn-sm btn-primary" onClick="viewMateri('+id+')"><i class="fa fa-book"></i> Materi</a>'+btnsurat+'</span></div></li>';
+                    }
+                }
+				
+                viewdatadetail = viewdatadetail +'</ul>';
+                $('#gridpencarian').html(viewdatadetail);
+            },
+            error: function (xhr, status, error) {
+                swal({
+                    title	: 'Stop',
+                    text	: xhr.responseText,
+                    type	: 'warning',
+                })
+            }
+        });
+    }
+	function viewMateri(id){
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+		$('#divawalpresensi').hide();
+        var noinduk	    = document.getElementById('mas_noinduk').value;
+        var formdata = new FormData();
+            formdata.set('val02', 'detailmateriperid');
+            formdata.set('val01', id);
+            formdata.set('_token', '{{ csrf_token() }}');
+        $.ajax({
+            url         : '{{ route("jsonPresensicari") }}',
+            data        : formdata,
+            type        : 'POST',
+            contentType : false,
+            processData : false,
+            success: function (data) {
+                viewdatadetail	= '<div class="direct-chat-messages">';
+				if (Array.isArray(data) && data.length > 0) {
+					for (let i = 0; i < data.length; i++) {
+                        let jammulai 		= data[i].jammulai;
+						let jamakhir 		= data[i].jamakhir;
+						let ruang 			= data[i].ruang;
+						let matapelajaran 	= data[i].matapelajaran;
+						let guruyanghadir 	= data[i].guruyanghadir;
+						let materi 			= data[i].materi;
+						let foto 			= data[i].foto;
+						
+						viewdatadetail 	= viewdatadetail +'<div class="direct-chat-msg left">'+
+											'<div class="direct-chat-info clearfix"><span class="direct-chat-name pull-right">'+jammulai+' s/d '+jamakhir+'</span><span class="direct-chat-timestamp pull-left"><i class="fa fa-bank"></i> '+ruang+'</span></div>'+foto+
+											'<div class="direct-chat-text">'+matapelajaran+' Materi '+materi+'</div></div>';
+                    }
+                }
+				
+                viewdatadetail = viewdatadetail +'</div>';
+                $('#gridviewmateri').html(viewdatadetail);
+				$('#divdetailmateri').show();
+            },
+            error: function (xhr, status, error) {
+                swal({
+                    title	: 'Stop',
+                    text	: xhr.responseText,
+                    type	: 'warning',
+                })
+            }
+        });
+    }
+	function readURL(input) {
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+			reader.readAsDataURL(input.files[0]);
+			reader.onload = function (e) {
+				$('#preview').attr('src', e.target.result);
+				$('#getfoto').val(e.target.result);
+			};
+		}
+	}
+
 $(document).ready(function () {
 	$('.overlay').hide();
 	$('#divpencarian').hide();
+	$('#divdetailmateri').hide();
+	$('#divawalpresensi').show();
 	var ttdPad = new SignaturePad(document.getElementById('id_ttd'), {
 	  backgroundColor: 'rgba(255, 255, 255, 0)',
 	  penColor: 'rgb(0, 0, 0)'
 	});
-	$('#btnsimpanttd').on('click', function (){		
+	$('#berkas_file').change(function () {
+		if(this.files[0].size > 1000000){
+			this.value = "";
+			swal({
+				title	: 'Mohon lengkapi',
+				text	: 'Maksimum File yang boleh di upload adalah 1Mb',
+				type	: 'info',
+			});
+		} else {
+			var imgPath = this.value;
+			var ukfile 	= this.files[0].size;
+			var ext 	= imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+			if(ext == "jpg" || ext == "jpeg" || ext == "png") {
+				readURL(this);
+			} else {
+				swal({
+					title: 'Mohon lengkapi',
+					text: 'File yang diperbolehkan hanya JPG/JPEG/PNG',
+					type: 'info',
+				});
+			}
+		}
+	});	
+	$('#btnsimpanttd').on('click', function (){
 		var set01 = ttdPad.toDataURL('image/png');
 		if (set01 == document.getElementById('id_ttdblank').toDataURL()){ set01 = ''; }
-		var set02 = '';
+		var set02 = document.getElementById('getfoto').value;
 		var set03 = document.getElementById('id_siswa').value;
 		var set04 = document.getElementById('id_tanggal').value;
 		var set05 = document.getElementById('id_selama').value;
@@ -200,8 +381,12 @@ $(document).ready(function () {
 			});
 		}
 	});
-	$('#btnclearttd').on('click', function (){		
+	$('#btnclearttd').on('click', function (){
 		ttdPad.clear();
+	});
+	$('.btnkembali').on('click', function (){
+		$('#divdetailmateri').hide();
+		$('#divawalpresensi').show();
 	});
 	$('#btnviewrekap').click(function () {
 		var set01=document.getElementById('id_siswa').value;
@@ -229,19 +414,20 @@ $(document).ready(function () {
 				],
 				type: 'POST',
 				data: {val01:set01, val02:'persiswa', _token: token},
-				url: "json/dataabsenkelas",
+				url: '{{ route("jsonDataabsenkelas") }}',
 			};
 			$('#divawal').show();
 			$('#divpencarian').hide();
 			var dataAdapter = new $.jqx.dataAdapter(source);
 			$("#gridnonhadir").jqxGrid({
-				width: '100%',   
-				columnsresize: true,
-				theme: "energyblue",
-				autoheight: true,
-				altrows: true,
-				source: dataAdapter,
-				columns: [
+				width			: '100%',   
+				columnsresize	: true,
+				theme			: "energyblue",
+				autoheight		: true,
+				altrows			: true,
+				source			: dataAdapter,
+				rowsheight		: 50,
+				columns			: [
 					{ text: 'Photo', datafield: 'foto', editable: false, width: '10%', cellsalign: 'center', align: 'center' },
 					{ text: 'No.Induk', datafield: 'noinduk', editable: false, width: '10%', cellsalign: 'center', align: 'center' },
 					{ text: 'Nama', datafield: 'nama', editable: false, width: '30%', cellsalign: 'left', align: 'center' },		
@@ -250,139 +436,78 @@ $(document).ready(function () {
 					{ text: 'Sakit', datafield: 'sakit', width: '8%', cellsalign: 'center', align: 'center'},
 					{ text: 'Ijin', datafield: 'ijin', width: '8%', cellsalign: 'center', align: 'center'},
 					{ text: 'Alpha', datafield: 'alpha', width: '8%', cellsalign: 'center', align: 'center'},
-					{ text: 'EDIT', columntype: 'button', width: '8%', align: 'center', cellsrenderer: function () {
-						return "EDIT";
+					{ text: 'Detail', columntype: 'button', width: '8%', align: 'center', cellsrenderer: function () {
+						return "View";
 						}, buttonclick: function (row) {
 							editrow = row;	
 							var offset 		= $("#gridnonhadir").offset();
 							var dataRecord 	= $("#gridnonhadir").jqxGrid('getrowdata', editrow);
-							var set01		= dataRecord.noinduk;
-							var set02		= 'persiswa';
-							var sourcerinciannilai = {
-								datatype: "json",
-								datafields: [
-									{ name: 'id',type: 'text'},	
-									{ name: 'nama',type: 'text'},
-									{ name: 'noinduk',type: 'text'},
-									{ name: 'tanggal',type: 'text'},	
-									{ name: 'alasan',type: 'text'},
-									{ name: 'inputor',type: 'text'},
-									{ name: 'surat',type: 'text'},
-									{ name: 'tapel',type: 'text'},
-									{ name: 'kelas',type: 'text'},
-									{ name: 'status',type: 'text'},
-									{ name: 'selama',type: 'text'},
-									{ name: 'alasan',type: 'text'},
-								],
-								type: 'POST',
-								data: {	val01:set01, val02:set02, _token: token },
-								url: 'json/presensicari',
-							};
+							$('#mas_noinduk').val(dataRecord.noinduk);
 							$('#divawal').hide();
+							openedpage();
 							$('#divpencarian').show();
-							var datarincianharian = new $.jqx.dataAdapter(sourcerinciannilai);
-							var editrow = -1;
-							$("#gridpencarian").jqxGrid({
-								width: '100%',
-								source: datarincianharian,
-								autoheight: true,
-								filterable: true,
-								theme: "orange",
-								columnsresize: true,
-								selectionmode: 'multiplecellsextended',
-								columns: [
-									{ text: 'View', columntype: 'button', width: '8%',  cellsrenderer: function () {
-										return "Surat";
-										}, buttonclick: function (row) {	
-											editrow = row;	
-											var offset 		= $("#gridpencarian").offset();		
-											var dataRecord 	= $("#gridpencarian").jqxGrid('getrowdata', editrow);
-											var set01		= dataRecord.surat;
-											if (set01 == ''){
-												swal({
-													title: 'Stop',
-													text: 'Tidak ada surat yang diajukan',
-													type: 'warning',
-												})
-											} else {
-												var newWindow = window.open('', '', 'width=800, height=500'),
-												document = newWindow.document.open(),
-														pageContent =
-															'<!DOCTYPE html>\n' +
-															'<html>\n' +
-															'<head>\n' +
-															'<meta charset="utf-8" />\n' +
-															'<title>Arsip Surat</title>\n' +
-															'</head>\n' +
-															'<body>' + set01 + '</body>\n</html>';
-												document.write(pageContent);
-												document.close();
-											}
-										}
-									},
-									{ text: 'KLS', datafield: 'kelas', width: '5%', align: 'center' },
-									{ text: 'Nama', datafield: 'nama', width: '29%', align: 'center' },
-									{ text: 'Tanggal', datafield: 'tanggal', width: '12%', cellsalign: 'left', align: 'center'},
-									{ text: 'Keterangan', datafield: 'alasan', width: '15%', cellsalign: 'left', align: 'center'},	
-									{ text: 'TAPEL', datafield: 'tapel', width: '12%', cellsalign: 'left', align: 'center' },
-									{ text: 'Inputor', datafield: 'inputor', width: '11%', cellsalign: 'left', align: 'center' },
-									{ text: 'Del', editable: false, sortable: false, filterable: false, columntype: 'button', width: '8%', cellsrenderer: function () {
-										return "Del";
-										}, buttonclick: function (row) {
-											editrow = row;	
-											var offset 		= $("#gridpencarian").offset();		
-											var dataRecord 	= $("#gridpencarian").jqxGrid('getrowdata', editrow);
-											var set01		= dataRecord.tapel;
-											if (set01 == ''){
-												swal({
-													title: 'Apakah anda yakin ?',
-													text: "Perhatian, data yang sudah di hapus tidak bisa di Undo, apakah anda yakin ingin menghapus",
-													type: 'warning',
-													showCancelButton: true,
-													confirmButtonClass: 'btn btn-confirm mt-2',
-													cancelButtonClass: 'btn btn-cancel ml-2 mt-2',
-													confirmButtonText: 'Yes'
-												}).then(function () {
-													var set01		= dataRecord.id;
-													var set02		= 'ijinortu';
-													var set03		= '';
-													var token		= document.getElementById('token').value;
-													$.post('admin/destroyer', { val01: set01, val02: set02, val03: '', _token: token },
-														function(data){					
-															var status  = data.status;
-															var message = data.message;
-															var warna 	= data.warna;
-															var icon 	= data.icon;
-															$.toast({
-																heading: status,
-																text: message,
-																position: 'top-right',
-																loaderBg: warna,
-																icon: icon,
-																hideAfter: 5000,
-																stack: 1
-															});
-															$("#gridpencarian").jqxGrid('updatebounddata');
-															return false;
-													});
-												});
-											} else {
-												swal({
-													title: 'Stop',
-													text: 'Data Yang Telah di Validasi TU, Tidak Bisa di Ubah',
-													type: 'warning',
-												})
-											}					
-										}
-									},
-								]
-							});
 						}
 					},
 				]
 			});
 		}
 	});
+	$("#btnexport").click(function () {
+            var gridContent = $("#gridviewmateri").jqxGrid('exportdata', 'json');
+                data        = $.parseJSON(gridContent);
+            var noOfContacts= data.length;
+            if(noOfContacts>0){
+                var table = document.createElement("table");
+                    table.style.width = '100%';
+                    table.setAttribute('border', '1');
+                    table.setAttribute('cellspacing', '0');
+                    table.setAttribute('cellpadding', '5');
+                    table.setAttribute('id', 'tabelcetak');
+                    table.setAttribute('class', 'text');
+                var col = [];
+                for (var i = 0; i < noOfContacts; i++) {
+                    for (var key in data[i]) {
+                        if (col.indexOf(key) === -1) {
+                            col.push(key);
+                        }
+                    }
+                }
+                var tHead = document.createElement("thead");
+                var hRow = document.createElement("tr");
+                for (var i = 0; i < col.length; i++) {
+                        var th = document.createElement("th");
+                        th.innerHTML = col[i];
+                        hRow.appendChild(th);
+                }
+                tHead.appendChild(hRow);
+                table.appendChild(tHead);
+                var tBody = document.createElement("tbody");
+                for (var i = 0; i < noOfContacts; i++) {
+                    var bRow = document.createElement("tr");
+                    for (var j = 0; j < col.length; j++) {
+                        var td 		= document.createElement("td");
+                        var isi 	= data[i][col[j]];
+                        if (isi == null){
+                            td.innerHTML = '';
+                        } else {
+                            td.setAttribute('style', 'mso-number-format: "\@";');
+                            td.innerHTML = isi;
+                        }
+                        bRow.appendChild(td);
+                    }
+                    tBody.appendChild(bRow)
+                }
+                table.appendChild(tBody);
+                var divContainer = document.getElementById("tabel_cetak");
+                    divContainer.innerHTML = "";
+                    divContainer.appendChild(table);
+            }
+            $("#tabel_cetak").btechco_excelexport({
+                containerid: "tabel_cetak"
+                , datatype: $datatype.Table
+            });
+            return false;
+        });
 });
 </script>
 @endpush

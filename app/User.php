@@ -51,6 +51,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Notification::class);
     }
+    public function examsCreated()
+    {
+        return $this->hasMany(\App\Models\Exam::class, 'created_by');
+    }
+
+    public function examParticipations()
+    {
+        return $this->hasMany(\App\Models\ExamParticipant::class, 'student_id');
+    }
+
+    public function answers()
+    {
+        return $this->hasMany(\App\Models\StudentAnswer::class, 'student_id');
+    }
     /**
      * The attributes that should be hidden for arrays.
      *

@@ -10,7 +10,7 @@
 	</style>
 	</head>
 	<body>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-image: url('{{asset('dist/img/logo-gray.jpg')}}'); background-repeat: no-repeat; background-position: center;">
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-image: url('{{ $logo_grey }}'); background-repeat: no-repeat; background-position: center;">
 		{!! $kopsurat !!}
 		<tr height="25">
 			<td colspan="11">No. <b><font style="font-size:24px">{!! $costumid !!}</font></b></td>
@@ -160,7 +160,7 @@
 		  </tr>
 		</table>
 		<p>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-image: url('{{asset('dist/img/logo-gray.jpg')}}'); background-repeat: no-repeat; background-position: center;">
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-image: url('{{ $logo_grey }}'); background-repeat: no-repeat; background-position: center;">
 			{!! $kopsurat !!}
 		<tr height="25">
 			<td colspan="11">No. <b><font style="font-size:24px">{!! $costumid !!}</font></b></td>

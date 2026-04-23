@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-      <div class="container">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0"> Laporan Penilaian Harian Siswa</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
-            </ol>
-          </div>
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1> Laporan Penilaian Harian Siswa</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    </ol>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row" >
                 <div class="col-md-12">
@@ -74,7 +74,7 @@
                 </div>
             </div>
 		</div>
-	</div>
+	</section>
 </div>
 <style>
     .kotakttd {
@@ -187,6 +187,7 @@
                 { name: 'guru',type: 'text'},
                 { name: 'tanggal',type: 'text'},
                 { name: 'jennilai',type: 'text'},
+                { name: 'deskripsi',type: 'text'},
             ],
             url: 'ortu/nilaisiswa',
             cache: false,
@@ -197,12 +198,15 @@
             columnsresize   : true,
             theme           : "energyblue",
             autoheight      : true,
+            sortable        : true,
+            pageable        : true,
             altrows         : true,
             filterable      : true,
             filtermode      : 'excel',
             source          : datanilai,
             selectionmode   : 'singlecell',
             columns         : [
+                /*
                 { text: 'Permohonan', columntype: 'button', width: '8%', cellsrenderer: function () {
                     return "REMIDI";
                     }, buttonclick: function (row) {
@@ -217,18 +221,18 @@
                         $('#divawal').hide();
                     }
                 },
+                */
                 { text: 'Tanggal', datafield: 'tanggal', width: '7%', align: 'center' },
-                { text: 'Nama', datafield: 'nama', width: '15%', align: 'center' },
                 { text: 'TAPEL', datafield: 'tapel', width: '8%', cellsalign: 'right', align: 'center'},
                 { text: 'KELAS', datafield: 'kelas', width: '7%', cellsalign: 'center', align: 'center'},
                 { text: 'SMT', datafield: 'semester', width: '5%', cellsalign: 'center', align: 'center'},
-                { text: 'TEMA', datafield: 'tema', width: '5%', cellsalign: 'center', align: 'center'},
-                { text: 'SUBTEMA', datafield: 'subtema', width: '5%', cellsalign: 'center', align: 'center'},
+                { text: 'Kode Materi', datafield: 'kodekd', width: '5%', cellsalign: 'center', align: 'center'},
+                { text: 'Materi', datafield: 'deskripsi', width: '20%', cellsalign: 'left', align: 'center'},
                 { text: 'MATPEL', datafield: 'matpel', width: '10%', cellsalign: 'left', align: 'center'},
                 { text: 'JENIS', datafield: 'jennilai', width: '10%', cellsalign: 'center', align: 'center'},
                 { text: 'NILAI', datafield: 'nilai', width: '5%', cellsalign: 'center', align: 'center'},
                 { text: 'RATAKELAS', datafield: 'ratakelas', width: '5%', cellsalign: 'center', align: 'center'},
-                { text: 'GURU', datafield: 'guru', width: '10%', cellsalign: 'center', align: 'center'},
+                { text: 'GURU', datafield: 'guru', width: '18%', cellsalign: 'center', align: 'center'},
             ],
         });
     });

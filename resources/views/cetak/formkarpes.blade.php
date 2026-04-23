@@ -11,14 +11,14 @@
 		border: thin solid #000;
 	}
 	table.background { 
-		background: url("dist/img/logo-gray.jpg") no-repeat;	
+		background: url("{{$logo_grey}}") no-repeat;	
 		background-position:center;		
 	}
 	</style>
 	</head>
 	<body>
 		@if ($status != 'verified')
-		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-image: url('{{asset('dist/img/logo-gray.jpg')}}'); background-repeat: no-repeat; background-position: center;">
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-image: url('{{ $logo_grey }}'); background-repeat: no-repeat; background-position: center;">
 		  <tr>
 			<td colspan="3" rowspan="7" align="center" valign="middle" style="border-bottom:double"><img src="{!! $logo !!}" width="98" height="75" /></td>
 			<td colspan="8"><b>{!! $yayasan !!}</b></td>

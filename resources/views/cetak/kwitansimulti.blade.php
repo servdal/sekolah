@@ -10,10 +10,10 @@
 	</style>
 	</head>
 	<body>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-image: url('{{asset('dist/img/logo-gray.jpg')}}'); background-repeat: no-repeat; background-position: center;">
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-image: url('{{ $logo_grey }}'); background-repeat: no-repeat; background-position: center;">
 		  <tr>
 			<td colspan="3" rowspan="4" align="center" valign="middle" style="border-bottom:double">
-				<img src="{{asset('logo.png')}}" width="98" height="75" />
+				<img src="{{ $logo01 }}" width="98" height="75" />
 			</td>
 			<td colspan="8">{!! $yayasan !!}</td>
 		  </tr>

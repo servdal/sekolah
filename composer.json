@@ -1,40 +1,31 @@
 {
+    "$schema": "https://getcomposer.org/schema.json",
     "name": "laravel/laravel",
     "type": "project",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "description": "The skeleton application for the Laravel framework.",
+    "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.0.2",
-        "arcanedev/log-viewer": "^9.0",
-        "barryvdh/laravel-dompdf": "^2.0",
-        "elibyy/tcpdf-laravel": "^9.0",
-        "guzzlehttp/guzzle": "^7.4",
-        "hisorange/browser-detect": "^4.5",
-        "laravel/framework": "^9.2",
-        "laravel/passport": "^10.4",
-        "laravel/sanctum": "^2.14.1",
-        "laravel/tinker": "^2.7",
-        "munafio/chatify": "^1.5",
-        "onecentlin/laravel-adminer": "^6.0",
-        "phpoffice/phpspreadsheet": "^1.22",
-        "pion/laravel-chunk-upload": "^1.5",
-        "pusher/pusher-php-server": "^7.2",
-        "simplehtmldom/simplehtmldom": "^2.0@RC",
+        "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^3.1",
+        "elibyy/tcpdf-laravel": "^11.5",
+        "guzzlehttp/guzzle": "^7.10",
+        "laravel/framework": "^12.0",
+        "laravel/tinker": "^2.10.1",
+        "maatwebsite/excel": "^3.1",
+        "opcodesio/log-viewer": "^3.21",
+        "phpoffice/phpspreadsheet": "^1.30",
         "simplesoftwareio/simple-qrcode": "^4.2",
-        "spatie/browsershot": "^3.57",
-        "spatie/laravel-backup": "^8.2",
-        "spatie/laravel-html": "^3.5",
-        "vedmant/laravel-feed-reader": "^1.5",
-        "xendit/xendit-php": "^2.18"
+        "yajra/laravel-datatables-oracle": "^12.6"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.9.1",
-        "laravel/sail": "^1.0.1",
-        "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^6.1",
-        "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0"
+        "fakerphp/faker": "^1.23",
+        "laravel/pail": "^1.2.2",
+        "laravel/pint": "^1.24",
+        "laravel/sail": "^1.41",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.6",
+        "phpunit/phpunit": "^11.5.3"
     },
     "autoload": {
         "psr-4": {
@@ -49,6 +40,22 @@
         }
     },
     "scripts": {
+        "setup": [
+            "composer install",
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php artisan key:generate",
+            "@php artisan migrate --force",
+            "npm install",
+            "npm run build"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
+        ],
+        "test": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
@@ -60,7 +67,12 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
-            "@php artisan key:generate --ansi"
+            "@php artisan key:generate --ansi",
+            "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+            "@php artisan migrate --graceful --ansi"
+        ],
+        "pre-package-uninstall": [
+            "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ]
     },
     "extra": {
@@ -69,10 +81,15 @@
         }
     },
     "config": {
+        "platform-check": false,
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }

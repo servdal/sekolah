@@ -29,7 +29,6 @@ use App\Tesppdb;
 use App\Formulirpsb;
 use App\Datapresensi;
 use App\Perpumini;
-use App\Datatema;
 use App\Datakd;
 use App\Kendaraan;
 use App\Kendaraanactivity;
@@ -49,6 +48,15 @@ use App\Datanilai;
 use App\Datasetorantahfid;
 use App\Presensifinger;
 use App\Datakkm;
+use App\Konseling;
+use App\Konselingguru;
+use App\RencanaKegiatan;
+use App\XFiles;
+use App\EfikasiKeuangan;
+use App\Inboxsurat;
+use App\PresensiKelas;
+use App\TagihanManual;
+use App\KurikulumAlquran;
 use Validator;
 use Session;
 use DateTime;
@@ -62,25 +70,25 @@ class AdminController extends Controller
 {
 	public function exSavesekolah(Request $request) {
 		$simpan 	= new Sekolah();
-		$simpan->nama_yayasan = $request->nama_yayasan; 
-		$simpan->nis = $request->nis; 
-		$simpan->nss = $request->nss; 
-		$simpan->npsn = $request->npsn; 
-		$simpan->kode_sekolah = $request->kode_sekolah; 
-		$simpan->nama_sekolah = $request->nama_sekolah; 
-		$simpan->alamat = $request->alamat; 
-		$simpan->kota = $request->kota; 
-		$simpan->telp = $request->telp; 
-		$simpan->email = $request->email; 
-		$simpan->id_kepala_sekolah = $request->id_kepala_sekolah; 
-		$simpan->slogan = $request->slogan; 
-		$simpan->level = $request->level; 
-		$simpan->status = $request->status; 
-		$simpan->pendaftaran = $request->pendaftaran; 
-		$simpan->pengumuman = $request->pengumuman; 
-		$simpan->no_rek = $request->no_rek; 
-		$simpan->nama_rek = $request->nama_rek; 
-		$simpan->nama_bank_rek = $request->nama_bank_rek; 
+		$simpan->nama_yayasan 		= $request->nama_yayasan;
+		$simpan->nis 				= $request->nis;
+		$simpan->nss 				= $request->nss;
+		$simpan->npsn 				= $request->npsn;
+		$simpan->kode_sekolah 		= $request->kode_sekolah;
+		$simpan->nama_sekolah 		= $request->nama_sekolah;
+		$simpan->alamat 			= $request->alamat;
+		$simpan->kota 				= $request->kota;
+		$simpan->telp 				= $request->telp;
+		$simpan->email 				= $request->email;
+		$simpan->id_kepala_sekolah 	= $request->id_kepala_sekolah;
+		$simpan->slogan 			= $request->slogan;
+		$simpan->level 				= $request->level;
+		$simpan->status 			= $request->status;
+		$simpan->pendaftaran 		= $request->pendaftaran;
+		$simpan->pengumuman 		= $request->pengumuman;
+		$simpan->no_rek 			= $request->no_rek;
+		$simpan->nama_rek 			= $request->nama_rek;
+		$simpan->nama_bank_rek 		= $request->nama_bank_rek;
 		
 
 		if ($request->hasFile('logo')) {
@@ -91,7 +99,7 @@ class AdminController extends Controller
 			} else {
 				$namafile		= time().'logo.'.$request->file('logo')->getClientOriginalExtension();
 				$uploadedFile 	= $request->file('logo');
-				Storage::putFileAs('logo',$uploadedFile,$namafile);
+				Storage::disk('local')->putFileAs('logo',$uploadedFile,$namafile);
 				$simpan->logo = 'logo/'.$namafile;
 			}
 			if ($request->hasFile('logo_grey')) {
@@ -102,7 +110,7 @@ class AdminController extends Controller
 				} else {
 					$background 	= time().'logo-gray.png';
 					$uploadedFile 	= $request->file('logo_grey');
-					Storage::putFileAs('logo',$uploadedFile,$background);
+					Storage::disk('local')->putFileAs('logo',$uploadedFile,$background);
 					$simpan->logo_grey = 'logo/'.$background;
 				}
 			}
@@ -115,7 +123,7 @@ class AdminController extends Controller
 					$frontlogo 	= time().'logofront.png';
 					
 					$uploadedFile 	= $request->file('frontpage');
-					Storage::putFileAs('logo',$uploadedFile,$frontlogo);
+					Storage::disk('local')->putFileAs('logo',$uploadedFile,$frontlogo);
 					$simpan->frontpage = 'logo/'.$frontlogo;
 				}
 			}
@@ -132,25 +140,25 @@ class AdminController extends Controller
 	}
 	public function exUpdatesekolah(Request $request) {
 		$update 	= Sekolah::where('id', $request->edit_id)->update([
-			'nama_yayasan' => $request->edit_nama_yayasan, 
-			'nis' => $request->edit_nis, 
-			'nss' => $request->edit_nss, 
-			'npsn' => $request->edit_npsn, 
-			'kode_sekolah' => $request->edit_kode_sekolah, 
-			'nama_sekolah' => $request->edit_nama_sekolah, 
-			'alamat' => $request->edit_alamat, 
-			'kota' => $request->edit_kota, 
-			'telp' => $request->edit_telp, 
-			'email' => $request->edit_email, 
+			'nama_yayasan' 		=> $request->edit_nama_yayasan, 
+			'nis' 				=> $request->edit_nis, 
+			'nss' 				=> $request->edit_nss, 
+			'npsn' 				=> $request->edit_npsn, 
+			'kode_sekolah' 		=> $request->edit_kode_sekolah, 
+			'nama_sekolah' 		=> $request->edit_nama_sekolah, 
+			'alamat' 			=> $request->edit_alamat, 
+			'kota' 				=> $request->edit_kota, 
+			'telp' 				=> $request->edit_telp, 
+			'email' 			=> $request->edit_email, 
 			'id_kepala_sekolah' => $request->edit_id_kepala_sekolah, 
-			'slogan' => $request->edit_slogan, 
-			'level' => $request->edit_level, 
-			'status' => $request->edit_status,
-			'pendaftaran' => $request->edit_pendaftaran,
-			'pengumuman' => $request->edit_pengumuman,
-			'no_rek' => $request->no_rek,
-			'nama_rek' => $request->edit_nama_rek,
-			'nama_bank_rek' => $request->edit_nama_bank_rek,
+			'slogan' 			=> $request->edit_slogan, 
+			'level' 			=> $request->edit_level, 
+			'status' 			=> $request->edit_status,
+			'pendaftaran' 		=> $request->edit_pendaftaran,
+			'pengumuman' 		=> $request->edit_pengumuman,
+			'no_rek' 			=> $request->no_rek,
+			'nama_rek' 			=> $request->edit_nama_rek,
+			'nama_bank_rek' 	=> $request->edit_nama_bank_rek,
 		]);
 		 
 		
@@ -163,7 +171,7 @@ class AdminController extends Controller
 			} else {
 				$namafile		= time().'logo.'.$request->file('edit_logo')->getClientOriginalExtension();
 				$uploadedFile 	= $request->file('edit_logo');
-				Storage::putFileAs('logo',$uploadedFile,$namafile);
+				Storage::disk('local')->putFileAs('logo',$uploadedFile,$namafile);
 					
 				$update 	= Sekolah::where('id',$request->edit_id)->update([
 					'logo' => 'logo/'.$namafile
@@ -178,7 +186,7 @@ class AdminController extends Controller
 			} else {
 				$background 	= time().'logo-gray.png';
 				$uploadedFile 	= $request->file('edit_logo_grey');
-				Storage::putFileAs('logo',$uploadedFile,$background);
+				Storage::disk('local')->putFileAs('logo',$uploadedFile,$background);
 				$update 	= Sekolah::where('id', $request->edit_id)->update([
 					'logo_grey' => 'logo/'.$background
 				]);
@@ -192,13 +200,12 @@ class AdminController extends Controller
 			} else {
 				$frontlogo 		= time().'logofront.png';
 				$uploadedFile 	= $request->file('edit_frontpage');
-				Storage::putFileAs('logo',$uploadedFile,$frontlogo);
+				Storage::disk('local')->putFileAs('logo',$uploadedFile,$frontlogo);
 				$update 	= Sekolah::where('id', $request->edit_id)->update([
 					'frontpage' => 'logo/'.$frontlogo 
 				]);
 			}
 		}
-
 		if ($update){			
 			return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Berhasil diubah']);
 			return back();
@@ -207,6 +214,95 @@ class AdminController extends Controller
 			return back();
 		}
 	}
+	public function jsonDatasekolah() {
+		$arrsekolah 	= [];
+		$homebase		= url("/");
+		$getallsekolah 	= Sekolah::get();
+		if (!empty($getallsekolah)){
+			foreach ($getallsekolah as $hasil) {
+				$logo 			= $hasil->logo;
+				$logo_grey 		= $hasil->logo_grey;
+				$frontpage 		= $hasil->frontpage;
+				$kopsurat 		= $hasil->kopsurat;
+				if (Storage::disk('local')->exists($logo)) {
+					$logo	= '<img src="'.$homebase.'/'.$logo.'" height="32">';
+				} else {
+					$logo	= '<img src="'.$homebase.'/boxed-bg.jpg" height="32">';
+				}
+				if (Storage::disk('local')->exists($logo_grey)) {
+					$logo_grey	= '<img src="'.$homebase.'/'.$logo_grey.'" height="32">';
+				} else {
+					$logo_grey	= '<img src="'.$homebase.'/boxed-bg.jpg" height="32">';
+				}
+				if (Storage::disk('local')->exists($frontpage)) {
+					$frontpage	= '<img src="'.$homebase.'/'.$frontpage.'" height="32">';
+				} else {
+					$frontpage	= '<img src="'.$homebase.'/boxed-bg.jpg" height="32">';
+				}
+				if (Storage::disk('local')->exists($kopsurat)) {
+					$kopsurat	= '<img src="'.$homebase.'/'.$kopsurat.'" height="32">';
+				} else {
+					$kopsurat	= '<img src="'.$homebase.'/boxed-bg.jpg" height="32">';
+				}
+				switch ($hasil->status) {
+					case 0:
+						$nama_status = "<span class='label label-danger'>Tidak Aktif</span>";
+					break;
+					case 1:
+						$nama_status = "<span class='label label-primary'>Aktif</span>";
+					break;
+				}
+				switch ($hasil->level) {
+					case 1:
+						$nama_level = "<span class='label label-info'>TK/KB</span>";
+					break;
+					case 2:
+						$nama_level = "<span class='label label-primary'>SD/MI</span>";
+					break;
+					case 3:
+						$nama_level = "<span class='label label-warning'>SLTP/Mts</span>";
+					break;
+					case 4:
+						$nama_level = "<span class='label label-danger'>SLTA/MA</span>";
+					break;
+				}
+				$arrsekolah[] = array(
+					'id' 					=> $hasil->id,	
+					'nama_yayasan' 			=> $hasil->nama_yayasan,
+					'kode_sekolah' 			=> $hasil->kode_sekolah,	
+					'nama_sekolah' 			=> $hasil->nama_sekolah,	
+					'alamat' 				=> $hasil->alamat,	
+					'kota' 					=> $hasil->kota,	
+					'telp' 					=> $hasil->telp,	
+					'email' 				=> $hasil->email,	
+					'id_kepala_sekolah' 	=> $hasil->id_kepala_sekolah,	
+					'slogan' 				=> $hasil->slogan,	
+					'logo' 					=> $hasil->logo,	
+					'logo_grey' 			=> $hasil->logo_grey,	
+					'frontpage' 			=> $hasil->frontpage,	
+					'nis' 					=> $hasil->nis,	
+					'nss' 					=> $hasil->nss,	
+					'npsn' 					=> $hasil->npsn,	
+					'status' 				=> $hasil->status,	
+					'level' 				=> $hasil->level,	
+					'pendaftaran' 			=> $hasil->pendaftaran,	
+					'pengumuman' 			=> $hasil->pengumuman,	
+					'no_rek' 				=> $hasil->no_rek,	
+					'nama_rek' 				=> $hasil->nama_rek,	
+					'nama_bank_rek' 		=> $hasil->nama_bank_rek,	
+					'nama_status' 			=> $nama_status,	
+					'nama_level' 			=> $nama_level, 	
+					'nama_kepala_sekolah' 	=> $hasil->kepala_sekolah->nama,	
+					'img_logo'				=> $logo,
+					'img_logo_grey'			=> $logo_grey,
+					'img_frontpage'			=> $frontpage,
+					'img_kopsurat'			=> $kopsurat,
+				);
+			}
+		}
+		echo json_encode($arrsekolah);
+	}
+	//END_DEVELOPER_CODE
 	public function viewPresensiFinger() {
 		$data				= [];
 		if (Session('previlage') == 'level1' OR Session('previlage') == 'level4' OR Session('previlage') == 'level5'){
@@ -267,6 +363,44 @@ class AdminController extends Controller
             return view('errors.notready', $data);
         }
 	}
+	public function viewCetakRaport() {
+		$data				= [];
+		if (Session('previlage') == 'level1' OR Session('previlage') == 'level2' OR Session('previlage') == 'Waka Kurikulum' OR Session('previlage') == 'Waka Kurikulum Al Quran' OR Session('previlage') == 'Waka Kesiswaan' OR Session('previlage') == 'level3' OR Session('previlage') == 'level4' OR Session('previlage') == 'Waka AlQuran'){
+			$iduser			= Session('id');
+			$getdatauser	= User::where('id', $iduser)->first();
+			if (isset($getdatauser->klsajar)){
+				$semester	= $getdatauser->smt;
+				$tapel		= $getdatauser->tapel;
+				$klsajar	= $getdatauser->klsajar;
+			} else {
+				$klsajar	= '';
+				$semester	= '';
+				$tapel		= '';
+			}
+			$data['namaapps01']  		= Session('sekolah_nama_aplikasi');
+			$data['domainapps01']  		= Session('sekolah_nama_yayasan');
+			$data['subdomainapps01']  	= Session('sekolah_nama_sekolah');
+			$data['subsubdomainapps01']	= Session('sekolah_kode_sekolah');
+			$data['addressapps01']  	= Session('sekolah_alamat');
+			$data['emailapps01']  		= Session('sekolah_email');
+			$data['lamanapps01']  		= parse_url(request()->root())['host'];
+			$data['logofrontapps01']  	= Session('sekolah_frontpage');
+			$data['logo01']  			= url("/").'/'.Session('sekolah_logo');
+			$data['sidebar']			= 'cetakrapot';
+			$data['semester']			= $semester;
+			$data['tapel']				= $tapel;
+			$data['setidkelas']			= $klsajar;
+			if (Session('sekolah_level') == '1'){
+				return view('simaster.cetakrapottpq', $data);
+			} else {
+				return view('simaster.cetakrapot', $data);
+			}
+		} else {
+			$data['kalimatheader']  	= 'Mohon Maaf';
+            $data['kalimatbody']  		= 'Laman Terbatas untuk Kalangan Tertentu, Mohon Kembali Ke Laman Sebelum atau Hubungi Tim ADMIN';
+            return view('errors.notready', $data);
+        }
+	}
 	public function viewAmilZIS() {
 		$tasks 			= [];
 		if (Session('previlage') == 'level1' OR Session('previlage') == 'adminzis' OR Session('previlage') == 'level5'){
@@ -319,7 +453,7 @@ class AdminController extends Controller
 	}
 	public function viewDatainduk() {
 		$tasks							= [];
-		if (Session('previlage') == 'level1' OR Session('previlage') == 'level4'){
+		if (Session('previlage') == 'level1' OR Session('previlage') == 'level4' OR Session('previlage') == 'Waka Kesiswaan'){
 			$bulan 						= (int)date("m");
 			$tahun 						= date("Y");
 			$tahunlalu 					= $tahun - 1;
@@ -333,6 +467,8 @@ class AdminController extends Controller
 			$tasks['tahunne']			= $tahun;
 			$tasks['tanggal']			= date("Y-m-d");
 			$tasks['angkatans']			= Datainduk::groupBy('tamasuk')->get();
+			$tasks['kelasrpa']			= KurikulumAlquran::where('id_sekolah', session('sekolah_id_sekolah'))->groupBy('kelas')->orderBy('kelas', 'ASC')->get();
+
 			$tasks['logo']				= url("/").'/'.Session('sekolah_logo');
 			$tasks['yayasan']			= Session('sekolah_nama_yayasan');
 			$tasks['sekolah']			= strtoupper(Session('sekolah_nama_sekolah'));
@@ -350,6 +486,20 @@ class AdminController extends Controller
 			$tasks['logo01']  			= url("/").'/'.Session('sekolah_logo');
 			$tasks['sidebar']			= 'datainduk';
 			return view('simaster.datainduk', $tasks);
+		} else {
+			$tasks['kalimatheader']  	= 'Mohon Maaf';
+        	$tasks['kalimatbody']  		= 'Anda Tidak di ijinkan masuk ke laman ini, silahkan kembali ke laman sebelumnya';
+            return view('errors.notready', $tasks);
+        }
+	}
+	public function viewPresensiRekapSantri() {
+		$tasks							= [];
+		if (Session('previlage') == 'level1' OR Session('previlage') == 'level4' OR Session('previlage') == 'level2' OR Session('previlage') == 'Waka Kurikulum' OR Session('previlage') == 'Waka Kurikulum Al Quran' OR Session('previlage') == 'Waka Kesiswaan' OR Session('previlage') == 'level3' OR Session('previlage') == 'Guru AlQuran' OR Session('previlage') == 'Waka AlQuran'){
+
+			$tasks['listbulan']			= PresensiKelas::select(DB::raw('YEAR(tanggal) as year'), DB::raw('MONTH(tanggal) as month'), DB::raw('COUNT(*) as count'))->groupBy(DB::raw('YEAR(tanggal)'), DB::raw('MONTH(tanggal)'))->get();;
+			$tasks['tanggal']			= date("Y-m-d");
+			$tasks['sidebar']			= 'rekappresensi';
+			return view('simaster.rekappresensi', $tasks);
 		} else {
 			$tasks['kalimatheader']  	= 'Mohon Maaf';
         	$tasks['kalimatbody']  		= 'Anda Tidak di ijinkan masuk ke laman ini, silahkan kembali ke laman sebelumnya';
@@ -381,6 +531,11 @@ class AdminController extends Controller
 	public function viewSetkeuangan() {
 		$data							= [];
 		if (Session('previlage') == 'level1' OR Session('previlage') == 'level5'){
+			$rstatus					= Layanan::where('id_sekolah', Session('sekolah_id_sekolah'))->where('layanan', 'daftarekskul')->first();
+			if (isset($rstatus->status)){
+				$ijin 					= $rstatus->status;
+			} else { $ijin				= ''; }
+			$data['ijin']				= $ijin;
 			$data['tahunne']			= date("Y");
 			$data['tanggal']			= date("Y-m-d");
 			$data['ekstrakulikuler']	= Ekstrakulikuler::where('id_sekolah', Session('sekolah_id_sekolah'))->get();
@@ -394,13 +549,13 @@ class AdminController extends Controller
 			$data['logofrontapps01']  	= Session('sekolah_frontpage');
 			$data['logo01']  			= url("/").'/'.Session('sekolah_logo');
 			$data['sidebar']			= 'setkeuangan';
+			$data['kelasrpa']			= KurikulumAlquran::where('id_sekolah', session('sekolah_id_sekolah'))->groupBy('kelas')->orderBy('kelas', 'ASC')->get();
 			return view('simaster.setkeuangan', $data);
 		} else {
 			$data['kalimatheader']  	= 'Mohon Maaf';
             $data['kalimatbody']  		= 'Laman Terbatas untuk Kalangan Tertentu, Mohon Kembali Ke Laman Sebelum atau Hubungi Tim ADMIN';
             return view('errors.notready', $data);
         }
-		
 	}
 	public function viewLapbayar() {
 		$tasks							= [];
@@ -432,6 +587,8 @@ class AdminController extends Controller
 			$tasks['logo01']  			= url("/").'/'.Session('sekolah_logo');
 			$tasks['sidebar']			= 'lapbayar';
 			$tasks['insidentalaktif']	= Insidental::where('aktifasi', 'aktif')->where('id_sekolah', Session('sekolah_id_sekolah'))->get();
+			$tasks['allinsidental']		= Insidental::where('id_sekolah', Session('sekolah_id_sekolah'))->get();
+			$tasks['datasiswa']			= Datainduk::where('id_sekolah', Session('sekolah_id_sekolah'))->where('nokelulusan', '')->get();
 			return view('simaster.lapbayar', $tasks);
 		} else {
 			$tasks['kalimatheader']  	= 'Mohon Maaf';
@@ -467,34 +624,32 @@ class AdminController extends Controller
 		$tasks   		=   [];
 		if (Session('previlage') == 'level1'){
 			$urutanwerno= array('red','green','blue','yellow','navy','teal','orange','maroon','black','aqua');
-			$groups 	= Logstaff::select(DB::Raw('DATE(timestamp) day'))->where('jenis', 'Perubahan Data Keuangan')->where('id_sekolah', Session('sekolah_id_sekolah'))->groupBy('day')->orderBy('timestamp')->limit(30)->get();
+			$groups 	= Logstaff::select(DB::Raw('DATE(created_at) day'))->whereIn('jenis', ['Perubahan Data Keuangan', 'Perubahan Data Pembayaran Siswa'])->where('id_sekolah', Session('sekolah_id_sekolah'))->groupBy('day')->orderBy('created_at')->limit(30)->get();
 			$y      	= 0;
 			$x      	= 0;		
 			foreach ($groups as $group) {
 				$tanggal    = $group->day;
-				$rsurat     = Logstaff::where('timestamp', 'like', '%'. $tanggal . '%')->where('jenis', 'Perubahan Data Keuangan')->orderBy('id', 'DESC')->get();
+				$rsurat     = Logstaff::where('created_at', 'like', '%'. $tanggal . '%')->whereIn('jenis', ['Perubahan Data Keuangan', 'Perubahan Data Pembayaran Siswa'])->orderBy('id', 'DESC')->get();
 				foreach ($rsurat as $rowpeng) {
-					$siapa          = $rowpeng->sopo;
+					$siapa          = $rowpeng->getDataInduk->nama ?? $rowpeng->sopo;
 					$pengumuman     = $rowpeng->kelakuan;   
-					$created_at     = $rowpeng->timestamp;
+					$created_at     = $rowpeng->created_at;
 					$kapan          = SendMail::timeago($created_at);
 					$iconne			= 'fa-bullhorn';
 					$jencolor 		= 'red';
-					
 					$tasks['pengumumans'][$x]['tanggal']     =   $created_at;
 					$tasks['pengumumans'][$x]['kapan']       =   $kapan;
 					$tasks['pengumumans'][$x]['jencolor']    =   $jencolor;
 					$tasks['pengumumans'][$x]['siapa']       =   $siapa;
 					$tasks['pengumumans'][$x]['pengumuman']  =   $pengumuman;
 					$tasks['pengumumans'][$x]['icon']        =   $iconne;
+					$tasks['pengumumans'][$x]['jenis']       =   $rowpeng->jenis;
 					$tasks['pengumumans'][$x]['urutanwerno'] =   $urutanwerno[$y];
-					
 					if ($y == 9) {
 						$y = 0; 
 					} else {
 						$y++; 
 					}
-					
 					$x++;
 				}
 			}
@@ -520,7 +675,7 @@ class AdminController extends Controller
 	}
 	public function viewLapppdb() {
 		$tasks						= [];
-		if (Session('previlage') == 'level1' OR Session('previlage') == 'level4' OR Session('previlage') == 'level5'){
+		if (Session('previlage') == 'level1' OR Session('previlage') == 'Waka Kesiswaan' OR Session('previlage') == 'level4' OR Session('previlage') == 'level5'){
 			$rsetting				= Sekolah::where('id', Session('sekolah_id_sekolah'))->first();
 			if (isset($rsetting->id)){
 				$pendaftaran 		= $rsetting->pendaftaran;
@@ -622,47 +777,6 @@ class AdminController extends Controller
 			if (Session('previlage') == 'ortu'){
 				return view('simaster.minimiortu', $tasks);
 			} else {
-				$urutanwerno	= array('red','green','blue','yellow','navy','teal','orange','maroon','black','aqua');
-				$groups     	= Perpumini::where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('id', 'DESC')->limit('10')->get();
-				$y      		= 0;
-				$x      		= 0;
-				foreach ($groups as $group) {
-					if ($x == 0){
-						$setaktif = 'active';
-					} else {
-						$setaktif = '';
-					}
-					if (is_null($group->gambar) OR $group->gambar == ''){ $lampiran	= $homebase.'/logo.png';}
-					else {
-						if (File::exists(base_path() ."/public/images/perpus/". $group->gambar)) {
-							$lampiran	= $homebase.'/images/perpus/'.$group->gambar;
-						} else {
-							$lampiran	= $homebase.'/logo.png';
-						}
-					}
-					$tasks['pengumumans'][$x]['id']			=   $group->id;
-					$tasks['pengumumans'][$x]['kodebuku']	=   $group->kodebuku;
-					$tasks['pengumumans'][$x]['pengarang']  =   $group->pengarang;
-					$tasks['pengumumans'][$x]['cetakan']	=   $group->cetakan;
-					$tasks['pengumumans'][$x]['judul']		=   $group->judul;
-					$tasks['pengumumans'][$x]['link']		=   $group->link;
-					$tasks['pengumumans'][$x]['lampiran']  	=   $lampiran;
-					$tasks['pengumumans'][$x]['setaktif']  	=   $setaktif;
-					$tasks['pengumumans'][$x]['kota']       =   $group->kota;
-					$tasks['pengumumans'][$x]['penerbit']  	=   $group->penerbit;
-					$tasks['pengumumans'][$x]['tahun']   	=   $group->tahun;
-					$tasks['pengumumans'][$x]['isbn']   	=   $group->isbn;
-					$tasks['pengumumans'][$x]['rakbuku']   	=   $group->rakbuku;
-					$tasks['pengumumans'][$x]['kategori']   =   $group->kategori;
-					$tasks['pengumumans'][$x]['urutanwerno']=   $urutanwerno[$y];
-					$tasks['pengumumans'][$x]['urutan']		=   $x + 1;
-					if ($y == 9) {
-						$y = 0; 
-					} else {
-						$y++; 
-					}
-					$x++;
-				}
 				$cekrusak 		= Perpumini::orderBy('id', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->where('kondisi', 'RUSAK')->count();
 				$cekhilang 		= Perpumini::orderBy('id', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->whereIn('kondisi', ['HILANG', 'MUSNAH'])->count();
 				$cekpinjam 		= Peminjaman::where('id_sekolah',session('sekolah_id_sekolah'))->where('status','1')->count();
@@ -777,88 +891,6 @@ class AdminController extends Controller
             return view('errors.notready', $tasks);
         }
 	}
-	public function jsonDatasekolah() {
-		$arrsekolah 	= [];
-		$homebase		= url("/");
-		$getallsekolah 	= Sekolah::get();
-		if (!empty($getallsekolah)){
-			foreach ($getallsekolah as $hasil) {
-				$logo 			= $hasil->logo;
-				$logo_grey 		= $hasil->logo_grey;
-				$frontpage 		= $hasil->frontpage;
-				if (File::exists(base_path() ."/public/". $logo)) {
-					$logo	= '<img src="'.$homebase.'/'.$logo.'" height="32">';
-				} else {
-					$logo	= '<img src="'.$homebase.'/boxed-bg.jpg" height="32">';
-				}
-				
-				if (File::exists(base_path() ."/public/". $logo_grey)) {
-					$logo_grey	= '<img src="'.$homebase.'/'.$logo_grey.'" height="32">';
-				} else {
-					$logo_grey	= '<img src="'.$homebase.'/boxed-bg.jpg" height="32">';
-				}
-				if (File::exists(base_path() ."/public/". $frontpage)) {
-					$frontpage	= '<img src="'.$homebase.'/'.$frontpage.'" height="32">';
-				} else {
-					$frontpage	= '<img src="'.$homebase.'/boxed-bg.jpg" height="32">';
-				}
-				switch ($hasil->status) {
-					case 0:
-						$nama_status = "<span class='label label-danger'>Tidak Aktif</span>";
-					break;
-					case 1:
-						$nama_status = "<span class='label label-primary'>Aktif</span>";
-					break;
-				}
-				switch ($hasil->level) {
-					case 1:
-						$nama_level = "<span class='label label-info'>TK/KB</span>";
-					break;
-					case 2:
-						$nama_level = "<span class='label label-primary'>SD/MI</span>";
-					break;
-					case 3:
-						$nama_level = "<span class='label label-warning'>SLTP/Mts</span>";
-					break;
-					case 4:
-						$nama_level = "<span class='label label-danger'>SLTA/MA</span>";
-					break;
-				}
-				$arrsekolah[] = array(
-					'id' 					=> $hasil->id,	
-					'nama_yayasan' 			=> $hasil->nama_yayasan,
-					'kode_sekolah' 			=> $hasil->kode_sekolah,	
-					'nama_sekolah' 			=> $hasil->nama_sekolah,	
-					'alamat' 				=> $hasil->alamat,	
-					'kota' 					=> $hasil->kota,	
-					'telp' 					=> $hasil->telp,	
-					'email' 				=> $hasil->email,	
-					'id_kepala_sekolah' 	=> $hasil->id_kepala_sekolah,	
-					'slogan' 				=> $hasil->slogan,	
-					'logo' 					=> $hasil->logo,	
-					'logo_grey' 			=> $hasil->logo_grey,	
-					'frontpage' 			=> $hasil->frontpage,	
-					'nis' 					=> $hasil->nis,	
-					'nss' 					=> $hasil->nss,	
-					'npsn' 					=> $hasil->npsn,	
-					'status' 				=> $hasil->status,	
-					'level' 				=> $hasil->level,	
-					'pendaftaran' 			=> $hasil->pendaftaran,	
-					'pengumuman' 			=> $hasil->pengumuman,	
-					'no_rek' 				=> $hasil->no_rek,	
-					'nama_rek' 				=> $hasil->nama_rek,	
-					'nama_bank_rek' 		=> $hasil->nama_bank_rek,	
-					'nama_status' 			=> $nama_status,	
-					'nama_level' 			=> $nama_level, 	
-					'nama_kepala_sekolah' 	=> $hasil->kepala_sekolah->nama,	
-					'img_logo'				=> $logo,
-					'img_logo_grey'			=> $logo_grey,
-					'img_frontpage'			=> $frontpage,
-				);
-			}
-		}
-		echo json_encode($arrsekolah);
-	}
 	public function viewSetting() {
 		$tasks						= [];
 		if (Session('previlage') == 'level1' OR Session('previlage') == 'level4'){
@@ -930,8 +962,8 @@ class AdminController extends Controller
 		$tasks							= [];
 		if (Session('previlage') == 'level1' OR Session('previlage') == 'level4'){
 			$rsekolah						= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
-			$jgarasi 						= Garasi::where('fakultas', Session('sekolah_id_sekolah'))->get();
-			$jgedung 						= Gedung::where('fakultas', Session('sekolah_id_sekolah'))->get();
+			$jgarasi 						= Garasi::where('id_sekolah', Session('sekolah_id_sekolah'))->get();
+			$jgedung 						= Gedung::where('id_sekolah', Session('sekolah_id_sekolah'))->get();
 			$tasks['gedunge']				= $jgedung;
 			$tasks['garasine']				= $jgarasi;
 			$tasks['sekolah']				= $rsekolah;
@@ -980,6 +1012,8 @@ class AdminController extends Controller
                 $totpepengeluaran	    = $getkredit->pengeluaran;
             } else { $totpepengeluaran  = 0 ;}
             $saldoakhir = $totpemasukan - $totpepengeluaran;
+			
+            $data['pengajuan']      	= RencanaKegiatan::where('bendahara', 'Mohon di Periksa')->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
             $data['danaterkumpul']      = number_format( $totpemasukan , 0 , '.' , ',' );
             $data['danaterserap']  		= number_format( $totpepengeluaran , 0 , '.' , ',' );
             $data['saldo']  		    = number_format( $saldoakhir , 0 , '.' , ',' );
@@ -1057,23 +1091,187 @@ class AdminController extends Controller
 	}
 	public function viewProfilPegawai($id) {
 		$data						= [];
-		$getdatapegawai 			= Dataindukstaff::where('id', $id)->first();
-		if (isset($getdatapegawai->id)){
-			$keaktifanpresensi 		= Loginputnilai::where('niy', $getdatapegawai->niy)->where('jennilai', 'Presensi Kelas')->where('id_sekolah',session('sekolah_id_sekolah'))->count();
-			$presensifinger 		= DB::table('db_presensifinger')->where('nip', $getdatapegawai->niy)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
-			$keaktifantahfids		= Datasetorantahfid::where('inputor', $getdatapegawai->niy)->where('id_sekolah',session('sekolah_id_sekolah'))->groupBy('tanggal')->get();
-			$keaktifantahfids		= count($keaktifantahfids);
-			$data['keaktifanpresensi']			= $keaktifanpresensi;
-            $data['presensifinger']			= $presensifinger;
-            $data['keaktifantahfids']			= $keaktifantahfids;
-            $data['user']			= $getdatapegawai;
-            return view('simaster.profilpegawai', $data);
+		if (Session('previlage') == 'level1'){
+			$getdatapegawai 			= Dataindukstaff::where('id', $id)->first();
+			if (isset($getdatapegawai->id)){
+				$keaktifanpresensi 		= Loginputnilai::where('niy', $getdatapegawai->niy)->where('jennilai', 'Presensi Kelas')->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+				$presensifinger 		= DB::table('db_presensifinger')->where('nip', $getdatapegawai->niy)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+				$keaktifantahfids		= Datasetorantahfid::where('inputor', $getdatapegawai->niy)->where('id_sekolah',session('sekolah_id_sekolah'))->groupBy('tanggal')->get();
+				$keaktifantahfids		= count($keaktifantahfids);
+				$data['keaktifanpresensi']			= $keaktifanpresensi;
+				$data['presensifinger']			= $presensifinger;
+				$data['keaktifantahfids']			= $keaktifantahfids;
+				$data['user']			= $getdatapegawai;
+				return view('simaster.profilpegawai', $data);
+			} else {
+				$data['kalimatheader']	= 'Mohon Maaf';
+				$data['kalimatbody']	= 'ID Pegawai '.$id.' Tidak ditemukan, Periksa Kembali URL Bapak/Ibu';
+				return view('errors.notready', $data);
+			}
 		} else {
-			$data['kalimatheader']	= 'Mohon Maaf';
-            $data['kalimatbody']	= 'ID Pegawai '.$id.' Tidak ditemukan, Periksa Kembali URL Bapak/Ibu';
+			$data['kalimatheader']  	= 'Mohon Maaf';
+            $data['kalimatbody']  		= 'Laman Terbatas untuk Kalangan Tertentu, Mohon Kembali Ke Laman Sebelum atau Hubungi Tim ADMIN';
             return view('errors.notready', $data);
 		}
 	}
+	public function viewPrestasisiswa() {
+		$tasks							= [];
+		if (Session('previlage') == 'level1' OR Session('previlage') == 'level2' OR Session('previlage') == 'level3' OR Session('previlage') == 'level4' OR Session('previlage') == 'Waka Kurikulum' OR Session('previlage') == 'Waka Kurikulum Al Quran' OR Session('previlage') == 'Waka Kesiswaan' OR Session('previlage') == 'Guru Ekstrakurikuler'){
+			$sekolah					= Session('sekolah_id_sekolah');
+			$datethn1 					= date("Y"); 
+			$datethn2 					= $datethn1 + 1; 
+			$datethn3 					= $datethn1 - 1;
+			$datethn4 					= $datethn1 - 2;
+			$tapel1 					= $datethn4.'-'.$datethn3;
+			$tapel2						= $datethn3.'-'.$datethn1;
+			$tapel3 					= $datethn1.'-'.$datethn2;
+			$tasks['datethn1']			= $datethn1;
+			$tasks['datethn2']			= $datethn2;
+			$tasks['datethn3']			= $datethn3;
+			$tasks['datethn4']			= $datethn4;
+			$tasks['tahunne']			= date("Y");
+			$tasks['tapel1']			= $tapel1;
+			$tasks['tapel2']			= $tapel2;
+			$tasks['tapel3']			= $tapel3;
+			$tasks['tanggal']			= date("d-m-Y");
+			$tasks['countregional']		= Prestasi::where('id_sekolah', $sekolah)->where('tanggal', 'LIKE', '%'.$datethn1.'%')->where('tingkat', 'Regional')->count();
+			$tasks['countnasional']		= Prestasi::where('id_sekolah', $sekolah)->where('tanggal', 'LIKE', '%'.$datethn1.'%')->where('tingkat', 'Nasional')->count();
+			$tasks['countinter']		= Prestasi::where('id_sekolah', $sekolah)->where('tanggal', 'LIKE', '%'.$datethn1.'%')->where('tingkat', 'Internasional')->count();
+			$tasks['datasiswa']			= Datainduk::where('id_sekolah', $sekolah)->where('nokelulusan', '')->get();
+			$tasks['namaapps01']  		= Session('sekolah_nama_aplikasi');
+			$tasks['domainapps01']  	= Session('sekolah_nama_yayasan');
+			$tasks['subdomainapps01']  	= Session('sekolah_nama_sekolah');
+			$tasks['subsubdomainapps01']= Session('sekolah_kode_sekolah');
+			$tasks['addressapps01']  	= Session('sekolah_alamat');
+			$tasks['emailapps01']  		= Session('sekolah_email');
+			$tasks['lamanapps01']  		= parse_url(request()->root())['host'];
+			$tasks['logofrontapps01']  	= Session('sekolah_frontpage');
+			$tasks['logo01']  			= url("/").'/'.Session('sekolah_logo');
+			$tasks['sidebar']			= 'prestasisiswa';
+			return view('simaster.prestasisiswa', $tasks);
+		} else {
+			$tasks['kalimatheader']  = 'Mohon Maaf';
+            $tasks['kalimatbody']  	= 'Laman Terbatas untuk Kalangan Tertentu, Mohon Kembali Ke Laman Sebelum atau Hubungi Tim ADMIN';
+            return view('errors.notready', $tasks);
+        }
+	}
+	public function zis() {
+		$rsetting				= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
+		if (isset($rsetting->id)){
+			$id 					= $rsetting->id;
+			$sekolah 				= $rsetting->nama_sekolah;
+			$yayasan 				= $rsetting->nama_yayasan;
+			$alamat 				= $rsetting->alamat;
+			$kepalasekolah 			= $rsetting->kepala_sekolah->nama;
+			$mutiara 				= $rsetting->slogan;
+			$logo 					= $rsetting->logo;
+			$frontpage 				= $rsetting->frontpage;
+			$pengumuman 			= $rsetting->pengumuman;
+			$pendaftaran 			= $rsetting->pendaftaran;
+			$no_rek 				= $rsetting->no_rek;
+			$nama_rek 				= $rsetting->nama_rek;
+			$nama_bank_rek 			= $rsetting->nama_bank_rek;
+	
+			$tasks					= [];
+			$tasks['id_sekolah']	= $id;
+			$tasks['logo']			= $logo;
+			$tasks['frontpage']		= $frontpage;
+			$tasks['yayasan']		= $yayasan;
+			$tasks['sekolah']		= $sekolah;
+			$tasks['alamat']		= $alamat;
+			$tasks['kepalasekolah']	= $kepalasekolah;
+			$tasks['pengumuman']	= $pengumuman;
+			$tasks['pendaftaran']	= $pendaftaran;
+			$tasks['no_rek']		= $no_rek;
+			$tasks['nama_rek']		= $nama_rek;
+			$tasks['nama_bank_rek']	= $nama_bank_rek;
+			
+			$rstatuszis				= Layanan::where('layanan', 'pembayaranzis')->where('id_sekolah', $id)->first();
+			if (isset($rstatuszis->status)){
+				$ijinzis 			= $rstatuszis->status;
+			} else { $ijinzis		= ''; }
+			if ($ijinzis == 'mati'){
+				$tasks['kalimatheader']  	= 'Mohon Maaf';
+				$tasks['kalimatbody']  		= 'Laman ini sementara di Tutup dan Akan dibuka saat Jadwal Penerimaan sudah di tentukan';
+				return view('errors.notready', $tasks);
+			} else {
+				$tasks['sidebar']	= 'zis';
+				return view('zis', $tasks);
+			}
+		} else {
+			$tasks['kalimatheader']  	= 'Mohon Maaf';
+            $tasks['kalimatbody']  		= 'Session Tidak Valid, Silahkan Relogin untuk mengakses Halaman Ini';
+            return view('errors.notready', $tasks);
+        }
+    }
+	public function pip(Request $request) {
+		$id 					= $request->input('id');
+		$rsetting				= Sekolah::where('id', $id)->first();
+		if(!$rsetting){
+			return view('accessdenided');	
+		}
+		$tasks					= [];		
+		$sekolah 				= $rsetting->nama_sekolah;
+		$yayasan 				= $rsetting->nama_yayasan;
+		$alamat 				= $rsetting->alamat;
+		$kepalasekolah 			= $rsetting->kepala_sekolah->nama;
+		$mutiara 				= $rsetting->slogan;
+		$logo 					= $rsetting->logo;
+		$frontpage 				= $rsetting->frontpage;
+		$pengumuman 			= $rsetting->pengumuman;
+		$pendaftaran 			= $rsetting->pendaftaran;
+		$homebase				= url("/");
+		$statppdb				= '';
+		$kodebaru				= '';
+		$kodepindahan 			= '';
+		$hargaformulir 			= '';
+		$namabank 				= '';
+		$norek 					= '';
+		$periode 				= '';
+		$setspp1 				= '';
+		$setspp2 				= '';
+		$setspp3 				= '';
+		$setdpp1 				= '';
+		$setdpp2 				= '';
+		$setdpp3 				= '';
+		$sql 					= Layanan::orderBy('layanan', 'ASC')->where('id_sekolah',$id)->get();
+		if (!empty($sql)){
+			foreach ($sql as $rlayanan){
+				$status 		= $rlayanan->status;
+				$layanan 		= $rlayanan->layanan;
+				if ($layanan == 'periodepsb') { $periode = $status; }
+				if ($layanan == 'ppdb') { $statppdb = $status; }
+				if ($layanan == 'kodebaru') { $kodebaru = $status; }
+				if ($layanan == 'kodepindahan') { $kodepindahan = $status; }
+				if ($layanan == 'hargaformulir') { $hargaformulir = $status; }
+				if ($layanan == 'namabank') { $namabank = $status; }
+				if ($layanan == 'norek') { $norek = $status; }
+				if ($layanan == 'spp1') { $setspp1 = $status; }
+				if ($layanan == 'spp2') { $setspp2 = $status; }
+				if ($layanan == 'spp3') { $setspp3 = $status; }
+				if ($layanan == 'dpp1') { $setdpp1 = $status; }
+				if ($layanan == 'dpp2') { $setdpp2 = $status; }
+			}
+		}
+		$tasks['id_sekolah']	= $id;
+		$tasks['logo']			= $logo;
+		$tasks['tabel']			= ProgramPIP::where('idsekolah', $id)->get();
+		$tasks['frontpage']		= $frontpage;
+		$tasks['yayasan']		= $yayasan;
+		$tasks['sekolah']		= $sekolah;
+		$tasks['alamat']		= $alamat;
+		$tasks['kepalasekolah']	= $kepalasekolah;
+		$tasks['pengumuman']	= $pengumuman;
+		$tasks['pendaftaran']	= $pendaftaran;
+		$tasks['statppdb']		= $statppdb;
+		$tasks['tahun']			= date("Y");
+		$tasks['hargaformulir']	= $hargaformulir;
+		$tasks['norek']			= $norek;
+		$tasks['namabank']		= $namabank;
+		$tasks['lvlsekolah']	= $rsetting->level;
+		$tasks['sidebar']		= 'pip';
+		return view('pip', $tasks);
+    }
 	public function getLaporanbulanan(Request $request) {
 		$bulan		= $request->input('val01');
 		$tahun		= $request->input('val02');
@@ -1168,10 +1366,20 @@ class AdminController extends Controller
 		$tanggal		= $request->input('val04');
 		$tgllaporan		= $request->input('val05');
 		$thnlalu 		= $tahun - 1;
-		$ahrf2 			= explode("-", $tgllaporan);	
-		$daylaporan 	= $ahrf2[0];
-		$blnlaporan 	= (int)$ahrf2[1];
-		$thnlaporan 	= $ahrf2[2];
+		if ($tgllaporan == '' OR $tgllaporan == null){
+			$tgllaporan	= date('d-m-Y');
+		}
+		$ahrf2 			= explode("-", $tgllaporan);
+		if (isset($ahrf2[2])){
+			$daylaporan 	= $ahrf2[0];
+			$blnlaporan 	= (int)$ahrf2[1];
+			$thnlaporan 	= $ahrf2[2];
+		} else {
+			$daylaporan 	= date('d');
+			$blnlaporan 	= (int)date('m');
+			$thnlaporan 	= date('Y');
+		}
+		
 		$rsetting		= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
 		$kepalasekolah	= $rsetting->kepala_sekolah->nama;
 		$niy			= $rsetting->kepala_sekolah->niy;
@@ -1264,7 +1472,7 @@ class AdminController extends Controller
 				$data['tabele'][$index]['tulisan6'] 	= $tulisan6;
 				$data['tabele'][$index]['tulisan7'] 	= $tulisan7;
 				$data['tabele'][$index]['tulisan8'] 	= $tulisan8;
-				
+				$index++;
 			}
 			$tulisan9	= number_format( $saldoakhir , 0 , '.' , ',' );
 			$tulisan10	= number_format( $totalpemasukan , 0 , '.' , ',' );
@@ -1317,7 +1525,7 @@ class AdminController extends Controller
 			$pemasukan	= $rdata->pemasukan;
 			$bendahara 	= $rdata->bendahara;
 			$tglkwitansi= $rdata->tglkwitansi;
-			$tandatangan= $rdata->tandatangan;
+			$tandatangan= $rdata->getTandatangan->xfile ?? '';
 			$keterangan	= $rdata->keterangan;
 			if ($tandatangan == '' OR is_null($tandatangan)){
 				$kunci 	= 'no';
@@ -1332,10 +1540,11 @@ class AdminController extends Controller
 			}
 			if ($pengeluaran == '' OR $pengeluaran == 0) {$total = $pemasukan;}
 			else { $total = $pengeluaran; }
-			$kwitansi 	= public_path('kwitansi/'.$rdata->id.'.pdf');
-			$draft 		= public_path('scan/generate/Kwitansi'.$rdata->id.'.pdf');
-			Storage::disk('local')->delete($kwitansi);
-			Storage::disk('local')->delete($draft);
+			$draft =  public_path('kwitansi/draft/'.$rdata->id.'.pdf');
+			try {
+				unlink($draft);
+			} catch (\Exception $e) {
+			}	
 			
 			$hasil[] = array(
 				'id' 			=> $rdata->id,	
@@ -1349,7 +1558,8 @@ class AdminController extends Controller
 				'keterangan' 	=> $keterangan,
 				'tgllengkap' 	=> $tgllengkap,
 				'total' 		=> $total,
-				'kunci'			=> $kunci
+				'kunci'			=> $kunci,
+				'tandatangan'	=> $tandatangan
 			);
 		}
         echo json_encode($hasil);
@@ -1384,11 +1594,12 @@ class AdminController extends Controller
 			}
 			if ($pengeluaran == '' OR $pengeluaran == 0) {$total = $pemasukan;}
 			else { $total = $pengeluaran; }
-			$kwitansi 	= public_path('kwitansi/'.$rdata->id.'.pdf');
-			$draft 		= public_path('scan/generate/Kwitansi'.$rdata->id.'.pdf');
-			Storage::disk('local')->delete($kwitansi);
-			Storage::disk('local')->delete($draft);
-			
+			$draft =  public_path('kwitansi/draft/'.$rdata->id.'.pdf');
+			try {
+				unlink($draft);
+			} catch (\Exception $e) {
+			}
+				
 			$hasil[] = array(
 				'id' 			=> $rdata->id,	
 				'tanggal' 		=> $rdata->tanggal,		
@@ -1405,10 +1616,6 @@ class AdminController extends Controller
 			);
 		}
         echo json_encode($hasil);
-	}
-	public function exKwitansi(Request $request) {
-		$idne   	= $request->input('valkirim');
-		return redirect('ctkkwt/'.$idne);
 	}
 	public function getRekapsaldo() {
 		$tahun 		= date("Y");
@@ -1535,6 +1742,2221 @@ class AdminController extends Controller
 		}
         echo json_encode($arraysurat);
 	}
+	public function getallkendaraan() {
+		$arraykendaraan = [];
+		$jruang 		= Kendaraan::where('id_sekolah', Session('sekolah_id_sekolah'))->orderBy('garasi', 'asc')->orderBy('merek', 'asc')->get();
+		foreach ($jruang as $result) {
+			$status 	= $result->marking == 'OK' ? '' : '<span class="badge badge-danger">INACTIVE</span>';
+			$kapasitas 	= $result->kapasitas == 0 ? '' : $result->kapasitas;
+			$arraykendaraan[] = [
+				'dot' 			=> $result->id,
+				'merek' 		=> $result->merek,
+				'garasi' 		=> $result->garasi,
+				'kodegarasi' 	=> $result->kodegarasi,
+				'kodekendaraan' => $result->kodekendaraan,
+				'driver' 		=> $result->driver,
+				'marking' 		=> $status ?: $result->marking,
+				'nopol' 		=> $result->nopol,
+				'kondisi' 		=> $status ?: $result->kondisi,
+				'utilitas' 		=> $status ?: $result->utilitas,
+				'kapasitas' 	=> $kapasitas,
+				'statpinjam' 	=> $status ?: $result->statpinjam,
+				'tarif' 		=> $status ?: $result->tarif,
+				'id_sekolah' 	=> $result->id_sekolah,
+				'inputor' 		=> $status ?: $result->inputor,
+				'pjgedung' 		=> $status ?: $result->pjgedung,
+				'pejabat' 		=> $status ?: $result->pjgedung,
+				'foto' 			=> $result->foto ?: '',
+			];
+		}
+		echo json_encode($arraykendaraan);    
+	}
+	public function getallgarasi() {
+		$jruang 	= Garasi::where('id_sekolah', Session('sekolah_id_sekolah'))->orderBy('namagd', 'asc')->get();
+		return $jruang;
+	}
+	public function getAktifitaskendaraan(Request $request) {
+		$arrayjadwal 	= array();
+		$jenis       	= $request->val01;
+		$bulan       	= $request->val02;
+		$tahun       	= $request->val03;
+		if ($jenis == 'BBM'){
+			if ($bulan == 'INI'){
+				$tahun 		= date("Y");
+				$jadwals   	= Kendaraanactivity::where('jenis', 'BBM')->where('id_sekolah', Session('sekolah_id_sekolah'))->whereYear('tanggal', $tahun)->get();
+			} else if ($bulan == 'ALL'){
+				$jadwals   	= Kendaraanactivity::where('jenis', 'BBM')->where('id_sekolah', Session('sekolah_id_sekolah'))->whereYear('tanggal', $tahun)->get();
+			} else {
+				$valcar 	= $tahun.'-'.$bulan;
+				$jadwals   	= Kendaraanactivity::where('jenis', 'BBM')->where('id_sekolah', Session('sekolah_id_sekolah'))->where('tanggal', 'LIKE', $valcari.'%')->get();
+			}
+		} else if ($jenis == 'SERVICE'){
+			if ($bulan == 'INI'){
+				$tahun 		= date("Y");
+				$jadwals   	= Kendaraanactivity::where('jenis', 'SERVICE')->where('id_sekolah', Session('sekolah_id_sekolah'))->whereYear('tanggal', $tahun)->get();
+			} else if ($bulan == 'ALL'){
+				$jadwals   	= Kendaraanactivity::where('jenis', 'SERVICE')->where('id_sekolah', Session('sekolah_id_sekolah'))->whereYear('tanggal', $tahun)->get();
+			} else {
+				$valcar 	= $tahun.'-'.$bulan;
+				$jadwals   	= Kendaraanactivity::where('jenis', 'SERVICE')->where('id_sekolah', Session('sekolah_id_sekolah'))->where('tanggal', 'LIKE', $valcari.'%')->get();
+			}
+		} else if ($jenis == 'TOL'){
+			if ($bulan == 'INI'){
+				$tahun 		= date("Y");
+				$jadwals   	= Kendaraanactivity::where('jenis', 'TOL')->where('id_sekolah', Session('sekolah_id_sekolah'))->whereYear('tanggal', $tahun)->get();
+			} else if ($bulan == 'ALL'){
+				$jadwals   	= Kendaraanactivity::where('jenis', 'TOL')->where('id_sekolah', Session('sekolah_id_sekolah'))->whereYear('tanggal', $tahun)->get();
+			} else {
+				$valcar 	= $tahun.'-'.$bulan;
+				$jadwals   	= Kendaraanactivity::where('jenis', 'TOL')->where('id_sekolah', Session('sekolah_id_sekolah'))->where('tanggal', 'LIKE', $valcari.'%')->get();
+			}
+		} else {
+			if ($bulan == 'INI'){
+				$tahun 		= date("Y");
+				$jadwals   	= Kendaraanactivity::where('id_sekolah', Session('sekolah_id_sekolah'))->whereYear('tanggal', $tahun)->get();
+			} else if ($bulan == 'ALL'){
+				$jadwals   	= Kendaraanactivity::where('id_sekolah', Session('sekolah_id_sekolah'))->whereYear('tanggal', $tahun)->get();
+			} else {
+				$valcari 	= $tahun.'-'.$bulan;
+				$jadwals   	= Kendaraanactivity::where('id_sekolah', Session('sekolah_id_sekolah'))->where('tanggal', 'LIKE', $valcari.'%')->get();
+			}
+		}
+        echo json_encode($jadwals);
+    }
+	public function getallruang() {
+		$arrayruang = [];
+		$jruang 	= Ruang::where('id_sekolah', Session('sekolah_id_sekolah'))->orderBy('kodegd', 'asc')->orderBy('namarg', 'asc')->get();
+		return $jruang;
+    }
+    public function getallgedung() {
+		$arrayruang = [];
+		$jruang 	= Gedung::where('id_sekolah', Session('sekolah_id_sekolah'))->orderBy('namagd', 'ASC')->get();
+    	return $jruang;
+    }
+	public function getdetailruang(Request $request) {
+    	$idruang 	= $request->input('val01');
+		$namarg 	= $request->input('val02');
+		$jfasruang	= DB::table('umum_fasilitasruang')
+							->select('umum_fasilitasruang.*', 'umum_ruang.namarg')
+							->leftJoin('umum_ruang', 'umum_fasilitasruang.idruang', 'umum_ruang.id')
+							->where('umum_ruang.id_sekolah', Session('sekolah_id_sekolah'))
+							->orderBy('umum_fasilitasruang.jenis', 'ASC')
+							->orderBy('umum_fasilitasruang.namabrg', 'ASC')
+							->get();
+		return $jfasruang;
+    }
+	public function getrekapdetailruang(Request $request) {
+    	$idruang 	= $request->input('val01');
+		$namarg 	= $request->input('val02');
+		$arrayfiles	= [];
+		$jfasruang	= Fasruang::where('idruang', $idruang)->groupBy('jenis')->get();
+    	foreach ($jfasruang as $file) {			
+			$jenis 		= $file->jenis;
+			$getallnama	= Fasruang::where('idruang', $idruang)->where('jenis', $jenis)->groupBy('namabrg')->get();
+			foreach($getallnama as $rnama){
+				$namabrg 	= $rnama->namabrg;
+				$getallstat	= Fasruang::where('idruang', $idruang)->where('jenis', $jenis)->where('namabrg', $namabrg)->groupBy('kondisi')->get();
+				foreach($getallstat as $rstat){
+					$kondisi 	= $rstat->kondisi;
+					$jumlah		= Fasruang::where('kondisi', $kondisi)->where('idruang', $idruang)->where('jenis', $jenis)->where('namabrg', $namabrg)->count();
+					$arrayfiles[] = array(
+						'namabrg' 		=> $namabrg,
+						'jenis' 		=> $jenis,
+						'jumlah' 		=> $jumlah,
+						'kondisi' 		=> $kondisi,
+					);
+				}
+			}
+    	}
+    	echo json_encode($arrayfiles);
+    }
+	public function jsonDatainduk() {
+		if (Session('previlage') == 'ortu'){
+			$getallsiswa 	= Datainduk::select('*', \DB::raw('CASE WHEN foto IS NULL OR foto = "" THEN CONCAT("' . url('/') . '/" , "'.session("sekolah_logo").'") ELSE CONCAT("' . url("/") . '/dist/img/foto/", foto) END AS lampiran'))
+								->where(function($query) {
+									$query->where('kodeortu', session('id'))
+										->orWhere('kodeortuasuh', session('email'));
+								})
+								->where('id_sekolah', session('sekolah_id_sekolah'))
+								->get();
+		} else {
+			$getallsiswa 	= Datainduk::select('*', \DB::raw('CASE WHEN foto IS NULL OR foto = "" THEN CONCAT("' . url('/') . '/" , "'.session("sekolah_logo").'") ELSE CONCAT("' . url("/") . '/dist/img/foto/", foto) END AS lampiran'))
+								->where('id_sekolah', session('sekolah_id_sekolah'))
+								->get();
+		}
+		echo json_encode($getallsiswa);
+	}
+	public function jsonCariDatainduk(Request $request) {
+		$arrsiswa 		= [];
+		$homebase		= url("/");
+		$jenis 			= $request->val01;
+		$valcari 		= $request->val02;
+		if ($jenis == 'keaktifankelas'){
+			$arraysurat	= [];
+			$i 			= 0;
+			$data		= new Loginputnilai();
+			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
+			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
+			$data 		= $data->where('niy', $valcari);
+			$data 		= $data->where('id_sekolah',session('sekolah_id_sekolah'));
+			if ($request->has('search') && !empty($request->search)) {
+				$searchTerm = $request->search;
+				$data->where(function ($q) use ($searchTerm) {
+					$q->where('tanggal', 'like', "%$searchTerm%")
+						->orWhere('matpel', 'like', "%$searchTerm%")
+						->orWhere('jennilai', 'like', "%$searchTerm%")
+						->orWhere('tapel', 'like', "%$searchTerm%")
+						->orWhere('kodekd', 'like', "%$searchTerm%")
+						->orWhere('kelas', 'like', "%$searchTerm%");
+				});
+			}
+			$data		= $data->orderByRaw($order)->paginate($limit);
+			$totaldata	= $data->total();
+			if ($data) {
+				foreach($data as $rows){
+					$arraysurat[$i] = $rows;
+					$i++;
+				}
+				$response = [
+					'message'	=> 'List Data Keaktifan Kelas',
+					'total'		=> $totaldata,
+					'data'		=> $arraysurat
+				];
+				return response()->json($response, 200);
+			}
+			$response = [
+				'message'        => 'No Data'
+			];
+			return response()->json($response, 500);
+		} else if ($jenis == 'finger'){
+			$arraysurat	= [];
+			$i 			= 0;
+			$data		= new Presensifinger();
+			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
+			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
+			$data 		= $data->where('nip', $valcari);
+			$data 		= $data->where('id_sekolah',session('sekolah_id_sekolah'));
+			if ($request->has('search') && !empty($request->search)) {
+				$searchTerm = $request->search;
+				$data->where(function ($q) use ($searchTerm) {
+					$q->where('tanggal', 'like', "%$searchTerm%")
+						->orWhere('tanggalscan', 'like', "%$searchTerm%")
+						->orWhere('jam', 'like', "%$searchTerm%")
+						->orWhere('kantor', 'like', "%$searchTerm%")
+						->orWhere('departemen', 'like', "%$searchTerm%")
+						->orWhere('jabatan', 'like', "%$searchTerm%");
+				});
+			}
+			$data		= $data->orderByRaw($order)->paginate($limit);
+			$totaldata	= $data->total();
+			if ($data) {
+				foreach($data as $rows){
+					$arraysurat[$i] = $rows;
+					$i++;
+				}
+				$response = [
+					'message'	=> 'List Data Finger',
+					'total'		=> $totaldata,
+					'data'		=> $arraysurat
+				];
+				return response()->json($response, 200);
+			}
+			$response = [
+				'message'        => 'No Data'
+			];
+			return response()->json($response, 500);
+		} else if ($jenis == 'preseniskelas'){
+			$arraysurat	= [];
+			$i 			= 0;
+			$data		= new PresensiKelas();
+			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
+			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
+			$data 		= $data->where('niyguru', $valcari);
+			$data 		= $data->where('id_sekolah',session('sekolah_id_sekolah'));
+			if ($request->has('search') && !empty($request->search)) {
+				$searchTerm = $request->search;
+				$data->where(function ($q) use ($searchTerm) {
+					$q->where('tanggal', 'like', "%$searchTerm%")
+						->orWhere('materi', 'like', "%$searchTerm%")
+						->orWhere('matapelajaran', 'like', "%$searchTerm%")
+						->orWhere('kelas', 'like', "%$searchTerm%")
+						->orWhere('tapel', 'like', "%$searchTerm%")
+						->orWhere('ruang', 'like', "%$searchTerm%");
+				});
+			}
+			$data		= $data->orderByRaw($order)->paginate($limit);
+			$totaldata	= $data->total();
+			if ($data) {
+				foreach($data as $rows){
+					$arraysurat[$i] = $rows;
+					$i++;
+				}
+				$response = [
+					'message'	=> 'List Data Presensi Kelas',
+					'total'		=> $totaldata,
+					'data'		=> $arraysurat
+				];
+				return response()->json($response, 200);
+			}
+			$response = [
+				'message'        => 'No Data'
+			];
+			return response()->json($response, 500);
+		} else if ($jenis == 'carirekappresensiperbulan'){
+			$arrdata		= [];
+			$arrbln 		= explode('-', $valcari);
+			if (isset($arrbln[1])){
+				$bulan 		= $arrbln[1];
+				if ($bulan < 10){
+					$valcari = $arrbln[0].'-0'.$bulan;
+				} else {
+					$valcari = $arrbln[0].'-'.$bulan;
+				}
+			}
+			$nomor			= 1;
+			$getallsiswa 	= Datainduk::where('id_sekolah',session('sekolah_id_sekolah'))->where('nokelulusan','')->orderBy('klspos', 'ASC')->orderBy('noinduk', 'ASC')->get();
+			if (!empty($getallsiswa)){
+				$total  	= Datapresensi::where('tanggal', 'LIKE', $valcari.'%')->where('id_sekolah', session('sekolah_id_sekolah'))->groupBy('tanggal')->get();
+				$total 		= count($total);
+				foreach($getallsiswa as $rows){
+					$cekhadir  		= Datapresensi::where('tanggal', 'LIKE', $valcari.'%')->where('noinduk', $rows->noinduk)->where('id_sekolah', $rows->id_sekolah)->whereIn('status', ['1','5'])->count();
+					$cekijin  		= Datapresensi::where('tanggal', 'LIKE', $valcari.'%')->where('noinduk', $rows->noinduk)->where('id_sekolah', $rows->id_sekolah)->where('status', 2)->count();
+					$ceksakit  		= Datapresensi::where('tanggal', 'LIKE', $valcari.'%')->where('noinduk', $rows->noinduk)->where('id_sekolah', $rows->id_sekolah)->where('status', 3)->count();
+					$cekalpha		= $total - $cekhadir - $cekijin - $ceksakit;
+					$arrdata[] = array(
+						'nomor' 		=> $nomor,
+						'nama' 			=> $rows->nama,
+						'klspos'		=> $rows->klspos,
+						'noinduk' 		=> $rows->noinduk,
+						'nisn' 			=> $rows->nisn,
+						'sakit'			=> $ceksakit,
+						'ijin'			=> $cekijin,
+						'alpha'			=> $cekalpha,
+						'hadir'			=> $cekhadir,
+						'valcari'		=> $valcari
+					);
+					$nomor++;
+				}
+			}
+			$jsonrab		= json_encode($arrdata);
+			$response = [
+				'data'		=> $jsonrab,
+			];
+			return response()->json($response, 200);
+		} else if ($jenis == 'cetakrekappresensiperbulan'){
+			$nomor				= 1;
+			$generatetable		= '<table class="table table-borderd table-striped"><thead><tr><th>No</th><th>Tanggal</th><th>Nama</th><th>Kelas</th><th>No.Induk</th><th>Keterangan</th></tr></thead><tbody>';
+			$getdatatanggal  	= Datapresensi::where('tanggal', 'LIKE', $request->val03.'%')->where('id_sekolah', session('sekolah_id_sekolah'))->groupBy('tanggal')->orderBy('tanggal', 'ASC')->get();
+			if (!empty($getdatatanggal)){
+				foreach($getdatatanggal as $rows){
+					$tanggal 		= $rows->tanggal;
+					$getpresensi	= DB::table('db_presensi')
+										->select('db_presensi.*', 'db_datainduk.nama', 'db_datainduk.klspos')
+										->leftJoin('db_datainduk', 'db_presensi.noinduk', 'db_datainduk.noinduk')
+										->where('db_presensi.tanggal', $rows->tanggal)
+										->where('db_presensi.noinduk', $request->val02)
+										->where('db_presensi.id_sekolah', Session('sekolah_id_sekolah'))
+										->first();
+					if (isset($getpresensi->status)){
+						$status 		= $getpresensi->status;
+						if ($status == '1'){
+							$keterangan = 'HADIR';
+						} else if ($status == '2'){
+							$keterangan = 'IJIN';
+						} else if ($status == '3'){
+							$keterangan	= 'SAKIT';
+						} else if ($status == '4'){
+							$keterangan	= 'ALPHA';
+						} else if ($status == '5'){
+							$keterangan	= 'HADIR TERLAMBAT';
+						} else {
+							$keterangan = $status;
+						}
+						$generatetable = $generatetable.'<tr><td>'.$nomor.'</td><td>'.$rows->tanggal.'</td><td>'.$getpresensi->nama.'</td><td>'.$getpresensi->klspos.'</td><td>'.$getpresensi->noinduk.'</td><td>'.$keterangan.'</td></tr>';
+					} else {
+						$generatetable 	= $generatetable.'<tr><td>'.$nomor.'</td><td>'.$rows->tanggal.'</td><td>-</td><td>-</td><td>-</td><td>Tidak Ada Data</td></tr>';
+					}
+					
+					$nomor++;
+				}
+			}
+			$generatetable = $generatetable.'</tbody></table>';
+			$response = [
+				'data'		=> $generatetable,
+			];
+			return response()->json($response, 200);
+		} else if ($jenis == 'logpribadi'){
+			$arraysurat	= [];
+			$i 			= 0;
+			$data		= new Logstaff();
+			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
+			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
+			$data 		= $data->where('sopo', $valcari);
+			$data 		= $data->where('id_sekolah',session('sekolah_id_sekolah'));
+			if ($request->has('search') && !empty($request->search)) {
+				$searchTerm = $request->search;
+				$data 		= $data->where('kelakuan', '%'.$searchTerm.'%');
+			}
+			$data		= $data->orderByRaw($order)->paginate($limit);
+			$totaldata	= $data->total();
+			if ($data) {
+				foreach($data as $rows){
+					$arraysurat[$i] = $rows;
+					$i++;
+				}
+				$response = [
+					'message'	=> 'List Log Pribadi',
+					'total'		=> $totaldata,
+					'data'		=> $arraysurat
+				];
+				return response()->json($response, 200);
+			}
+			$response = [
+				'message'        => 'No Data'
+			];
+			return response()->json($response, 500);
+		} else if ($jenis == 'alquran'){
+			$arraysurat	= [];
+			$i 			= 0;
+			$data		= new Datasetorantahfid();
+			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
+			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
+			$data 		= $data->where('inputor', $valcari);
+			$data 		= $data->where('id_sekolah',session('sekolah_id_sekolah'));
+			if ($request->has('search') && !empty($request->search)) {
+				$searchTerm = $request->search;
+				$data->where(function ($q) use ($searchTerm) {
+					$q->where('tanggal', 'like', "%$searchTerm%")
+						->orWhere('tapel', 'like', "%$searchTerm%")
+						->orWhere('semester', 'like', "%$searchTerm%");
+				});
+			}
+			$dataGroupedByDate 	= $data->groupBy('tanggal')->get();
+			$countTanggal 		= [];
+			foreach ($dataGroupedByDate as $datakelompok) {
+				$tanggal = $datakelompok->tanggal;
+				if (!isset($countTanggal[$tanggal])) {
+					$countTanggal[$tanggal] = 0;
+				}
+				$countTanggal[$tanggal]++;
+			}
+			$data = $data->orderByRaw($order)->paginate($limit);
+			$totaldata	= $data->total();
+			if ($data->count() > 0) {
+				foreach ($data as $rows) {
+					$rows->count_tanggal 	= isset($countTanggal[$rows->tanggal]) ? $countTanggal[$rows->tanggal] : 0;
+					$arraysurat[] 			= $rows;
+				}
+				$response = [
+					'message' 	=> 'List Keaktifan Alquran',
+					'total' 	=> $totaldata,
+					'data' 		=> $arraysurat
+				];
+				return response()->json($response, 200);
+			}
+			$response = [
+				'message'        => 'No Data'
+			];
+			return response()->json($response, 500);
+		} else if ($jenis == 'logsebagaigurubk'){
+			$arraysurat	= [];
+			$i 			= 0;
+			$data		= new Konseling();
+			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
+			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
+			$data 		= $data->where('guru', $valcari);
+			$data 		= $data->where('id_sekolah',session('sekolah_id_sekolah'));
+			if ($request->has('search') && !empty($request->search)) {
+				$searchTerm = $request->search;
+				$data->where(function ($q) use ($searchTerm) {
+					$q->where('nama', 'like', "%$searchTerm%")
+						->orWhere('kelas', 'like', "%$searchTerm%")
+						->orWhere('deskripsi', 'like', "%$searchTerm%")
+						->orWhere('tglmasalah', 'like', "%$searchTerm%")
+						->orWhere('jenis', 'like', "%$searchTerm%")
+						->orWhere('tglpenanganan', 'like', "%$searchTerm%")
+						->orWhere('kategori', 'like', "%$searchTerm%")
+						->orWhere('tindaklanjut', 'like', "%$searchTerm%")
+						->orWhere('layanan', 'like', "%$searchTerm%");
+				});
+			}
+			$data		= $data->orderByRaw($order)->paginate($limit);
+			$totaldata	= $data->total();
+			if ($data) {
+				foreach($data as $rows){
+					$arraysurat[$i] = $rows;
+					$i++;
+				}
+				$response = [
+					'message'	=> 'List Log Sebagai Guru BK',
+					'total'		=> $totaldata,
+					'data'		=> $arraysurat
+				];
+				return response()->json($response, 200);
+			}
+			$response = [
+				'message'        => 'No Data'
+			];
+			return response()->json($response, 500);
+		} else if ($jenis == 'bimbingan'){
+			$arraysurat	= [];
+			$i 			= 0;
+			$data		= new Konselingguru();
+			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
+			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
+			$data 		= $data->where('niy', $valcari);
+			$data 		= $data->where('id_sekolah',session('sekolah_id_sekolah'));
+			if ($request->has('search') && !empty($request->search)) {
+				$searchTerm = $request->search;
+				$data->where(function ($q) use ($searchTerm) {
+					$q->where('nama', 'like', "%$searchTerm%")
+						->orWhere('deskripsi', 'like', "%$searchTerm%")
+						->orWhere('tglmasalah', 'like', "%$searchTerm%")
+						->orWhere('jenis', 'like', "%$searchTerm%")
+						->orWhere('tglpenanganan', 'like', "%$searchTerm%")
+						->orWhere('kategori', 'like', "%$searchTerm%")
+						->orWhere('tindaklanjut', 'like', "%$searchTerm%")
+						->orWhere('layanan', 'like', "%$searchTerm%");
+				});
+			}
+			$data		= $data->orderByRaw($order)->paginate($limit);
+			$totaldata	= $data->total();
+			if ($data) {
+				foreach($data as $rows){
+					$arraysurat[$i] = $rows;
+					$i++;
+				}
+				$response = [
+					'message'	=> 'List Log Bimbingan Karyawan',
+					'total'		=> $totaldata,
+					'data'		=> $arraysurat
+				];
+				return response()->json($response, 200);
+			}
+			$response = [
+				'message'        => 'No Data'
+			];
+			return response()->json($response, 500);
+		} else if ($jenis == 'exportbimbingan'){
+			$sql 		= Konselingguru::where('niy', $valcari)->where('id_sekolah', session('sekolah_id_sekolah'))->get();
+			echo json_encode($sql);
+		} else if ($jenis == 'datapelengkapsiswa'){
+			$id 		= $request->val02;
+			$nik 		= $request->val03;
+			$panggilan 	= $request->val04;
+			$nama 		= $request->val05;
+			$datainduk 	= Datainduk::where('id', $id)->first();
+			$cekada 	= Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah', session('sekolah_id_sekolah'))->count();
+			if ($cekada == 0){
+				Datapelengkappsb::create([
+					'niksiswa'		=> $datainduk->nik, 
+					'panggilan'		=> $datainduk->panggilan, 
+					'umur'			=> 0, 
+					'agama'			=> 'Islam',
+					'warga'			=> 'WNI',
+					'bahasa'		=> 'Indenesia',
+					'penyakit'		=> '',
+					'anakke'		=> '',
+					'kandung'		=> '',
+					'tiri'			=> '',
+					'angkat'		=> '',
+					'jarak'			=> '',
+					'telpon'		=> '',
+					'bersama'		=> '',
+					'payah'			=> $datainduk->payah,
+					'pibu'			=> $datainduk->pibu,
+					'gayah'			=> $datainduk->gayah,
+					'gibu'			=> $datainduk->gibu,
+					'aayah'			=> '',
+					'aaibu'			=> '',
+					'hayah'			=> '',
+					'hibu'			=> '',
+					'agamawali'		=> '',
+					'hwali'			=> '',
+					'kwali'			=> '',
+					'hubwali'		=> '',
+					'alamattk'		=> '',
+					'pindahasal'	=> '',
+					'pindahkelas'	=> '',
+					'pindahtgl'		=> '',
+					'pindahkekls'	=> '',
+					'kesulitan'		=> '',
+					'anggotarumah'	=> '',
+					'kegiatansendiri'=>'',
+					'mata'			=> '',
+					'telinga'		=> '',
+					'wajah'			=> '',
+					'gybljr'		=> $datainduk->gybljr,
+					'bakat'			=> $datainduk->bakat,
+					'sumberinfo'	=> '',
+					'prestasi1'		=> '',
+					'prestasi2'		=> '',
+					'prestasi3'		=> '',
+					'prestasi4'		=> '',
+					'marking'		=> $datainduk->id,
+					'scanakta'		=> $nik.'-Akte',
+					'scanfoto'		=> $nik.'-Foto',
+					'scankk'		=> $nik.'-KSK',
+					'scanket'		=> $nik.'-SKL',
+					'scanbukti'		=> $nik.'-BuktiBayar',
+					'id_sekolah'    => session('sekolah_id_sekolah')
+				]);
+			}
+			$result 	= Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+			echo json_encode($result);
+		} else {
+			$getallsiswa 	= Datainduk::where('tamasuk', $valcari)->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('noinduk', 'DESC')->get();
+			if (!empty($getallsiswa)){
+				foreach ($getallsiswa as $hasil) {
+					$foto 		= $hasil->foto;
+					if ($foto == '' OR is_null($foto)){
+						$lampiran = '<img src="'.url("/").'/'.Session('sekolah_logo').'" height="35">';
+					} else {
+						$lampiran = '<img src="'.url("/").'/dist/img/foto/'.$foto.'" height="35">';
+					}
+					$arrsiswa[] = array(
+						'id' 			=> $hasil->id,	
+						'nik' 			=> $hasil->nik,
+						'nama' 			=> $hasil->nama,	
+						'kelamin' 		=> $hasil->kelamin,
+						'tmplahir' 		=> $hasil->tmplahir,
+						'tgllahir' 		=> $hasil->tgllahir,
+						'noinduk' 		=> $hasil->noinduk,
+						'nisn' 			=> $hasil->nisn,
+						'darah' 		=> $hasil->darah,
+						'tinggi' 		=> $hasil->tinggi,
+						'berat' 		=> $hasil->berat,
+						'namaayah' 		=> $hasil->namaayah,
+						'namaibu' 		=> $hasil->namaibu,	
+						'kerjaayah' 	=> $hasil->kerjaayah,
+						'kerjaibu'		=> $hasil->kerjaibu,
+						'wali'			=> $hasil->wali,
+						'pekerjaanwali'	=> $hasil->pekerjaanwali,
+						'erte'			=> $hasil->erte,
+						'erwe'			=> $hasil->erwe,
+						'alamatortu'	=> $hasil->alamatortu,
+						'kelurahan'		=> $hasil->kelurahan,
+						'kecamatan'		=> $hasil->kecamatan,
+						'kota'			=> $hasil->kota,
+						'kodepos'		=> $hasil->kodepos,
+						'klspos'		=> $hasil->klspos,			
+						'foto'			=> $hasil->foto,
+						'tamasuk'		=> $hasil->tamasuk,
+						'hape'			=> $hasil->hape,
+						'asal'			=> $hasil->asal,
+						'mutasi'		=> $hasil->mutasi,
+						'nokelulusan'	=> $hasil->nokelulusan,
+						'lampiran'		=> $lampiran,
+					);
+				}
+			}
+			if (Session('email') !== null){
+				$getallsiswa 	= Datainduk::where('kodeortuasuh', Session('email'))->orderBy('noinduk', 'DESC')->get();
+				if (!empty($getallsiswa)){
+					foreach ($getallsiswa as $hasil) {
+						$foto 		= $hasil->foto;
+						if ($foto == '' OR is_null($foto)){
+							$foto = url("/").'/'.Session('sekolah_logo');
+						} else {
+							if (Storage::disk('local')->exists('/dist/img/foto/' . $foto)) {
+								$foto = url("/").'/dist/img/foto/'.$foto;
+							} else {
+								$foto = url("/").'/'.Session('sekolah_logo');
+							}
+						}
+						$arrsiswa[] = array(
+							'id' 			=> $hasil->id,	
+							'nik' 			=> $hasil->nik,
+							'nama' 			=> $hasil->nama,	
+							'kelamin' 		=> $hasil->kelamin,
+							'tmplahir' 		=> $hasil->tmplahir,
+							'tgllahir' 		=> $hasil->tgllahir,
+							'noinduk' 		=> $hasil->noinduk,
+							'nisn' 			=> $hasil->nisn,
+							'darah' 		=> $hasil->darah,
+							'tinggi' 		=> $hasil->tinggi,
+							'berat' 		=> $hasil->berat,
+							'namaayah' 		=> $hasil->namaayah,
+							'namaibu' 		=> $hasil->namaibu,	
+							'kerjaayah' 	=> $hasil->kerjaayah,
+							'kerjaibu'		=> $hasil->kerjaibu,
+							'wali'			=> $hasil->wali,
+							'pekerjaanwali'	=> $hasil->pekerjaanwali,
+							'erte'			=> $hasil->erte,
+							'erwe'			=> $hasil->erwe,
+							'alamatortu'	=> $hasil->alamatortu,
+							'kelurahan'		=> $hasil->kelurahan,
+							'kecamatan'		=> $hasil->kecamatan,
+							'kota'			=> $hasil->kota,
+							'kodepos'		=> $hasil->kodepos,
+							'klspos'		=> $hasil->klspos,			
+							'foto'			=> $hasil->foto,
+							'tamasuk'		=> $hasil->tamasuk,
+							'hape'			=> $hasil->hape,
+							'asal'			=> $hasil->asal,
+							'mutasi'		=> $hasil->mutasi,
+							'nokelulusan'	=> $hasil->nokelulusan,
+							'lampiran'		=> $lampiran,
+						);
+					}
+				}
+			}
+			echo json_encode($arrsiswa);
+		}
+	}
+	public function jrekapthnini() {
+		$arrrekap 	= [];
+		$tahun		= date("Y");
+		$beras 		= 0;
+		$uang 		= 0;
+		$maal		= 0;
+		$shodaqoh	= 0;
+		$getallthn 	= Pembayaranzis::where('created_at', 'LIKE', $tahun.'%')->where('tglvalidasi', '!=', '0000-00-00')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+		if (!empty($getallthn)){
+			foreach ($getallthn as $rdatane) {
+				$jeniszakat		= $rdatane->jeniszakat;
+				$nominal		= $rdatane->nominal;
+				$zakatmaal		= $rdatane->zakatmaal;
+				$donasi			= $rdatane->donasi;
+				if ($jeniszakat == 'Uang'){
+					$uang 		= $uang + $nominal;
+				} else {
+					$beras 		= $beras + $nominal;
+				}
+				$maal 			= $maal + $zakatmaal;
+				$shodaqoh		= $shodaqoh + $donasi;
+			}
+		}
+		$arrrekap[] 	= array(
+			'jenis' 	=> 'Zakat Fitrah Beras',
+			'jumlah' 	=> $beras,
+		);
+		$arrrekap[] 	= array(
+			'jenis' 	=> 'Zakat Fitrah Uang',
+			'jumlah' 	=> $uang,
+		);
+		$arrrekap[] 	= array(
+			'jenis' 	=> 'Zakat Maal',
+			'jumlah' 	=> $maal,
+		);
+		$arrrekap[] 	= array(
+			'jenis' 	=> 'Shodaqoh/Donasi',
+			'jumlah' 	=> $shodaqoh,
+		);
+		echo json_encode($arrrekap);
+	}
+	public function jallData(Request $request) {
+		$bulan   	=   $request->val01;
+		$tahun   	=   $request->val02;
+		$jenis 		=   $request->val03;
+		
+		if ($jenis == 'ALL'){
+			if ($tahun == 'TAHUNINI'){
+				$tahun 		= date("Y");
+				$getallthn 	= Pembayaranzis::where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+			} else {
+				if ($bulan == 'ALL'){
+					$getallthn 	= Pembayaranzis::where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+				} else { 
+					$valcari 	= $tahun.'-'.$bulan;
+					$getallthn 	= Pembayaranzis::where('created_at', 'LIKE', $valcari.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+				}
+			}
+		} else {
+			if ($jenis== 'Shodaqoh'){
+				if ($tahun == 'TAHUNINI'){
+					$tahun 		= date("Y");
+					$getallthn 	= Pembayaranzis::where('donasi', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+				} else {
+					if ($bulan == 'ALL'){
+						$getallthn 	= Pembayaranzis::where('donasi', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+					} else { 
+						$valcari 	= $tahun.'-'.$bulan;
+						$getallthn 	= Pembayaranzis::where('donasi', '!=', '0')->where('created_at', 'LIKE', $valcari.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+					}
+				}
+			}
+			else if ($jenis== 'Maal'){
+				if ($tahun == 'TAHUNINI'){
+					$tahun 		= date("Y");
+					$getallthn 	= Pembayaranzis::where('zakatmaal', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+				} else {
+					if ($bulan == 'ALL'){
+						$getallthn 	= Pembayaranzis::where('zakatmaal', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+					} else { 
+						$valcari 	= $tahun.'-'.$bulan;
+						$getallthn 	= Pembayaranzis::where('zakatmaal', '!=', '0')->where('created_at', 'LIKE', $valcari.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+					}
+				}
+			}
+			else {
+				if ($tahun == 'TAHUNINI'){
+					$tahun 		= date("Y");
+					$getallthn 	= Pembayaranzis::where('nominal', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+				} else {
+					if ($bulan == 'ALL'){
+						$getallthn 	= Pembayaranzis::where('nominal', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+					} else { 
+						$valcari 	= $tahun.'-'.$bulan;
+						$getallthn 	= Pembayaranzis::where('nominal', '!=', '0')->where('created_at', 'LIKE', $valcari.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
+					}
+				}
+			}
+		}
+		$alldata 	= [];
+		if (!empty($getallthn)){
+			foreach ($getallthn as $rdatane) {
+				$jeniszakat		= $rdatane->jeniszakat;
+				$nominal		= $rdatane->nominal;
+				$zakatmaal		= $rdatane->zakatmaal;
+				$donasi			= $rdatane->donasi;
+				$uang 			= 0;
+				$beras 			= 0;
+				if ($jeniszakat == 'Uang'){
+					$uang 		= $nominal;
+				} else { $beras = $nominal; }
+				$total 			= $uang + $zakatmaal + $donasi;
+				$alldata[] 		= array(
+					'idne'			=> $rdatane->id,
+					'namawali'		=> $rdatane->namawali,
+					'hape'			=> $rdatane->hape,
+					'namasiswa'		=> $rdatane->namasiswa,
+					'kelas'			=> $rdatane->kelas,
+					'jeniszakat'	=> $jeniszakat,
+					'orang'			=> $rdatane->orang,
+					'beras'			=> $beras,
+					'uang'			=> $uang,
+					'nominal'		=> $nominal,
+					'zakatmaal'		=> $zakatmaal,
+					'donasi'		=> $donasi,
+					'total'			=> $total,
+					'validator'		=> $rdatane->validator,
+					'tglvalidasi'	=> $rdatane->tglvalidasi,
+					'namafile'		=> $rdatane->getTandatangan->xfile ?? '',
+				);
+			}
+		}
+		echo json_encode($alldata);
+	}
+	public function jsonDataindukstaff() {
+		$arrstaf 		= [];
+		$homebase		= url("/");
+		$getallstaf 	= Dataindukstaff::orderBy('niy', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+		if (!empty($getallstaf)){
+			foreach ($getallstaf as $hasil) {
+				$foto 		= $hasil->foto;
+				if ($foto == '' OR is_null($foto)){
+					$lampiran = '<img src="'.url("/").'/'.Session('sekolah_logo').'" height="35">';
+				} else {
+					$lampiran = '<img src="'.url("/").'/dist/img/foto/'.$foto.'" height="35">';
+				}
+				
+				$arrstaf[] = array(
+					'id' 			=> $hasil->id,	
+					'nama' 			=> $hasil->nama,		
+					'ttl' 			=> $hasil->ttl,
+					'nuptk' 		=> $hasil->nuptk,
+					'niy' 			=> $hasil->niy,
+					'kelamin' 		=> $hasil->kelamin,
+					'agama' 		=> $hasil->agama,
+					'ijasah' 		=> $hasil->ijasah,
+					'jabatan' 		=> $hasil->jabatan,
+					'statpeg' 		=> $hasil->statpeg,
+					'alamat' 		=> $hasil->alamat,	
+					'notelp' 		=> $hasil->notelp,
+					'foto' 			=> $foto,
+					'tmt' 			=> $hasil->tmt,
+					'idfinger' 		=> $hasil->idfinger,
+					'lampiran'		=> $lampiran,
+				);
+			}
+		}		
+		echo json_encode($arrstaf);
+	}
+	public function jsonSetinsidental() {
+		$arrinsidental		= [];
+		$homebase			= url("/");
+		$getaktifinsidental = Insidental::where('aktifasi', 'aktif')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('id', 'DESC')->get();
+		if (!empty($getaktifinsidental)){
+			foreach ($getaktifinsidental as $hasil) {
+				$arrinsidental[] = array(
+					'id' 		=> $hasil->id,
+					'deskripsi'	=> $hasil->deskripsi,
+					'kode'		=> $hasil->kode,
+					'bataswaktu'=> $hasil->bataswaktu,
+					'aktifasi'	=> $hasil->aktifasi,
+					'jenis'		=> $hasil->jenis,
+					'operator'	=> $hasil->operator,
+					'timestamp'	=> $hasil->timestamp,
+					'biaya'		=> number_format( $hasil->biaya , 0 , '.' , ',' ),
+				);
+			}
+		}		
+		echo json_encode($arrinsidental);
+	}
+	public function jsonEkskul() {
+		$arrekskul		= [];
+		$homebase		= url("/");
+		$getalekskul 	= Ekstrakulikuler::where('id_sekolah', session('sekolah_id_sekolah'))->orderBy('id', 'DESC')->get();
+		if (!empty($getalekskul)){
+			foreach ($getalekskul as $hasil) {
+				$set01		= $hasil->nama;
+				$jumlah 	= DB::table('db_setkeuangan')
+								->join('db_datainduk', 'db_setkeuangan.noinduk', 'db_datainduk.noinduk')
+								->where('db_datainduk.id_sekolah', session('sekolah_id_sekolah'))
+								->where('db_datainduk.nokelulusan', '')
+								->where(function ($query) use ($set01) {
+								$query->where('db_setkeuangan.eksul1', $set01)
+									->orWhere('db_setkeuangan.eksul2', $set01)
+									->orWhere('db_setkeuangan.eksul3', $set01)
+									->orWhere('db_setkeuangan.eksul4', $set01)
+									->orWhere('db_setkeuangan.eksul5', $set01);
+							})->count();
+				$arrekskul[] = array(
+					'id' 		=> $hasil->id,
+					'namaeksul'	=> $hasil->nama,
+					'status'	=> $hasil->status,
+					'peminat'	=> $jumlah,
+					'biaya'		=> number_format( $hasil->biaya , 0 , '.' , ',' ),
+				);
+			}
+		}		
+		echo json_encode($arrekskul);
+	}
+	public function jsonSetkeuangan(Request $request) {
+		$homebase 	= url("/");
+		$alldata 	= [];
+		$kelas 		= $request->val01;
+		$query 		= Datainduk::where('nokelulusan', '')->where('id_sekolah', session('sekolah_id_sekolah'));
+		if ($kelas == 'jilid'){
+			$query->where('jilid', $request->val02);
+		} else {
+			if ($kelas !== 'all') {
+				$query->where('klspos', 'LIKE', $kelas . '%');
+			}
+		}
+		
+		$getallsiswa = $query->get();
+		if ($getallsiswa->isNotEmpty()) {
+			foreach ($getallsiswa as $hasil) {
+				$noinduk 	= $hasil->noinduk;
+				$eksul1 	= '';
+				$eksul2 	= '';
+				$eksul3 	= '';
+				$eksul4 	= '';
+				$eksul5 	= '';
+				$biaya1 	= '';
+				$biaya2 	= '';
+				$biaya3 	= '';
+				$biaya4 	= '';
+				$biaya5 	= '';
+				$spp 		= 0;
+				$dpp 		= 0;
+				$paguyuban 	= 0;
+				$foto 		= $hasil->foto;
+				if ($foto == '' OR is_null($foto)){
+					$lampiran = url("/").'/'.Session('sekolah_logo');
+				} else {
+					if (Storage::disk('local')->exists('/dist/img/foto/' . $foto)) {
+						$lampiran = url("/").'/dist/img/foto/'.$foto;
+					} else {
+						$lampiran = url("/").'/'.Session('sekolah_logo');
+					}
+				}
+				$getdatakeu = Setkuangan::where('noinduk', $noinduk)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+				if ($getdatakeu !== null) {
+					$spp 		= number_format($getdatakeu->spp, 0, '.', ',');
+					$dpp 		= number_format($getdatakeu->dpp, 0, '.', ',');
+					$paguyuban 	= number_format($getdatakeu->paguyuban, 0, '.', ',');
+					$eksul1 	= $getdatakeu->eksul1;
+					$eksul2 	= $getdatakeu->eksul2;
+					$eksul3 	= $getdatakeu->eksul3;
+					$eksul4 	= $getdatakeu->eksul4;
+					$eksul5 	= $getdatakeu->eksul5;
+					foreach ([$eksul1, $eksul2, $eksul3, $eksul4, $eksul5] as $i => $ekstrakulikuler) {
+						if ($ekstrakulikuler !== '') {
+							$cekbiaya = Ekstrakulikuler::where('nama', $ekstrakulikuler)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+							if ($cekbiaya !== null) {
+								${"biaya" . ($i + 1)} = $cekbiaya->biaya;
+							}
+						}
+					}
+				}
+				$alldata[] = [
+					'id' 		=> $hasil->id,
+					'noinduk' 	=> $hasil->noinduk,
+					'dpp' 		=> $dpp,
+					'spp' 		=> $spp,
+					'paguyuban' => $paguyuban,
+					'eksul1' 	=> $eksul1,
+					'eksul2' 	=> $eksul2,
+					'eksul3' 	=> $eksul3,
+					'eksul4' 	=> $eksul4,
+					'eksul5' 	=> $eksul5,
+					'biaya1' 	=> $biaya1,
+					'biaya2' 	=> $biaya2,
+					'biaya3' 	=> $biaya3,
+					'biaya4' 	=> $biaya4,
+					'biaya5' 	=> $biaya5,
+					'lampiran' 	=> $lampiran,
+					'nama' 		=> $hasil->nama,
+					'kelas' 	=> $hasil->klspos,
+					'kelamin' 	=> $hasil->kelamin,
+					'nisn' 		=> $hasil->nisn,
+				];
+			}
+		}
+		echo json_encode($alldata);
+	}
+	public function jsonLapinsidental(Request $request) {
+		$set01   	= $request->val01;
+		$set02   	= $request->val02;
+		$alldata 	= [];
+		$getallsiswa= Datainduk::where('klspos', 'LIKE', $set02.'%')->where('nokelulusan', '')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+		if (!empty($getallsiswa)){
+			foreach ($getallsiswa as $hasil) {
+				$noinduk 		= $hasil->noinduk;
+				if ($set01 == 'dpp'){
+					$getdpp		= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+					if (isset($getdpp->dpp)){
+						$dpp 		= $getdpp->dpp;
+						$tdpp 		= number_format( $dpp , 0 , '.' , ',' );
+						$getjmldpp 	= Pembayaran::select(DB::raw("SUM(biaya) as jumlah"))
+										->where('jenis', 'dpp')
+										->where('noinduk', $noinduk)
+										->where('verifikasi', '!=', '')
+										->where('id_sekolah',session('sekolah_id_sekolah'))
+										->groupBy('jenis')->first();
+						if (isset($getjmldpp->jumlah)){
+							$bayar 	= $getjmldpp->jumlah;
+						}else { $bayar 	= 0; }
+						
+						$selisih 	= $dpp - $bayar;
+						$tbayar		= number_format( $bayar , 0 , '.' , ',' );
+						if ($selisih <= 0){
+							$keterangan ='LUNAS';
+						} else { 
+							$tselisih	= number_format( $selisih , 0 , '.' , ',' );
+							$keterangan = 'Kekurangan DPP '.$tselisih; 
+						}				
+						$alldata[] = array(
+							'id' 			=> $hasil->id,
+							'noinduk'		=> $noinduk,
+							'kelas'			=> $hasil->klspos,
+							'tagihan'		=> $tdpp,
+							'bayar'			=> $tbayar,
+							'keterangan'	=> $keterangan,
+							'nama'			=> $hasil->nama,	
+						);
+					}
+				} else {
+					$rkeuangan = Insidental::where('id', $set01)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+					if (isset($rkeuangan->kode)){
+						$kode 			= $rkeuangan->kode;
+						$biaya 			= $rkeuangan->biaya;
+						$tbiaya			= number_format( $biaya , 0 , '.' , ',' );
+						$getjmldpp 		= Pembayaran::select(DB::raw("SUM(biaya) as jumlah"))
+											->where('jenis', $kode)
+											->where('noinduk', $noinduk)
+											->where('verifikasi', '!=', '')
+											->where('id_sekolah',session('sekolah_id_sekolah'))
+											->groupBy('jenis')->first();
+						if (isset($getjmldpp->jumlah)){
+							$bayar 	= $getjmldpp->jumlah;
+						}else { $bayar 	= 0; }
+						
+						$selisih 	= $biaya - $bayar;
+						$tbayar		= number_format( $bayar , 0 , '.' , ',' );
+						if ($selisih <= 0){
+							$keterangan ='LUNAS';
+						} else { 
+							$tselisih		= number_format( $selisih , 0 , '.' , ',' );
+							$keterangan 	= 'Kekurangan Insidental Kode '.$kode.' Sejumlah '.$tselisih; 
+						}				
+						$alldata[] = array(
+							'id' 			=> $hasil->id,
+							'noinduk'		=> $noinduk,
+							'kelas'			=> $hasil->klspos,
+							'tagihan'		=> $biaya,
+							'bayar'			=> $tbayar,
+							'keterangan'	=> $keterangan,
+							'nama'			=> $hasil->nama,
+						);
+					}
+				}
+			}
+		}
+		echo json_encode($alldata);
+	}
+	public function jsonLapbulanan(Request $request) {
+		$bulan1   	= (int)$request->val01;
+		$bulan2   	= (int)$request->val02;
+		$tahun   	= $request->val03;
+		$arraysurat	= [];
+		$i 			= 1;
+		$bulanlist 	= array(0 => "bulan", 1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
+		$finish 	= $bulan2 +1;
+		while ($bulan1 != $finish){
+			$bulan 	= $bulanlist[$bulan1];
+			$getallsiswa= Datainduk::where('nokelulusan', '')->orderBy('noinduk', 'ASC')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+			if (!empty($getallsiswa)){
+				foreach ($getallsiswa as $hasil) {
+					$noinduk 	= $hasil->noinduk;
+					$biaya1		= 0;
+					$biaya2		= 0;
+					$biaya3		= 0;
+					$biaya4		= 0;
+					$biaya5		= 0;
+					$getdpp		= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+					if (isset($getdpp->spp)){
+						$dpp 		= $getdpp->dpp;
+						$spp 		= $getdpp->spp;
+						$paguyuban	= $getdpp->paguyuban;
+						$eksul1 	= $getdpp->eksul1;
+						$eksul2 	= $getdpp->eksul2;
+						$eksul3 	= $getdpp->eksul3;
+						$eksul4 	= $getdpp->eksul4;
+						$eksul5 	= $getdpp->eksul5;
+					} else {
+						$dpp 		= 0;
+						$spp 		= 0;
+						$paguyuban	= 0;
+						$eksul1 	= '';
+						$eksul2 	= '';
+						$eksul3 	= '';
+						$eksul4 	= '';
+						$eksul5 	= '';
+					}
+					if ($eksul1 != ''){
+						$rekskul1 = Ekstrakulikuler::where('nama', 'LIKE', $eksul1)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+						if(isset($rekskul1->biaya)){
+							$biaya1	= $rekskul1->biaya;
+						}
+					}
+					if ($eksul2 != ''){
+						$rekskul2 = Ekstrakulikuler::where('nama', 'LIKE', $eksul2)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+						if(isset($rekskul2->biaya)){
+							$biaya2	= $rekskul2->biaya;
+						}
+					}
+					if ($eksul3 != ''){
+						$rekskul3 = Ekstrakulikuler::where('nama', 'LIKE', $eksul3)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+						if(isset($rekskul3->biaya)){
+							$biaya3	= $rekskul3->biaya;
+						}
+					}
+					if ($eksul4 != ''){
+						$rekskul4 = Ekstrakulikuler::where('nama', 'LIKE', $eksul4)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+						if(isset($rekskul4->biaya)){
+							$biaya4	= $rekskul4->biaya;
+						}
+					}
+					if ($eksul5 != ''){
+						$rekskul5 = Ekstrakulikuler::where('nama', 'LIKE', $eksul5)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+						if(isset($rekskul5->biaya)){
+							$biaya5	= $rekskul5->biaya;
+						}
+					}
+					$bayarspp		= 0;
+					$bayarpaguyuban = 0;
+					$bayareks1		= 0;
+					$bayareks2		= 0;
+					$bayareks3		= 0;
+					$bayareks4		= 0;
+					$bayareks5		= 0;
+					$result 		= Pembayaran::select(DB::raw('SUM(biaya) as biaya'), 'jenis')
+										->where('noinduk', $noinduk)
+										->where('verifikasi', '!=', '')
+										->where('bulan', $bulan)
+										->where('tahun', $tahun)
+										->where('id_sekolah',session('sekolah_id_sekolah'))
+										->groupBy('jenis')->orderBy('jenis', 'DESC')->get();
+					foreach($result as $row) {
+						$jmlhbyr 	= $row->biaya;
+						$jenis 		= $row->jenis;
+						if ($jenis == 'spp'){
+							$bayarspp = $jmlhbyr;
+						}
+						if ($jenis == 'Uang Makan'){
+							$bayarpaguyuban = $jmlhbyr;
+						}
+						if ($jenis == $eksul1){
+							$bayareks1 = $jmlhbyr;
+						}
+						if ($jenis == $eksul2){
+							$bayareks2 = $jmlhbyr;
+						}
+						if ($jenis == $eksul3){
+							$bayareks3 = $jmlhbyr;
+						}
+						if ($jenis == $eksul4){
+							$bayareks4 = $jmlhbyr;
+						}
+						if ($jenis == $eksul5){
+							$bayareks5 = $jmlhbyr;
+						};
+					}
+					$total = (($spp - $bayarspp)+($paguyuban - $bayarpaguyuban)+($biaya1 - $bayareks1)+($biaya2 - $bayareks2)+($biaya3 - $bayareks3)+($biaya4 - $bayareks4)+($biaya5 - $bayareks5));
+					if ($total <= 0){
+						$keterangan = 'LUNAS';
+					}
+					else {
+						$tselisih	= number_format( $total , 0 , '.' , ',' );
+						$keterangan = 'Kekurangan Pembayaran '.$tselisih;
+					}
+					$periode = $bulan.'-'.$tahun;
+					$arraysurat[] = array(
+						'id' 			=> $i,
+						'noinduk'		=> $noinduk,
+						'nama'			=> $hasil->nama,
+						'kelas'			=> $hasil->klspos,
+						'periode'		=> $periode,
+						'tspp'			=> $spp,
+						'bspp'			=> $bayarspp,
+						'tpaguyuban'	=> $paguyuban,
+						'bpaguyuban'	=> $bayarpaguyuban,
+						'teks1'			=> $biaya1,
+						'teks2'			=> $biaya2,
+						'teks3'			=> $biaya3,
+						'teks4'			=> $biaya4,
+						'teks5'			=> $biaya5,
+						'beks1'			=> $bayareks1,
+						'beks2'			=> $bayareks2,
+						'beks3'			=> $bayareks3,
+						'beks4'			=> $bayareks4,
+						'beks5'			=> $bayareks5,
+						'keterangan'	=> $keterangan,
+					);
+					$i++;
+				}
+			}
+			$bulan1++;
+		}
+		echo json_encode($arraysurat);
+	}
+	public function jsonLaplengkap(Request $request) {
+		$bulan1   	= (int)$request->val01;
+		$bulan2   	= (int)$request->val02;
+		$tahun   	= $request->val03;
+		$arraysurat	= [];
+		$i 			= 1;
+		$toall		= 0;
+		$bulanlist 	= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
+		$finish 	= $bulan2 +1;
+		while ($bulan1 != $finish){
+			$bulan 	= $bulanlist[$bulan1];
+			$valcari= '%'.$bulan.$tahun.'%';
+			$getallsiswa= Datainduk::where('id_sekolah',session('sekolah_id_sekolah'))->where('nokelulusan', '')->orderBy('noinduk', 'ASC')->get();
+			if (!empty($getallsiswa)){
+				foreach ($getallsiswa as $rbayar) {
+					$noinduk 		= $rbayar->noinduk;
+					$klspos			= $rbayar->klspos;
+					$nama 	        = $rbayar->nama;
+					$total 			= 0;
+					$spp 			= 0;
+					$dpp 			= 0;
+					$paguyuban 		= 0;
+					$ekskul1 		= 0;
+					$ekskul2 		= 0;
+					$ekskul3 		= 0;
+					$ekskul4 		= 0;
+					$ekskul5 		= 0;
+					$insid1 		= 0;
+					$insid2 		= 0;
+					$insid3 		= 0;
+					$insid4 		= 0;
+					$insid5 		= 0;
+					$bln 			= '';
+					$thn			= '';
+					$result 		= Pembayaran::select(DB::raw('SUM(biaya) as biaya'), 'jenis', 'bulan', 'tahun')->where('noinduk', $noinduk)->where('verifikasi', '!=', '')->where('bulan', $bulan)->where('tahun', $tahun)->groupBy('jenis')->orderBy('jenis', 'DESC')->get();
+					foreach($result as $row) {
+						$jmlhbyr 	= $row->biaya;
+						$jenis 		= $row->jenis;
+						$bln 		= $row->bulan;
+						$thn 		= $row->tahun;
+						$total      = $total + $jmlhbyr;
+						if ($jenis == 'spp'){
+							$spp = number_format( $jmlhbyr , 0 , '.' , ',' );
+						}
+						else if ($jenis == 'Uang Makan'){
+							$paguyuban = number_format( $jmlhbyr , 0 , '.' , ',' );
+						}
+						else if ($jenis == 'dpp'){
+							$dpp = number_format( $jmlhbyr , 0 , '.' , ',' );
+						}
+						else {
+							$count 	= Ekstrakulikuler::where('nama', $jenis)->count();
+							if ($count != 0){
+									if ($ekskul1 == 0) { $ekskul1 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
+									else if ($ekskul2 == 0) { $ekskul2 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
+									else if ($ekskul3 == 0) { $ekskul3 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
+									else if ($ekskul4 == 0) { $ekskul4 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
+									else { $ekskul5 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
+							} else {
+									if ($insid1 == 0) { $insid1 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
+									else if ($insid2 == 0) { $insid2 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
+									else if ($insid3 == 0) { $insid3 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
+									else if ($insid4 == 0) { $insid4 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
+									else { $insid5 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
+							}
+						}
+					}
+					$periode 	= $bln.'-'.$thn;
+					$toall 		= $toall + $total;
+					if ($total != 0){
+						$tulistotal = number_format( $total , 0 , '.' , ',' );
+						$arraysurat[] = array(
+							'noinduk'		=> $noinduk,
+							'nama'			=> $nama,
+							'kelas'			=> $klspos,
+							'periode'		=> $periode,
+							'tspp'			=> $spp,
+							'tpaguyuban'	=> $paguyuban,
+							'teks1'			=> $ekskul1,
+							'teks2'			=> $ekskul2,
+							'teks3'			=> $ekskul3,
+							'teks4'			=> $ekskul4,
+							'teks5'			=> $ekskul5,
+							'beks1'			=> $insid1,
+							'beks2'			=> $insid2,
+							'beks3'			=> $insid3,
+							'beks4'			=> $insid4,
+							'beks5'			=> $insid5,
+							'keterangan'	=> $tulistotal,
+						);
+					}
+					$i++;
+				}
+			}
+			$bulan1++;
+		}
+		$tulistotalall 	= number_format( $toall , 0 , '.' , ',' );
+		$arraysurat[] 	= array(
+			'noinduk'		=> '',
+			'nama'			=> 'Total',
+			'kelas'			=> '',
+			'periode'		=> '',
+			'tspp'			=> '',
+			'tpaguyuban'	=> '',
+			'teks1'			=> '',
+			'teks2'			=> '',
+			'teks3'			=> '',
+			'teks4'			=> '',
+			'beks1'			=> '',
+			'beks2'			=> '',
+			'beks3'			=> '',
+			'beks4'			=> '',
+			'keterangan'	=> $tulistotalall,
+		);
+		echo json_encode($arraysurat);
+    }
+	public function jsonLaplengkapperjenis(Request $request) {
+		$bulan1   	= (int)$request->val01;
+		$bulan2   	= (int)$request->val02;
+		$tahun   	= $request->val03;
+		$arraysurat	= [];
+		$i 			= 1;
+		$bulanlist 	= array(0 => "bulan", 1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
+		$finish 	= $bulan2 +1;
+		while ($bulan1 != $finish){
+			$bulan 		= $bulanlist[$bulan1];
+			$valcari 	= '%'.$bulan.$tahun.'%';
+			$periode	= $bulan.' '.$tahun;
+			$sql 		= Pembayaran::where('bulan', $bulan)->where('tahun', $tahun)->where('biaya', '!=', '0')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+			if (!empty($sql)){
+				foreach ($sql as $hasil){
+					$jenis = $hasil->jenis;
+					$ceknama = Insidental::where('kode', $jenis)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+					if (isset($ceknama->deskripsi)){
+						$jenis = $ceknama->deskripsi;
+					}
+					$arraysurat[] = array(
+						'noinduk'		=> $hasil->noinduk,
+						'nama'			=> $hasil->nama,
+						'kelas'			=> $hasil->kelas,
+						'periode'		=> $periode,
+						'nominal'		=> $hasil->biaya,
+						'keterangan'	=> $jenis,
+						'petugas'		=> $hasil->inputor,
+						'tglverifikasi'	=> $hasil->updated_at,
+					);
+				}
+			}			
+			$bulan1++;
+		}
+		echo json_encode($arraysurat);
+	}
+	public function jsoRekapharian(Request $request) {
+		$bulan1   	= (int)$request->val01;
+		$bulan2   	= (int)$request->val02;
+		$tahun   	= $request->val03;
+		$arraysurat	= [];
+		$i 			= 1;
+		$bulanlist 	= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
+		$finish 	= $bulan2 +1;
+		while ($bulan1 != $finish){
+			$bulan 		= $bulanlist[$bulan1];
+			$valcari 	= '%'.$bulan.$tahun.'%';
+			$periode	= $bulan.' '.$tahun;
+			$sql 		= Pembayaran::where('harian', 'LIKE', $valcari)->where('id_sekolah',session('sekolah_id_sekolah'))->groupBy('harian')->get();
+			if (!empty($sql)){
+				foreach ($sql as $hasil){
+					$harian 		= $hasil->harian;
+					$tanggal 		= $hasil->created_at;
+					$biaya1			= 0;
+					$biaya2			= 0;
+					$totaltransaksi = 0;
+					$totaltransaksi = Pembayaran::where('harian', $harian)->where('biaya', '!=', '0')->where('id_sekolah',session('sekolah_id_sekolah'))->groupBy('noinduk')->count();
+					
+					$rbiaya1 		= Pembayaran::select(DB::raw('SUM(biaya) as biaya'), 'jenis')
+										->where('harian', $harian)
+										->where('verifikasi', '!=', '')
+										->where('id_sekolah',session('sekolah_id_sekolah'))
+										->groupBy('harian')->get();
+					if(isset($rbiaya1->biaya)){
+						$biaya1	= $rbiaya1->biaya;
+					}
+					
+					$rbiaya2 		= Pembayaran::select(DB::raw('SUM(biaya) as biaya'), 'jenis')
+										->where('harian', $harian)
+										->where('verifikasi', '')
+										->where('id_sekolah',session('sekolah_id_sekolah'))
+										->groupBy('harian')->get();
+					if(isset($rbiaya2->biaya)){
+						$biaya2	= $rbiaya2->biaya;
+					}
+					$arraysurat[] = array(
+						'tanggaltrans'		=> $harian,
+						'jumlahtrans'		=> $totaltransaksi,
+						'verifiedtrans'		=> number_format( $biaya1 , 0 , '.' , ',' ),
+						'unverifiedtrans'	=> number_format( $biaya2 , 0 , '.' , ',' ),
+					);
+				}
+			}
+			$bulan1++;
+		}
+		echo json_encode($arraysurat);
+	}
+	public function jsoRincianharian(Request $request) {
+		$harian   	= $request->val01;
+		$arraysurat	= [];
+		$sql 		= Pembayaran::where('harian', $harian)->where('biaya', '!=', '0')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+		if (!empty($sql)){
+			foreach ($sql as $rbayar){
+				$nama			= $rbayar->nama;
+				$noinduk		= $rbayar->noinduk;
+				$bulan			= $rbayar->bulan;
+				$tahun			= $rbayar->tahun;
+				$tanggal		= $rbayar->harian;
+				$verifikasi		= $rbayar->verifikasi;
+				$marking		= $rbayar->marking;
+				$biaya			= $rbayar->biaya;
+				$jenis			= $rbayar->jenis;
+				$klspos			= $rbayar->kelas;
+				$rutin			= $bulan.'-'.$tahun;
+				$arraysurat[] = array(
+					'id' 		=> $rbayar->id,
+					'nama'		=> $nama,
+					'noinduk'	=> $noinduk,
+					'kelas'		=> $klspos,
+					'rutin'		=> $rutin,				
+					'verifi'	=> $verifikasi,
+					'marking'	=> $marking,
+					'tanggal'	=> $tanggal,
+					'jenis'		=> $jenis,
+					'biaya'		=> number_format( $biaya , 0 , '.' , ',' ),
+				);
+			}
+		}
+		echo json_encode($arraysurat);
+	}
+	public function jsonRincianlastortu(Request $request) {
+		$noinduk   	= $request->val01;
+		$bulan   	= $request->val02;
+		$tahun   	= $request->val03;
+		$arraysurat	= [];
+		$sql 		= Pembayaran::where('noinduk', $noinduk)->where('bulan', $bulan)->where('tahun', $tahun)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+		if (!empty($sql)){
+			foreach ($sql as $rbayar){
+				$nama			= $rbayar->nama;
+				$noinduk		= $rbayar->noinduk;
+				$bulan			= $rbayar->bulan;
+				$tahun			= $rbayar->tahun;
+				$tanggal		= $rbayar->harian;
+				$verifikasi		= $rbayar->verifikasi;
+				$marking		= $rbayar->marking;
+				$biaya			= $rbayar->biaya;
+				$jenis			= $rbayar->jenis;
+				$klspos			= $rbayar->kelas;
+				$rutin			= $bulan.'-'.$tahun;
+				$arraysurat[] = array(
+					'id' 		=> $rbayar->id,
+					'inputor' 	=> $rbayar->inputor,
+					'nama'		=> $nama,
+					'noinduk'	=> $noinduk,
+					'rutin'		=> $rutin,
+					'verifi'	=> $verifikasi,
+					'marking'	=> $marking,
+					'tanggal'	=> $tanggal,
+					'jenis'		=> $jenis,
+					'biaya'		=> number_format( $biaya , 0 , '.' , ',' ),
+				);
+			}
+		}
+		echo json_encode($arraysurat);
+	}
+	public function jsonRincianbyrortu(Request $request) {
+		$marking   	= $request->val01;
+		$arraysurat	= [];
+		$sql 		= Pembayaran::where('marking', $marking)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+		if (!empty($sql)){
+			foreach ($sql as $rbayar){
+				$nama			= $rbayar->nama;
+				$noinduk		= $rbayar->noinduk;
+				$bulan			= $rbayar->bulan;
+				$tahun			= $rbayar->tahun;
+				$tanggal		= $rbayar->harian;
+				$verifikasi		= $rbayar->verifikasi;
+				$marking		= $rbayar->marking;
+				$biaya			= $rbayar->biaya;
+				$jenis			= $rbayar->jenis;
+				$klspos			= $rbayar->kelas;
+				$rutin			= $bulan.'-'.$tahun;
+				$arraysurat[] = array(
+					'id' 		=> $rbayar->id,
+					'inputor' 	=> $rbayar->inputor,
+					'nama'		=> $nama,
+					'noinduk'	=> $noinduk,
+					'rutin'		=> $rutin,
+					'verifi'	=> $verifikasi,
+					'marking'	=> $marking,
+					'tanggal'	=> $tanggal,
+					'jenis'		=> $jenis,
+					'biaya'		=> number_format( $biaya , 0 , '.' , ',' ),
+				);
+			}
+		}
+		echo json_encode($arraysurat);
+	}
+	public function jsonDatabayar() {
+		$arraysurat	= [];
+		$sql 		= Pembayaran::select(DB::raw('SUM(biaya) as biaya'), 'id', 'bulan', 'tahun', 'marking', 'nama', 'noinduk', 'verifikasi', 'inputor', 'kirim')
+						->where('verifikasi', '')
+						->where('id_sekolah',session('sekolah_id_sekolah'))
+						->groupBy('marking')->get();
+		if (!empty($sql)){
+			foreach ($sql as $rbayar){
+				$nama			= $rbayar->nama;
+				$noinduk		= $rbayar->noinduk;
+				$bulan			= $rbayar->bulan;
+				$tahun			= $rbayar->tahun;
+				$tanggal		= $rbayar->harian;
+				$verifikasi		= $rbayar->verifikasi;
+				$marking		= $rbayar->marking;
+				$total			= $rbayar->biaya;
+				$jenis			= $rbayar->jenis;
+				$klspos			= $rbayar->kelas;
+				$rutin			= $bulan.'-'.$tahun;
+				$getnomerhp 	= Datainduk::where('id_sekolah', Session('sekolah_id_sekolah'))->where('noinduk', $noinduk)->first();
+				if (isset($getnomerhp->hape)){
+					$hape 		= $getnomerhp->hape;
+				} else { $hape 	= ''; }
+				$arraysurat[] = array(
+					'no' 		=> $rbayar->id,
+					'inputor' 	=> $rbayar->inputor,
+					'nama'		=> $nama,
+					'noinduk'	=> $noinduk,
+					'rutin'		=> $rutin,
+					'verifi'	=> $verifikasi,
+					'marking'	=> $marking,
+					'tanggal'	=> $tanggal,
+					'hape'		=> $hape,
+					'foto'		=> $rbayar->getTandatangan->xfile ?? '',
+					'kirim'		=> $rbayar->kirim,
+					'total'		=> number_format( $total , 0 , '.' , ',' ),
+				);
+			}
+		}
+		echo json_encode($arraysurat);
+	}
+	public function jsonTagihanManual() {
+		$arraysurat	= [];
+		$sql 		= TagihanManual::whereNull('marking')->where('id_sekolah', session('sekolah_id_sekolah'))->orderBy('idsiswa')->get();
+		if (!empty($sql)){
+			foreach ($sql as $rbayar){
+				
+				$arraysurat[] = array(
+					'id' 			=> $rbayar->id,
+					'idsiswa' 		=> $rbayar->idsiswa,
+					'jenis' 		=> $rbayar->jenis,
+					'keterangan' 	=> $rbayar->keterangan,
+					'tenggat' 		=> $rbayar->tenggat,
+					'marking' 		=> $rbayar->marking,
+					'biaya' 		=> $rbayar->biaya,	
+					'nama'			=> $rbayar->getDataInduk->nama ?? '',
+					'noinduk'		=> $rbayar->getDataInduk->noinduk ?? '',
+					'klspos'		=> $rbayar->getDataInduk->klspos ?? '',
+					'nominal'		=> number_format( $rbayar->biaya , 0 , '.' , ',' ),
+				);
+			}
+		}
+		echo json_encode($arraysurat);
+	}
+	public function jsonTabungan() {
+		$arrrekap 	= [];
+		if (Session('previlage') == 'ortu'){
+			$kodeortu	= Session('id');
+			$sql 		= Datainduk::where('kodeortu', $kodeortu)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+			if (!empty($sql)){
+				foreach ($sql as $rjeneng) {
+					$noinduk 	= $rjeneng->noinduk;
+					$kelas 		= $rjeneng->klspos;
+					$jmlhkredit = 0;
+					$jmlhdebet 	= 0;
+					$rdata 		= Tabungan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('marking', 'DESC')->get();
+					if (!empty($rdata)){
+						foreach ($rdata as $rbayar) {			
+							$nama			= $rbayar->nama;
+							$noinduk		= $rbayar->noinduk;
+							$kredit			= (int)$rbayar->kredit;
+							$debet			= (int)$rbayar->debet;
+							$jmlhkredit 	=  $jmlhkredit + $kredit;
+							$jmlhdebet 		=  $jmlhdebet + $debet;							
+							$arrrekap[] = array(
+								'id' 		=> $rbayar->id,
+								'nama'		=> $nama,
+								'noinduk'	=> $noinduk,
+								'kelas' 	=> $kelas,			
+								'debet'		=> $debet,
+								'kredit'	=> $kredit,
+								'keterangan'=> $rbayar->keterangan,
+								'verified' 	=> $rbayar->verified,
+								'marking' 	=> $rbayar->marking,
+								'inputor' 	=> $rbayar->inputor,
+							);
+						}
+					}					
+				}
+			}
+		} else {
+			$jmlhkredit = 0;
+			$jmlhdebet 	= 0;
+			$rdata 		= Tabungan::where('verified', '')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('marking', 'DESC')->get();
+			if (!empty($rdata)){
+				foreach ($rdata as $rbayar) {			
+					$nama			= $rbayar->nama;
+					$noinduk		= $rbayar->noinduk;
+					$kredit			= (int)$rbayar->kredit;
+					$debet			= (int)$rbayar->debet;
+					$jmlhkredit 	=  $jmlhkredit + $kredit;
+					$jmlhdebet 		=  $jmlhdebet + $debet;
+					$getkelas		= Datainduk::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+					if (isset($getkelas->klspos)){
+						$kelas 		= $getkelas->klspos;
+					} else { $kelas = ''; }
+					$arrrekap[] = array(
+						'id' 		=> $rbayar->id,
+						'nama'		=> $nama,
+						'noinduk'	=> $noinduk,
+						'kelas' 	=> $kelas,			
+						'debet'		=> $debet,
+						'kredit'	=> $kredit,
+						'keterangan'=> $rbayar->keterangan,
+						'verified' 	=> $rbayar->verified,
+						'marking' 	=> $rbayar->marking,
+						'inputor' 	=> $rbayar->inputor,
+					);
+				}
+			}			
+		}
+		echo json_encode($arrrekap);
+	}
+	public function jsonLaptabunganharian(Request $request) {
+		$tanggal   	= $request->val01;
+		$arraysurat	= [];
+		$jmlhkredit = 0;
+		$jmlhdebet 	= 0;
+		$sql 		= Tabungan::where('marking', $tanggal)->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('marking', 'DESC')->get();
+		if (!empty($sql)){
+			foreach ($sql as $rbayar){
+				$nama			= $rbayar->nama;
+				$noinduk		= $rbayar->noinduk;
+				$kredit			= (int)$rbayar->kredit;
+				$debet			= (int)$rbayar->debet;
+				$jmlhkredit 	=  $jmlhkredit + $kredit;
+				$jmlhdebet 		=  $jmlhdebet + $debet;
+				$getkelas		= Datainduk::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+				if (isset($getkelas->klspos)){
+					$kelas 		= $getkelas->klspos;
+				} else { $kelas = ''; }
+				$arraysurat[] = array(
+					'id' 		=> $rbayar->id,
+					'nama'		=> $nama,
+					'noinduk'	=> $noinduk,
+					'kelas' 	=> $kelas,			
+					'debet'		=> $debet,
+					'kredit'	=> $kredit,
+					'keterangan'=> $rbayar->keterangan,
+					'verified' 	=> $rbayar->verified,
+					'marking' 	=> $rbayar->marking,
+					'inputor' 	=> $rbayar->inputor,
+				);
+			}
+		}
+		$arraysurat[] = array(
+			'id' 			=> '',	
+			'nama' 			=> 'Total',	
+			'noinduk' 		=> '',
+			'kelas' 		=> '',			
+			'debet'			=> $jmlhdebet,
+			'kredit'		=> $jmlhkredit,
+			'keterangan'	=> '',
+			'verified'		=> '',
+			'marking'		=> '',
+			'inputor'		=> '',
+		);
+		echo json_encode($arraysurat);
+	}
+	public function jsonCaritabungan(Request $request) {
+		$noinduk   	= $request->val01;
+		$arraysurat	= [];
+		$jmlhkredit = 0;
+		$jmlhdebet 	= 0;
+		$getkelas	= Datainduk::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+		if (isset($getkelas->klspos)){
+			$kelas 	= $getkelas->klspos;
+		} else { $kelas = ''; }
+		$sql 		= Tabungan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('marking', 'DESC')->get();
+		if (!empty($sql)){
+			foreach ($sql as $rbayar){
+				$nama			= $rbayar->nama;
+				$noinduk		= $rbayar->noinduk;
+				$kredit			= (int)$rbayar->kredit;
+				$debet			= (int)$rbayar->debet;
+				$jmlhkredit 	=  $jmlhkredit + $kredit;
+				$jmlhdebet 		=  $jmlhdebet + $debet;
+				$arraysurat[] = array(
+					'id' 		=> $rbayar->id,
+					'nama'		=> $nama,
+					'noinduk'	=> $noinduk,
+					'kelas' 	=> $kelas,			
+					'debet'		=> $debet,
+					'kredit'	=> $kredit,
+					'keterangan'=> $rbayar->keterangan,
+					'verified' 	=> $rbayar->verified,
+					'marking' 	=> $rbayar->marking,
+					'inputor' 	=> $rbayar->inputor,
+				);
+			}
+		}
+		$sisa = $jmlhdebet - $jmlhkredit;
+		$arraysurat[] = array(
+			'id' 			=> '',
+			'nama' 			=> 'Total',
+			'noinduk' 		=> '',
+			'kelas' 		=> '',
+			'debet'			=> $jmlhdebet,
+			'kredit'		=> $jmlhkredit,
+			'keterangan'	=> $sisa,
+			'verified'		=> '',
+			'marking'		=> '',
+			'inputor'		=> '',
+		);
+		echo json_encode($arraysurat);
+	}
+	public function jsonJadwalujianppdb() {
+		$arrjadwalpsb	= [];
+		$bulanlist 		= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
+		$sql 			= Tesppdb::orderBy('tanggal', 'ASC')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+		if (!empty($sql)){
+			foreach ($sql as $hasil){
+				$tanggal 	= $hasil->tanggal;
+				$arrayttl 	= explode("-", $tanggal);
+				$thniki 	= $arrayttl[0];
+				$mthiki 	= $arrayttl[1];
+				$tgliki 	= $arrayttl[2];
+				$settanggal	= $tgliki.'-'.$mthiki.'-'.$thniki;
+				$intbulan	= (int)$mthiki;
+				$blniki 	= $bulanlist[$intbulan];
+				$tlstgl 	= $tgliki.' '.$blniki.' '.$thniki;
+				$arrjadwalpsb[] = array(
+					'idne' 		=> $hasil->id,
+					'hari' 		=> $hasil->hari,
+					'jam' 		=> $hasil->jam,
+					'materi' 	=> $hasil->materi,
+					'nama'		=> $hasil->nama,
+					'tanggal'	=> $settanggal,
+					'tlstanggal'=> $tlstgl,
+					'ruang'		=> $hasil->ruang,
+				);
+			}
+		}
+		echo json_encode($arrjadwalpsb);
+	}
+	public function jsonDetailpembeli(Request $request) {
+		$arrjadwalpsb			= [];
+		$tapel					= $request->val01;
+		$jenis					= $request->val02;
+		$sql 					= Formulirpsb::where('tapel', $tapel)->where('jenis', $jenis)->where('id_sekolah', session('sekolah_id_sekolah'))->orderBy('tanggal', 'ASC')->get();
+		if (!empty($sql)){
+			foreach ($sql as $hasil){
+				$arrjadwalpsb[] = array(
+					'id' 		=> $hasil->id,	
+					'tapel' 	=> $hasil->tapel,	
+					'nama' 		=> $hasil->nama,			
+					'jenis'		=> $hasil->jenis,
+					'nomor'		=> $hasil->nomor,
+					'costumid'	=> $hasil->jenis.$hasil->nomor,
+					'nominal'	=> number_format( $hasil->nominal , 0 , '.' , ',' ),
+					'tanggal'	=> $hasil->tanggal,
+				);
+			}
+		}
+		echo json_encode($arrjadwalpsb);
+	}
+	public function jsonDatapembelianform() {
+		$arrformulirpsb	= [];
+		$rsetting		= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
+		if (isset($rsetting->pendaftaran)){
+			$pendaftaran	= $rsetting->pendaftaran;
+			$sql 			= Formulirpsb::select(DB::raw('SUM(nominal) as nominal'), DB::raw('COUNT(id) as jumlah'), 'tapel', 'jenis')
+								->where('tapel', $pendaftaran)->where('id_sekolah',session('sekolah_id_sekolah'))
+								->groupBy('jenis')->orderBy('jenis', 'DESC')->get();
+			if (!empty($sql)){
+				foreach ($sql as $hasil){
+					$arrformulirpsb[] = array(
+						'tapel' 		=> $hasil->tapel,
+						'jenis' 		=> $hasil->jenis,		
+						'jumlah' 		=> $hasil->jumlah,
+						'nominal' 		=> number_format( $hasil->nominal , 0 , '.' , ',' ),
+					);
+				}
+			}
+		}
+		echo json_encode($arrformulirpsb);
+	}
+	public function jsonDatappdb() {
+		$arrdatappdb	= [];
+		$rsetting		= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
+		if (isset($rsetting->pendaftaran)){
+			$pendaftaran 	= $rsetting->pendaftaran;
+		} else {
+			$pendaftaran	= 'No Data';
+		}
+		$getnomer 		= Datainduk::orderBy('noinduk', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+		if (isset($getnomer->noinduk)){
+			$noinduk	= (int)$getnomer->noinduk;
+			$berikutnya	= $noinduk + 1;
+		} else {
+			$noinduk	= 1;
+			$berikutnya	= 2;
+		}
+		$bulanlist 	= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
+		$arrdatappdb= Datapsb::select('id', 'nama', 'nik', 'kodependaf', 'kelamin', 'tmplahir', 'tgllahir', 'darah', 'tinggi', 'berat', 'namaayah', 'namaibu', 'kerjaayah', 'kerjaibu', 'wali', 'pekerjaanwali', 'alamatortu', 'foto', 'tamasuk', 'hape', 'asal', 'erte', 'erwe', 'kelurahan', 'kecamatan', 'kota', 'kodepos', 'telpon', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12', 'n13', 'total', 'rata', 'hasil', 'nosurat', 'dana1', 'dana2', 'dana3', 'dana4')
+								->selectSub(function ($query) {
+									$query->selectRaw("CASE
+														WHEN status = 'verified' THEN '<small class=\"label bg-green\">GOOD</small>'
+														WHEN status = 'unverified' THEN '<small class=\"label bg-red\">BAD</small>'
+														ELSE '<strong>' || status || '%</strong>'
+														END AS status");
+								}, 'persenselesai')
+								->where('tamasuk', $pendaftaran)
+								->where('id_sekolah', session('sekolah_id_sekolah'))
+								->orderBy('id', 'DESC')
+								->get();
+		
+		echo json_encode($arrdatappdb);
+	}
+	public function jsonBuku(Request $request) {
+		$arrperpus	= [];	
+		$homebase	= url("/");
+		$i 			= 0;
+		$data		= new Perpumini();
+		$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
+		$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
+		$data		= $data->where('kondisi', 'BAIK');
+		$data 		= $data->where('id_sekolah', session('sekolah_id_sekolah'));
+		if ($request->has('search') && !empty($request->search)) {
+			$searchTerm = $request->search;
+			$data->where(function ($q) use ($searchTerm) {
+				$q->where('judul', 'like', "%$searchTerm%")
+					->orWhere('kodebuku', 'like', "%$searchTerm%")
+					->orWhere('pengarang', 'like', "%$searchTerm%")
+					->orWhere('penerbit', 'like', "%$searchTerm%")
+					->orWhere('jenisperolehan', 'like', "%$searchTerm%")
+					->orWhere('kondisi', 'like', "%$searchTerm%")
+					->orWhere('tahunperolehan', 'like', "%$searchTerm%")
+					->orWhere('kategori', 'like', "%$searchTerm%");
+			});
+		}
+		$data		= $data->orderByRaw($order)->groupby('isbn')->paginate($limit);
+		$totaldata	= $data->total();
+		if (!empty($data)){
+			foreach($data as $hasil){
+				$i++;
+				$foto 		= $hasil->gambar;
+				if ($foto == '' OR is_null($foto)){
+					$lampiran = url("/").'/'.Session('sekolah_logo');
+				} else {
+					$lampiran = url("/").'/images/perpus/'.$foto;
+				}
+				$jumlahbuku 	= Perpumini::where('id_sekolah',session('sekolah_id_sekolah'))->where('isbn', $hasil->isbn)->count();
+				$cekpeminjaman 	= Peminjaman::where('kodebuku', $hasil->id)->count();
+				if ($cekpeminjaman >= $jumlahbuku){
+					$marking = 'NO';
+				} else { $marking = 'YES'; }
+				$jadwalguna = '';
+				if ($marking == 'NO'){
+					$getpinjam = Perpumini::where('id_sekolah',session('sekolah_id_sekolah'))->where('isbn', $hasil->isbn)->get();
+					if(isset($getpinjam)){
+						$jadwalguna = '<ol>';
+						foreach($getpinjam as $rpinjam){
+							$jadwalguna = $jadwalguna.'<li>Dipinjam Oleh : '.$rpinjam->peminjam.' Kelas '.$rpinjam->kelas.' Pada Tanggal '.$rpinjam->tglkembali.'</li>';
+						}
+						$jadwalguna = $jadwalguna.'</ol>';
+					}
+				}
+				$arrperpus[] = array(
+					'id' 			=> $hasil->id,
+					'gambar' 		=> $lampiran,		
+					'judul' 		=> $hasil->judul,
+					'link' 			=> $hasil->link,
+					'kodebuku' 		=> $hasil->kodebuku,
+					'pengarang' 	=> $hasil->pengarang,
+					'cetakan' 		=> $hasil->cetakan,
+					'kota' 			=> $hasil->kota,
+					'penerbit' 		=> $hasil->penerbit,
+					'tahun' 		=> $hasil->tahun,
+					'ilustrasi' 	=> $hasil->ilustrasi,
+					'halaman' 		=> $hasil->halaman,
+					'id_sekolah' 	=> $hasil->id_sekolah,
+					'isbn' 			=> $hasil->isbn,
+					'tglmasuk' 		=> $hasil->tglmasuk,
+					'tahunperolehan'=> $hasil->tahunperolehan,
+					'jenisperolehan'=> $hasil->jenisperolehan,
+					'rakbuku' 		=> $hasil->rakbuku,
+					'kondisi' 		=> $hasil->kondisi,
+					'kategori' 		=> $hasil->kategori,
+					'inputor' 		=> $hasil->inputor,
+					'created_at' 	=> $hasil->created_at,
+					'jumlah' 		=> $jumlahbuku,
+					'marking' 		=> $marking,
+					'jadwalguna' 	=> $jadwalguna,
+				);
+			}
+			$response = [
+				'message'	=> 'Perpustakaan Mini',
+				'total'		=> $totaldata,
+				'data'		=> $arrperpus
+			];
+			return response()->json($response, 200);
+		}
+		$response = [
+			'message'        => 'No Data'
+		];
+		return response()->json($response, 500);
+	}
+	public function jsonBukucari(Request $request) {
+		$arrperpus	= [];	
+		$homebase	= url("/");
+		$kerja		= $request->val01;
+		if ($kerja == 'perid'){
+			$data	=   Perpumini::where('id', $request->val02)->first();
+			if (isset($data->id)){
+				$gambar	= $data->gambar;
+				if ($gambar == '' OR $gambar == null){
+					$gambar = $homebase.'/logo.png';
+				} else {
+					$gambar = $homebase.'/images/perpus/'.$gambar;
+				}
+				$judul		= $data->judul;
+				$pengarang	= $data->pengarang;
+				$kodebuku	= $data->kodebuku;
+				$rakbuku	= $data->rakbuku;
+			} else {
+				$gambar 	= $homebase.'/logo.png';
+				$judul		= 'Buku Tidak di Temukan';
+				$pengarang	= 'unkown';
+				$kodebuku	= '';
+				$rakbuku	= '';
+			}
+			return response()->json([
+				'id' 		=> $request->val02,
+				'gambar' 	=> $gambar,
+				'judul' 	=> $judul,
+				'pengarang' => $pengarang,
+				'kodebuku' 	=> $kodebuku,
+				'rakbuku' 	=> $rakbuku,
+			]);
+		} else {
+			if ($kerja == 'all'){
+				$sql 		= Perpumini::orderBy('id', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->where('kondisi', 'BAIK')->get();
+			} else if ($kerja == 'rusak'){
+				$sql 		= Perpumini::orderBy('id', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->where('kondisi', 'RUSAK')->get();
+			} else {
+				$sql 		= Perpumini::orderBy('id', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->whereIn('kondisi', ['HILANG', 'MUSNAH'])->get();
+			}
+			if (!empty($sql)){
+				foreach ($sql as $hasil){
+					if (is_null($hasil->gambar) OR $hasil->gambar == ''){ $lampiran	= $homebase.'/logo.png'; }
+					else {
+						if (File::exists(base_path()) ."/public/images/perpus/". $hasil->gambar) {
+							$lampiran	= $homebase.'/images/perpus/'.$hasil->gambar;
+						} else {
+							$lampiran	= $homebase.'/logo.png';
+						}
+					}
+					
+					$arrperpus[] = array(
+						'idne' 			=> $hasil->id,
+						'gambar' 		=> $lampiran,		
+						'judul' 		=> $hasil->judul,
+						'link' 			=> $hasil->link,
+						'kodebuku' 		=> $hasil->kodebuku,
+						'pengarang' 	=> $hasil->pengarang,
+						'cetakan' 		=> $hasil->cetakan,
+						'kota' 			=> $hasil->kota,
+						'penerbit' 		=> $hasil->penerbit,
+						'tahun' 		=> $hasil->tahun,
+						'ilustrasi' 	=> $hasil->ilustrasi,
+						'halaman' 		=> $hasil->halaman,
+						'id_sekolah' 	=> $hasil->id_sekolah,
+						'isbn' 			=> $hasil->isbn,
+						'tglmasuk' 		=> $hasil->tglmasuk,
+						'tahunperolehan'=> $hasil->tahunperolehan,
+						'jenisperolehan'=> $hasil->jenisperolehan,
+						'rakbuku' 		=> $hasil->rakbuku,
+						'kondisi' 		=> $hasil->kondisi,
+						'kategori' 		=> $hasil->kategori,
+						'inputor' 		=> $hasil->inputor,
+					);
+				}
+			}
+			echo json_encode($arrperpus);
+		}
+		
+	}
+	public function jsonPeminjaman(Request $request) {
+		$arrperpus 	= [];
+		$homebase 	= url("/");
+		$bulan 		= $request->val01;
+		$tahun 		= $request->val02;
+		$sql 		= Peminjaman::where('id_sekolah', session('sekolah_id_sekolah'));
+		if ($bulan !== 'aktif') {
+			$sql->where('tglpinjam', 'LIKE', ($bulan === 'ALL') ? $tahun.'%' : $tahun.'-'.$bulan.'-%');
+		}
+		$sql->orderBy('tglkembali', 'ASC');
+		$peminjamans = $sql->get();
+		foreach ($peminjamans as $hasil) {
+			$status 	= $hasil->status;
+			$tlsstatus 	= '';
+			switch ($status) {
+				case 0:
+					$tlsstatus = '<span class="badge bg-green">TELAH DIKEMBALIKAN</span>';
+					break;
+				case 2:
+					$tlsstatus = '<span class="badge bg-red">HILANG / TIDAK DIKEMBALIKAN</span>';
+					break;
+				default:
+					$tlsstatus = '<span class="badge bg-aqua">AKTIF</span>';
+			}
+			$getgambar 	= Perpumini::where('id', $hasil->kodebuku)->first();
+			$gambar 	= '';
+			$judul 		= '';
+			$link 		= '';
+			$kodebuku 	= '';
+			$rakbuku 	= '';
+
+			if ($getgambar) {
+				$gambar 	= ($getgambar->gambar) ? '<img src="'.$homebase.'/images/perpus/'.$getgambar->gambar.'" height="35">' : '<img src="'.$homebase.'/logo.png" height="35">';
+				$judul 		= $getgambar->judul;
+				$link 		= $getgambar->link;
+				$kodebuku 	= $getgambar->kodebuku;
+				$rakbuku 	= $getgambar->rakbuku;
+			}
+
+			$foto 		= '';
+			$getfoto 	= Datainduk::where('noinduk', $hasil->noinduk)->first();
+
+			if ($getfoto && $getfoto->foto) {
+				$foto 	= '<img src="'.$homebase.'/dist/img/foto/'.$getfoto->foto.'" height="35">';
+			} else {
+				$foto 	= '<img src="'.$homebase.'/logo.png" height="35">';
+			}
+
+			$arrperpus[] = [
+				'idne' 		=> $hasil->id,
+				'foto' 		=> $foto,
+				'gambar' 	=> $gambar,
+				'judul' 	=> $judul,
+				'link' 		=> $link,
+				'idbuku' 	=> $hasil->kodebuku,
+				'kodebuku' 	=> $kodebuku,
+				'pengarang' => $hasil->pengarang,
+				'kota' 		=> $hasil->kota,
+				'penerbit' 	=> $hasil->penerbit,
+				'id_sekolah'=> $hasil->id_sekolah,
+				'isbn' 		=> $hasil->isbn,
+				'tglpinjam' => $hasil->tglpinjam,
+				'tglkembali'=> $hasil->tglkembali,
+				'rakbuku' 	=> $rakbuku,
+				'biaya' 	=> $hasil->biaya,
+				'denda' 	=> $hasil->denda,
+				'peminjam' 	=> $hasil->peminjam,
+				'noinduk' 	=> $hasil->noinduk,
+				'kelas' 	=> $hasil->kelas,
+				'status' 	=> $hasil->status,
+				'inputor' 	=> $hasil->inputor,
+				'tlsstatus' => $tlsstatus,
+			];
+		}
+		echo json_encode($arrperpus);
+	}
+	public function jsonPrestasithnini() {
+		$arrrekap 		= [];
+		$tahun			= date("Y");
+		$rsetting		= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
+		$sekolah 		= $rsetting->nama_sekolah;
+		$yayasan 		= $rsetting->nama_yayasan;
+		$alamat 		= $rsetting->alamat;
+		if (isset($rsetting->kepala_sekolah->nama)){
+			$kasub 			= $rsetting->kepala_sekolah->nama;
+			$nipkasub 		= $rsetting->kepala_sekolah->niy;
+		} else {
+			$kasub 			= config('global.swandhananama');
+			$nipkasub 		= '-';
+		}
+		$getallthn 	= Prestasi::where('id_sekolah', Session('sekolah_id_sekolah') )->where('tanggal', 'LIKE', '%'.$tahun.'%')->groupBy('kelas')->get();
+		if (!empty($getallthn)){
+			foreach ($getallthn as $rdatane) {
+				$kelas		= $rdatane->kelas;
+				$total 		= Prestasi::where('id_sekolah', Session('sekolah_id_sekolah') )->where('tanggal', 'LIKE', '%'.$tahun.'%')->where('kelas', $kelas)->count();
+				$arrrekap[] 	= array(
+					'jenis' 	=> $kelas,
+					'jumlah' 	=> $total,
+				);
+			}
+		}
+		echo json_encode($arrrekap);
+	}
+	public function jsonPrestasithniniperbidang() {
+		$arrrekap 	= [];
+		$tahun		= date("Y");
+		$getallthn 	= Prestasi::where('id_sekolah', Session('sekolah_id_sekolah') )->where('tanggal', 'LIKE', '%'.$tahun.'%')->groupBy('bidang')->get();
+		if (!empty($getallthn)){
+			foreach ($getallthn as $rdatane) {
+				$bidang		= $rdatane->bidang;
+				$total 		= Prestasi::where('id_sekolah', Session('sekolah_id_sekolah') )->where('tanggal', 'LIKE', '%'.$tahun.'%')->where('bidang', $bidang)->count();
+				$arrrekap[] 	= array(
+					'jenis' 	=> $bidang,
+					'jumlah' 	=> $total,
+				);
+			}
+		}
+		echo json_encode($arrrekap);
+	}
+	public function jsonAlldataprestasi(Request $request) {
+		$bulan 		= $request->val01;
+		$tahun 		= $request->val02;
+		$tahunini 	= date("Y");
+		$query 		= Prestasi::where('id_sekolah', session('sekolah_id_sekolah'));
+		if ($bulan == 'REGIONAL') {
+			$query->where('tingkat', 'Regional');
+		} elseif ($bulan == 'NASIONAL') {
+			$query->where('tingkat', 'Nasional');
+		} elseif ($bulan == 'INTERNASIONAL') {
+			$query->where('tingkat', 'Internasional');
+		} elseif ($bulan == 'ALL') {
+			if ($tahun == 'TAHUNINI') {
+				$query->where('tanggal', 'LIKE', "%$tahunini%");
+			} else {
+				$query->where('tanggal', 'LIKE', "%$tahun%");
+			}
+		} else {
+			if ($bulan == 'ALL') {
+				$query->where('tanggal', 'LIKE', "%$tahun%");
+			} else {
+				$query->where('tanggal', 'LIKE', "%$bulan-$tahun%");
+			}
+		}
+		$getallthn 	= $query->get();
+		$alldata 	= [];
+		$homebase 	= url("/");
+
+		if ($getallthn->isNotEmpty()) {
+			foreach ($getallthn as $rdatane) {
+				$namafile 	= $rdatane->getTandatangan->xfile ?? '';
+				$tanggal 	= $rdatane->tanggal;
+				$cektanggal = explode(" s/d ", $tanggal);
+				$tanggal1 	= $cektanggal[0];
+				$tanggal2 	= isset($cektanggal[1]) ? $cektanggal[1] : $tanggal1;
+
+				$alldata[] = [
+					'id' 			=> $rdatane->id,
+					'kegiatan' 		=> $rdatane->namakegiatan,
+					'bidang' 		=> $rdatane->bidang,
+					'peringkat' 	=> $rdatane->juara,
+					'penyelenggara' => $rdatane->penyelenggara,
+					'tanggal' 		=> $rdatane->tanggal,
+					'tempat' 		=> $rdatane->tempat,
+					'tingkat' 		=> $rdatane->tingkat,
+					'tapel' 		=> $rdatane->tapel,
+					'nama' 			=> $rdatane->nama,
+					'noinduk' 		=> $rdatane->noinduk,
+					'kelas'	 		=> $rdatane->kelas,
+					'nmfile' 		=> $namafile,
+					'typefile' 		=> 'teks',
+					'tanggal1' 		=> $tanggal1,
+					'tanggal2' 		=> $tanggal2,
+					'inputor' 		=> $rdatane->inputor,
+				];
+			}
+		}
+		echo json_encode($alldata);
+	}
+	public function jsonPresensiPIPview(Request $request) {
+        $mulai   	= $request->input('val01');
+		$akhir  	= $request->input('val02');
+		if ($akhir == ''){
+			$getalldata = AbsenProgramPIP::where('idsekolah', Session('sekolah_id_sekolah'))->whereDate('created_at', 'LIKE', $mulai.'%')->get();
+		} else {
+			$getalldata = AbsenProgramPIP::where('idsekolah', Session('sekolah_id_sekolah'))->whereBetween('created_at', [$mulai, $akhir])->orderBy('created_at', 'ASC')->get();
+		}
+		
+		$arrrekap	= [];
+		if (!empty($getalldata)){
+			foreach($getalldata as $rdata){
+				$pejabat 	= $rdata->pejabat;
+				$arrrekap[] = array(
+					'nama' 		=> $rdata->nama,
+					'kelas' 	=> $rdata->kelas,
+					'tanggal' 	=> $rdata->created_at->tostring()
+				);
+			}
+		}
+		echo json_encode($arrrekap);
+    }
+	public function jsonDataprogramPIP() {
+		$arrayruang = [];
+		$jruang 	= ProgramPIP::where('idsekolah', Session('sekolah_id_sekolah'))->orderBy('nama', 'asc')->get();
+    	foreach ($jruang as $result) {
+			$arrayruang[] = array(
+				'id' 				=> $result->id,
+				'idsekolah' 		=> $result->idsekolah,
+				'datamasuk' 		=> $result->datamasuk,
+				'nama' 				=> $result->nama,
+				'kelaslama' 		=> $result->kelaslama,
+				'kelasbaru' 		=> $result->kelasbaru,
+				'tahap' 			=> $result->tahap,
+				'norek' 			=> $result->norek,
+				'virtualacc' 		=> $result->virtualacc,
+				'keterangan' 		=> $result->keterangan,
+				'created_by' 		=> $result->created_by,
+				'created_at' 		=> $result->created_at,
+			);
+    	}
+    	echo json_encode($arrayruang);	
+    }
 	public function simpanTransaksi(Request $request) {
 		$deskripsi	= $request->input('set01');
 		$pos		= $request->input('set02');
@@ -1551,6 +3973,7 @@ class AdminController extends Controller
 		if ($tanggal == '' OR is_null($tanggal)){
 			$tanggal = date("Y-m-d");
 		}
+		$bayar      = null;
 		$total 		= (int)str_replace(',','',$jumlah);
 		if ($jenis == 'operasionalefi' and $postujuan != '' and $jumlah == ''){ $jumlah = '-'; }
 		if ($jenis == 'operasionalefi' and $alasan != '' and $jumlah == ''){ $jumlah = '-'; }
@@ -1578,8 +4001,7 @@ class AdminController extends Controller
 								<h4><i class="icon fa fa-ban"></i> Error!</h4>
 								Jumlah Pelunasan Harus Sama Dengan Jumlah Yang di Hutang.
 							  </div>'; 
-				}
-				else {
+				} else {
 					if ($marking != ''){
 						$getdatacari= HPTKeuangan::where('id_sekolah', $idsekolah)->where('marking', $marking)->whereNotIn('id', [$pos])->first();
 						if(isset($getdatacari->jenis)){
@@ -1788,6 +4210,63 @@ class AdminController extends Controller
 					'created_by'	=> Session('nip')
 				]);
 			}
+			if ($jenis == 'pengeluarankegiatan'){
+				$penerima	= $request->input('set06');
+				$idkeg		= $request->input('set07');
+				$getpenerima= Dataindukstaff::where('niy', $penerima)->first();
+				if (isset($getpenerima->id)){
+					$penerima = $getpenerima->nama;
+				}
+				$deskripsitls	= 'Diterima Oleh '.$penerima.' '.$deskripsi;
+				$ceksudah 		= HPTKeuangan::where('tanggal', $dino)->where('bulan', $wulan)->where('tahun', $tahun)->where('realnominal', $idkeg)->where('pengeluaran', $total)->where('jenis', $pos)->where('id_sekolah', $idsekolah)->where('deskripsi', $deskripsitls)->count();
+				if ($ceksudah == 0){
+					$bayar 			= HPTKeuangan::create([
+						'tanggal'		=> $dino, 
+						'bulan'			=> $wulan, 
+						'tahun'			=> $tahun, 
+						'deskripsi'		=> $deskripsitls, 
+						'pemasukan'		=> '',
+						'pengeluaran'	=> $total,
+						'jenis'			=> $pos,
+						'realnominal'	=> $idkeg,
+						'realjenis'		=> 'Kegiatan',
+						'keterangan'	=> '',
+						'marking'		=> '',
+						'id_sekolah'	=> $idsekolah,
+						'created_by'	=> Session('nip')
+					]);
+					if ($bayar){
+						$timestamp 	= time();
+						EfikasiKeuangan::create([
+							'tanggal'		=> date('Y-m-d'),
+							'deskripsi'		=> $deskripsi, 
+							'pemasukan'		=> $total,
+							'pengeluaran'	=> '',
+							'realnominal'	=> $idkeg,
+							'realjenis'		=> 'Kegiatan',
+							'penerima'		=> $penerima,
+							'keterangan'	=> '',
+							'marking'		=> $idsekolah.'-'.$idkeg.'-Efikasi-'.$timestamp,
+							'id_sekolah'	=> $idsekolah,
+							'created_by'	=> Session('nip')
+						]);
+						XFiles::create([
+							'xmarking'	=> $idsekolah.'-'.$idkeg.'-Efikasi-'.$timestamp,
+							'xtabel'	=> 'db_efikasikeuangan',
+							'xjenis'	=> 'Kegiatan Tahun '.date('Y'),
+							'xfile'		=> ''
+						]);
+					}
+				} else {
+					$bayar = null;
+					echo '<div class="alert alert-danger alert-dismissable">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<h4><i class="icon fa fa-ban"></i> Gagal!</h4>
+							Transaksi '.$jenis.' Sudah ada, Periksa isian Bapak/Ibu
+					  </div>';
+				}
+				
+			}
 			if ($jenis == 'pinjaman'){ 
 				if ($pos == $postujuan){
 					$bayar 	= HPTKeuangan::create([
@@ -1955,8 +4434,7 @@ class AdminController extends Controller
 							Transaksi '.$jenis.' Sukses Dilaksanakan
 					  </div>';
 			}		
-		}
-		else {
+		} else {
 			echo '<div class="alert alert-danger alert-dismissable">
 					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 					<h4><i class="icon fa fa-ban"></i> Error!</h4>
@@ -1982,27 +4460,46 @@ class AdminController extends Controller
         $val14		= $request->input('val14');
 		$val15		= $request->input('val15');
         $jenis		= $request->input('jenis');
+		$sendstatus	= '';
 		if ($jenis == 'validasikwitansi'){
 			$getdata 		= HPTKeuangan::where('id', $idne)->first();
 			if (isset($getdata->id)){
+				$namafile		= $homebase.'/ttdkwitansi/'.$idne;
 				$bendahara 		= $getdata->bendahara;
 				$tglkwitansi 	= $getdata->tglkwitansi;
-				$tandatangan 	= $getdata->tandatangan;
+				$tandatangan 	= $getdata->getTandatangan->xfile ?? '';
 				$email			= '';
 				$hape			= '';
 				if (is_null($tandatangan) OR $tandatangan == ''){
-					$getusers 		= User::where('id', $val02)->first();
+					$getusers 		= Dataindukstaff::where('id', $val02)->first();
 					if (isset($getusers->id)){
-						$email 		= $getusers->email;
-						$hape 		= $getusers->nip;
+						$hape 		= $getusers->notelp;
+						$nip 		= $getusers->niy;
 						$bendahara 	= $getusers->nama;
+						Inboxsurat::updateOrCreate(
+							[
+								'xmarking'		=> Session('sekolah_id_sekolah').'-'.$getdata->id.'-kwitansi',
+								'penerima' 		=> $getusers->niy,
+								'id_sekolah' 	=> Session('sekolah_id_sekolah')
+							],
+							[
+								'tabel' 			=> 'db_keuangan',
+								'perihal' 			=> 'Tandatangan Kwitansi '.$getdata->deskripsi,
+								'pengirim' 			=> Session('nama'),
+								'jenis' 			=> 'TTE',
+								'urlsurat'			=> $namafile,
+								'status'			=> 1
+							]
+						);
+						$gethape 	= User::where('nip', $nip)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+						if (isset($gethape->email)){
+							$email 	= $gethape->email;
+						}
 						HPTKeuangan::where('id', $idne)->update([
 							'bendahara'		=> $getusers->nama,
 							'tglkwitansi'	=> date("Y-m-d"),
-							'tandatangan'	=> ''
 						]);
 					}
-					$namafile	= $homebase.'/ttdkwitansi/'.$idne;
 					$emailbody 	= '
 					<p>Yth. '.$bendahara.'</p>
 					<p>&nbsp;</p>
@@ -2019,18 +4516,7 @@ class AdminController extends Controller
 					<p>[Email ini digenerate secara otomatis, dimohon tidak membalas email ini]</p>';
 					if ($email != ''){
 						$perihal	= 'Mohon Menandatangani Kwitansi';
-						try {
-							Mail::send('email',
-								array(
-									'isisurat' => $emailbody,
-								), function($message) use ($email, $perihal){
-								$message->from('swandhana.fp@ub.ac.id');
-								$message->to($email)->subject($perihal);
-							});
-							$sendstatus = 'success';
-						} catch (\Exception $e) {
-							$sendstatus = $e->getMessage();
-						}
+						$sendstatus	= SendMail::notif($bendahara,$email,$perihal,$emailbody);
 					}
 					$emailbody 	= '
 					Yth. '.$bendahara.'%0A
@@ -2133,55 +4619,68 @@ class AdminController extends Controller
 		}
 	}
 	public function exupdDatainduk(Request $request) {
-		$nama 		= $request->edit_nama;
-		$nik 		= $request->edit_nik;
-		$tmplahir	= $request->edit_tmplahir;
-		$tgllahir	= $request->tanggallahir;
-		$kelamin	= $request->edit_kelamin;
-		$tinggi		= $request->edit_tinggi;
-		$berat		= $request->edit_berat;
-		$darah		= $request->edit_darah;
-		$ayah		= $request->edit_ayah;
-		$ibu		= $request->edit_ibu;
-		$kayah		= $request->edit_kayah;
-		$kibu		= $request->edit_kibu;
-		$wali		= $request->edit_wali;
-		$kwali		= $request->edit_kwali;
-		$alamat		= $request->edit_alamat;
-		$erte		= $request->edit_rt;
-		$erwe		= $request->edit_rw;
-		$kelurahan	= $request->edit_kel;
-		$kecamtan	= $request->edit_kec;
-		$kota		= $request->edit_kota;
-		$kodepos	= $request->edit_kodepos;
-		$noinduk	= $request->edit_noinduk;
-		$nisn		= $request->edit_nisn;
-		$hape		= $request->edit_hape;
-		$asal		= $request->edit_asal;
-		$tahun		= $request->edit_tahun;
-		$mutasi		= $request->edit_mutasi;
-		$id			= $request->edit_idne;
-		$kelas		= $request->edit_kelas;
-		$jilid		= $request->edit_jilid;
-		$is_asuh	= $request->edit_isasuh;
-		if($nik == '' OR $nama == '' OR $tmplahir == '' OR $kelamin == '' OR $ayah == '' OR $ibu == '' OR $alamat == '' OR $hape == '' OR $noinduk == '' OR $tgllahir == '' OR $tahun == '' OR $kelas == ''){
+		$nama 				= $request->edit_nama;
+		$nik 				= $request->edit_nik;
+		$tmplahir			= $request->edit_tmplahir;
+		$tgllahir			= $request->tanggallahir;
+		$kelamin			= $request->edit_kelamin;
+		$tinggi				= $request->edit_tinggi;
+		$berat				= $request->edit_berat;
+		$darah				= $request->edit_darah;
+		$ayah				= $request->edit_ayah;
+		$ibu				= $request->edit_ibu;
+		$kayah				= $request->edit_kayahopsi;
+		if ($kayah == 'Lainnya'){ $kayah = $request->edit_kayahteks; }
+		$kibu				= $request->edit_kibuopsi;
+		if ($kibu == 'Lainnya'){ $kibu = $request->edit_kibuteks; }
+		$wali				= $request->edit_wali;
+		$kwali				= $request->edit_kwali;
+		$alamat				= $request->edit_alamat;
+		$erte				= $request->edit_rt;
+		$erwe				= $request->edit_rw;
+		$kelurahan			= $request->edit_kel;
+		$kecamtan			= $request->edit_kec;
+		$kota				= $request->edit_kota;
+		$kodepos			= $request->edit_kodepos;
+		$noinduk			= $request->edit_noinduk;
+		$nisn				= $request->edit_nisn;
+		$hape				= $request->edit_hape;
+		$asal				= $request->edit_asal;
+		$tahun				= $request->edit_tahun;
+		$mutasi				= $request->edit_mutasi;
+		$id					= $request->edit_idne;
+		$kelas				= $request->edit_kelas;
+		$jilid				= $request->edit_jilid;
+		$is_asuh			= $request->edit_isasuh;
+		$nokelulusan		= $request->edit_nokelulusan;
+		$melanjutkanke		= $request->id_melanjutkankeopsi;
+		if ($melanjutkanke == 'Lainnya') { $melanjutkanke = $request->id_melanjutkanketeks; }
+		$nik				= preg_replace('/\s/', '', $nik);
+		$noinduk			= preg_replace('/\s/', '', $noinduk);
+		$noinduk			= str_replace('/', '', $noinduk);
+		$noinduk			= str_replace('.','',$noinduk);
+		$nisn				= preg_replace('/\s/', '', $nisn);
+		if ($nokelulusan == null){ $nokelulusan = ''; }
+		$error				= '';
+		if ($nokelulusan != '' AND $melanjutkanke == ''){
+			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Jika Nomor Kelulusan di isi, mohon di isi pula melanjutkannya kemana']);
+			return back();
+		} else if($nik == '' OR $nama == '' OR $tmplahir == '' OR $kelamin == '' OR $ayah == '' OR $ibu == '' OR $alamat == '' OR $hape == '' OR $noinduk == '' OR $tgllahir == '' OR $tahun == '' OR $kelas == ''){
 			$error ='Pastikan Semua Form Yang Bertanda Bintang di Bawah Sudah di Isi <br />
-			Nama : '.$nama.'<br />
-			TTL : '.$tmplahir.'/'.$tgllahir.'<br />
-			Kelamin : '.$kelamin.'<br />
-			Ayah : '.$ayah.'<br />
-			Ibu : '.$ibu.'<br />
-			No. HP : '.$hape.'<br />
-			Alamat : '.$alamat.'<br />
-			Tahun : '.$tahun.'<br />
-			Kelas : '.$kelas.'<br />
-			No. Induk : '.$noinduk.'<br /> Apabila ada data yang kosong, mohon di isi dengan strip (-) atau angka 0 (nol)';
+			Nama 		: '.$nama.'<br />
+			TTL 		: '.$tmplahir.'/'.$tgllahir.'<br />
+			Kelamin 	: '.$kelamin.'<br />
+			Ayah 		: '.$ayah.'<br />
+			Ibu 		: '.$ibu.'<br />
+			No. HP 		: '.$hape.'<br />
+			Alamat 		: '.$alamat.'<br />
+			Tahun 		: '.$tahun.'<br />
+			Kelas 		: '.$kelas.'<br />
+			NIK 		: '.$nik.'<br />
+			No. Induk 	: '.$noinduk.'<br /> Apabila ada data yang kosong, mohon di isi dengan strip (-) atau angka 0 (nol)';
 			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => $error]);
 			return back();
 		} else {
-			$noinduk	= preg_replace('/\s/', '', $noinduk);
-			$noinduk	= str_replace('/', '', $noinduk);
-			$nisn		= preg_replace('/\s/', '', $nisn);
 			if ($id == 'new'){
 				$ceksudah1 	= Datainduk::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
 				if ($nisn == '' OR is_null($nisn)){
@@ -2192,38 +4691,56 @@ class AdminController extends Controller
 				$ceksudah = $ceksudah1 + $ceksudah2;
 				if ($ceksudah == 0){
 					$input = Datainduk::create([
-						'noinduk'		=> $noinduk!=null?$noinduk:time(),
-						'nik'			=> $nik!=null?$nik:time(),
-						'nisn'			=> $nisn!=null?$nisn:'',
-						'nama'			=> $nama!=null?$nama:'',
-						'kelamin'		=> $kelamin!=null?$kelamin:'',
-						'tmplahir'		=> $tmplahir!=null?$tmplahir:'',
-						'tgllahir'		=> $tgllahir!=null?$tgllahir:date("Y-m-d"),
-						'darah'			=> $darah!=null?$darah:'',
-						'berat'			=> $berat!=null?$berat:0,
-						'tinggi'		=> $tinggi!=null?$tinggi:0,
-						'alamatortu'	=> $alamat!=null?$alamat:'',
-						'namaayah'		=> $ayah!=null?$ayah:'',
-						'namaibu'		=> $ibu!=null?$ibu:'',
-						'kerjaayah'		=> $kayah!=null?$kayah:'',
-						'kerjaibu'		=> $kibu!=null?$kibu:'',
-						'wali'			=> $wali!=null?$wali:'',
-						'pekerjaanwali' => $kwali!=null?$kwali:'',
-						'klspos'		=> $kelas!=null?$kelas:'',
-						'tamasuk'		=> $tahun!=null?$tahun:'',
-						'hape'			=> $hape!=null?$hape:'',
-						'asal'			=> $asal!=null?$asal:'',
-						'mutasi'		=> $mutasi!=null?$mutasi:'',
-						'kelurahan'		=> $kelurahan!=null?$kelurahan:'',
-						'kecamatan'		=> $kecamtan!=null?$kecamtan:'',
-						'kota'			=> $kota!=null?$kota:'',
-						'kodepos'		=> $kodepos!=null?$kodepos:'',
-						'telpon'		=> $hape!=null?$hape:'',
-						'erte'			=> $erte!=null?$erte:'',
-						'erwe'			=> $erwe!=null?$erwe:'',
-						'jilid'			=> $jilid!=null?$jilid:1,
-						'is_asuh'		=> $is_asuh!=null?$is_asuh:0,
-						'id_sekolah'	=> session('sekolah_id_sekolah'),
+						'noinduk'			=> $noinduk,
+						'nik'				=> $nik!=null?$nik:time(),
+						'nisn'				=> $nisn!=null?$nisn:'',
+						'nama'				=> $nama!=null?$nama:'',
+						'kelamin'			=> $kelamin!=null?$kelamin:'',
+						'tmplahir'			=> $tmplahir!=null?$tmplahir:'',
+						'tgllahir'			=> $tgllahir!=null?$tgllahir:date("Y-m-d"),
+						'darah'				=> $darah!=null?$darah:'',
+						'berat'				=> $berat!=null?$berat:0,
+						'tinggi'			=> $tinggi!=null?$tinggi:0,
+						'namaayah'			=> $ayah!=null?$ayah:'',
+						'namaibu'			=> $ibu!=null?$ibu:'',
+						'kerjaayah'			=> $kayah!=null?$kayah:'',
+						'kerjaibu'			=> $kibu!=null?$kibu:'',
+						'wali'				=> $wali!=null?$wali:'',
+						'pekerjaanwali' 	=> $kwali!=null?$kwali:'',
+						'klspos'			=> $kelas!=null?$kelas:'',
+						'tamasuk'			=> $tahun!=null?$tahun:'',
+						'hape'				=> $hape!=null?$hape:'',
+						'asal'				=> $asal!=null?$asal:'',
+						'mutasi'			=> $mutasi!=null?$mutasi:'',
+						'alamatortu'		=> $alamat!=null?$alamat:'',
+						'erte'				=> $erte!=null?$erte:'',
+						'erwe'				=> $erwe!=null?$erwe:'',
+						'kelurahan'			=> $kelurahan!=null?$kelurahan:'',
+						'kecamatan'			=> $kecamtan!=null?$kecamtan:'',
+						'kota'				=> $kota!=null?$kota:'',
+						'kodepos'			=> $kodepos!=null?$kodepos:'',
+						'jalansaatini'		=> $request->edit_alamatsaatini!=null?$request->edit_alamatsaatini:$alamat,
+						'rtsaatini'			=> $request->edit_rtsaatini!=null?$request->edit_rtsaatini:$erte,
+						'rwsaatini'			=> $request->edit_rwsaatini!=null?$request->edit_rwsaatini:$erwe,
+						'desasaatini'		=> $request->edit_kelsaatini!=null?$request->edit_kelsaatini:$kelurahan,
+						'kecamatansaatini'	=> $request->edit_kecsaatini!=null?$request->edit_kecsaatini:$kecamtan,
+						'kotasaatini'		=> $request->edit_kotasaatini!=null?$request->edit_kotasaatini:$kota,
+						'kodepossaatini'	=> $request->edit_kodepossaatini!=null?$request->edit_kodepossaatini:$kodepos,
+						'telpon'			=> $hape!=null?$hape:'',
+						'jilid'				=> $jilid!=null?$jilid:1,
+						'is_asuh'			=> $is_asuh!=null?$is_asuh:0,
+						'panggilan'			=> $request->edit_panggilan, 
+						'agama'				=> $request->id_agama, 
+						'payah'				=> $request->id_payah,
+						'pibu'				=> $request->id_pibu,
+						'gayah'				=> $request->id_gayah,
+						'gibu'				=> $request->id_gibu,
+						'gybljr'			=> $request->edit_gayabelajar,
+						'bakat'				=> $request->edit_karakter,
+						'nokelulusan'		=> '',
+						'melanjutkanke'		=> $melanjutkanke,
+						'id_sekolah'		=> session('sekolah_id_sekolah'),
+						'updated_at'		=> date('Y-m-d H:i:s')
 					]);
 					$id = $input->id;
 					if ($input){
@@ -2232,97 +4749,32 @@ class AdminController extends Controller
 								'file' =>  'mimes:jpg,jpeg,png,PNG,JPG,JPEG|max:20000'
 							]);
 							if ($validator->fails()) {
-								$error = $validation->errors();
-								return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => $error]);
-								return back();
+								$error = $error.$validation->errors();
 							} else {
 								$getfotolama 	= Datainduk::where('id', $id)->first();
 								$fotolama		= $getfotolama->foto;
 								if ($fotolama != ''){
-									if (File::exists(base_path() ."/public/dist/img/foto/". $fotolama)) {
-										File::delete(base_path() ."/public/dist/img/foto/". $fotolama);
+									$draft =  public_path('dist/img/foto/'.$fotolama);
+									try {
+										unlink($draft);
+									} catch (\Exception $e) {
 									}
 								}
 								$namafile		= $id.'.'.$request->file('edit_foto')->getClientOriginalExtension();
 								$uploadedFile 	= $request->file('edit_foto');
-								Storage::putFileAs('dist/img/foto/',$uploadedFile,$namafile);
+								Storage::disk('local')->putFileAs('dist/img/foto/',$uploadedFile,$namafile);
 								Datainduk::where('id', $id)->update([
 									'foto' => $namafile
 								]);
-								return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Update Foto dan Data Siswa Sukses']);
-								return back();
 							}
 						}
-						$cekkelengkapan = Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
-						if ($cekkelengkapan == 0){
-							Datapelengkappsb::create([
-								'niksiswa'		=> $nik, 
-								'panggilan'		=> $request->edit_panggilan, 
-								'umur'			=> 0, 
-								'agama'			=> $request->id_agama, 
-								'warga'			=> 'WNI', 
-								'bahasa'		=> 'Indenesia', 
-								'penyakit'		=> '', 
-								'anakke'		=> '', 
-								'kandung'		=> '', 
-								'tiri'			=> '', 
-								'angkat'		=> '', 
-								'jarak'			=> '', 
-								'telpon'		=> '', 
-								'bersama'		=> '', 
-								'payah'			=> $request->id_payah,
-								'pibu'			=> $request->id_pibu,
-								'gayah'			=> $request->id_gayah,
-								'gibu'			=> $request->id_gibu,
-								'aayah'			=> '',
-								'aaibu'			=> '',
-								'hayah'			=> '',
-								'hibu'			=> '',
-								'agamawali'		=> '',
-								'hwali'			=> '',
-								'kwali'			=> '',
-								'hubwali'		=> '',
-								'alamattk'		=> '',
-								'pindahasal'	=> '',
-								'pindahkelas'	=> '',
-								'pindahtgl'		=> '',
-								'pindahkekls'	=> '',
-								'kesulitan'		=> '',
-								'anggotarumah'	=> '',
-								'kegiatansendiri'=>'',
-								'mata'			=> '',
-								'telinga'		=> '',
-								'wajah'			=> '',
-								'gybljr'		=> $request->edit_gayabelajar,
-								'bakat'			=> $request->edit_karakter,
-								'sumberinfo'	=> '',
-								'prestasi1'		=> '',
-								'prestasi2'		=> '',
-								'prestasi3'		=> '',
-								'prestasi4'		=> '',
-								'marking'		=> $id,
-								'scanakta'		=> '',
-								'scanfoto'		=> '',
-								'scankk'		=> '',
-								'scanket'		=> '',
-								'scanbukti'		=> '',
-								'id_sekolah'    => session('sekolah_id_sekolah')
-							]);
+						if ($error == ''){
+							return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Tambah Data Siswa Tersimpan']);
+							return back();	
 						} else {
-							Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',session('sekolah_id_sekolah'))->update([
-								'panggilan'		=> $request->edit_panggilan, 
-								'agama'			=> $request->id_agama, 
-								'marking'		=> $id,
-								'payah'			=> $request->id_payah,
-								'pibu'			=> $request->id_pibu,
-								'gayah'			=> $request->id_gayah,
-								'gibu'			=> $request->id_gibu,
-								'gybljr'		=> $request->edit_gayabelajar,
-								'bakat'			=> $request->edit_karakter,
-							]);
+							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => $error]);
+							return back();
 						}
-						return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Siswa Tersimpan']);
-						return back();
 					} else {
 						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Input Gagal, Coba Beberapa Saat Lagi']);
 						return back();
@@ -2341,39 +4793,55 @@ class AdminController extends Controller
 				$ceksudah = $ceksudah + $ceksudah2;
 				if ($ceksudah == 0){
 					$input = Datainduk::where('id', $id)->update([
-						'noinduk'		=> $noinduk!=null?$noinduk:time(),
-						'nik'			=> $nik!=null?$nik:time(),
-						'nisn'			=> $nisn!=null?$nisn:'',
-						'nama'			=> $nama!=null?$nama:'',
-						'kelamin'		=> $kelamin!=null?$kelamin:'',
-						'tmplahir'		=> $tmplahir!=null?$tmplahir:'',
-						'tgllahir'		=> $tgllahir!=null?$tgllahir:date("Y-m-d"),
-						'darah'			=> $darah!=null?$darah:'',
-						'berat'			=> $berat!=null?$berat:0,
-						'tinggi'		=> $tinggi!=null?$tinggi:0,
-						'alamatortu'	=> $alamat!=null?$alamat:'',
-						'namaayah'		=> $ayah!=null?$ayah:'',
-						'namaibu'		=> $ibu!=null?$ibu:'',
-						'kerjaayah'		=> $kayah!=null?$kayah:'',
-						'kerjaibu'		=> $kibu!=null?$kibu:'',
-						'wali'			=> $wali!=null?$wali:'',
-						'pekerjaanwali' => $kwali!=null?$kwali:'',
-						'klspos'		=> $kelas!=null?$kelas:'',
-						'tamasuk'		=> $tahun!=null?$tahun:'',
-						'hape'			=> $hape!=null?$hape:'',
-						'asal'			=> $asal!=null?$asal:'',
-						'mutasi'		=> $mutasi!=null?$mutasi:'',
-						'kelurahan'		=> $kelurahan!=null?$kelurahan:'',
-						'kecamatan'		=> $kecamtan!=null?$kecamtan:'',
-						'kota'			=> $kota!=null?$kota:'',
-						'kodepos'		=> $kodepos!=null?$kodepos:'',
-						'telpon'		=> $hape!=null?$hape:'',
-						'erte'			=> $erte!=null?$erte:'',
-						'erwe'			=> $erwe!=null?$erwe:'',
-						'jilid'			=> $jilid!=null?$jilid:1,
-						'is_asuh'		=> $is_asuh!=null?$is_asuh:0,
-						'id_sekolah'	=> session('sekolah_id_sekolah'),
-						'updated_at'	=> date("Y-m-d H:i:s")
+						'noinduk'			=> $noinduk,
+						'nik'				=> $nik!=null?$nik:time(),
+						'nisn'				=> $nisn!=null?$nisn:'',
+						'nama'				=> $nama!=null?$nama:'',
+						'kelamin'			=> $kelamin!=null?$kelamin:'',
+						'tmplahir'			=> $tmplahir!=null?$tmplahir:'',
+						'tgllahir'			=> $tgllahir!=null?$tgllahir:date("Y-m-d"),
+						'darah'				=> $darah!=null?$darah:'',
+						'berat'				=> $berat!=null?$berat:0,
+						'tinggi'			=> $tinggi!=null?$tinggi:0,
+						'namaayah'			=> $ayah!=null?$ayah:'',
+						'namaibu'			=> $ibu!=null?$ibu:'',
+						'kerjaayah'			=> $kayah!=null?$kayah:'',
+						'kerjaibu'			=> $kibu!=null?$kibu:'',
+						'wali'				=> $wali!=null?$wali:'',
+						'pekerjaanwali' 	=> $kwali!=null?$kwali:'',
+						'klspos'			=> $kelas!=null?$kelas:'',
+						'tamasuk'			=> $tahun!=null?$tahun:'',
+						'hape'				=> $hape!=null?$hape:'',
+						'asal'				=> $asal!=null?$asal:'',
+						'mutasi'			=> $mutasi!=null?$mutasi:'',
+						'alamatortu'		=> $alamat!=null?$alamat:'',
+						'erte'				=> $erte!=null?$erte:'',
+						'erwe'				=> $erwe!=null?$erwe:'',
+						'kelurahan'			=> $kelurahan!=null?$kelurahan:'',
+						'kecamatan'			=> $kecamtan!=null?$kecamtan:'',
+						'kota'				=> $kota!=null?$kota:'',
+						'kodepos'			=> $kodepos!=null?$kodepos:'',
+						'jalansaatini'		=> $request->edit_alamatsaatini!=null?$request->edit_alamatsaatini:$alamat,
+						'rtsaatini'			=> $request->edit_rtsaatini!=null?$request->edit_rtsaatini:$erte,
+						'rwsaatini'			=> $request->edit_rwsaatini!=null?$request->edit_rwsaatini:$erwe,
+						'desasaatini'		=> $request->edit_kelsaatini!=null?$request->edit_kelsaatini:$kelurahan,
+						'kecamatansaatini'	=> $request->edit_kecsaatini!=null?$request->edit_kecsaatini:$kecamtan,
+						'kotasaatini'		=> $request->edit_kotasaatini!=null?$request->edit_kotasaatini:$kota,
+						'kodepossaatini'	=> $request->edit_kodepossaatini!=null?$request->edit_kodepossaatini:$kodepos,
+						'telpon'			=> $hape!=null?$hape:'',
+						'jilid'				=> $jilid!=null?$jilid:1,
+						'is_asuh'			=> $is_asuh!=null?$is_asuh:0,
+						'panggilan'			=> $request->edit_panggilan, 
+						'agama'				=> $request->id_agama, 
+						'payah'				=> $request->id_payah,
+						'pibu'				=> $request->id_pibu,
+						'gayah'				=> $request->id_gayah,
+						'gibu'				=> $request->id_gibu,
+						'gybljr'			=> $request->edit_gayabelajar,
+						'bakat'				=> $request->edit_karakter,
+						'nokelulusan'		=> $nokelulusan,
+						'melanjutkanke'		=> $melanjutkanke,
+						'updated_at'		=> date("Y-m-d H:i:s")
 					]);
 					if ($input){
 						if ($request->hasFile('edit_foto')) {
@@ -2381,97 +4849,221 @@ class AdminController extends Controller
 								'file' =>  'mimes:jpg,jpeg,png,PNG,JPG,JPEG|max:20000'
 							]);
 							if ($validator->fails()) {
-								$error = $validation->errors();
-								return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => $error]);
-								return back();
+								$error = $error.$validation->errors();
 							} else {
-								$getfotolama 	= Datainduk::where('id', $id)->first();
-								$fotolama		= $getfotolama->foto;
-								if ($fotolama != ''){
-									if (File::exists(base_path() ."/public/dist/img/foto/". $fotolama)) {
-										File::delete(base_path() ."/public/dist/img/foto/". $fotolama);
-									}
-								}
+								
 								$namafile		= $id.'.'.$request->file('edit_foto')->getClientOriginalExtension();
 								$uploadedFile 	= $request->file('edit_foto');
-								Storage::putFileAs('dist/img/foto/',$uploadedFile,$namafile);
+								Storage::disk('local')->putFileAs('dist/img/foto/',$uploadedFile,$namafile);
 								Datainduk::where('id', $id)->update([
 									'foto' => $namafile
 								]);
-								return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Update Foto dan Data Siswa Sukses']);
-								return back();
 							}
 						}
-						$cekkelengkapan = Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
-						if ($cekkelengkapan == 0){
-							Datapelengkappsb::create([
-								'niksiswa'		=> $nik,
-								'panggilan'		=> $request->edit_panggilan, 
-								'umur'			=> 0, 
-								'agama'			=> $request->id_agama, 
-								'warga'			=> 'WNI', 
-								'bahasa'		=> 'Indenesia', 
-								'penyakit'		=> '', 
-								'anakke'		=> '', 
-								'kandung'		=> '', 
-								'tiri'			=> '', 
-								'angkat'		=> '', 
-								'jarak'			=> '', 
-								'telpon'		=> '', 
-								'bersama'		=> '', 
-								'payah'			=> $request->id_payah,
-								'pibu'			=> $request->id_pibu,
-								'gayah'			=> $request->id_gayah,
-								'gibu'			=> $request->id_gibu,
-								'aayah'			=> '',
-								'aaibu'			=> '',
-								'hayah'			=> '',
-								'hibu'			=> '',
-								'agamawali'		=> '',
-								'hwali'			=> '',
-								'kwali'			=> '',
-								'hubwali'		=> '',
-								'alamattk'		=> '',
-								'pindahasal'	=> '',
-								'pindahkelas'	=> '',
-								'pindahtgl'		=> '',
-								'pindahkekls'	=> '',
-								'kesulitan'		=> '',
-								'anggotarumah'	=> '',
-								'kegiatansendiri'=>'',
-								'mata'			=> '',
-								'telinga'		=> '',
-								'wajah'			=> '',
-								'gybljr'		=> $request->edit_gayabelajar,
-								'bakat'			=> $request->edit_karakter,
-								'sumberinfo'	=> '',
-								'prestasi1'		=> '',
-								'prestasi2'		=> '',
-								'prestasi3'		=> '',
-								'prestasi4'		=> '',
-								'marking'		=> $id,
-								'scanakta'		=> '',
-								'scanfoto'		=> '',
-								'scankk'		=> '',
-								'scanket'		=> '',
-								'scanbukti'		=> '',
-								'id_sekolah'    => session('sekolah_id_sekolah')
-							]);
+						if ($error == ''){
+							if ($melanjutkanke == 'SDTQ Daarul Ukhuwwah' AND $nokelulusan != ''){
+								$datalama 				= Datainduk::where('id', $id)->first();
+								$tahun					= date('Y');
+								$statppdb				= '';
+								$kodebaru				= '';
+								$kodepindahan 			= '';
+								$hargaformulir 			= '';
+								$namabank 				= '';
+								$norek 					= '';
+								$periode 				= '';
+								$sql 					= Layanan::orderBy('layanan', 'ASC')->where('id_sekolah', '1')->get();
+								if (!empty($sql)){
+									foreach ($sql as $rlayanan){
+										$status 		= $rlayanan->status;
+										$layanan 		= $rlayanan->layanan;
+										if ($layanan == 'periodepsb') { $periode = $status; }
+										if ($layanan == 'ppdb') { $statppdb = $status; }
+										if ($layanan == 'kodebaru') { $kodebaru = $status; }
+										if ($layanan == 'kodepindahan') { $kodepindahan = $status; }
+										if ($layanan == 'hargaformulir') { $hargaformulir = $status; }
+										if ($layanan == 'namabank') { $namabank = $status; }
+										if ($layanan == 'norek') { $norek = $status; }
+										if ($layanan == 'spp1') { $setspp1 = $status; }
+										if ($layanan == 'spp2') { $setspp2 = $status; }
+										if ($layanan == 'spp3') { $setspp3 = $status; }
+										if ($layanan == 'dpp1') { $setdpp1 = $status; }
+										if ($layanan == 'dpp2') { $setdpp2 = $status; }
+									}
+								}
+								$count = Datapsb::where('nik', $datalama->nik)->where('id_sekolah', '1')->count();
+								if ($count == 0){
+									$kodethn 	 	= substr($tahun, -4);
+									$urutanbaru		= Datapsb::where('tahun', $kodethn)->where('kodepsb', 'baru')->where('id_sekolah', '1')->count();
+									$urutanpindah	= Datapsb::where('tahun', $kodethn)->where('kodepsb', '!=', 'baru')->where('id_sekolah', '1')->count();
+									$getid 			= Datapsb::orderBy('id', 'DESC')->where('id_sekolah', '1')->first();
+									if (isset($getid->id)){
+										$idne 		= $getid->id;
+										$idne		= $idne + 1;
+									} else {
+										$idne		= 1;
+									}
+									$urutan  		= $urutanbaru + 1; 
+									$kodependaf 	= $kodebaru.'-'.$urutan; 
+									$kodepsb 		= 'baru';
+									$rowcekkode 	= Datapsb::where('kodependaf', $kodependaf)->where('id_sekolah', '1')->count();
+									if ($rowcekkode != 0){
+										$urutan 	= $urutan + 1;
+										$kodependaf = $kodebaru.'-'.$urutan; 
+									}
+									$rowcekkode 	= Datapsb::where('kodependaf', $kodependaf)->where('id_sekolah', '1')->count();
+									if ($rowcekkode != 0){
+										$urutan 	= $urutan + 1;
+										$kodependaf = $kodebaru.'-'.$urutan; 
+									}
+									$rowcekkode 	= Datapsb::where('kodependaf', $kodependaf)->where('id_sekolah', '1')->count();
+									if ($rowcekkode == 0){
+										$gooo = Datapsb::create([
+											'tahun'			=> $kodethn, 
+											'kodependaf'	=> $kodependaf, 
+											'kodepsb'		=> $kodepsb, 
+											'nama'			=> $datalama->nama, 
+											'nik'			=> $datalama->nik, 
+											'kelamin'		=> $datalama->kelamin, 
+											'tmplahir'		=> $datalama->tmplahir, 
+											'tgllahir'		=> $datalama->tgllahir, 
+											'umur'			=> $datalama->umur, 
+											'darah'			=> $datalama->darah, 
+											'berat'			=> $datalama->berat, 
+											'tinggi'		=> $datalama->tinggi,
+											'alamatortu'	=> $datalama->alamatortu,
+											'namaayah'		=> $datalama->namaayah,
+											'namaibu'		=> $datalama->namaibu,
+											'kerjaayah'		=> $datalama->kerjaayah,
+											'kerjaibu'		=> $datalama->kerjaibu,
+											'wali'			=> $datalama->wali,
+											'pekerjaanwali'	=> $datalama->pekerjaanwali,
+											'foto'			=> $datalama->foto,
+											'tamasuk'		=> $tahun, 
+											'hape'			=> $datalama->hape,
+											'asal'			=> Session('sekolah_nama_sekolah'),
+											'mutasi'		=> '',
+											'kelurahan'		=> $datalama->kelurahan,
+											'kecamatan'		=> $datalama->kecamatan,
+											'kota'			=> $datalama->kota,
+											'kodepos'		=> $datalama->kodepos,
+											'telpon'		=> '',
+											'erte'			=> $datalama->erte,
+											'erwe'			=> $datalama->erwe,
+											'n1'			=> '', 
+											'n2'			=> '', 
+											'n3'			=> '', 
+											'n4'			=> '', 
+											'n5'			=> '', 
+											'n6'			=> '', 
+											'n7'			=> '', 
+											'n8'			=> '', 
+											'n9'			=> '', 
+											'n10'			=> '', 
+											'n11'			=> '', 
+											'n12'			=> '', 
+											'n13'			=> '', 
+											'total'			=> '', 
+											'rata'			=> '', 
+											'hasil'			=> '', 
+											'deadline'		=> '', 
+											'akhirumum'		=> '', 
+											'nosurat'		=> '', 
+											'des1'			=> '', 
+											'des2'			=> '', 
+											'des3'			=> '', 
+											'des4'			=> '', 
+											'des5'			=> '', 
+											'des6'			=> '', 
+											'des7'			=> '', 
+											'des8'			=> '', 
+											'dana1'			=> '', 
+											'dana2'			=> '', 
+											'dana3'			=> '', 
+											'dana4'			=> '', 
+											'status'		=> 10,
+											'id_sekolah'    => 1
+										]);
+										if ($gooo){
+											$cekkelengkapan = Datapelengkappsb::where('niksiswa', $datalama->nik)->where('id_sekolah', '1')->count();
+											if ($cekkelengkapan == 0){
+												Datapelengkappsb::create([
+													'niksiswa'		=> $datalama->nik, 
+													'panggilan'		=> $datalama->panggilan, 
+													'umur'			=> $datalama->umur, 
+													'agama'			=> $datalama->agama, 
+													'warga'			=> 'WNI', 
+													'bahasa'		=> 'INDONESIA', 
+													'penyakit'		=> '', 
+													'anakke'		=> '', 
+													'kandung'		=> '', 
+													'tiri'			=> '', 
+													'angkat'		=> '', 
+													'jarak'			=> '', 
+													'telpon'		=> '', 
+													'bersama'		=> '', 
+													'payah'			=> '',
+													'pibu'			=> '',
+													'gayah'			=> '',
+													'gibu'			=> '',
+													'aayah'			=> '',
+													'aaibu'			=> '',
+													'hayah'			=> '',
+													'hibu'			=> '',
+													'agamawali'		=> '',
+													'hwali'			=> '',
+													'kwali'			=> '',
+													'hubwali'		=> '',
+													'alamattk'		=> '',
+													'pindahasal'	=> '',
+													'pindahkelas'	=> '',
+													'pindahtgl'		=> '',
+													'pindahkekls'	=> '',
+													'kesulitan'		=> '',
+													'anggotarumah'	=> '',
+													'kegiatansendiri'=>'',
+													'mata'			=> '',
+													'telinga'		=> '',
+													'wajah'			=> '',
+													'gybljr'		=> '',
+													'bakat'			=> '',
+													'sumberinfo'	=> '',
+													'prestasi1'		=> '',
+													'prestasi2'		=> '',
+													'prestasi3'		=> '',
+													'prestasi4'		=> '',
+													'marking'		=> $gooo->id,
+													'scanakta'		=> '',
+													'scanfoto'		=> '',
+													'scankk'		=> '',
+													'scanket'		=> '',
+													'scanbukti'		=> '',
+													'id_sekolah'    => 1
+												]);
+											} else {
+												Datapelengkappsb::where('niksiswa', $datalama->nik)->where('id_sekolah', '1')->update([
+													'panggilan'		=> $datalama->panggilan, 
+													'umur'			=> $datalama->umur, 
+													'agama'			=> $datalama->agama, 
+												]);
+											}							
+										}
+									}
+								}
+								XFiles::where('xjenis', Session('sekolah_id_sekolah').';'.$noinduk)->update([
+									'xfile'	=> ''
+								]);
+							}
+							if ($nokelulusan != ''){
+								XFiles::where('xjenis', Session('sekolah_id_sekolah').';'.$noinduk)->update([
+									'xfile'	=> ''
+								]);
+							}
+							return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Update Data Siswa Tersimpan']);
+							return back();	
 						} else {
-							Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',session('sekolah_id_sekolah'))->update([
-								'panggilan'		=> $request->edit_panggilan, 
-								'agama'			=> $request->id_agama, 
-								'payah'			=> $request->id_payah,
-								'pibu'			=> $request->id_pibu,
-								'gayah'			=> $request->id_gayah,
-								'gibu'			=> $request->id_gibu,
-								'marking'		=> $id,
-								'gybljr'		=> $request->edit_gayabelajar,
-								'bakat'			=> $request->edit_karakter,
-							]);
+							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => $error]);
+							return back();
 						}
-						return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Update Data Siswa Tersimpan']);
-						return back();
 					} else {
 						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Update Gagal, Coba Beberapa Saat Lagi']);
 						return back();
@@ -2515,22 +5107,25 @@ class AdminController extends Controller
 			]);
 			if ($input){
 				if ($nisn == ''){ $nisn = '-'; }
-					Mutasi::create([
-						'nama'		=> $nama, 
-						'noinduk'	=> $noinduk, 
-						'nisn'		=> $nisn, 
-						'tapel'		=> $tahun, 
-						'sdtujuan'	=> $tujuan, 
-						'alamat'	=> $alamat, 
-						'alasan'	=> $alasan, 
-						'tanggal'	=> $tanggal,
-						'id_sekolah'=> session('sekolah_id_sekolah')
-					]);
-					echo '<div class="alert alert-success alert-dismissable">
+				XFiles::where('xjenis', Session('sekolah_id_sekolah').';'.$noinduk)->update([
+					'xfile'	=> ''
+				]);
+				Mutasi::create([
+					'nama'		=> $nama, 
+					'noinduk'	=> $noinduk, 
+					'nisn'		=> $nisn, 
+					'tapel'		=> $tahun, 
+					'sdtujuan'	=> $tujuan, 
+					'alamat'	=> $alamat, 
+					'alasan'	=> $alasan, 
+					'tanggal'	=> $tanggal,
+					'id_sekolah'=> session('sekolah_id_sekolah')
+				]);
+				echo '<div class="alert alert-success alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 						<h4><i class="icon fa fa-check"></i> Sukses </h4>
 						Update Data Induk Siswa Berhasil Di Simpan
-						</div>';
+					</div>';
 			} else {
 				echo '<div class="alert alert-danger alert-dismissable">
 				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -2540,528 +5135,18 @@ class AdminController extends Controller
 			}
 		}
 	}
-	public function jsonDatainduk() {
-		$arrsiswa 		= [];
-		$homebase		= url("/");
-		if (Session('previlage') == 'ortu'){
-			$getallsiswa 	= Datainduk::where('kodeortu', Session('id'))->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('noinduk', 'DESC')->get();
-		} else {
-			$getallsiswa 	= Datainduk::orderBy('noinduk', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+	public function exupdDataPSB(Request $request) {
+		$niksiswa 	= $request->niksiswa;
+		$data 		= Datapelengkappsb::where('niksiswa', $niksiswa);
+		if ($data){
+			$inputData = $request->except(['_token']);
+			$data->update($inputData);
+			return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Updated']);
+			return back();
+		}else {
+			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Input Gagal', 'message' => 'Silahkan ulangi beberapa saat lagi, atau hubungi admin TI anda']);
+			return back();
 		}
-		if (!empty($getallsiswa)){
-			foreach ($getallsiswa as $hasil) {
-				$foto 		= $hasil->foto;
-				if ($foto != ''){
-					if (File::exists(base_path() ."/public/dist/img/foto/". $foto)) {
-						$lampiran	= '<img src="'.$homebase.'/dist/img/foto/'.$foto.'" height="35">';
-					} else {
-						$lampiran	= '<img src="'.$homebase.'/logo.png" height="35">';
-					}
-				} else {
-					$lampiran	= '<img src="'.$homebase.'/logo.png" height="35">';
-				}
-				$getpanggilan 	= Datapelengkappsb::where('marking', $hasil->id)->first();
-				if (isset($getpanggilan->id)){
-					$bakat 		= $getpanggilan->bakat;
-					$gybljr 	= $getpanggilan->gybljr;
-					$gayah 		= $getpanggilan->gayah;
-					$gibu 		= $getpanggilan->gibu;
-					$payah 		= $getpanggilan->payah;
-					$pibu 		= $getpanggilan->pibu;
-					$panggilan 	= $getpanggilan->panggilan;
-					$agama 		= $getpanggilan->agama;
-				} else { $payah = ''; $pibu = ''; $panggilan = $hasil->nama; $agama = ''; $bakat = ''; $gybljr = ''; $gayah = ''; $gibu = ''; }
-				$arrsiswa[] = array(
-					'panggilan' 	=> $panggilan,
-					'agama' 		=> $agama,
-					'bakat' 		=> $bakat,
-					'gybljr' 		=> $gybljr,
-					'gayah' 		=> $gayah,
-					'gibu' 			=> $gibu,
-					'payah' 		=> $payah,
-					'pibu' 			=> $pibu,
-					'id' 			=> $hasil->id,	
-					'nik' 			=> $hasil->nik,
-					'nama' 			=> $hasil->nama,	
-					'kelamin' 		=> $hasil->kelamin,
-					'tmplahir' 		=> $hasil->tmplahir,
-					'tgllahir' 		=> $hasil->tgllahir,
-					'noinduk' 		=> $hasil->noinduk,
-					'nisn' 			=> $hasil->nisn,
-					'darah' 		=> $hasil->darah,
-					'tinggi' 		=> $hasil->tinggi,
-					'berat' 		=> $hasil->berat,
-					'namaayah' 		=> $hasil->namaayah,
-					'namaibu' 		=> $hasil->namaibu,	
-					'kerjaayah' 	=> $hasil->kerjaayah,
-					'kerjaibu'		=> $hasil->kerjaibu,
-					'wali'			=> $hasil->wali,
-					'pekerjaanwali'	=> $hasil->pekerjaanwali,
-					'erte'			=> $hasil->erte,
-					'erwe'			=> $hasil->erwe,
-					'alamatortu'	=> $hasil->alamatortu,
-					'kelurahan'		=> $hasil->kelurahan,
-					'kecamatan'		=> $hasil->kecamatan,
-					'kota'			=> $hasil->kota,
-					'kodepos'		=> $hasil->kodepos,
-					'klspos'		=> $hasil->klspos,			
-					'foto'			=> $hasil->foto,
-					'tamasuk'		=> $hasil->tamasuk,
-					'hape'			=> $hasil->hape,
-					'asal'			=> $hasil->asal,
-					'mutasi'		=> $hasil->mutasi,
-					'nokelulusan'	=> $hasil->nokelulusan,
-					'jilid'			=> $hasil->jilid,
-					'lampiran'		=> $lampiran,
-				);
-			}
-		}
-		if (Session('email') !== null){
-			$getallsiswa 	= Datainduk::where('kodeortuasuh', Session('email'))->orderBy('noinduk', 'DESC')->get();
-			if (!empty($getallsiswa)){
-				foreach ($getallsiswa as $hasil) {
-					$foto 		= $hasil->foto;
-					if ($foto != ''){
-						if (File::exists(base_path() ."/public/dist/img/foto/". $foto)) {
-							$lampiran	= '<img src="'.$homebase.'/dist/img/foto/'.$foto.'" height="35">';
-						} else {
-							$lampiran	= '<img src="'.$homebase.'/logo.png" height="35">';
-						}
-					} else {
-						$lampiran	= '<img src="'.$homebase.'/logo.png" height="35">';
-					}
-					$getpanggilan 	= Datapelengkappsb::where('marking', $hasil->id)->first();
-					if (isset($getpanggilan->id)){
-						$panggilan 	= $getpanggilan->panggilan;
-						$agama 		= $getpanggilan->agama;
-					} else { $panggilan = $hasil->nama; $agama = ''; }
-					$arrsiswa[] = array(
-						'panggilan' 	=> $panggilan,
-						'agama' 		=> $agama,
-						'id' 			=> $hasil->id,	
-						'nik' 			=> $hasil->nik,
-						'nama' 			=> $hasil->nama,	
-						'kelamin' 		=> $hasil->kelamin,
-						'tmplahir' 		=> $hasil->tmplahir,
-						'tgllahir' 		=> $hasil->tgllahir,
-						'noinduk' 		=> $hasil->noinduk,
-						'nisn' 			=> $hasil->nisn,
-						'darah' 		=> $hasil->darah,
-						'tinggi' 		=> $hasil->tinggi,
-						'berat' 		=> $hasil->berat,
-						'namaayah' 		=> $hasil->namaayah,
-						'namaibu' 		=> $hasil->namaibu,	
-						'kerjaayah' 	=> $hasil->kerjaayah,
-						'kerjaibu'		=> $hasil->kerjaibu,
-						'wali'			=> $hasil->wali,
-						'pekerjaanwali'	=> $hasil->pekerjaanwali,
-						'erte'			=> $hasil->erte,
-						'erwe'			=> $hasil->erwe,
-						'alamatortu'	=> $hasil->alamatortu,
-						'kelurahan'		=> $hasil->kelurahan,
-						'kecamatan'		=> $hasil->kecamatan,
-						'kota'			=> $hasil->kota,
-						'kodepos'		=> $hasil->kodepos,
-						'klspos'		=> $hasil->klspos,			
-						'foto'			=> $hasil->foto,
-						'tamasuk'		=> $hasil->tamasuk,
-						'hape'			=> $hasil->hape,
-						'asal'			=> $hasil->asal,
-						'mutasi'		=> $hasil->mutasi,
-						'jilid'			=> $hasil->jilid,
-						'nokelulusan'	=> $hasil->nokelulusan,
-						'lampiran'		=> $lampiran,
-					);
-				}
-			}
-		}
-		echo json_encode($arrsiswa);
-	}
-	public function jsonCariDatainduk(Request $request) {
-		$arrsiswa 		= [];
-		$homebase		= url("/");
-		$jenis 			= $request->val01;
-		$valcari 		= $request->val02;
-		if ($jenis == 'keaktifankelas'){
-			$arraysurat	= [];
-			$i 			= 0;
-			$data		= new Loginputnilai();
-			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
-			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
-			$data 		= $data->where('niy', $valcari);
-			if ($request->has('search') && !empty($request->search)) {
-				$searchTerm = $request->search;
-				$data->where(function ($q) use ($searchTerm) {
-					$q->where('tanggal', 'like', "%$searchTerm%")
-						->orWhere('matpel', 'like', "%$searchTerm%")
-						->orWhere('jennilai', 'like', "%$searchTerm%")
-						->orWhere('tapel', 'like', "%$searchTerm%")
-						->orWhere('kodekd', 'like', "%$searchTerm%")
-						->orWhere('kelas', 'like', "%$searchTerm%");
-				});
-			}
-			$data		= $data->orderByRaw($order)->paginate($limit);
-			$totaldata	= $data->total();
-			if ($data) {
-				foreach($data as $rows){
-					$arraysurat[$i] = $rows;
-					$i++;
-				}
-				$response = [
-					'message'	=> 'List Data Keaktifan Kelas',
-					'total'		=> $totaldata,
-					'data'		=> $arraysurat
-				];
-				return response()->json($response, 200);
-			}
-			$response = [
-				'message'        => 'No Data'
-			];
-			return response()->json($response, 500);
-		} else if ($jenis == 'finger'){
-			$arraysurat	= [];
-			$i 			= 0;
-			$data		= new Presensifinger();
-			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
-			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
-			$data 		= $data->where('nip', $valcari);
-			if ($request->has('search') && !empty($request->search)) {
-				$searchTerm = $request->search;
-				$data->where(function ($q) use ($searchTerm) {
-					$q->where('tanggal', 'like', "%$searchTerm%")
-						->orWhere('tanggalscan', 'like', "%$searchTerm%")
-						->orWhere('jam', 'like', "%$searchTerm%")
-						->orWhere('kantor', 'like', "%$searchTerm%")
-						->orWhere('departemen', 'like', "%$searchTerm%")
-						->orWhere('jabatan', 'like', "%$searchTerm%");
-				});
-			}
-			$data		= $data->orderByRaw($order)->paginate($limit);
-			$totaldata	= $data->total();
-			if ($data) {
-				foreach($data as $rows){
-					$arraysurat[$i] = $rows;
-					$i++;
-				}
-				$response = [
-					'message'	=> 'List Data Finger',
-					'total'		=> $totaldata,
-					'data'		=> $arraysurat
-				];
-				return response()->json($response, 200);
-			}
-			$response = [
-				'message'        => 'No Data'
-			];
-			return response()->json($response, 500);
-		} else if ($jenis == 'logpribadi'){
-			$arraysurat	= [];
-			$i 			= 0;
-			$data		= new Logstaff();
-			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
-			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
-			$data 		= $data->where('sopo', $valcari);
-			if ($request->has('search') && !empty($request->search)) {
-				$searchTerm = $request->search;
-				$data 		= $data->where('kelakuan', '%'.$searchTerm.'%');
-			}
-			$data		= $data->orderByRaw($order)->paginate($limit);
-			$totaldata	= $data->total();
-			if ($data) {
-				foreach($data as $rows){
-					$arraysurat[$i] = $rows;
-					$i++;
-				}
-				$response = [
-					'message'	=> 'List Log Pribadi',
-					'total'		=> $totaldata,
-					'data'		=> $arraysurat
-				];
-				return response()->json($response, 200);
-			}
-			$response = [
-				'message'        => 'No Data'
-			];
-			return response()->json($response, 500);
-		} else if ($jenis == 'alquran'){
-			$arraysurat	= [];
-			$i 			= 0;
-			$data		= new Datasetorantahfid();
-			$limit		= ($request->input('limit') == null ? '10' : $request->input('limit'));
-			$order		= ($request->input('order') == null ? 'id desc' : $request->input('order'));
-			$data 		= $data->where('inputor', $valcari);
-			if ($request->has('search') && !empty($request->search)) {
-				$searchTerm = $request->search;
-				$data->where(function ($q) use ($searchTerm) {
-					$q->where('tanggal', 'like', "%$searchTerm%")
-						->orWhere('tapel', 'like', "%$searchTerm%")
-						->orWhere('semester', 'like', "%$searchTerm%");
-				});
-			}
-			$dataGroupedByDate 	= $data->groupBy('tanggal')->get();
-			$countTanggal 		= [];
-			foreach ($dataGroupedByDate as $datakelompok) {
-				$tanggal = $datakelompok->tanggal;
-				if (!isset($countTanggal[$tanggal])) {
-					$countTanggal[$tanggal] = 0;
-				}
-				$countTanggal[$tanggal]++;
-			}
-			$data = $data->orderByRaw($order)->paginate($limit);
-			$totaldata	= $data->total();
-			if ($data->count() > 0) {
-				foreach ($data as $rows) {
-					$rows->count_tanggal 	= isset($countTanggal[$rows->tanggal]) ? $countTanggal[$rows->tanggal] : 0;
-					$arraysurat[] 			= $rows;
-				}
-				$response = [
-					'message' 	=> 'List Keaktifan Alquran',
-					'total' 	=> $totaldata,
-					'data' 		=> $arraysurat
-				];
-				return response()->json($response, 200);
-			}
-			$response = [
-				'message'        => 'No Data'
-			];
-			return response()->json($response, 500);
-		} else {
-			$getallsiswa 	= Datainduk::where('tamasuk', $valcari)->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('noinduk', 'DESC')->get();
-			if (!empty($getallsiswa)){
-				foreach ($getallsiswa as $hasil) {
-					$foto 		= $hasil->foto;
-					if ($foto != ''){
-						if (File::exists(base_path() ."/public/dist/img/foto/". $foto)) {
-							$lampiran	= '<img src="'.$homebase.'/dist/img/foto/'.$foto.'" height="35">';
-						} else {
-							$lampiran	= '<img src="'.$homebase.'/logo.png" height="35">';
-						}
-					} else {
-						$lampiran	= '<img src="'.$homebase.'/logo.png" height="35">';
-					}
-					$arrsiswa[] = array(
-						'id' 			=> $hasil->id,	
-						'nik' 			=> $hasil->nik,
-						'nama' 			=> $hasil->nama,	
-						'kelamin' 		=> $hasil->kelamin,
-						'tmplahir' 		=> $hasil->tmplahir,
-						'tgllahir' 		=> $hasil->tgllahir,
-						'noinduk' 		=> $hasil->noinduk,
-						'nisn' 			=> $hasil->nisn,
-						'darah' 		=> $hasil->darah,
-						'tinggi' 		=> $hasil->tinggi,
-						'berat' 		=> $hasil->berat,
-						'namaayah' 		=> $hasil->namaayah,
-						'namaibu' 		=> $hasil->namaibu,	
-						'kerjaayah' 	=> $hasil->kerjaayah,
-						'kerjaibu'		=> $hasil->kerjaibu,
-						'wali'			=> $hasil->wali,
-						'pekerjaanwali'	=> $hasil->pekerjaanwali,
-						'erte'			=> $hasil->erte,
-						'erwe'			=> $hasil->erwe,
-						'alamatortu'	=> $hasil->alamatortu,
-						'kelurahan'		=> $hasil->kelurahan,
-						'kecamatan'		=> $hasil->kecamatan,
-						'kota'			=> $hasil->kota,
-						'kodepos'		=> $hasil->kodepos,
-						'klspos'		=> $hasil->klspos,			
-						'foto'			=> $hasil->foto,
-						'tamasuk'		=> $hasil->tamasuk,
-						'hape'			=> $hasil->hape,
-						'asal'			=> $hasil->asal,
-						'mutasi'		=> $hasil->mutasi,
-						'nokelulusan'	=> $hasil->nokelulusan,
-						'lampiran'		=> $lampiran,
-					);
-				}
-			}
-			if (Session('email') !== null){
-				$getallsiswa 	= Datainduk::where('kodeortuasuh', Session('email'))->orderBy('noinduk', 'DESC')->get();
-				if (!empty($getallsiswa)){
-					foreach ($getallsiswa as $hasil) {
-						$foto 		= $hasil->foto;
-						if ($foto != ''){
-							if (File::exists(base_path() ."/public/dist/img/foto/". $foto)) {
-								$lampiran	= '<img src="'.$homebase.'/dist/img/foto/'.$foto.'" height="35">';
-							} else {
-								$lampiran	= '<img src="'.$homebase.'/logo.png" height="35">';
-							}
-						} else {
-							$lampiran	= '<img src="'.$homebase.'/logo.png" height="35">';
-						}
-						$arrsiswa[] = array(
-							'id' 			=> $hasil->id,	
-							'nik' 			=> $hasil->nik,
-							'nama' 			=> $hasil->nama,	
-							'kelamin' 		=> $hasil->kelamin,
-							'tmplahir' 		=> $hasil->tmplahir,
-							'tgllahir' 		=> $hasil->tgllahir,
-							'noinduk' 		=> $hasil->noinduk,
-							'nisn' 			=> $hasil->nisn,
-							'darah' 		=> $hasil->darah,
-							'tinggi' 		=> $hasil->tinggi,
-							'berat' 		=> $hasil->berat,
-							'namaayah' 		=> $hasil->namaayah,
-							'namaibu' 		=> $hasil->namaibu,	
-							'kerjaayah' 	=> $hasil->kerjaayah,
-							'kerjaibu'		=> $hasil->kerjaibu,
-							'wali'			=> $hasil->wali,
-							'pekerjaanwali'	=> $hasil->pekerjaanwali,
-							'erte'			=> $hasil->erte,
-							'erwe'			=> $hasil->erwe,
-							'alamatortu'	=> $hasil->alamatortu,
-							'kelurahan'		=> $hasil->kelurahan,
-							'kecamatan'		=> $hasil->kecamatan,
-							'kota'			=> $hasil->kota,
-							'kodepos'		=> $hasil->kodepos,
-							'klspos'		=> $hasil->klspos,			
-							'foto'			=> $hasil->foto,
-							'tamasuk'		=> $hasil->tamasuk,
-							'hape'			=> $hasil->hape,
-							'asal'			=> $hasil->asal,
-							'mutasi'		=> $hasil->mutasi,
-							'nokelulusan'	=> $hasil->nokelulusan,
-							'lampiran'		=> $lampiran,
-						);
-					}
-				}
-			}
-			echo json_encode($arrsiswa);
-		}
-	}
-	public function jrekapthnini() {
-		$arrrekap 	= [];
-		$tahun		= date("Y");
-		$beras 		= 0;
-		$uang 		= 0;
-		$maal		= 0;
-		$shodaqoh	= 0;
-		$getallthn 	= Pembayaranzis::where('created_at', 'LIKE', $tahun.'%')->where('tglvalidasi', '!=', '0000-00-00')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-		if (!empty($getallthn)){
-			foreach ($getallthn as $rdatane) {
-				$jeniszakat		= $rdatane->jeniszakat;
-				$nominal		= $rdatane->nominal;
-				$zakatmaal		= $rdatane->zakatmaal;
-				$donasi			= $rdatane->donasi;
-				if ($jeniszakat == 'Uang'){
-					$uang 		= $uang + $nominal;
-				} else {
-					$beras 		= $beras + $nominal;
-				}
-				$maal 			= $maal + $zakatmaal;
-				$shodaqoh		= $shodaqoh + $donasi;
-			}
-		}
-		$arrrekap[] 	= array(
-			'jenis' 	=> 'Zakat Fitrah Beras',
-			'jumlah' 	=> $beras,
-		);
-		$arrrekap[] 	= array(
-			'jenis' 	=> 'Zakat Fitrah Uang',
-			'jumlah' 	=> $uang,
-		);
-		$arrrekap[] 	= array(
-			'jenis' 	=> 'Zakat Maal',
-			'jumlah' 	=> $maal,
-		);
-		$arrrekap[] 	= array(
-			'jenis' 	=> 'Shodaqoh/Donasi',
-			'jumlah' 	=> $shodaqoh,
-		);
-		echo json_encode($arrrekap);
-	}
-	public function jallData(Request $request) {
-		$bulan   	=   $request->val01;
-		$tahun   	=   $request->val02;
-		$jenis 		=   $request->val03;
-		
-		if ($jenis == 'ALL'){
-			if ($tahun == 'TAHUNINI'){
-				$tahun 		= date("Y");
-				$getallthn 	= Pembayaranzis::where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-			} else {
-				if ($bulan == 'ALL'){
-					$getallthn 	= Pembayaranzis::where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-				} else { 
-					$valcari 	= $tahun.'-'.$bulan;
-					$getallthn 	= Pembayaranzis::where('created_at', 'LIKE', $valcari.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-				}
-			}
-		} else {
-			if ($jenis== 'Shodaqoh'){
-				if ($tahun == 'TAHUNINI'){
-					$tahun 		= date("Y");
-					$getallthn 	= Pembayaranzis::where('donasi', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-				} else {
-					if ($bulan == 'ALL'){
-						$getallthn 	= Pembayaranzis::where('donasi', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-					} else { 
-						$valcari 	= $tahun.'-'.$bulan;
-						$getallthn 	= Pembayaranzis::where('donasi', '!=', '0')->where('created_at', 'LIKE', $valcari.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-					}
-				}
-			}
-			else if ($jenis== 'Maal'){
-				if ($tahun == 'TAHUNINI'){
-					$tahun 		= date("Y");
-					$getallthn 	= Pembayaranzis::where('zakatmaal', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-				} else {
-					if ($bulan == 'ALL'){
-						$getallthn 	= Pembayaranzis::where('zakatmaal', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-					} else { 
-						$valcari 	= $tahun.'-'.$bulan;
-						$getallthn 	= Pembayaranzis::where('zakatmaal', '!=', '0')->where('created_at', 'LIKE', $valcari.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-					}
-				}
-			}
-			else {
-				if ($tahun == 'TAHUNINI'){
-					$tahun 		= date("Y");
-					$getallthn 	= Pembayaranzis::where('nominal', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-				} else {
-					if ($bulan == 'ALL'){
-						$getallthn 	= Pembayaranzis::where('nominal', '!=', '0')->where('created_at', 'LIKE', $tahun.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-					} else { 
-						$valcari 	= $tahun.'-'.$bulan;
-						$getallthn 	= Pembayaranzis::where('nominal', '!=', '0')->where('created_at', 'LIKE', $valcari.'%')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('updated_at', 'ASC')->get();
-					}
-				}
-			}
-		}
-		$alldata 	= [];
-		if (!empty($getallthn)){
-			foreach ($getallthn as $rdatane) {
-				$jeniszakat		= $rdatane->jeniszakat;
-				$nominal		= $rdatane->nominal;
-				$zakatmaal		= $rdatane->zakatmaal;
-				$donasi			= $rdatane->donasi;
-				$uang 			= 0;
-				$beras 			= 0;
-				if ($jeniszakat == 'Uang'){
-					$uang 		= $nominal;
-				} else { $beras = $nominal; }
-				$total 			= $uang + $zakatmaal + $donasi;
-				$alldata[] 		= array(
-					'idne'			=> $rdatane->id,
-					'namawali'		=> $rdatane->namawali,
-					'hape'			=> $rdatane->hape,
-					'namasiswa'		=> $rdatane->namasiswa,
-					'kelas'			=> $rdatane->kelas,
-					'jeniszakat'	=> $jeniszakat,
-					'orang'			=> $rdatane->orang,
-					'beras'			=> $beras,
-					'uang'			=> $uang,
-					'nominal'		=> $nominal,
-					'zakatmaal'		=> $zakatmaal,
-					'donasi'		=> $donasi,
-					'total'			=> $total,
-					'validator'		=> $rdatane->validator,
-					'tglvalidasi'	=> $rdatane->tglvalidasi,
-					'namafile'		=> $rdatane->namafile,
-				);
-			}
-		}
-		echo json_encode($alldata);
 	}
 	public function exVerifikasi(Request $request) {
 		$idne   		=   $request->val01;
@@ -3069,8 +5154,16 @@ class AdminController extends Controller
 		$keterangan   	=   $request->val03;
 		if ($keterangan == 'hapusdata'){
 			if ($verifikasi == 'SAYA YAKIN'){
-				$hapus = Pembayaranzis::where('id', $idne)->delete();
+				$cekfilelm 	= Pembayaranzis::where('id', $idne)->first();
+				$hapus 		= Pembayaranzis::where('id', $idne)->delete();
 				if ($hapus){
+					XFiles::where('xmarking', $cekfilelm->marking)->delete();
+					Logstaff::create([
+						'jenis'			=> 'ZIS', 
+						'sopo'			=> Session('nip'),
+						'kelakuan'		=> Session('nama').' Menghapus Data ZIS '.json_encode($cekfilelm).' Pada '.date('Y-m-d H:i:s'),
+						'id_sekolah' 	=> session('sekolah_id_sekolah')
+					]);
 					echo '<div class="alert alert-success alert-dismissable">
 							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 							<h4><i class="icon fa fa-check"></i> Sukses</h4>
@@ -3188,7 +5281,7 @@ class AdminController extends Controller
 						} else {
 							$namafile		= 'STAF-'.$niy.'.'.$request->file('id_foto')->getClientOriginalExtension();
 							$uploadedFile 	= $request->file('id_foto');
-							Storage::putFileAs('dist/img/foto/',$uploadedFile,$namafile);
+							Storage::disk('local')->putFileAs('dist/img/foto/',$uploadedFile,$namafile);
 							Dataindukstaff::where('niy', $niy)->where('id_sekolah', session('sekolah_id_sekolah'))->update([
 								'foto' => $namafile
 							]);
@@ -3248,13 +5341,15 @@ class AdminController extends Controller
 					return back();
 				} else {
 					if ($fotolama != ''){
-						if (File::exists(base_path() ."/public/dist/img/foto/". $fotolama)) {
-							File::delete(base_path() ."/public/dist/img/foto/". $fotolama);
+						$draft =  public_path('dist/img/foto/'.$fotolama);
+						try {
+							unlink($draft);
+						} catch (\Exception $e) {
 						}
 					}
 					$namafile		= 'STAF-'.$niy.'.'.$request->file('edit_foto')->getClientOriginalExtension();
 					$uploadedFile 	= $request->file('edit_foto');
-					Storage::putFileAs('dist/img/foto/',$uploadedFile,$namafile);
+					Storage::disk('local')->putFileAs('dist/img/foto/',$uploadedFile,$namafile);
 					Dataindukstaff::where('id', $idne)->update([
 						'foto' => $namafile
 					]);
@@ -3310,29 +5405,18 @@ class AdminController extends Controller
 			$getalldata		= $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 			$hilangkan 		= array(",", ".", " ");
 			foreach($getalldata as $val){
-				$tanggalscan	= $val['A'];
-				$tanggal		= $val['B'];
-				$jam			= $val['C'];
-				$pin			= $val['D'];
-				$nip			= $val['E'];
-				$nama			= $val['F'];
-				$jabatan		= $val['G'];
-				$departemen  	= $val['H'];
-				$kantor  		= $val['I'];
-				$verifikasi  	= $val['J'];
-				$deviceio  		= $val['K'];
-				$workcode  		= $val['L'];
-				$sndevice  		= $val['M'];
-				$mesin  		= $val['N'];
-				$recreatetgl 	= explode('-', $tanggal);
-				if (isset($recreatetgl[2])){
-					$dd 		= $recreatetgl[0];
-					$mm 		= $recreatetgl[1];
-					$yy 		= $recreatetgl[2];
-					$tanggal	= $yy.'-'.$mm.'-'.$dd;
-					$tanggalscan= $tanggal.' '.$jam;
-				}
-				if ($tanggalscan != 'Tanggal scan'){
+				$pin		= $val['A'];
+				$nip		= $val['B'];
+				$nama		= $val['C'];
+				$jabatan	= $val['D'];
+				$departemen	= $val['E'];
+				$kantor		= $val['F'];
+				$tanggal	= $val['G'];
+				$jam1  		= $val['H'];
+				$jam2  		= $val['I'];
+				$jam3  		= $val['J'];
+				$tanggal 	= date('Y-m-d', strtotime($tanggal));
+				if ($pin != 'A'){
 					$cekpeg 	= Dataindukstaff::where('idfinger', $pin)->first();
 					if (isset($cekpeg->id)){
 						$jabatan= $cekpeg->jabatan;
@@ -3344,161 +5428,72 @@ class AdminController extends Controller
 					$input = Presensifinger::updateOrCreate(
 						[
 							'pin' 			=> $pin,
-							'tanggalscan' 	=> $tanggalscan,
+							'tanggal' 		=> $tanggal,
 							'id_sekolah' 	=> session('sekolah_id_sekolah')
 						],
 						[
-							'tanggalscan' 	=> $tanggalscan,
 							'tanggal' 		=> $tanggal,
-							'jam' 			=> $jam,
+							'jam1' 			=> $jam1,
+							'jam2' 			=> $jam2,
+							'jam3' 			=> $jam3,
 							'pin' 			=> $pin,
 							'nip' 			=> $nip,
 							'nama' 			=> $nama,
 							'jabatan' 		=> $jabatan,
 							'departemen' 	=> $tapel,
 							'kantor' 		=> $semester,
-							'verifikasi' 	=> $verifikasi,
-							'deviceio' 		=> $deviceio,
-							'workcode' 		=> $workcode,
-							'serialnumber' 	=> $sndevice,
-							'namamesin' 	=> $mesin,
+							'created_by'	=> session('nip'),
 							'id_sekolah' 	=> session('sekolah_id_sekolah')
 						]
 					);
 					if ($input){
 						$arrstaf[] = array(
-							'tanggalscan' 	=> $tanggalscan,
 							'tanggal' 		=> $tanggal,
-							'jam' 			=> $jam,
+							'jam1' 			=> $jam1,
+							'jam2' 			=> $jam2,
+							'jam3' 			=> $jam3,
 							'pin' 			=> $pin,
 							'nip' 			=> $nip,
 							'nama' 			=> $nama,
 							'jabatan' 		=> $jabatan,
 							'departemen' 	=> $tapel,
 							'kantor' 		=> $semester,
-							'verifikasi' 	=> $verifikasi,
-							'deviceio' 		=> $deviceio,
-							'workcode' 		=> $workcode,
-							'serialnumber' 	=> $sndevice,
-							'namamesin' 	=> $mesin,
 							'catatan'		=> $catatan,
 							'status'		=> 'Sukses'
 						);
 						$jumlah++;
 					} else {
 						$arrstaf[] = array(
-							'tanggalscan' 	=> $tanggalscan,
 							'tanggal' 		=> $tanggal,
-							'jam' 			=> $jam,
+							'jam1' 			=> $jam1,
+							'jam2' 			=> $jam2,
+							'jam3' 			=> $jam3,
 							'pin' 			=> $pin,
 							'nip' 			=> $nip,
 							'nama' 			=> $nama,
 							'jabatan' 		=> $jabatan,
 							'departemen' 	=> $tapel,
 							'kantor' 		=> $semester,
-							'verifikasi' 	=> $verifikasi,
-							'deviceio' 		=> $deviceio,
-							'workcode' 		=> $workcode,
-							'serialnumber' 	=> $sndevice,
-							'namamesin' 	=> $mesin,
 							'catatan'		=> $catatan,
 							'status'		=> 'Gagal'
 						);
 					}
 				}
 			}
+			$arrstaf = json_encode($arrstaf);
+			return response()->json(['data' => $arrstaf, 'icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Data Presensi Sejumlah '.$jumlah.' Sukses di Import']);
+			return back();
+		} else {
+			$id 		= $request->id;
+			$arrpresensi= Presensifinger::where('nip', $id)->where('departemen', $tapel)->where('kantor', $semester)->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('tanggal', 'ASC')->orderBy('pin', 'ASC')->get();
+			$jumlah		= count($arrpresensi);
+			$arrstaf 	= json_encode($arrpresensi);
+			$arrngajar 	= DB::table('jadwal_realisasi')->where('niyguru', $id)->where('tapel', $tapel)->where('semester', $semester)->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('mulai', 'ASC')->get();
+			$jngajar	= count($arrngajar);
+			$arrguru 	= json_encode($arrngajar);
+			return response()->json(['datapresensikelas' => $arrguru, 'data' => $arrstaf, 'icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Data Presensi Ditemukan Sejumlah '.$jumlah.' Presensi Kelas Sejumlah '.$jngajar]);
+			return back();
 		}
-		$arrstaf = json_encode($arrstaf);
-		return response()->json(['data' => $arrstaf, 'icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Data Presensi Sejumlah '.$jumlah.' Sukses di Import']);
-		return back();
-		
-	}
-	public function jsonDataindukstaff() {
-		$arrstaf 		= [];
-		$homebase		= url("/");
-		$getallstaf 	= Dataindukstaff::orderBy('niy', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-		if (!empty($getallstaf)){
-			foreach ($getallstaf as $hasil) {
-				$foto 		= $hasil->foto;
-				if ($foto != ''){
-					if (File::exists(base_path() ."/public/dist/img/foto/". $foto)) {
-						$lampiran	= '<img src="'.$homebase.'/dist/img/foto/'.$foto.'" height="35">';
-					} else {
-						$lampiran	= '<img src="'.$homebase.'/'.Session('sekolah_logo').'" height="35">';
-					}
-				} else {
-					$lampiran	= '<img src="'.$homebase.'/'.Session('sekolah_logo').'" height="35">';
-				}
-				$arrstaf[] = array(
-					'id' 			=> $hasil->id,	
-					'nama' 			=> $hasil->nama,		
-					'ttl' 			=> $hasil->ttl,
-					'nuptk' 		=> $hasil->nuptk,
-					'niy' 			=> $hasil->niy,
-					'kelamin' 		=> $hasil->kelamin,
-					'agama' 		=> $hasil->agama,
-					'ijasah' 		=> $hasil->ijasah,
-					'jabatan' 		=> $hasil->jabatan,
-					'statpeg' 		=> $hasil->statpeg,
-					'alamat' 		=> $hasil->alamat,	
-					'notelp' 		=> $hasil->notelp,
-					'foto' 			=> $hasil->foto,
-					'tmt' 			=> $hasil->tmt,
-					'idfinger' 		=> $hasil->idfinger,
-					'lampiran'		=> $lampiran,
-				);
-			}
-		}		
-		echo json_encode($arrstaf);
-	}
-	public function jsonSetinsidental() {
-		$arrinsidental		= [];
-		$homebase			= url("/");
-		$getaktifinsidental = Insidental::where('aktifasi', 'aktif')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('id', 'DESC')->get();
-		if (!empty($getaktifinsidental)){
-			foreach ($getaktifinsidental as $hasil) {
-				$arrinsidental[] = array(
-					'id' 		=> $hasil->id,
-					'deskripsi'	=> $hasil->deskripsi,
-					'kode'		=> $hasil->kode,
-					'bataswaktu'=> $hasil->bataswaktu,
-					'aktifasi'	=> $hasil->aktifasi,
-					'jenis'		=> $hasil->jenis,
-					'operator'	=> $hasil->operator,
-					'timestamp'	=> $hasil->timestamp,
-					'biaya'		=> number_format( $hasil->biaya , 0 , '.' , ',' ),
-				);
-			}
-		}		
-		echo json_encode($arrinsidental);
-	}
-	public function jsonEkskul() {
-		$arrekskul		= [];
-		$homebase		= url("/");
-		$getalekskul 	= Ekstrakulikuler::where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('id', 'DESC')->get();
-		if (!empty($getalekskul)){
-			foreach ($getalekskul as $hasil) {
-				$set01		= $hasil->nama;
-				$jumlah 	= DB::table('db_setkeuangan')
-								->join('db_datainduk', 'db_setkeuangan.noinduk', 'db_datainduk.noinduk')
-								->where('db_setkeuangan.id_sekolah', session('sekolah_id_sekolah'))
-								->where('db_datainduk.nokelulusan', '')
-								->where(function ($query) use ($set01) {
-								$query->where('db_setkeuangan.eksul1', $set01)
-									->orWhere('db_setkeuangan.eksul2', $set01)
-									->orWhere('db_setkeuangan.eksul3', $set01)
-									->orWhere('db_setkeuangan.eksul4', $set01)
-									->orWhere('db_setkeuangan.eksul5', $set01);
-							})->count();
-				$arrekskul[] = array(
-					'id' 		=> $hasil->id,
-					'namaeksul'	=> $hasil->nama,
-					'peminat'	=> $jumlah,
-					'biaya'		=> number_format( $hasil->biaya , 0 , '.' , ',' ),
-				);
-			}
-		}		
-		echo json_encode($arrekskul);
 	}
 	public function exInsidental(Request $request) {
 		$kode 		= $request->val01;
@@ -3572,12 +5567,12 @@ class AdminController extends Controller
 							<h4><i class="icon fa fa-check"></i> Sukses</h4>
 							'.$deskripsi .'
 						</div>'; 	
-				} else { 			
+				} else {
 					echo '<div class="alert alert-danger alert-dismissable">
 							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 							<h4><i class="icon fa fa-ban"></i> Error</h4>
 							Gagal menyimpan 
-						</div>';	
+						</div>';
 				}
 			}			
 		}
@@ -3677,50 +5672,85 @@ class AdminController extends Controller
 			$dpp 		= str_replace(',','',$ndpp);
 			$spp 		= str_replace(',','',$nspp);
 			$paguyuban 	= str_replace(',','',$npaguyuban);
-			$cekmasuk 	= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
-			if ($cekmasuk == 0){
-				$input 	= Setkuangan::create([
-					'nama'		=> $nama, 
-					'noinduk'	=> $noinduk, 
-					'dpp'		=> '',
-					'spp'		=> '',
-					'paguyuban' => '',
-					'eksul1'	=> '',
-					'eksul2'	=> '',
-					'eksul3'	=> '',
-					'eksul4'	=> '',
-					'eksul5'	=> '',
-					'id_sekolah'=> session('sekolah_id_sekolah'),
-				]);
-				Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->update([
-					'dpp'		=> $dpp,
-					'spp'		=> $spp,
-					'paguyuban' => $paguyuban,
-					'eksul1'	=> $ekskul1,
-					'eksul2'	=> $ekskul2,
-					'eksul3'	=> $ekskul3,
-					'eksul4'	=> $ekskul4,
-					'eksul5'	=> $ekskul5,
-					'id_sekolah'=> session('sekolah_id_sekolah'),
-				]);
+			if ($nama == 'ekskulonly'){
+				$cekmasuk 	= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+				if ($cekmasuk == 0){
+					$input 	= Setkuangan::create([
+						'nama'		=> '', 
+						'noinduk'	=> $noinduk, 
+						'dpp'		=> '',
+						'spp'		=> '',
+						'paguyuban' => '',
+						'eksul1'	=> '',
+						'eksul2'	=> '',
+						'eksul3'	=> '',
+						'eksul4'	=> '',
+						'eksul5'	=> '',
+						'id_sekolah'=> session('sekolah_id_sekolah'),
+					]);
+					Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->update([
+						'eksul1'	=> $ekskul1,
+						'eksul2'	=> $ekskul2,
+						'eksul3'	=> $ekskul3,
+						'eksul4'	=> $ekskul4,
+						'eksul5'	=> $ekskul5,
+					]);
+				} else {
+					$input	= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->update([
+						'eksul1'	=> $ekskul1,
+						'eksul2'	=> $ekskul2,
+						'eksul3'	=> $ekskul3,
+						'eksul4'	=> $ekskul4,
+						'eksul5'	=> $ekskul5,
+					]);
+				}
 			} else {
-				$input	= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->update([
-					'dpp'		=> $dpp,
-					'spp'		=> $spp,
-					'paguyuban' => $paguyuban,
-					'eksul1'	=> $ekskul1,
-					'eksul2'	=> $ekskul2,
-					'eksul3'	=> $ekskul3,
-					'eksul4'	=> $ekskul4,
-					'eksul5'	=> $ekskul5,
-					'id_sekolah'=> session('sekolah_id_sekolah'),
-				]);
+				$cekmasuk 	= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+				if ($cekmasuk == 0){
+					$input 	= Setkuangan::create([
+						'nama'		=> $nama, 
+						'noinduk'	=> $noinduk, 
+						'dpp'		=> '',
+						'spp'		=> '',
+						'paguyuban' => '',
+						'eksul1'	=> '',
+						'eksul2'	=> '',
+						'eksul3'	=> '',
+						'eksul4'	=> '',
+						'eksul5'	=> '',
+						'id_sekolah'=> session('sekolah_id_sekolah'),
+					]);
+					Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->update([
+						'dpp'		=> $dpp,
+						'spp'		=> $spp,
+						'paguyuban' => $paguyuban,
+						'eksul1'	=> $ekskul1,
+						'eksul2'	=> $ekskul2,
+						'eksul3'	=> $ekskul3,
+						'eksul4'	=> $ekskul4,
+						'eksul5'	=> $ekskul5,
+						'id_sekolah'=> session('sekolah_id_sekolah'),
+					]);
+				} else {
+					$input	= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->update([
+						'dpp'		=> $dpp,
+						'spp'		=> $spp,
+						'paguyuban' => $paguyuban,
+						'eksul1'	=> $ekskul1,
+						'eksul2'	=> $ekskul2,
+						'eksul3'	=> $ekskul3,
+						'eksul4'	=> $ekskul4,
+						'eksul5'	=> $ekskul5,
+						'id_sekolah'=> session('sekolah_id_sekolah'),
+					]);
+				}
 			}
+			
 			if ($input){
 				echo '<div class="alert alert-success alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 						<h4><i class="icon fa fa-check"></i> Sukses</h4>
-						Data an. '.$nama .' Berhasil Di Simpan
+						Data Berhasil Di Simpan
 					</div>';
 			} else {
 				echo '<div class="alert alert-danger alert-dismissable">
@@ -3730,330 +5760,6 @@ class AdminController extends Controller
 					</div>';	
 			}
 		}
-	}
-	public function jsonSetkeuangan(Request $request) {
-		$homebase 	= url("/");
-		$alldata 	= [];
-		$kelas 		= $request->val01;
-		$query 		= Datainduk::where('nokelulusan', '')->where('id_sekolah', session('sekolah_id_sekolah'));
-		if ($kelas !== 'all') {
-			$query->where('klspos', 'LIKE', $kelas . '%');
-		}
-		$getallsiswa = $query->get();
-		if ($getallsiswa->isNotEmpty()) {
-			foreach ($getallsiswa as $hasil) {
-				$noinduk 	= $hasil->noinduk;
-				$eksul1 	= '';
-				$eksul2 	= '';
-				$eksul3 	= '';
-				$eksul4 	= '';
-				$eksul5 	= '';
-				$biaya1 	= '';
-				$biaya2 	= '';
-				$biaya3 	= '';
-				$biaya4 	= '';
-				$biaya5 	= '';
-				$spp 		= 0;
-				$dpp 		= 0;
-				$paguyuban 	= 0;
-				$foto 		= $hasil->foto;
-				if (File::exists(base_path() . "/public/dist/img/foto/" . $foto)) {
-					$lampiran = '<img src="' . $homebase . '/dist/img/foto/' . $foto . '" height="35">';
-				} else {
-					$lampiran = '<img src="' . $homebase . '/boxed-bg.jpg" height="35">';
-				}
-				$getdatakeu = Setkuangan::where('noinduk', $noinduk)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
-				if ($getdatakeu !== null) {
-					$spp 		= number_format($getdatakeu->spp, 0, '.', ',');
-					$dpp 		= number_format($getdatakeu->dpp, 0, '.', ',');
-					$paguyuban 	= number_format($getdatakeu->paguyuban, 0, '.', ',');
-					$eksul1 	= $getdatakeu->eksul1;
-					$eksul2 	= $getdatakeu->eksul2;
-					$eksul3 	= $getdatakeu->eksul3;
-					$eksul4 	= $getdatakeu->eksul4;
-					$eksul5 	= $getdatakeu->eksul5;
-					foreach ([$eksul1, $eksul2, $eksul3, $eksul4, $eksul5] as $i => $ekstrakulikuler) {
-						if ($ekstrakulikuler !== '') {
-							$cekbiaya = Ekstrakulikuler::where('nama', $ekstrakulikuler)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
-							if ($cekbiaya !== null) {
-								${"biaya" . ($i + 1)} = $cekbiaya->biaya;
-							}
-						}
-					}
-				}
-				$alldata[] = [
-					'id' 		=> $hasil->id,
-					'noinduk' 	=> $hasil->noinduk,
-					'dpp' 		=> $dpp,
-					'spp' 		=> $spp,
-					'paguyuban' => $paguyuban,
-					'eksul1' 	=> $eksul1,
-					'eksul2' 	=> $eksul2,
-					'eksul3' 	=> $eksul3,
-					'eksul4' 	=> $eksul4,
-					'eksul5' 	=> $eksul5,
-					'biaya1' 	=> $biaya1,
-					'biaya2' 	=> $biaya2,
-					'biaya3' 	=> $biaya3,
-					'biaya4' 	=> $biaya4,
-					'biaya5' 	=> $biaya5,
-					'lampiran' 	=> $lampiran,
-					'nama' 		=> $hasil->nama,
-					'kelas' 	=> $hasil->klspos,
-					'kelamin' 	=> $hasil->kelamin,
-					'nisn' 		=> $hasil->nisn,
-				];
-			}
-		}
-		echo json_encode($alldata);
-	}
-	public function ctkViewdetailtu(Request $request) {
-		$marking	= $request->valkirim;
-		return redirect('ctkkwt/'.$marking);
-	}
-	public function ctkKwitansimulti(Request $request) {
-		$arridne	= $request->valkirim;
-		$jeneng		= Session('nama');
-		$tanggal	= $request->tanggal;
-		$bulanlist 	= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
-		if ($tanggal != ''){
-			$arrayttl 	= explode("-", $tanggal);
-			$tgliki 	= $arrayttl[0];
-			$mthiki 	= (int)$arrayttl[1];
-			$thniki 	= $arrayttl[2];
-			$blniki 	= $bulanlist[$mthiki];
-		} else {
-			$tgliki 	= date('d');
-			$mthiki 	= date('m');
-			$mthiki 	= (int)$mthiki;
-			$thniki 	= date('Y');
-			$blniki 	= $bulanlist[$mthiki];
-		}
-		$tanggalctk = $tgliki.' '.$blniki.' '.$thniki;
-		
-		$total		= 0;
-		$ekskula	= '';
-		$ekskulb	= '';
-		$ekskulc	= '';
-		$ekskuld	= ''; 
-		$ekskula2	= 0;
-		$ekskulb2	= 0;
-		$ekskulc2	= 0;
-		$ekskuld2	= 0;
-		$bulan		= '';
-		$tahun		= '';
-		$kelas		= '';
-		$biayaspp	= 0;
-		$biayadpp	= 0;
-		$paguyuban	= 0;
-		$bkegiatan  = 0;
-		$bbukupaket	= 0;
-		$bbukutulis	= 0;
-		$lain1		= '';
-		$lain1a		= 0;
-		$lain2		= '';
-		$lain2a		= 0;
-		$lain3		= '';
-		$lain3a		= 0;
-		$tbukutulis = '';
-		$tkegiatan  = '';
-		$lain4 		= '';
-		$lain4a		= 0;
-		$ekskule 	= '';
-		$ekskule2	= 0;
-		$tbukupaket = '';
-		$noinduk	= '';
-		$nama		= '';
-		$tulisbln	= '';
-		$tlsbulan	= '';
-		$gaksama	= '';
-		foreach ($arridne as $idne) {
-			$getmarking 	= Pembayaran::where('id', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-			$marking		= $getmarking->marking;			
-			$sql 			= Pembayaran::where('marking', $marking)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-			if (!empty($sql)){
-				foreach ($sql as $rrincian){
-					$nama 		= $rrincian->nama;
-					$noinduk 	= $rrincian->noinduk;
-					$jenis 		= $rrincian->jenis;		
-					$biaya 		= $rrincian->biaya;
-					$bulane 	= $rrincian->bulan;
-					$tahune 	= $rrincian->tahun;
-					$kelas 		= $rrincian->kelas;
-					if ($gaksama == ''){ $gaksama = $noinduk; }
-					else { 
-						if ($gaksama != $noinduk){ $gaksama = 'benar'; }
-						else { $gaksama = $noinduk; }
-					}
-					$bulan		= $bulane.'-'.$tahune.',';
-					if ($tulisbln != $bulan){ $tulisbln = $bulan; $tlsbulan = $tlsbulan.' '.$bulan; }
-					$tahun		= $tahune;
-					$total		= $total + $biaya;
-					$cekekskul	= Ekstrakulikuler::where('nama', $jenis)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
-					if ($cekekskul != 0){
-						if ( $ekskula == $jenis ){ $ekskula2 = $ekskula2 + $biaya; }
-						else if ( $ekskulb == $jenis ){ $ekskulb2 = $ekskulb2 + $biaya; }
-						else if ( $ekskulc == $jenis ){ $ekskulc2 = $ekskulc2 + $biaya; }
-						else if ( $ekskuld == $jenis ){ $ekskuld2 = $ekskuld2 + $biaya; }
-						else if ( $ekskule == $jenis ){ $ekskule2 = $ekskule2 + $biaya; }
-						else if ($ekskula == ''){ $ekskula = $jenis; $ekskula2 = $ekskula2 + $biaya;}
-						else if ($ekskulb == ''){ $ekskulb = $jenis; $ekskulb2 = $ekskulb2 + $biaya; }
-						else if ($ekskulc == ''){ $ekskulc = $jenis; $ekskulc2 = $ekskulc2 + $biaya; }
-						else if ($ekskuld == ''){ $ekskuld = $jenis; $ekskuld2 = $ekskuld2 + $biaya; }
-						else { $ekskule = $jenis; $ekskule2 = $ekskule2 + $biaya; }		
-					} else {
-						if ($jenis == 'spp'){
-							$biayaspp = $biayaspp + $biaya;
-						} elseif ($jenis == 'dpp'){
-							$biayadpp = $biayadpp + $biaya;
-						} elseif ($jenis == 'Uang Makan'){
-							$paguyuban = $paguyuban + $biaya;
-						} else {
-							$cekinsidental = Insidental::where('kode', $jenis)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-							if (isset($cekinsidental->jenis)){
-								$termasuk = $cekinsidental->jenis;
-								$jenislain = $cekinsidental->deskripsi;
-							} else {
-								$termasuk 	= '';
-								$jenislain 	= 'Deleted Insidental';
-							}
-							if ($termasuk == 'kegiatan'){ $bkegiatan = $bkegiatan + $biaya; }
-							else if ($termasuk == 'bukupaket'){ $bbukupaket = $bbukupaket + $biaya; }
-							else if ($termasuk == 'bukutulis'){ $bbukutulis = $bbukutulis + $biaya; }
-							else {
-								if ($lain1 == $jenislain){ $lain1a = $lain1a + $biaya; }
-								else if ($lain2 == $jenislain){ $lain2a = $lain2a + $biaya; }
-								else if ($lain3 == $jenislain){ $lain3a = $lain3a + $biaya; }
-								else if ($lain4 == $jenislain){ $lain4a = $lain4a + $biaya; }
-								else if ($lain1 == ''){
-									$lain1 	= $jenislain;
-									$lain1a = $lain1a + $biaya;
-								}
-								else if ($lain2 == ''){
-									$lain2 	= $jenislain;
-									$lain2a = $lain2a + $biaya;
-								}
-								else if ($lain3 == ''){
-									$lain3 	= $jenislain;
-									$lain3a = $lain3a + $biaya;
-								}
-								else {
-									$lain4 	= $jenislain;
-									$lain4a = $lain4a + $biaya;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		$x 			= SendMail::terbilang($total);
-		if ($ekskula2 != 0){
-			$tekskula2	= number_format( $ekskula2 , 0 , '.' , ',' );
-		} else { $tekskula2 = ''; }
-		if ($ekskulb2 != 0){
-			$tekskulb2	= number_format( $ekskulb2 , 0 , '.' , ',' );
-		} else { $tekskulb2 = ''; }
-		if ($ekskulc2 != 0){
-			$tekskulc2	= number_format( $ekskulc2 , 0 , '.' , ',' );
-		} else { $tekskulc2 = ''; }
-		if ($ekskuld2 != 0){
-			$tekskuld2	= number_format( $ekskuld2 , 0 , '.' , ',' );
-		} else { $tekskuld2 = ''; }
-		if ($ekskule2 != 0){
-			$tekskule2	= number_format( $ekskule2 , 0 , '.' , ',' );
-		} else { $tekskule2 = ''; }
-		if ($biayaspp != 0){
-			$tbiayaspp	= number_format( $biayaspp , 0 , '.' , ',' );
-		} else { $tbiayaspp = ''; }
-		if ($biayadpp != 0){
-			$tbiayadpp	= number_format( $biayadpp , 0 , '.' , ',' );
-		} else { $tbiayadpp = ''; }
-		if ($paguyuban != 0){
-			$tpaguyuban	= number_format( $paguyuban , 0 , '.' , ',' );
-		} else { $tpaguyuban = ''; }
-		if ($bkegiatan != 0){
-			$tkegiatan	= number_format( $bkegiatan , 0 , '.' , ',' );
-		} else { $tkegiatan = ''; }
-		if ($bbukupaket != 0){
-			$tbukupaket	= number_format( $bbukupaket , 0 , '.' , ',' );
-		} else { $tbukupaket = ''; }
-		if ($bbukutulis != 0){
-			$tbukutulis	= number_format( $bbukutulis , 0 , '.' , ',' );
-		} else { $tbukutulis = ''; }
-		if ($lain1a != 0){
-			$tlain1a	= number_format( $lain1a , 0 , '.' , ',' );
-		} else { $tlain1a = ''; }
-		if ($lain2a != 0){
-			$tlain2a	= number_format( $lain2a , 0 , '.' , ',' );
-		} else { $tlain2a = ''; }
-		if ($lain3a != 0){
-			$tlain3a	= number_format( $lain3a , 0 , '.' , ',' );
-		} else { $tlain3a = ''; }
-		if ($lain4a != 0){
-			$tlain4a	= number_format( $lain4a , 0 , '.' , ',' );
-		} else { $tlain4a = ''; }
-		$tulisan					= number_format( $total , 0 , '.' , ',' );
-		$y 							= $x.' rupiah';
-		$niy 						= Session('nip');
-		$asline 					= Session('nama');
-		$rsetting					= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
-		$sekolah 					= $rsetting->nama_sekolah;
-		$yayasan 					= $rsetting->nama_yayasan;
-		$alamat 					= $rsetting->alamat;
-		$kepalasekolah 				= $rsetting->kepala_sekolah->nama;
-		$mutiara 					= $rsetting->slogan;
-		$logo 						= $rsetting->logo;
-		$logogrey 					= $rsetting->logo_grey;
-		$tasks						= [];
-		$tasks['logo']				= $logo;
-		$tasks['logo_grey']			= $rsetting->logo_grey;
-		$tasks['rsetting']			= $rsetting;
-		$tasks['yayasan']			= $yayasan;
-		$tasks['sekolah']			= $sekolah;
-		$tasks['alamat']			= $alamat;
-		$tasks['nama']				= $nama;
-		$tasks['kelas']				= $kelas;
-		$tasks['y']					= $y;
-		$tasks['tlsbulan']			= $tlsbulan;
-		$tasks['tbiayaspp']			= $tbiayaspp;
-		$tasks['tbukutulis']		= $tbukutulis;
-		$tasks['tkegiatan']			= $tkegiatan;
-		$tasks['tbukupaket']		= $tbukupaket;
-		$tasks['tbiayadpp']			= $tbiayadpp;
-		$tasks['tpaguyuban']		= $tpaguyuban;
-		$tasks['ekskula']			= $ekskula;
-		$tasks['tekskula2']			= $tekskula2;
-		$tasks['lain1']				= $lain1;
-		$tasks['tlain1a']			= $tlain1a;
-		$tasks['ekskulb']			= $ekskulb;
-		$tasks['tekskulb2']			= $tekskulb2;
-		$tasks['lain2']				= $lain2;
-		$tasks['tlain2a']			= $tlain2a;
-		$tasks['ekskulc']			= $ekskulc;
-		$tasks['tekskulc2']			= $tekskulc2;
-		$tasks['lain3']				= $lain3;
-		$tasks['tlain3a']			= $tlain3a;
-		$tasks['ekskuld']			= $ekskuld;
-		$tasks['tekskuld2']			= $tekskuld2;
-		$tasks['lain4']				= $lain4;
-		$tasks['tlain4a']			= $tlain4a;
-		$tasks['ekskule']			= $ekskule;
-		$tasks['tekskule2']			= $tekskule2;
-		$tasks['tanggalctk']		= $tanggalctk;
-		$tasks['tulisan']			= $tulisan;
-		$tasks['mutiara']			= $mutiara;
-		$tasks['asline']			= $asline;
-		$tasks['namaapps01']  		= Session('sekolah_nama_aplikasi');
-		$tasks['domainapps01']  	= Session('sekolah_nama_yayasan');
-		$tasks['subdomainapps01']  	= Session('sekolah_nama_sekolah');
-		$tasks['subsubdomainapps01']= Session('sekolah_kode_sekolah');
-		$tasks['addressapps01']  	= Session('sekolah_alamat');
-		$tasks['emailapps01']  		= Session('sekolah_email');
-		$tasks['lamanapps01']  		= parse_url(request()->root())['host'];
-		$tasks['logofrontapps01']  	= Session('sekolah_frontpage');
-		$tasks['logo01']  			= url("/").'/'.Session('sekolah_logo');
-		return view('cetak.kwitansimulti', $tasks);
 	}
 	public function exMultiverified(Request $request) {
 		$arridne	= $request->val01;
@@ -4696,547 +6402,6 @@ class AdminController extends Controller
 		}
 		echo $generatetable;
 	}
-	public function jsonLapinsidental(Request $request) {
-		$set01   	= $request->val01;
-		$set02   	= $request->val02;
-		$alldata 	= [];
-		$getallsiswa= Datainduk::where('klspos', 'LIKE', $set02.'%')->where('nokelulusan', '')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-		if (!empty($getallsiswa)){
-			foreach ($getallsiswa as $hasil) {
-				$noinduk 		= $hasil->noinduk;
-				if ($set01 == 'dpp'){
-					$getdpp		= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-					$dpp 		= $getdpp->dpp;
-					$tdpp 		= number_format( $dpp , 0 , '.' , ',' );
-					$getjmldpp 	= Pembayaran::select(DB::raw("SUM(biaya) as jumlah"))
-									->where('jenis', 'dpp')
-									->where('noinduk', $noinduk)
-									->where('verifikasi', '!=', '')
-									->where('id_sekolah',session('sekolah_id_sekolah'))
-									->groupBy('jenis')->first();
-					if (isset($getjmldpp->jumlah)){
-						$bayar 	= $getjmldpp->jumlah;
-					}else { $bayar 	= 0; }
-					
-					$selisih 	= $dpp - $bayar;
-					$tbayar		= number_format( $bayar , 0 , '.' , ',' );
-					if ($selisih <= 0){
-						$keterangan ='LUNAS';
-					}
-					else { 
-						$tselisih	= number_format( $selisih , 0 , '.' , ',' );
-						$keterangan = 'Kekurangan DPP '.$tselisih; 
-					}				
-					$alldata[] = array(
-						'id' 			=> $hasil->id,
-						'noinduk'		=> $noinduk,
-						'kelas'			=> $hasil->klspos,
-						'tagihan'		=> $tdpp,
-						'bayar'			=> $tbayar,
-						'keterangan'	=> $keterangan,
-						'nama'			=> $hasil->nama,	
-					);
-				} else {
-					$rkeuangan = Insidental::where('id', $set01)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-					if (isset($rkeuangan->kode)){
-						$kode 			= $rkeuangan->kode;
-						$biaya 			= $rkeuangan->biaya;
-						$tbiaya			= number_format( $biaya , 0 , '.' , ',' );
-					} else {
-						$kode 			= '';
-						$biaya			= '';
-						$tbiaya			= 0;
-					}
-					
-					$getjmldpp 	= Pembayaran::select(DB::raw("SUM(biaya) as jumlah"))
-									->where('jenis', $kode)
-									->where('noinduk', $noinduk)
-									->where('verifikasi', '!=', '')
-									->where('id_sekolah',session('sekolah_id_sekolah'))
-									->groupBy('jenis')->first();
-					if (isset($getjmldpp->jumlah)){
-						$bayar 	= $getjmldpp->jumlah;
-					}else { $bayar 	= 0; }
-					
-					$selisih 	= $biaya - $bayar;
-					$tbayar		= number_format( $bayar , 0 , '.' , ',' );
-					if ($selisih <= 0){
-						$keterangan ='LUNAS';
-					}
-					else { 
-						$tselisih		= number_format( $selisih , 0 , '.' , ',' );
-						$keterangan 	= 'Kekurangan Insidental Kode '.$kode.' Sejumlah '.$tselisih; 
-					}				
-					$alldata[] = array(
-						'id' 			=> $hasil->id,
-						'noinduk'		=> $noinduk,
-						'kelas'			=> $hasil->klspos,
-						'tagihan'		=> $tdpp,
-						'bayar'			=> $tbayar,
-						'keterangan'	=> $keterangan,
-						'nama'			=> $hasil->nama,
-					);
-				}
-			}
-		}
-		echo json_encode($alldata);
-	}
-	public function jsonLapbulanan(Request $request) {
-		$bulan1   	= (int)$request->val01;
-		$bulan2   	= (int)$request->val02;
-		$tahun   	= $request->val03;
-		$arraysurat	= [];
-		$i 			= 1;
-		$bulanlist 	= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
-		$finish 	= $bulan2 +1;
-		while ($bulan1 != $finish){
-			$bulan 	= $bulanlist[$bulan1];
-			$getallsiswa= Datainduk::where('nokelulusan', '')->orderBy('noinduk', 'ASC')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-			if (!empty($getallsiswa)){
-				foreach ($getallsiswa as $hasil) {
-					$noinduk 	= $hasil->noinduk;
-					$biaya1		= 0;
-					$biaya2		= 0;
-					$biaya3		= 0;
-					$biaya4		= 0;
-					$biaya5		= 0;
-					$getdpp		= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-					if (isset($getdpp->spp)){
-						$dpp 		= $getdpp->dpp;
-						$spp 		= $getdpp->spp;
-						$paguyuban	= $getdpp->paguyuban;
-						$eksul1 	= $getdpp->eksul1;
-						$eksul2 	= $getdpp->eksul2;
-						$eksul3 	= $getdpp->eksul3;
-						$eksul4 	= $getdpp->eksul4;
-						$eksul5 	= $getdpp->eksul5;
-					} else {
-						$dpp 		= 0;
-						$spp 		= 0;
-						$paguyuban	= 0;
-						$eksul1 	= '';
-						$eksul2 	= '';
-						$eksul3 	= '';
-						$eksul4 	= '';
-						$eksul5 	= '';
-					}
-					if ($eksul1 != ''){
-						$rekskul1 = Ekstrakulikuler::where('nama', 'LIKE', $eksul1)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-						if(isset($rekskul1->biaya)){
-							$biaya1	= $rekskul1->biaya;
-						}
-					}
-					if ($eksul2 != ''){
-						$rekskul2 = Ekstrakulikuler::where('nama', 'LIKE', $eksul2)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-						if(isset($rekskul2->biaya)){
-							$biaya2	= $rekskul2->biaya;
-						}
-					}
-					if ($eksul3 != ''){
-						$rekskul3 = Ekstrakulikuler::where('nama', 'LIKE', $eksul3)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-						if(isset($rekskul3->biaya)){
-							$biaya3	= $rekskul3->biaya;
-						}
-					}
-					if ($eksul4 != ''){
-						$rekskul4 = Ekstrakulikuler::where('nama', 'LIKE', $eksul4)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-						if(isset($rekskul4->biaya)){
-							$biaya4	= $rekskul4->biaya;
-						}
-					}
-					if ($eksul5 != ''){
-						$rekskul5 = Ekstrakulikuler::where('nama', 'LIKE', $eksul5)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-						if(isset($rekskul5->biaya)){
-							$biaya5	= $rekskul5->biaya;
-						}
-					}
-					$bayarspp		= 0;
-					$bayarpaguyuban = 0;
-					$bayareks1		= 0;
-					$bayareks2		= 0;
-					$bayareks3		= 0;
-					$bayareks4		= 0;
-					$bayareks5		= 0;
-					$result 		= Pembayaran::select(DB::raw('SUM(biaya) as biaya'), 'jenis')
-										->where('noinduk', $noinduk)
-										->where('verifikasi', '!=', '')
-										->where('bulan', $bulan)
-										->where('tahun', $tahun)
-										->where('id_sekolah',session('sekolah_id_sekolah'))
-										->groupBy('jenis')->orderBy('jenis', 'DESC')->get();
-					foreach($result as $row) {
-						$jmlhbyr 	= $row->biaya;
-						$jenis 		= $row->jenis;
-						if ($jenis == 'spp'){
-							$bayarspp = $jmlhbyr;
-						}
-						if ($jenis == 'Uang Makan'){
-							$bayarpaguyuban = $jmlhbyr;
-						}
-						if ($jenis == $eksul1){
-							$bayareks1 = $jmlhbyr;
-						}
-						if ($jenis == $eksul2){
-							$bayareks2 = $jmlhbyr;
-						}
-						if ($jenis == $eksul3){
-							$bayareks3 = $jmlhbyr;
-						}
-						if ($jenis == $eksul4){
-							$bayareks4 = $jmlhbyr;
-						}
-						if ($jenis == $eksul5){
-							$bayareks5 = $jmlhbyr;
-						};
-					}
-					$total = (($spp - $bayarspp)+($paguyuban - $bayarpaguyuban)+($biaya1 - $bayareks1)+($biaya2 - $bayareks2)+($biaya3 - $bayareks3)+($biaya4 - $bayareks4)+($biaya5 - $bayareks5));
-					if ($total <= 0){
-						$keterangan = 'LUNAS';
-					}
-					else {
-						$tselisih	= number_format( $total , 0 , '.' , ',' );
-						$keterangan = 'Kekurangan Pembayaran '.$tselisih;
-					}
-					$periode = $bulan.'-'.$tahun;
-					$arraysurat[] = array(
-						'id' 			=> $i,
-						'noinduk'		=> $noinduk,
-						'nama'			=> $hasil->nama,
-						'kelas'			=> $hasil->klspos,
-						'periode'		=> $periode,
-						'tspp'			=> $spp,
-						'bspp'			=> $bayarspp,
-						'tpaguyuban'	=> $paguyuban,
-						'bpaguyuban'	=> $bayarpaguyuban,
-						'teks1'			=> $biaya1,
-						'teks2'			=> $biaya2,
-						'teks3'			=> $biaya3,
-						'teks4'			=> $biaya4,
-						'teks5'			=> $biaya5,
-						'beks1'			=> $bayareks1,
-						'beks2'			=> $bayareks2,
-						'beks3'			=> $bayareks3,
-						'beks4'			=> $bayareks4,
-						'beks5'			=> $bayareks5,
-						'keterangan'	=> $keterangan,
-					);
-					$i++;
-				}
-			}
-			$bulan1++;
-		}
-		echo json_encode($arraysurat);
-	}
-	public function jsonLaplengkap(Request $request) {
-		$bulan1   	= (int)$request->val01;
-		$bulan2   	= (int)$request->val02;
-		$tahun   	= $request->val03;
-		$arraysurat	= [];
-		$i 			= 1;
-		$toall		= 0;
-		$bulanlist 	= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
-		$finish 	= $bulan2 +1;
-		while ($bulan1 != $finish){
-			$bulan 	= $bulanlist[$bulan1];
-			$valcari= '%'.$bulan.$tahun.'%';
-			$getallsiswa= Datainduk::where('id_sekolah',session('sekolah_id_sekolah'))->where('nokelulusan', '')->orderBy('noinduk', 'ASC')->get();
-			if (!empty($getallsiswa)){
-				foreach ($getallsiswa as $rbayar) {
-					$noinduk 		= $rbayar->noinduk;
-					$klspos			= $rbayar->klspos;
-					$nama 	        = $rbayar->nama;
-					$total 			= 0;
-					$spp 			= 0;
-					$dpp 			= 0;
-					$paguyuban 		= 0;
-					$ekskul1 		= 0;
-					$ekskul2 		= 0;
-					$ekskul3 		= 0;
-					$ekskul4 		= 0;
-					$ekskul5 		= 0;
-					$insid1 		= 0;
-					$insid2 		= 0;
-					$insid3 		= 0;
-					$insid4 		= 0;
-					$insid5 		= 0;
-					$bln 			= '';
-					$thn			= '';
-					$result 		= Pembayaran::select(DB::raw('SUM(biaya) as biaya'), 'jenis', 'bulan', 'tahun')
-										->where('noinduk', $noinduk)
-										->where('verifikasi', '!=', '')
-										->where('bulan', $bulan)
-										->where('tahun', $tahun)
-										->groupBy('jenis')->orderBy('jenis', 'DESC')->get();
-					foreach($result as $row) {
-						$jmlhbyr 	= $row->biaya;
-						$jenis 		= $row->jenis;
-						$bln 		= $row->bulan;
-						$thn 		= $row->tahun;
-						$total      = $total + $jmlhbyr;
-						if ($jenis == 'spp'){
-							$spp = number_format( $jmlhbyr , 0 , '.' , ',' );
-						}
-						else if ($jenis == 'Uang Makan'){
-							$paguyuban = number_format( $jmlhbyr , 0 , '.' , ',' );
-						}
-						else if ($jenis == 'dpp'){
-							$dpp = number_format( $jmlhbyr , 0 , '.' , ',' );
-						}
-						else {
-							$count 	= Ekstrakulikuler::where('nama', $jenis)->count();
-							if ($count != 0){
-									if ($ekskul1 == 0) { $ekskul1 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
-									else if ($ekskul2 == 0) { $ekskul2 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
-									else if ($ekskul3 == 0) { $ekskul3 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
-									else if ($ekskul4 == 0) { $ekskul4 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
-									else { $ekskul5 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
-							}
-							else {
-									if ($insid1 == 0) { $insid1 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
-									else if ($insid2 == 0) { $insid2 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
-									else if ($insid3 == 0) { $insid3 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
-									else if ($insid4 == 0) { $insid4 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
-									else { $insid5 = number_format( $jmlhbyr , 0 , '.' , ',' ); }
-							}
-						}
-					}
-					$periode 	= $bln.'-'.$thn;
-					$toall 		= $toall + $total;
-					if ($total != 0){
-						$tulistotal = number_format( $total , 0 , '.' , ',' );
-						$arraysurat[] = array(
-							'noinduk'		=> $noinduk,
-							'nama'			=> $nama,
-							'kelas'			=> $klspos,
-							'periode'		=> $periode,
-							'tspp'			=> $spp,
-							'tpaguyuban'	=> $paguyuban,
-							'teks1'			=> $ekskul1,
-							'teks2'			=> $ekskul2,
-							'teks3'			=> $ekskul3,
-							'teks4'			=> $ekskul4,
-							'teks5'			=> $ekskul5,
-							'beks1'			=> $insid1,
-							'beks2'			=> $insid2,
-							'beks3'			=> $insid3,
-							'beks4'			=> $insid4,
-							'beks5'			=> $insid5,
-							'keterangan'	=> $tulistotal,
-						);
-					}
-					$i++;
-				}
-			}
-			$bulan1++;
-		}
-		$tulistotalall 	= number_format( $toall , 0 , '.' , ',' );
-		$arraysurat[] 	= array(
-			'noinduk'		=> '',
-			'nama'			=> 'Total',
-			'kelas'			=> '',
-			'periode'		=> '',
-			'tspp'			=> '',
-			'tpaguyuban'	=> '',
-			'teks1'			=> '',
-			'teks2'			=> '',
-			'teks3'			=> '',
-			'teks4'			=> '',
-			'beks1'			=> '',
-			'beks2'			=> '',
-			'beks3'			=> '',
-			'beks4'			=> '',
-			'keterangan'	=> $tulistotalall,
-		);
-		echo json_encode($arraysurat);
-    }
-	public function jsonLaplengkapperjenis(Request $request) {
-		$bulan1   	= (int)$request->val01;
-		$bulan2   	= (int)$request->val02;
-		$tahun   	= $request->val03;
-		$arraysurat	= [];
-		$i 			= 1;
-		$bulanlist 	= array(0 => "bulan", 1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
-		$finish 	= $bulan2 +1;
-		while ($bulan1 != $finish){
-			$bulan 		= $bulanlist[$bulan1];
-			$valcari 	= '%'.$bulan.$tahun.'%';
-			$periode	= $bulan.' '.$tahun;
-			$sql 		= Pembayaran::where('bulan', $bulan)->where('tahun', $tahun)->where('biaya', '!=', '0')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-			if (!empty($sql)){
-				foreach ($sql as $hasil){
-					$jenis = $hasil->jenis;
-					$ceknama = Insidental::where('kode', $jenis)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-					if (isset($ceknama->deskripsi)){
-						$jenis = $ceknama->deskripsi;
-					}
-					$arraysurat[] = array(
-						'noinduk'		=> $hasil->noinduk,
-						'nama'			=> $hasil->nama,
-						'kelas'			=> $hasil->kelas,
-						'periode'		=> $periode,
-						'nominal'		=> $hasil->biaya,
-						'keterangan'	=> $jenis,
-						'petugas'		=> $hasil->inputor,
-						'tglverifikasi'	=> $hasil->timestamp,
-					);
-				}
-			}			
-			$bulan1++;
-		}
-		echo json_encode($arraysurat);
-	}
-	public function jsoRekapharian(Request $request) {
-		$bulan1   	= (int)$request->val01;
-		$bulan2   	= (int)$request->val02;
-		$tahun   	= $request->val03;
-		$arraysurat	= [];
-		$i 			= 1;
-		$bulanlist 	= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
-		$finish 	= $bulan2 +1;
-		while ($bulan1 != $finish){
-			$bulan 		= $bulanlist[$bulan1];
-			$valcari 	= '%'.$bulan.$tahun.'%';
-			$periode	= $bulan.' '.$tahun;
-			$sql 		= Pembayaran::where('harian', 'LIKE', $valcari)->where('id_sekolah',session('sekolah_id_sekolah'))->groupBy('harian')->get();
-			if (!empty($sql)){
-				foreach ($sql as $hasil){
-					$harian 		= $hasil->harian;
-					$tanggal 		= $hasil->timestamp;
-					$biaya1			= 0;
-					$biaya2			= 0;
-					$totaltransaksi = 0;
-					$totaltransaksi = Pembayaran::where('harian', $harian)->where('biaya', '!=', '0')->where('id_sekolah',session('sekolah_id_sekolah'))->groupBy('noinduk')->count();
-					
-					$rbiaya1 		= Pembayaran::select(DB::raw('SUM(biaya) as biaya'), 'jenis')
-										->where('harian', $harian)
-										->where('verifikasi', '!=', '')
-										->where('id_sekolah',session('sekolah_id_sekolah'))
-										->groupBy('harian')->get();
-					if(isset($rbiaya1->biaya)){
-						$biaya1	= $rbiaya1->biaya;
-					}
-					
-					$rbiaya2 		= Pembayaran::select(DB::raw('SUM(biaya) as biaya'), 'jenis')
-										->where('harian', $harian)
-										->where('verifikasi', '')
-										->where('id_sekolah',session('sekolah_id_sekolah'))
-										->groupBy('harian')->get();
-					if(isset($rbiaya2->biaya)){
-						$biaya2	= $rbiaya2->biaya;
-					}
-					$arraysurat[] = array(
-						'tanggaltrans'		=> $harian,
-						'jumlahtrans'		=> $totaltransaksi,
-						'verifiedtrans'		=> number_format( $biaya1 , 0 , '.' , ',' ),
-						'unverifiedtrans'	=> number_format( $biaya2 , 0 , '.' , ',' ),
-					);
-				}
-			}
-			$bulan1++;
-		}
-		echo json_encode($arraysurat);
-	}
-	public function jsoRincianharian(Request $request) {
-		$harian   	= $request->val01;
-		$arraysurat	= [];
-		$sql 		= Pembayaran::where('harian', $harian)->where('biaya', '!=', '0')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-		if (!empty($sql)){
-			foreach ($sql as $rbayar){
-				$nama			= $rbayar->nama;
-				$noinduk		= $rbayar->noinduk;
-				$bulan			= $rbayar->bulan;
-				$tahun			= $rbayar->tahun;
-				$tanggal		= $rbayar->harian;
-				$verifikasi		= $rbayar->verifikasi;
-				$marking		= $rbayar->marking;
-				$biaya			= $rbayar->biaya;
-				$jenis			= $rbayar->jenis;
-				$klspos			= $rbayar->kelas;
-				$rutin			= $bulan.'-'.$tahun;
-				$arraysurat[] = array(
-					'id' 		=> $rbayar->id,
-					'nama'		=> $nama,
-					'noinduk'	=> $noinduk,
-					'kelas'		=> $klspos,
-					'rutin'		=> $rutin,				
-					'verifi'	=> $verifikasi,
-					'marking'	=> $marking,
-					'tanggal'	=> $tanggal,
-					'jenis'		=> $jenis,
-					'biaya'		=> number_format( $biaya , 0 , '.' , ',' ),
-				);
-			}
-		}
-		echo json_encode($arraysurat);
-	}
-	public function jsonRincianlastortu(Request $request) {
-		$noinduk   	= $request->val01;
-		$bulan   	= $request->val02;
-		$tahun   	= $request->val03;
-		$arraysurat	= [];
-		$sql 		= Pembayaran::where('noinduk', $noinduk)->where('bulan', $bulan)->where('tahun', $tahun)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-		if (!empty($sql)){
-			foreach ($sql as $rbayar){
-				$nama			= $rbayar->nama;
-				$noinduk		= $rbayar->noinduk;
-				$bulan			= $rbayar->bulan;
-				$tahun			= $rbayar->tahun;
-				$tanggal		= $rbayar->harian;
-				$verifikasi		= $rbayar->verifikasi;
-				$marking		= $rbayar->marking;
-				$biaya			= $rbayar->biaya;
-				$jenis			= $rbayar->jenis;
-				$klspos			= $rbayar->kelas;
-				$rutin			= $bulan.'-'.$tahun;
-				$arraysurat[] = array(
-					'id' 		=> $rbayar->id,
-					'inputor' 	=> $rbayar->inputor,
-					'nama'		=> $nama,
-					'noinduk'	=> $noinduk,
-					'rutin'		=> $rutin,
-					'verifi'	=> $verifikasi,
-					'marking'	=> $marking,
-					'tanggal'	=> $tanggal,
-					'jenis'		=> $jenis,
-					'biaya'		=> number_format( $biaya , 0 , '.' , ',' ),
-				);
-			}
-		}
-		echo json_encode($arraysurat);
-	}
-	public function jsonRincianbyrortu(Request $request) {
-		$marking   	= $request->val01;
-		$arraysurat	= [];
-		$sql 		= Pembayaran::where('marking', $marking)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-		if (!empty($sql)){
-			foreach ($sql as $rbayar){
-				$nama			= $rbayar->nama;
-				$noinduk		= $rbayar->noinduk;
-				$bulan			= $rbayar->bulan;
-				$tahun			= $rbayar->tahun;
-				$tanggal		= $rbayar->harian;
-				$verifikasi		= $rbayar->verifikasi;
-				$marking		= $rbayar->marking;
-				$biaya			= $rbayar->biaya;
-				$jenis			= $rbayar->jenis;
-				$klspos			= $rbayar->kelas;
-				$rutin			= $bulan.'-'.$tahun;
-				$arraysurat[] = array(
-					'id' 		=> $rbayar->id,
-					'inputor' 	=> $rbayar->inputor,
-					'nama'		=> $nama,
-					'noinduk'	=> $noinduk,
-					'rutin'		=> $rutin,
-					'verifi'	=> $verifikasi,
-					'marking'	=> $marking,
-					'tanggal'	=> $tanggal,
-					'jenis'		=> $jenis,
-					'biaya'		=> number_format( $biaya , 0 , '.' , ',' ),
-				);
-			}
-		}
-		echo json_encode($arraysurat);
-	}
 	public function exManualbyr(Request $request) {
 		$noinduk	= $request->val01;
 		$dpp		= $request->val02;
@@ -5262,7 +6427,7 @@ class AdminController extends Controller
 			$dino 			= date("d");
 			$wulan 			= date("m");
 			$yers 			= date("Y");
-			$marking 		= session('sekolah_id_sekolah').'-'.$noinduk.$dino.$bulan.$tahun;
+			$marking 		= session('sekolah_id_sekolah').'-'.$noinduk.'-'.$dino.$bulan.$tahun;
 			$dinoan 		= $dino.$wulan.$yers;
 			$statusinput	= '';
 			$rdetail		= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
@@ -5303,12 +6468,10 @@ class AdminController extends Controller
 							'biaya'		=> $spp, 
 							'bulan'		=> $bulan, 
 							'tahun'		=> $tahun, 
-							'timestamp'	=> 'CURRENT_TIMESTAMP', 
 							'verifikasi'=> '', 
 							'marking'	=> $marking, 
 							'harian'	=> $dinoan, 
-							'inputor'	=> Session('nama'), 
-							'buktibayar'=> '',
+							'inputor'	=> Session('nip'), 
 							'id_sekolah'=> session('sekolah_id_sekolah')
 						]);
 						if ($bayar){
@@ -5346,12 +6509,10 @@ class AdminController extends Controller
 							'biaya'		=> $paguyuban, 
 							'bulan'		=> $bulan, 
 							'tahun'		=> $tahun, 
-							'timestamp'	=> 'CURRENT_TIMESTAMP', 
 							'verifikasi'=> '', 
 							'marking'	=> $marking, 
 							'harian'	=> $dinoan, 
-							'inputor'	=> Session('nama'), 
-							'buktibayar'=> '',
+							'inputor'	=> Session('nip'), 
 							'id_sekolah'=> session('sekolah_id_sekolah')
 						]);
 						if ($bayar){
@@ -5389,12 +6550,10 @@ class AdminController extends Controller
 							'biaya'		=> $eksul1,
 							'bulan'		=> $bulan,
 							'tahun'		=> $tahun,
-							'timestamp'	=> 'CURRENT_TIMESTAMP',
 							'verifikasi'=> '',
 							'marking'	=> $marking,
 							'harian'	=> $dinoan,
-							'inputor'	=> Session('nama'),
-							'buktibayar'=> '',
+							'inputor'	=> Session('nip'),
 							'id_sekolah'=> session('sekolah_id_sekolah')
 						]);
 						if ($bayar){
@@ -5432,12 +6591,10 @@ class AdminController extends Controller
 							'biaya'		=> $eksul2,
 							'bulan'		=> $bulan,
 							'tahun'		=> $tahun,
-							'timestamp'	=> 'CURRENT_TIMESTAMP',
 							'verifikasi'=> '',
 							'marking'	=> $marking,
 							'harian'	=> $dinoan,
-							'inputor'	=> Session('nama'),
-							'buktibayar'=> '',
+							'inputor'	=> Session('nip'),
 							'id_sekolah'=> session('sekolah_id_sekolah')
 						]);
 						if ($bayar){
@@ -5475,13 +6632,11 @@ class AdminController extends Controller
 							'biaya'		=> $eksul3,
 							'bulan'		=> $bulan,
 							'tahun'		=> $tahun,
-							'timestamp'	=> 'CURRENT_TIMESTAMP',
 							'verifikasi'=> '',
 							'marking'	=> $marking,
 							'harian'	=> $dinoan,
-							'inputor'	=> Session('nama'),
-							'buktibayar'=> '',
-							'id_sekolah'	=> session('sekolah_id_sekolah'),
+							'inputor'	=> Session('nip'),
+							'id_sekolah'=> session('sekolah_id_sekolah'),
 						]);
 						if ($bayar){
 							$statusinput = $statusinput.'<br /><font color=green>Sukses Input Ektrakulikuler '.$neksul3.' an. '.$nama.' Bulan '.$bulan.' Tahun '.$tahun.' Sejumlah '.$eksul3.'</font>';
@@ -5518,12 +6673,10 @@ class AdminController extends Controller
 							'biaya'		=> $eksul4,
 							'bulan'		=> $bulan,
 							'tahun'		=> $tahun,
-							'timestamp'	=> 'CURRENT_TIMESTAMP',
 							'verifikasi'=> '',
 							'marking'	=> $marking,
 							'harian'	=> $dinoan,
-							'inputor'	=> Session('nama'),
-							'buktibayar'=> '',
+							'inputor'	=> Session('nip'),
 							'id_sekolah'=> session('sekolah_id_sekolah'),
 						]);
 						if ($bayar){
@@ -5561,12 +6714,10 @@ class AdminController extends Controller
 							'biaya'		=> $eksul5,
 							'bulan'		=> $bulan,
 							'tahun'		=> $tahun,
-							'timestamp'	=> 'CURRENT_TIMESTAMP',
 							'verifikasi'=> '',
 							'marking'	=> $marking,
 							'harian'	=> $dinoan,
-							'inputor'	=> Session('nama'),
-							'buktibayar'=> '',
+							'inputor'	=> Session('nip'),
 							'id_sekolah'=> session('sekolah_id_sekolah')
 						]);
 						if ($bayar){
@@ -5595,12 +6746,10 @@ class AdminController extends Controller
 						'biaya'		=> $dpp,
 						'bulan'		=> $bulan,
 						'tahun'		=> $tahun,
-						'timestamp'	=> 'CURRENT_TIMESTAMP',
 						'verifikasi'=> '',
 						'marking'	=> $marking,
 						'harian'	=> $dinoan,
-						'inputor'	=> Session('nama'),
-						'buktibayar'=> '',
+						'inputor'	=> Session('nip'),
 						'id_sekolah'=> session('sekolah_id_sekolah'),
 					]);
 					if ($bayar){
@@ -5634,12 +6783,10 @@ class AdminController extends Controller
 							'biaya'		=> $biaya,
 							'bulan'		=> $bulan,
 							'tahun'		=> $tahun,
-							'timestamp'	=> 'CURRENT_TIMESTAMP',
 							'verifikasi'=> '',
 							'marking'	=> $marking,
 							'harian'	=> $dinoan,
-							'inputor'	=> Session('nama'),
-							'buktibayar'=> '',
+							'inputor'	=> Session('nip'),
 							'id_sekolah'=> session('sekolah_id_sekolah')
 						]);
 						if ($bayar){
@@ -5675,12 +6822,10 @@ class AdminController extends Controller
 							'biaya'		=> $biaya,
 							'bulan'		=> $bulan,
 							'tahun'		=> $tahun,
-							'timestamp'	=> 'CURRENT_TIMESTAMP',
 							'verifikasi'=> '',
 							'marking'	=> $marking,
 							'harian'	=> $dinoan,
-							'inputor'	=> Session('nama'),
-							'buktibayar'=> '',
+							'inputor'	=> Session('nip'),
 							'id_sekolah'=> session('sekolah_id_sekolah')
 						]);
 						if ($bayar){
@@ -5716,12 +6861,10 @@ class AdminController extends Controller
 							'biaya'		=> $biaya,
 							'bulan'		=> $bulan,
 							'tahun'		=> $tahun,
-							'timestamp'	=> 'CURRENT_TIMESTAMP',
 							'verifikasi'=> '',
 							'marking'	=> $marking,
 							'harian'	=> $dinoan,
-							'inputor'	=> Session('nama'),
-							'buktibayar'=> '',
+							'inputor'	=> Session('nip'),
 							'id_sekolah'=> session('sekolah_id_sekolah')
 						]);
 						if ($bayar){
@@ -5737,6 +6880,15 @@ class AdminController extends Controller
 				} 
 				
 			}
+			XFiles::updateOrCreate(
+				[
+					'xmarking'	=> $marking,
+				],
+				[
+					'xtabel'	=> 'db_pembayaran',
+					'xjenis'	=> Session('sekolah_id_sekolah').';'.$noinduk,
+				]
+			);
 			echo '<div class="alert alert-info alert-dismissable">
 					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 					<h4><i class="icon fa fa-check"></i> Input Sukses!</h4>
@@ -5755,95 +6907,91 @@ class AdminController extends Controller
 		$biaya 		= $request->val02;
 		$sopo 		= Session('nama');
 		$alasan 	= $request->val04;
-		if($alasan == '' or $biaya == ''){
-			echo '<div class="alert alert-danger alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<h4><i class="icon fa fa-ban"></i> Error</h4>
-					Pastikan Alasan Perubahan Telah Terisi, Bila Biaya tidak ada, di isi angka 0 
-				</div>';
-		} else {
+		if ($idne == 'tagihanmanual'){
 			$biaya 		= str_replace(',','',$biaya);
-			$rlampau	= Pembayaran::where('id', $idne)->first();
-			$jenis 		= $rlampau->jenis;
-			$biayalama	= $rlampau->biaya;
-			$nama 		= $rlampau->nama;
-			$noinduk 	= $rlampau->noinduk;
-			$verifikasi = $rlampau->verifikasi;
-			if ($verifikasi == ''){
-				$deskripsi 	= $sopo.' Telah Mengubah Data Pembayaran Jenis '.$jenis.' An. '.$nama. ' No. Induk '.$noinduk.' Dari '.$biayalama.' Ke '.$biaya.' dikarenakan '.$alasan;
-				$update		= Pembayaran::where('id', $idne)->update([
-					'biaya'		=> $biaya,
-					'inputor'	=> $sopo,				
-					'id_sekolah'=> session('sekolah_id_sekolah'),				
+			$jenis 		= $request->val03;
+			$idsiswa	= $request->val04;
+			$tenggat	= $request->val05;
+			$idne		= $request->val06;
+			if ($idne == 'new'){
+				$input 	= TagihanManual::create([
+					'idsiswa'		=> $idsiswa,
+					'jenis'			=> $jenis,
+					'biaya'			=> $biaya,
+					'tenggat'		=> $tenggat,
+					'marking'		=> null,
+					'keterangan'	=> 'Ditambahan Oleh '.Session('nama').' pada '.date('Y-m-d H:i:s'),
+					'id_sekolah'	=> Session('sekolah_id_sekolah')
 				]);
-				if ($update){
-					Logstaff::create([
-						'jenis'		=> 'Perubahan Data Pembayaran Siswa',
-						'sopo'		=> Session('nip'), 
-						'kelakuan'	=> $deskripsi,
-						'id_sekolah'=> session('sekolah_id_sekolah')
+			} else {
+				$input 	= TagihanManual::where('id', $idne)->update([
+					'idsiswa'		=> $idsiswa,
+					'jenis'			=> $jenis,
+					'biaya'			=> $biaya,
+					'tenggat'		=> $tenggat,
+					'marking'		=> null,
+					'keterangan'	=> 'Diubah Oleh '.Session('nama').' pada '.date('Y-m-d H:i:s'),
+					'id_sekolah'	=> Session('sekolah_id_sekolah')
+				]);
+			}
+			if ($input){
+				return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Sukses di Tambahkan']);
+				return back();
+			} else { 
+				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Database Error, Silahkan coba beberapa saat lagi']);
+				return back(); 
+			}
+		} else {
+			if($alasan == '' or $biaya == ''){
+				echo '<div class="alert alert-danger alert-dismissable">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<h4><i class="icon fa fa-ban"></i> Error</h4>
+						Pastikan Alasan Perubahan Telah Terisi, Bila Biaya tidak ada, di isi angka 0 
+					</div>';
+			} else {
+				$biaya 		= str_replace(',','',$biaya);
+				$rlampau	= Pembayaran::where('id', $idne)->first();
+				$jenis 		= $rlampau->jenis;
+				$biayalama	= $rlampau->biaya;
+				$nama 		= $rlampau->nama;
+				$noinduk 	= $rlampau->noinduk;
+				$verifikasi = $rlampau->verifikasi;
+				if ($verifikasi == ''){
+					$deskripsi 	= $sopo.' Telah Mengubah Data Pembayaran Jenis '.$jenis.' An. '.$nama. ' No. Induk '.$noinduk.' Dari '.$biayalama.' Ke '.$biaya.' dikarenakan '.$alasan;
+					$update		= Pembayaran::where('id', $idne)->update([
+						'biaya'		=> $biaya,
+						'inputor'	=> $sopo,				
+						'id_sekolah'=> session('sekolah_id_sekolah'),				
 					]);
-					echo '<div class="alert alert-success alert-dismissable">
-							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-							<h4><i class="icon fa fa-check"></i> Sukses</h4>
-							Sukses Update '.$jenis.' dengan Biaya '.$biaya.' 
-						</div>'; 	
+					if ($update){
+						Logstaff::create([
+							'jenis'		=> 'Perubahan Data Pembayaran Siswa',
+							'sopo'		=> Session('nip'), 
+							'kelakuan'	=> $deskripsi,
+							'id_sekolah'=> session('sekolah_id_sekolah')
+						]);
+						echo '<div class="alert alert-success alert-dismissable">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+								<h4><i class="icon fa fa-check"></i> Sukses</h4>
+								Sukses Update '.$jenis.' dengan Biaya '.$biaya.' 
+							</div>'; 	
+					} else {
+						echo '<div class="alert alert-danger alert-dismissable">
+								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+								<h4><i class="icon fa fa-ban"></i> Error</h4>
+								Gagal menyimpan 
+							</div>';
+					}
 				} else {
 					echo '<div class="alert alert-danger alert-dismissable">
 							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 							<h4><i class="icon fa fa-ban"></i> Error</h4>
-							Gagal menyimpan 
+							Gagal Mengubah, Data yang telah terverifikasi tidak bisa diubah 
 						</div>';
 				}
-			} else {
-				echo '<div class="alert alert-danger alert-dismissable">
-						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-						<h4><i class="icon fa fa-ban"></i> Error</h4>
-						Gagal Mengubah, Data yang telah terverifikasi tidak bisa diubah 
-					</div>';
 			}
 		}
-	}
-	public function jsonDatabayar() {
-		$arraysurat	= [];
-		$sql 		= Pembayaran::select(DB::raw('SUM(biaya) as biaya'), 'id', 'bulan', 'tahun', 'timestamp', 'marking', 'nama', 'noinduk', 'verifikasi', 'inputor', 'buktibayar', 'kirim')
-						->where('verifikasi', '')
-						->where('id_sekolah',session('sekolah_id_sekolah'))
-						->groupBy('marking')->get();
-		if (!empty($sql)){
-			foreach ($sql as $rbayar){
-				$nama			= $rbayar->nama;
-				$noinduk		= $rbayar->noinduk;
-				$bulan			= $rbayar->bulan;
-				$tahun			= $rbayar->tahun;
-				$tanggal		= $rbayar->harian;
-				$verifikasi		= $rbayar->verifikasi;
-				$marking		= $rbayar->marking;
-				$total			= $rbayar->biaya;
-				$jenis			= $rbayar->jenis;
-				$klspos			= $rbayar->kelas;
-				$rutin			= $bulan.'-'.$tahun;
-				$getnomerhp 	= Datainduk::where('id_sekolah', Session('sekolah_id_sekolah'))->where('noinduk', $noinduk)->first();
-				if (isset($getnomerhp->hape)){
-					$hape 		= $getnomerhp->hape;
-				} else { $hape 	= ''; }
-				$arraysurat[] = array(
-					'no' 		=> $rbayar->id,
-					'inputor' 	=> $rbayar->inputor,
-					'nama'		=> $nama,
-					'noinduk'	=> $noinduk,
-					'rutin'		=> $rutin,
-					'verifi'	=> $verifikasi,
-					'marking'	=> $marking,
-					'tanggal'	=> $tanggal,
-					'hape'		=> $hape,
-					'foto'		=> $rbayar->buktibayar,
-					'kirim'		=> $rbayar->kirim,
-					'total'		=> number_format( $total , 0 , '.' , ',' ),
-				);
-			}
-		}
-		echo json_encode($arraysurat);
+		
 	}
 	public function exvVerifiedpembayaran(Request $request) {
 		$idne		= $request->val01;
@@ -5893,11 +7041,10 @@ class AdminController extends Controller
 								$termasuk = $cekinsidental->jenis;
 								if ($termasuk == 'bukupaket' OR $termasuk == 'bukutulis'){ $jenis = 'buku'; }
 								else { $jenis = $termasuk; }
-							} else {
-								$jenis = 'lainlain';
 							}
 						}
 					}
+					$marking 	= md5($row->marking.'-'.$jenis);
 					HPTKeuangan::create([
 						'tanggal'		=> $tgliki,
 						'bulan'			=> $mthiki,
@@ -5905,12 +7052,22 @@ class AdminController extends Controller
 						'deskripsi'		=> $row->jenis.' an. '.$row->nama.' Kelas '.$row->kelas.' Bulan '.$row->bulan.' Tahun '.$row->tahun,
 						'jenis'			=> $jenis,
 						'pemasukan'		=> $row->biaya,
+						'marking'		=> $marking,
 						'bendahara'		=> null,
 						'tglkwitansi'	=> null,
-						'tandatangan'	=> null,
 						'id_sekolah'	=> session('sekolah_id_sekolah'),
 						'created_by'	=> Session('nip')
 					]);
+					$cekmasukxfile = XFiles::where('xmarking', $marking)->count();
+					if ($cekmasukxfile == 0){
+						XFiles::create([
+							'xmarking'	=> $marking,
+							'xtabel'	=> 'db_keuangan',
+							'xjenis'	=> '',
+							'xfile'		=> ''
+						]);
+					}
+					
 				}
 			}
 			echo '<div class="alert alert-success alert-dismissable">
@@ -5925,168 +7082,6 @@ class AdminController extends Controller
 					Sistem Error, Silahkan coba beberapa saat lagi
 				</div>'; 
 		}
-	}
-	public function jsonTabungan() {
-		$arrrekap 	= [];
-		if (Session('previlage') == 'ortu'){
-			$kodeortu	= Session('id');
-			$sql 		= Datainduk::where('kodeortu', $kodeortu)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-			if (!empty($sql)){
-				foreach ($sql as $rjeneng) {
-					$noinduk 	= $rjeneng->noinduk;
-					$kelas 		= $rjeneng->klspos;
-					$jmlhkredit = 0;
-					$jmlhdebet 	= 0;
-					$rdata 		= Tabungan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('marking', 'DESC')->get();
-					if (!empty($rdata)){
-						foreach ($rdata as $rbayar) {			
-							$nama			= $rbayar->nama;
-							$noinduk		= $rbayar->noinduk;
-							$kredit			= (int)$rbayar->kredit;
-							$debet			= (int)$rbayar->debet;
-							$jmlhkredit 	=  $jmlhkredit + $kredit;
-							$jmlhdebet 		=  $jmlhdebet + $debet;							
-							$arrrekap[] = array(
-								'id' 		=> $rbayar->id,
-								'nama'		=> $nama,
-								'noinduk'	=> $noinduk,
-								'kelas' 	=> $kelas,			
-								'debet'		=> $debet,
-								'kredit'	=> $kredit,
-								'keterangan'=> $rbayar->keterangan,
-								'verified' 	=> $rbayar->verified,
-								'marking' 	=> $rbayar->marking,
-								'inputor' 	=> $rbayar->inputor,
-							);
-						}
-					}					
-				}
-			}
-		} else {
-			$jmlhkredit = 0;
-			$jmlhdebet 	= 0;
-			$rdata 		= Tabungan::where('verified', '')->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('marking', 'DESC')->get();
-			if (!empty($rdata)){
-				foreach ($rdata as $rbayar) {			
-					$nama			= $rbayar->nama;
-					$noinduk		= $rbayar->noinduk;
-					$kredit			= (int)$rbayar->kredit;
-					$debet			= (int)$rbayar->debet;
-					$jmlhkredit 	=  $jmlhkredit + $kredit;
-					$jmlhdebet 		=  $jmlhdebet + $debet;
-					$getkelas		= Datainduk::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-					if (isset($getkelas->klspos)){
-						$kelas 		= $getkelas->klspos;
-					} else { $kelas = ''; }
-					$arrrekap[] = array(
-						'id' 		=> $rbayar->id,
-						'nama'		=> $nama,
-						'noinduk'	=> $noinduk,
-						'kelas' 	=> $kelas,			
-						'debet'		=> $debet,
-						'kredit'	=> $kredit,
-						'keterangan'=> $rbayar->keterangan,
-						'verified' 	=> $rbayar->verified,
-						'marking' 	=> $rbayar->marking,
-						'inputor' 	=> $rbayar->inputor,
-					);
-				}
-			}			
-		}
-		echo json_encode($arrrekap);
-	}
-	public function jsonLaptabunganharian(Request $request) {
-		$tanggal   	= $request->val01;
-		$arraysurat	= [];
-		$jmlhkredit = 0;
-		$jmlhdebet 	= 0;
-		$sql 		= Tabungan::where('marking', $tanggal)->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('marking', 'DESC')->get();
-		if (!empty($sql)){
-			foreach ($sql as $rbayar){
-				$nama			= $rbayar->nama;
-				$noinduk		= $rbayar->noinduk;
-				$kredit			= (int)$rbayar->kredit;
-				$debet			= (int)$rbayar->debet;
-				$jmlhkredit 	=  $jmlhkredit + $kredit;
-				$jmlhdebet 		=  $jmlhdebet + $debet;
-				$getkelas		= Datainduk::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-				if (isset($getkelas->klspos)){
-					$kelas 		= $getkelas->klspos;
-				} else { $kelas = ''; }
-				$arraysurat[] = array(
-					'id' 		=> $rbayar->id,
-					'nama'		=> $nama,
-					'noinduk'	=> $noinduk,
-					'kelas' 	=> $kelas,			
-					'debet'		=> $debet,
-					'kredit'	=> $kredit,
-					'keterangan'=> $rbayar->keterangan,
-					'verified' 	=> $rbayar->verified,
-					'marking' 	=> $rbayar->marking,
-					'inputor' 	=> $rbayar->inputor,
-				);
-			}
-		}
-		$arraysurat[] = array(
-			'id' 			=> '',	
-			'nama' 			=> 'Total',	
-			'noinduk' 		=> '',
-			'kelas' 		=> '',			
-			'debet'			=> $jmlhdebet,
-			'kredit'		=> $jmlhkredit,
-			'keterangan'	=> '',
-			'verified'		=> '',
-			'marking'		=> '',
-			'inputor'		=> '',
-		);
-		echo json_encode($arraysurat);
-	}
-	public function jsonCaritabungan(Request $request) {
-		$noinduk   	= $request->val01;
-		$arraysurat	= [];
-		$jmlhkredit = 0;
-		$jmlhdebet 	= 0;
-		$getkelas	= Datainduk::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-		if (isset($getkelas->klspos)){
-			$kelas 	= $getkelas->klspos;
-		} else { $kelas = ''; }
-		$sql 		= Tabungan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->orderBy('marking', 'DESC')->get();
-		if (!empty($sql)){
-			foreach ($sql as $rbayar){
-				$nama			= $rbayar->nama;
-				$noinduk		= $rbayar->noinduk;
-				$kredit			= (int)$rbayar->kredit;
-				$debet			= (int)$rbayar->debet;
-				$jmlhkredit 	=  $jmlhkredit + $kredit;
-				$jmlhdebet 		=  $jmlhdebet + $debet;
-				$arraysurat[] = array(
-					'id' 		=> $rbayar->id,
-					'nama'		=> $nama,
-					'noinduk'	=> $noinduk,
-					'kelas' 	=> $kelas,			
-					'debet'		=> $debet,
-					'kredit'	=> $kredit,
-					'keterangan'=> $rbayar->keterangan,
-					'verified' 	=> $rbayar->verified,
-					'marking' 	=> $rbayar->marking,
-					'inputor' 	=> $rbayar->inputor,
-				);
-			}
-		}
-		$sisa = $jmlhdebet - $jmlhkredit;
-		$arraysurat[] = array(
-			'id' 			=> '',
-			'nama' 			=> 'Total',
-			'noinduk' 		=> '',
-			'kelas' 		=> '',
-			'debet'			=> $jmlhdebet,
-			'kredit'		=> $jmlhkredit,
-			'keterangan'	=> $sisa,
-			'verified'		=> '',
-			'marking'		=> '',
-			'inputor'		=> '',
-		);
-		echo json_encode($arraysurat);
 	}
 	public function exTabung(Request $request) {
 		$noinduk	= $request->val01;
@@ -6133,7 +7128,7 @@ class AdminController extends Controller
 					'nama'			=> $nama,
 					'debet'			=> 0,
 					'kredit'		=> $jumlah,
-					'keterangan'	=> '',
+					'keterangan'	=> $perlu,
 					'verified'		=> '',
 					'marking'		=> $marking,
 					'inputor'		=> $inputor,
@@ -6329,8 +7324,8 @@ class AdminController extends Controller
 				if ($val['AC'] == ''){ $telpon = '0000 000000'; }else { $telpon = $val['AC']; }
 				if ($val['AD'] == ''){ $erte = '000'; }else { $erte = $val['AD']; }
 				if ($val['AE'] == ''){ $erwe = '000'; }else { $erwe = $val['AE']; }
-				if ($val['AF'] == ''){ $nokelulusan = ''; }else { $nokelulusan = $val['AF']; }
-				if ($val['AG'] == ''){ $kodeortu = '0'; }else { $kodeortu = $val['AG']; }
+				if (!isset($val['AF']) OR $val['AF'] == ''){ $nokelulusan = ''; }else { $nokelulusan = $val['AF']; }
+				if (!isset($val['AG']) OR $val['AG'] == ''){ $kodeortu = '0'; }else { $kodeortu = $val['AG']; }
 				$cekmasuk = Datainduk::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
 				if ($cekmasuk == 0){
 					if ($nama != '' AND $noinduk != ''){
@@ -6464,7 +7459,7 @@ class AdminController extends Controller
 							'eksul3'	=> $ekskul3,
 							'eksul4'	=> $ekskul4,
 							'eksul5'	=> $ekskul5,
-							'id_sekolah'	=> session('sekolah_id_sekolah'),
+							'id_sekolah'=> session('sekolah_id_sekolah'),
 						]);
 					} else {
 						$input	= Setkuangan::where('noinduk', $noinduk)->where('id_sekolah',session('sekolah_id_sekolah'))->update([
@@ -6476,7 +7471,7 @@ class AdminController extends Controller
 							'eksul3'	=> $ekskul3,
 							'eksul4'	=> $ekskul4,
 							'eksul5'	=> $ekskul5,
-							'id_sekolah'	=> session('sekolah_id_sekolah'),
+							'id_sekolah'=> session('sekolah_id_sekolah'),
 						]);
 					}					
 					if ($input){ $sukses++; }
@@ -6666,181 +7661,6 @@ class AdminController extends Controller
 				</div>'; 
 		}		
 	}
-	public function ctkKwitansipsb(Request $request) {
-		$rsetting				= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
-		$sekolah 				= $rsetting->nama_sekolah;
-		$yayasan 				= $rsetting->nama_yayasan;
-		$alamat 				= $rsetting->alamat;
-		$kepalasekolah 			= $rsetting->kepala_sekolah->nama;
-		$niykasek				= $rsetting->kepala_sekolah->niy;
-		$mutiara 				= $rsetting->slogan;
-		$logo 					= $rsetting->logo;
-		$kota 					= $rsetting->kota;
-		$logo_grey 				= $rsetting->logo_grey;
-		$frontpage 				= $rsetting->frontpage;
-		$akreditasi 			= $rsetting->akreditasi;
-		$kopsurat 				= $rsetting->kopsurat;
-		$nis 					= $rsetting->nis;
-		$email 					= $rsetting->email;
-		$tamasuk				= $rsetting->pendaftaran;
-		$homebase				= url("/");
-		$statppdb				= '';
-		$kodebaru				= '';
-		$kodepindahan 			= '';
-		$hargaformulir 			= '';
-		$namabank 				= '';
-		$norek 					= '';
-		$periode 				= '';
-		$setspp1 				= '';
-		$setspp2 				= '';
-		$setspp3 				= '';
-		$setdpp1 				= '';
-		$setdpp2 				= '';
-		if ($kopsurat == '' OR $kopsurat == null){
-			$kopsurat 			= '<tr>
-										<td colspan="3" rowspan="7" align="center" valign="middle" style="border-bottom:double"><img src="'.$homebase.'/'.$logo.'" width="75" /></td>
-										<td colspan="8"><b>'.$yayasan.'</b></td>
-									</tr>
-									<tr><td colspan="8"><b>'.$sekolah.'</b></td></tr>
-									<tr><td colspan="8"><b>'.$akreditasi.'</b></td></tr>
-									<tr><td colspan="8">'.$nis.'</td></tr>
-									<tr><td colspan="8">'.$alamat.'</td></tr>
-									<tr><td colspan="8">'.$email.'</td></tr>
-									<tr>
-										<td width="157" style="border-bottom:double">&nbsp;</td>
-										<td width="26" style="border-bottom:double">&nbsp;</td>
-										<td width="87" style="border-bottom:double">&nbsp;</td>
-										<td width="22" style="border-bottom:double">&nbsp;</td>
-										<td width="25" style="border-bottom:double">&nbsp;</td>
-										<td width="198" style="border-bottom:double">&nbsp;</td>
-										<td width="39" style="border-bottom:double">&nbsp;</td>
-										<td width="129" style="border-bottom:double">&nbsp;</td>
-									</tr>';
-		} else {
-			$kopsurat			= '<tr><td colspan="11"><img src="'.$homebase.'/'.$kopsurat.'" width="100%" /></tr>';
-		}
-		$sql 					= Layanan::orderBy('layanan', 'ASC')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-		if (!empty($sql)){
-			foreach ($sql as $rlayanan){
-				$status 		= $rlayanan->status;
-				$layanan 		= $rlayanan->layanan;
-				if ($layanan == 'periodepsb') { $periode = $status; }
-				if ($layanan == 'ppdb') { $statppdb = $status; }
-				if ($layanan == 'kodebaru') { $kodebaru = $status; }
-				if ($layanan == 'kodepindahan') { $kodepindahan = $status; }
-				if ($layanan == 'hargaformulir') { $hargaformulir = $status; }
-				if ($layanan == 'namabank') { $namabank = $status; }
-				if ($layanan == 'norek') { $norek = $status; }
-				if ($layanan == 'spp1') { $setspp1 = $status; }
-				if ($layanan == 'spp2') { $setspp2 = $status; }
-				if ($layanan == 'spp3') { $setspp3 = $status; }
-				if ($layanan == 'dpp1') { $setdpp1 = $status; }
-				if ($layanan == 'dpp2') { $setdpp2 = $status; }
-			}
-		}
-		if (isset($request->valkirim)){
-			$idne = $request->valkirim;
-		} else { $idne = ''; }
-		$bulanlist 				= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
-		$tgliki 				= date("d");
-		$mthiki 				= (int)date("m");
-		$thniki 				= date("Y");
-		$blniki 				= $bulanlist[$mthiki];
-		$tanggalctk 			= $tgliki.' '.$blniki.' '.$thniki;
-		$niy 					= Session('nip');
-		$asline 				= Session('nama');
-		$costumid				= $kodebaru;
-		if ($idne != ''){
-			$rmaster2	= Datapsb::where('id', $idne)->first();
-			$nama 		= $rmaster2->nama;
-			$tamasuk	= $rmaster2->tamasuk;
-			$jeneng		= $request->jeneng;
-			$nominal	= $hargaformulir;
-			$nomhuruf 	= SendMail::terbilang($nominal);
-			$nomangka	= number_format( $nominal , 0 , '.' , ',' );
-		} else {
-			$jenis		= $request->val01;
-			$nama		= $request->val02;
-			$nominal	= str_replace(',','',$request->val03);
-			$nomor		= $request->val04;
-			$jeneng		= $request->val05;
-			$idlws 		= '';
-			if (isset($request->val06)) {
-				$idlws	= $request->val06;
-			}
-			$tglcetak 		= '';
-			if (isset($request->val07)) {
-				$tglcetak	= $request->val07;
-			}
-			
-			$nomhuruf 	= SendMail::terbilang($nominal);
-			$nomangka	= number_format( $nominal , 0 , '.' , ',' );
-			$tahunne	= date("Y");
-			$kodethn 	= substr($tahunne, -2);
-			
-			if ($jenis == 'Reguler'){
-				$costumid 	= $kodebaru.$nomor;
-				$jenis		= $kodebaru;
-			}
-			else {
-				$costumid 	= $kodepindahan.$nomor;
-				$jenis		= $kodepindahan;
-			}
-			if ($idlws == ''){
-				$input = Formulirpsb::create([
-					'tapel'		=> $tamasuk, 
-					'nama'		=> $nama, 
-					'jenis'		=> $jenis, 
-					'nomor'		=> $nomor, 
-					'nominal'	=> $nominal, 
-					'tanggal'	=> $tanggalctk,
-					'id_sekolah'=> session('sekolah_id_sekolah')
-				]);
-				$idlws = $input->id;
-				if ($input){
-					HPTKeuangan::create([
-						'tanggal'		=> $tgliki,
-						'bulan'			=> $mthiki,
-						'tahun'			=> $thniki,
-						'deskripsi'		=> 'Pembelian Formulir an. '.$nama.' TA.'.$tamasuk,
-						'jenis'			=> 'pendaftaran',
-						'bendahara'		=> null,
-						'tglkwitansi'	=> null,
-						'tandatangan'	=> null,
-						'id_sekolah'	=> session('sekolah_id_sekolah'),
-						'created_by'	=> Session('nip')
-					]);
-				}
-			}
-			else {
-				$tanggalctk = $tglcetak;
-			}
-		}
-		$alamatcetak				= $homebase.'/kwitansipsb/'.$idlws;
-		$qrcode 					= base64_encode(QrCode::format('png')->size(100)->generate($alamatcetak));
-		$tasks						= [];
-		$tasks['logo_grey']			= $homebase.'/'.$rsetting->logo_grey;
-		$tasks['kopsurat']			= $kopsurat;
-		$tasks['rsetting']			= $rsetting;
-		$tasks['qrcode']			= $qrcode;
-		$tasks['costumid']			= $costumid;
-		$tasks['nama']				= $nama;
-		$tasks['nomhuruf']			= $nomhuruf;
-		$tasks['tamasuk']			= $tamasuk;
-		$tasks['tanggalctk']		= $tanggalctk;
-		$tasks['nomangka']			= $nomangka;
-		$tasks['asline']			= $asline;
-		$tasks['namaapps01']  		= Session('sekolah_nama_aplikasi');
-		$tasks['domainapps01']  	= Session('sekolah_nama_yayasan');
-		$tasks['subdomainapps01']  	= Session('sekolah_nama_sekolah');
-		$tasks['subsubdomainapps01']= Session('sekolah_kode_sekolah');
-		$tasks['addressapps01']  	= Session('sekolah_alamat');
-		$tasks['emailapps01']  		= Session('sekolah_email');
-		$tasks['lamanapps01']  		= parse_url(request()->root())['host'];
-		$tasks['logofrontapps01']  	= Session('sekolah_frontpage');
-		$tasks['logo01']  			= url("/").'/'.Session('sekolah_logo');
-		return view('cetak.kwitansipsb', $tasks);
-	}
 	public function exSavearsipppdb(Request $request) {
 		$idne		= $request->val01;
 		$kelas		= $request->val02;
@@ -6894,6 +7714,17 @@ class AdminController extends Controller
 			]);
 			$arsip 			= 'Arsip TA '.$getdatapsb->tamasuk;
 			if ($input){
+				Setkuangan::updateOrCreate(
+					[
+						'noinduk'		=> $noinduk,
+						'id_sekolah' 	=> session('sekolah_id_sekolah')
+					],
+					[
+						'nama'		=> $getdatapsb->nama,
+						'dpp'		=> $getdatapsb->dana2,
+						'spp'		=> $getdatapsb->dana3,
+					]
+				);
 				Datapsb::where('id', $idne)->update([
 					'tamasuk' => $arsip
 				]);
@@ -6952,43 +7783,49 @@ class AdminController extends Controller
 		$dpp1 		= str_replace(',','',$dpp1);
 		$dpp2 		= str_replace(',','',$dpp2);
 		$status		= '';
+		$i 			= 1;
 		$layananData= [
 			'spp1' => [
-				'status' => $spp1,
-				'message' => 'SPP 1'
+				'status' 	=> $spp1,
+				'message' 	=> 'SPP 1',
+				'nominal'	=> $request->val01
 			],
 			'spp2' => [
-				'status' => $spp2,
-				'message' => 'SPP 2'
+				'status' 	=> $spp2,
+				'message' 	=> 'SPP 2',
+				'nominal'	=> $request->val02
 			],
 			'spp3' => [
-				'status' => $spp3,
-				'message' => 'SPP 3'
+				'status' 	=> $spp3,
+				'message' 	=> 'DPP 3',
+				'nominal'	=> $request->val03
 			],
 			'dpp1' => [
-				'status' => $dpp1,
-				'message' => 'DPP 1'
+				'status' 	=> $dpp1,
+				'message' 	=> 'DPP 1',
+				'nominal'	=> $request->val04
 			],
 			'dpp2' => [
-				'status' => $dpp2,
-				'message' => 'DPP 2'
+				'status' 	=> $dpp2,
+				'message' 	=> 'DPP 2',
+				'nominal'	=> $request->val05
 			],
 		];
 		
 		foreach ($layananData as $layanan => $data) {
 			$cek = Layanan::where('layanan', $layanan)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
 			if (isset($cek->id)){
-				Layanan::where('layanan', $cek->id)->update([
+				Layanan::where('layanan', $layanan)->where('id_sekolah', session('sekolah_id_sekolah'))->update([
 					'status' 		=> $data['status'],
 				]);
-				$status = $status . '<br />Update Setting ' . $data['message'] . ' Nominal ' . $request->{'val0' . ($i + 1)};
+				$status = $status . '<br />Update Setting ' . $data['message'] . ' Nominal ' . $data['nominal'];
 			} else {
 				Layanan::create([
 					'layanan' 	=> $layanan,
 					'status' 	=> $data['status'],
 					'id_sekolah'=> session('sekolah_id_sekolah')
 				]);
-				$status = $status . '<br />Tambah Setting ' . $data['message'] . ' Nominal ' . $request->{'val0' . ($i + 1)};
+				$status = $status . '<br />Tambah Setting ' . $data['message'] . ' Nominal ' . $data['nominal'];
 			}
 		}
 		echo '<div class="alert alert-info alert-dismissable">
@@ -7230,287 +8067,6 @@ class AdminController extends Controller
 				</div>';	
 		}		
 	}
-	public function jsonJadwalujianppdb() {
-		$arrjadwalpsb	= [];
-		$bulanlist 		= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
-		$sql 			= Tesppdb::orderBy('tanggal', 'ASC')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
-		if (!empty($sql)){
-			foreach ($sql as $hasil){
-				$tanggal 	= $hasil->tanggal;
-				$arrayttl 	= explode("-", $tanggal);
-				$thniki 	= $arrayttl[0];
-				$mthiki 	= $arrayttl[1];
-				$tgliki 	= $arrayttl[2];
-				$settanggal	= $tgliki.'-'.$mthiki.'-'.$thniki;
-				$intbulan	= (int)$mthiki;
-				$blniki 	= $bulanlist[$intbulan];
-				$tlstgl 	= $tgliki.' '.$blniki.' '.$thniki;
-				$arrjadwalpsb[] = array(
-					'idne' 		=> $hasil->id,
-					'hari' 		=> $hasil->hari,
-					'jam' 		=> $hasil->jam,
-					'materi' 	=> $hasil->materi,
-					'nama'		=> $hasil->nama,
-					'tanggal'	=> $settanggal,
-					'tlstanggal'=> $tlstgl,
-					'ruang'		=> $hasil->ruang,
-				);
-			}
-		}
-		echo json_encode($arrjadwalpsb);
-	}
-	public function jsonDetailpembeli(Request $request) {
-		$arrjadwalpsb			= [];
-		$tapel					= $request->val01;
-		$jenis					= $request->val02;
-		$sql 					= Formulirpsb::where('tapel', $tapel)->where('jenis', $jenis)->where('id_sekolah', session('sekolah_id_sekolah'))->orderBy('tanggal', 'ASC')->get();
-		if (!empty($sql)){
-			foreach ($sql as $hasil){
-				$arrjadwalpsb[] = array(
-					'id' 		=> $hasil->id,	
-					'tapel' 	=> $hasil->tapel,	
-					'nama' 		=> $hasil->nama,			
-					'jenis'		=> $hasil->jenis,
-					'nomor'		=> $hasil->nomor,
-					'costumid'	=> $hasil->jenis.$hasil->nomor,
-					'nominal'	=> number_format( $hasil->nominal , 0 , '.' , ',' ),
-					'tanggal'	=> $hasil->tanggal,
-				);
-			}
-		}
-		echo json_encode($arrjadwalpsb);
-	}
-	public function jsonDatapembelianform() {
-		$arrformulirpsb	= [];
-		$rsetting		= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
-		$pendaftaran	= $rsetting->pendaftaran;
-		$sql 			= Formulirpsb::select(DB::raw('SUM(nominal) as nominal'), DB::raw('COUNT(id) as jumlah'), 'tapel', 'jenis')
-							->where('tapel', $pendaftaran)->where('id_sekolah',session('sekolah_id_sekolah'))
-							->groupBy('jenis')->orderBy('jenis', 'DESC')->get();
-		if (!empty($sql)){
-			foreach ($sql as $hasil){
-				$arrformulirpsb[] = array(
-					'tapel' 		=> $hasil->tapel,
-					'jenis' 		=> $hasil->jenis,		
-					'jumlah' 		=> $hasil->jumlah,
-					'nominal' 		=> number_format( $hasil->nominal , 0 , '.' , ',' ),
-				);
-			}
-		}
-		echo json_encode($arrformulirpsb);
-	}
-	public function jsonDatappdb() {
-		//skripby_chatgpt
-		$arrdatappdb	= [];
-		$rsetting		= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
-		if (isset($rsetting->pendaftaran)){
-			$pendaftaran 	= $rsetting->pendaftaran;
-		} else {
-			$pendaftaran	= 'No Data';
-		}
-		$getnomer 		= Datainduk::orderBy('noinduk', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-		if (isset($getnomer->noinduk)){
-			$noinduk	= $getnomer->noinduk;
-			$berikutnya	= $noinduk + 1;
-		} else {
-			$noinduk	= 1;
-			$berikutnya	= 2;
-		}
-		$bulanlist 	= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
-		$arrdatappdb= Datapsb::select('id', 'nama', 'nik', 'kodependaf', 'kelamin', 'tmplahir', 'tgllahir', 'darah', 'tinggi', 'berat', 'namaayah', 'namaibu', 'kerjaayah', 'kerjaibu', 'wali', 'pekerjaanwali', 'alamatortu', 'foto', 'tamasuk', 'hape', 'asal', 'erte', 'erwe', 'kelurahan', 'kecamatan', 'kota', 'kodepos', 'telpon', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10', 'n11', 'n12', 'n13', 'total', 'rata', 'hasil', 'nosurat', 'dana1', 'dana2', 'dana3', 'dana4')
-								->selectSub(function ($query) {
-									$query->selectRaw("CASE
-														WHEN status = 'verified' THEN '<small class=\"label bg-green\">GOOD</small>'
-														WHEN status = 'unverified' THEN '<small class=\"label bg-red\">BAD</small>'
-														ELSE '<strong>' || status || '%</strong>'
-														END AS status");
-								}, 'persenselesai')
-								->where('tamasuk', $pendaftaran)
-								->where('id_sekolah', session('sekolah_id_sekolah'))
-								->orderBy('id', 'DESC')
-								->get();
-		
-		echo json_encode($arrdatappdb);
-	}
-	public function jsonBuku() {
-		$arrperpus	= [];	
-		$homebase	= url("/");
-		$i 			= 0;
-		$sql 		= Perpumini::orderBy('id', 'DESC')->where('id_sekolah',session('sekolah_id_sekolah'))->groupby('isbn')->get();
-		if (!empty($sql)){
-			foreach ($sql as $hasil){
-				$i++;
-				$lampiran 		= ($hasil->gambar && File::exists(public_path("images/perpus/{$hasil->gambar}"))) ? "$homebase/images/perpus/{$hasil->gambar}" : "$homebase/logo.png";
-				$jumlahbuku 	= Perpumini::where('id_sekolah',session('sekolah_id_sekolah'))->where('isbn', $hasil->isbn)->count();
-				$cekpeminjaman 	= Peminjaman::where('kodebuku', $hasil->id)->count();
-				if ($cekpeminjaman >= $jumlahbuku){
-					$marking = 'NO';
-				} else { $marking = 'YES'; }
-				$jadwalguna = '';
-				if ($marking == 'NO'){
-					$getpinjam = Perpumini::where('id_sekolah',session('sekolah_id_sekolah'))->where('isbn', $hasil->isbn)->get();
-					if(isset($getpinjam)){
-						$jadwalguna = '<ol>';
-						foreach($getpinjam as $rpinjam){
-							$jadwalguna = $jadwalguna.'<li>Dipinjam Oleh : '.$rpinjam->peminjam.' Kelas '.$rpinjam->kelas.' Pada Tanggal '.$rpinjam->tglkembali.'</li>';
-						}
-						$jadwalguna = $jadwalguna.'</ol>';
-					}
-					
-				}
-				$arrperpus[] = array(
-					'idne' 			=> $hasil->id,
-					'gambar' 		=> $lampiran,		
-					'judul' 		=> $hasil->judul,
-					'link' 			=> $hasil->link,
-					'kodebuku' 		=> $hasil->kodebuku,
-					'pengarang' 	=> $hasil->pengarang,
-					'cetakan' 		=> $hasil->cetakan,
-					'kota' 			=> $hasil->kota,
-					'penerbit' 		=> $hasil->penerbit,
-					'tahun' 		=> $hasil->tahun,
-					'ilustrasi' 	=> $hasil->ilustrasi,
-					'halaman' 		=> $hasil->halaman,
-					'id_sekolah' 	=> $hasil->id_sekolah,
-					'isbn' 			=> $hasil->isbn,
-					'tglmasuk' 		=> $hasil->tglmasuk,
-					'tahunperolehan'=> $hasil->tahunperolehan,
-					'jenisperolehan'=> $hasil->jenisperolehan,
-					'rakbuku' 		=> $hasil->rakbuku,
-					'kondisi' 		=> $hasil->kondisi,
-					'kategori' 		=> $hasil->kategori,
-					'inputor' 		=> $hasil->inputor,
-					'jumlah' 		=> $jumlahbuku,
-					'marking' 		=> $marking,
-					'jadwalguna' 	=> $jadwalguna,
-				);
-			}
-		}
-		echo json_encode($arrperpus);
-	}
-	public function jsonBukucari(Request $request) {
-		//skripby_chatgpt
-		$arrperpus 	= [];
-		$homebase 	= url("/");
-		$kerja 		= $request->val01;
-		$sql 		= Perpumini::orderBy('id', 'DESC')
-						->where('id_sekolah', session('sekolah_id_sekolah'));
-		if ($kerja == 'all') {
-			$sql->where('kondisi', 'BAIK');
-		} elseif ($kerja == 'rusak') {
-			$sql->where('kondisi', 'RUSAK');
-		} else {
-			$sql->whereIn('kondisi', ['HILANG', 'MUSNAH']);
-		}
-		$peminjamans = $sql->get();
-
-		foreach ($peminjamans as $hasil) {
-			$lampiran = ($hasil->gambar && File::exists(public_path("images/perpus/{$hasil->gambar}"))) ? "$homebase/images/perpus/{$hasil->gambar}" : "$homebase/logo.png";
-			
-			$arrperpus[] = [
-				'idne' 			=> $hasil->id,
-				'gambar' 		=> $lampiran,        
-				'judul' 		=> $hasil->judul,
-				'link' 			=> $hasil->link,
-				'kodebuku' 		=> $hasil->kodebuku,
-				'pengarang' 	=> $hasil->pengarang,
-				'cetakan' 		=> $hasil->cetakan,
-				'kota' 			=> $hasil->kota,
-				'penerbit' 		=> $hasil->penerbit,
-				'tahun' 		=> $hasil->tahun,
-				'ilustrasi' 	=> $hasil->ilustrasi,
-				'halaman' 		=> $hasil->halaman,
-				'id_sekolah' 	=> $hasil->id_sekolah,
-				'isbn' 			=> $hasil->isbn,
-				'tglmasuk' 		=> $hasil->tglmasuk,
-				'tahunperolehan'=> $hasil->tahunperolehan,
-				'jenisperolehan'=> $hasil->jenisperolehan,
-				'rakbuku' 		=> $hasil->rakbuku,
-				'kondisi' 		=> $hasil->kondisi,
-				'kategori' 		=> $hasil->kategori,
-				'inputor' 		=> $hasil->inputor,
-			];
-		}
-
-		echo json_encode($arrperpus);
-	}
-	public function jsonPeminjaman(Request $request) {
-		//skripby_chatgpt
-		$arrperpus 	= [];
-		$homebase 	= url("/");
-		$bulan 		= $request->val01;
-		$tahun 		= $request->val02;
-		$sql 		= Peminjaman::where('id_sekolah', session('sekolah_id_sekolah'));
-		if ($bulan !== 'aktif') {
-			$sql->where('tglpinjam', 'LIKE', ($bulan === 'ALL') ? $tahun.'%' : $tahun.'-'.$bulan.'-%');
-		}
-		$sql->orderBy('tglkembali', 'ASC');
-		$peminjamans = $sql->get();
-		foreach ($peminjamans as $hasil) {
-			$status 	= $hasil->status;
-			$tlsstatus 	= '';
-			switch ($status) {
-				case 0:
-					$tlsstatus = '<span class="badge bg-green">TELAH DIKEMBALIKAN</span>';
-					break;
-				case 2:
-					$tlsstatus = '<span class="badge bg-red">HILANG / TIDAK DIKEMBALIKAN</span>';
-					break;
-				default:
-					$tlsstatus = '<span class="badge bg-aqua">AKTIF</span>';
-			}
-			$getgambar 	= Perpumini::where('id', $hasil->kodebuku)->first();
-			$gambar 	= '';
-			$judul 		= '';
-			$link 		= '';
-			$kodebuku 	= '';
-			$rakbuku 	= '';
-
-			if ($getgambar) {
-				$gambar 	= ($getgambar->gambar) ? '<img src="'.$homebase.'/images/perpus/'.$getgambar->gambar.'" height="35">' : '<img src="'.$homebase.'/logo.png" height="35">';
-				$judul 		= $getgambar->judul;
-				$link 		= $getgambar->link;
-				$kodebuku 	= $getgambar->kodebuku;
-				$rakbuku 	= $getgambar->rakbuku;
-			}
-
-			$foto 		= '';
-			$getfoto 	= Datainduk::where('noinduk', $hasil->noinduk)->first();
-
-			if ($getfoto && $getfoto->foto) {
-				$foto 	= '<img src="'.$homebase.'/dist/img/foto/'.$getfoto->foto.'" height="35">';
-			} else {
-				$foto 	= '<img src="'.$homebase.'/logo.png" height="35">';
-			}
-
-			$arrperpus[] = [
-				'idne' 		=> $hasil->id,
-				'foto' 		=> $foto,
-				'gambar' 	=> $gambar,
-				'judul' 	=> $judul,
-				'link' 		=> $link,
-				'idbuku' 	=> $hasil->kodebuku,
-				'kodebuku' 	=> $kodebuku,
-				'pengarang' => $hasil->pengarang,
-				'kota' 		=> $hasil->kota,
-				'penerbit' 	=> $hasil->penerbit,
-				'id_sekolah'=> $hasil->id_sekolah,
-				'isbn' 		=> $hasil->isbn,
-				'tglpinjam' => $hasil->tglpinjam,
-				'tglkembali'=> $hasil->tglkembali,
-				'rakbuku' 	=> $rakbuku,
-				'biaya' 	=> $hasil->biaya,
-				'denda' 	=> $hasil->denda,
-				'peminjam' 	=> $hasil->peminjam,
-				'noinduk' 	=> $hasil->noinduk,
-				'kelas' 	=> $hasil->kelas,
-				'status' 	=> $hasil->status,
-				'inputor' 	=> $hasil->inputor,
-				'tlsstatus' => $tlsstatus,
-			];
-		}
-		echo json_encode($arrperpus);
-	}
 	public function exSavebuku(Request $request) {
 		$judul			= $request->set01;
 		$pengarang		= $request->set02;
@@ -7530,62 +8086,17 @@ class AdminController extends Controller
 		$link 			= $request->set16;
 		$idne 			= $request->set17;
 		$gakboleh 		= '';
-		if ($idne == 'new'){
-			$kalimat		= 'Buku berjudul '.$judul.' Pengarang '.$pengarang.' Terbitan '.$penerbit.' berhasil di tambahkan';
-			$cekjudul		= Perpumini::where('kodebuku', $kodebuku)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
-			if ($kondisi == 'MUSNAH' OR $kondisi == 'HILANG'){ $gakboleh = 'Buku Baru Tidak Boleh di Set HILANG / MUSNAH'; }
-		} else {
-			$kalimat		= 'Buku berjudul '.$judul.' Pengarang '.$pengarang.' Terbitan '.$penerbit.' berhasil di update';
-			$cekjudul		= Perpumini::where('id', '!=', $idne)->where('kodebuku', $kodebuku)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
-			if ($kondisi == 'MUSNAH' OR $kondisi == 'HILANG'){ 
+		if ($kondisi == 'MUSNAH' OR $kondisi == 'HILANG'){
+			if ($idne == 'new'){
+				$gakboleh = 'Buku Baru Tidak Boleh di Set HILANG / MUSNAH';
+			} else {
 				$cekpinjam 	= Peminjaman::where('kodebuku', $idne)->count();
 				if ($cekpinjam != 0){
 					$gakboleh = 'Buku ini masih dipinjam, selesaikan terlebih dahulu peminjaman buku ini';
-				}
-			}
-		}
-		if ($judul == '' OR $pengarang == '' OR $penerbit == '' OR $kota == '' OR $tahun == '' OR $kodebuku == '' OR $rakbuku == '' OR $tanggalmsk == '' OR $isbn == ''){
-			$gakboleh = 'Mohon melengkapi semua form, khususnya yang bertanda bintang';
-		}
-		if ($kategori == 'E-Book' AND $link == ''){
-			$gakboleh = 'Untuk Kategori E-Book Mohon melengkapi dengan link asal file / download file';
-		}
-		if ($gakboleh != ''){
-			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => $gakboleh]);
-			return back();
-		} else if ($cekjudul == 0){
-			if ($ilustrasi == ''){ $ilustrasi = '14.5 X 21'; }
-			if ($halaman == ''){ $halaman = '0'; }
-			$arrthnmasuk 	= explode('-', $tanggalmsk);
-			$thnmasuk 		= $arrthnmasuk[2];
-			if ($idne == 'new'){
-				if ($link == ''){
-					$input = Perpumini::create([
-						'gambar'			=> '',
-						'judul'				=> $judul,
-						'link'				=> '',
-						'kodebuku'			=> $kodebuku,
-						'pengarang'			=> $pengarang,
-						'cetakan'			=> $cetakan,
-						'kota'				=> $kota,
-						'penerbit'			=> $penerbit,
-						'tahun'				=> $tahun,
-						'ilustrasi'			=> $ilustrasi,
-						'halaman'			=> $halaman,
-						'id_sekolah'		=> session('sekolah_id_sekolah'),
-						'isbn'				=> $isbn,
-						'tglmasuk'			=> $tanggalmsk,
-						'tahunperolehan'	=> $thnmasuk,
-						'jenisperolehan'	=> $jenis,
-						'rakbuku'			=> $rakbuku,
-						'kondisi'			=> $kondisi,
-						'kategori'			=> $kategori,
-						'inputor'			=> Session('nama')
-						
-					]);
+					return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => $gakboleh]);
+					return back();
 				} else {
-					$input = Perpumini::create([
-						'gambar'			=> '',
+					$input = Perpumini::where('id', $idne)->update([
 						'judul'				=> $judul,
 						'link'				=> $link,
 						'kodebuku'			=> $kodebuku,
@@ -7596,6 +8107,84 @@ class AdminController extends Controller
 						'tahun'				=> $tahun,
 						'ilustrasi'			=> $ilustrasi,
 						'halaman'			=> $halaman,
+						'isbn'				=> $isbn,
+						'tglmasuk'			=> $tanggalmsk,
+						'tahunperolehan'	=> date('Y'),
+						'jenisperolehan'	=> $jenis,
+						'rakbuku'			=> $rakbuku,
+						'kondisi'			=> $kondisi,
+						'kategori'			=> $kategori,
+						'inputor'			=> Session('nip'),
+						'updated_at'		=> date("Y-m-d H:i:s")
+					]);
+					if ($input){
+						$getgambar = Perpumini::where('id', $idne)->first();
+						if (isset($getgambar->gambar)){
+							$gambarlama = $getgambar->gambar;
+							if ($gambarlama != ''){
+								$draft =  public_path('images/perpus/'.$gambarlama);
+								try {
+									unlink($draft);
+								} catch (\Exception $e) {
+								}
+							}
+						}
+						$kalimat		= Session('nama').' Merubah Data Buku berjudul '.$judul.' Pengarang '.$pengarang.' Terbitan '.$penerbit.' menjadi '.$kondisi;
+						Logstaff::create([
+							'jenis'			=> 'Perubahan Data Perpustakaan', 
+							'sopo'			=> Session('nip'),
+							'kelakuan'		=> $kalimat,
+							'id_sekolah' 	=> session('sekolah_id_sekolah')
+						]);
+						return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => $kalimat]);
+						return back();
+					} else { 
+						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Data Gagal di Input, Mohon Ulangi Beberapa Saat Lagi.!!']);
+						return back();	 
+					}
+				}
+			}
+		} else {
+			if ($idne == 'new'){
+				$kalimat		= 'Buku berjudul '.$judul.' Pengarang '.$pengarang.' Terbitan '.$penerbit.' berhasil di tambahkan';
+				$cekjudul		= Perpumini::where('kodebuku', $kodebuku)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+			} else {
+				$kalimat		= 'Buku berjudul '.$judul.' Pengarang '.$pengarang.' Terbitan '.$penerbit.' berhasil di update';
+				$cekjudul		= Perpumini::where('id', '!=', $idne)->where('kodebuku', $kodebuku)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+			}
+			if ($judul == '' OR $pengarang == '' OR $penerbit == '' OR $kota == '' OR $tahun == '' OR $kodebuku == '' OR $rakbuku == '' OR $tanggalmsk == '' OR $isbn == ''){
+				$gakboleh = 'Mohon melengkapi semua form, khususnya yang bertanda bintang';
+			}
+			if ($kategori == 'E-Book' AND $link == ''){
+				$gakboleh = 'Untuk Kategori E-Book Mohon melengkapi dengan link asal file / download file';
+			}
+			if ($gakboleh != ''){
+				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => $gakboleh]);
+				return back();
+			} else if ($cekjudul == 0){
+				if ($ilustrasi == ''){ $ilustrasi = '14.5 X 21'; }
+				if ($halaman == ''){ $halaman = '0'; }
+	
+				$arrthnmasuk 	= explode('-', $tanggalmsk);
+				if (isset($arrthnmasuk[2])){
+					$thnmasuk 	= $arrthnmasuk[2];
+				} else {
+					$thnmasuk	= date('Y');
+				}
+				
+				if ($idne == 'new'){
+					$input = Perpumini::create([
+						'gambar'			=> '',
+						'judul'				=> $judul,
+						'link'				=> $link ?? '',
+						'kodebuku'			=> $kodebuku,
+						'pengarang'			=> $pengarang,
+						'cetakan'			=> $cetakan,
+						'kota'				=> $kota,
+						'penerbit'			=> $penerbit,
+						'tahun'				=> $tahun,
+						'ilustrasi'			=> $ilustrasi,
+						'halaman'			=> $halaman,
 						'id_sekolah'		=> session('sekolah_id_sekolah'),
 						'isbn'				=> $isbn,
 						'tglmasuk'			=> $tanggalmsk,
@@ -7604,62 +8193,65 @@ class AdminController extends Controller
 						'rakbuku'			=> $rakbuku,
 						'kondisi'			=> $kondisi,
 						'kategori'			=> $kategori,
-						'inputor'			=> Session('nama')
+						'inputor'			=> Session('nip')
+					]);
+					$idne 	= $input->id;
+				} else {
+					$input = Perpumini::where('id', $idne)->update([
+						'judul'				=> $judul,
+						'link'				=> $link,
+						'kodebuku'			=> $kodebuku,
+						'pengarang'			=> $pengarang,
+						'cetakan'			=> $cetakan,
+						'kota'				=> $kota,
+						'penerbit'			=> $penerbit,
+						'tahun'				=> $tahun,
+						'ilustrasi'			=> $ilustrasi,
+						'halaman'			=> $halaman,
+						'isbn'				=> $isbn,
+						'tglmasuk'			=> $tanggalmsk,
+						'tahunperolehan'	=> $thnmasuk,
+						'jenisperolehan'	=> $jenis,
+						'rakbuku'			=> $rakbuku,
+						'kondisi'			=> $kondisi,
+						'kategori'			=> $kategori,
+						'inputor'			=> Session('nip'),
+						'updated_at'		=> date("Y-m-d H:i:s")
 					]);
 				}
-			} else {
-				$input = Perpumini::where('id', $idne)->update([
-					'judul'				=> $judul,
-					'link'				=> $link,
-					'kodebuku'			=> $kodebuku,
-					'pengarang'			=> $pengarang,
-					'cetakan'			=> $cetakan,
-					'kota'				=> $kota,
-					'penerbit'			=> $penerbit,
-					'tahun'				=> $tahun,
-					'ilustrasi'			=> $ilustrasi,
-					'halaman'			=> $halaman,
-					'isbn'				=> $isbn,
-					'tglmasuk'			=> $tanggalmsk,
-					'tahunperolehan'	=> $thnmasuk,
-					'jenisperolehan'	=> $jenis,
-					'rakbuku'			=> $rakbuku,
-					'kondisi'			=> $kondisi,
-					'kategori'			=> $kategori,
-					'inputor'			=> Session('nama'),
-					'updated_at'		=> date("Y-m-d H:i:s")
-				]);
-			}
-			if ($input){
-				if ($request->hasFile('file')) {
-					if ($idne != 'new'){
-						$getgambar = Perpumini::where('id', $idne)->first();
-						if (isset($getgambar->gambar)){
-							$gambarlama = $getgambar->gambar;
-							if ($gambarlama != ''){
-								if (File::exists(base_path() ."/public/images/perpus/". $gambarlama)) {
-								File::delete(base_path() ."/public/images/perpus/". $gambarlama);
+				if ($input){
+					if ($request->hasFile('file')) {
+						if ($idne != 'new'){
+							$getgambar = Perpumini::where('id', $idne)->first();
+							if (isset($getgambar->gambar)){
+								$gambarlama = $getgambar->gambar;
+								if ($gambarlama != ''){
+									$draft =  public_path('images/perpus/'.$gambarlama);
+									try {
+										unlink($draft);
+									} catch (\Exception $e) {
+									}
 								}
 							}
 						}
+						$ekstensi		= $request->file('file')->getClientOriginalExtension();
+						$namafile 		= session('sekolah_id_sekolah').'-Buku-'.$idne.'.'.$ekstensi;
+						$uploadedFile 	= $request->file('file');
+						Storage::disk('local')->putFileAs('images/perpus/',$uploadedFile,$namafile);
+						Perpumini::where('id', $idne)->update([
+							'gambar'	=> $namafile,
+						]);
 					}
-					$ekstensi		= $request->file('file')->getClientOriginalExtension();
-					$namafile 		= $isbn.'.'.$ekstensi;
-					$uploadedFile 	= $request->file('file');
-					Storage::putFileAs('images/perpus/',$uploadedFile,$namafile);
-					Perpumini::where('isbn', $isbn)->update([
-						'gambar'	=> $namafile,
-					]);
+					return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => $kalimat]);
+					return back();
+				} else { 
+					return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Data Gagal di Input, Mohon Ulangi Beberapa Saat Lagi.!!']);
+					return back();	 
 				}
-				return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => $kalimat]);
+			} else {
+				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Kode Buku Sudah Ada, Mohon beri Kode Lain !!']);
 				return back();
-			} else { 
-				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Data Gagal di Input, Mohon Ulangi Beberapa Saat Lagi.!!']);
-				return back();	 
 			}
-		} else {
-			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Kode Buku Sudah Ada, Mohon beri Kode Lain !!']);
-			return back();
 		}
 	}
 	public function exPeminjaman(Request $request) {
@@ -7743,7 +8335,7 @@ class AdminController extends Controller
 					'peminjam'	=> $nama,
 					'noinduk'	=> $noinduk,
 					'kelas'		=> $kelas,
-					'inputor'	=> Session('nama'),
+					'inputor'	=> Session('nip'),
 					'status'	=> $status,
 					'id_sekolah'=> session('sekolah_id_sekolah'),
 				]);
@@ -7770,10 +8362,16 @@ class AdminController extends Controller
 		$inputor	= Session('nama');
 		$busek 		= null;
 		if ($tabel == 'perpusmini'){
-			$getdatalama= Perpumini::where('id', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-			$busek 		= Perpumini::where('id', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->delete();
+			$getdatalama= Perpumini::where('id', $idne)->first();
+			$busek 		= Perpumini::where('id', $idne)->delete();
 			$kalimat 	= 'Data Perpustakaan Mini Berhasil di Hapus';
 			$deskripsi 	= 'Menghapus data Perpustakaan Judul Buku '.$getdatalama->judul;
+		}
+		if ($tabel == 'tagihanmanual'){
+			$getdatalama= TagihanManual::where('id', $idne)->first();
+			$busek 		= TagihanManual::where('id', $idne)->delete();
+			$kalimat 	= 'Data Tagihan Manual Berhasil di Hapus';
+			$deskripsi 	= 'Menghapus data Tagihan Manual '.json_encode($getdatalama);
 		}
 		if ($tabel == 'datanilai'){
 			$valcari 	= '';
@@ -7801,12 +8399,6 @@ class AdminController extends Controller
 			}
 			$busek 		= Loginputnilai::where('id', $idne)->delete();
 		}
-		if ($tabel == 'db_tema'){
-			$getdatalama= Datatema::where('id', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-			$busek 		= Datatema::where('id', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->delete();
-			$kalimat 	= 'Data Tema Berhasil di Hapus';
-			$deskripsi 	= 'Menghapus data Tema '.$getdatalama->tema;
-		}
 		if ($tabel == 'db_kkm'){
 			$getdatalama= Datakkm::where('id', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
 			$busek 		= Datakkm::where('id', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->delete();
@@ -7832,8 +8424,8 @@ class AdminController extends Controller
 			$deskripsi 	= 'Menghapus data Pengumuman Tgl. '.$getdatalama->tanggal;
 		}
 		if ($tabel == 'ijinortu'){
-			$getdatalama= Datapresensi::where('id', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
-			$busek 		= Datapresensi::where('id', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->delete();
+			$getdatalama= Datapresensi::where('id', $idne)->first();
+			$busek 		= Datapresensi::where('id', $idne)->delete();
 			$kalimat 	= 'Data Presensi Berhasil di Hapus';
 			$deskripsi 	= 'Menghapus data Presensi Tgl. '.$getdatalama->tanggal.' No.Induk : '.$getdatalama->noinduk;
 		}
@@ -7871,10 +8463,43 @@ class AdminController extends Controller
 		}
 		if ($tabel == 'presensifinger'){
 			$tanggalscan= $request->val03;
-			$getdatalama= DB::table('db_presensifinger')->where('pin', $idne)->where('tanggalscan', $tanggalscan)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
-			$busek		= DB::table('db_presensifinger')->where('pin', $idne)->where('tanggalscan', $tanggalscan)->where('id_sekolah', session('sekolah_id_sekolah'))->delete();
-			$deskripsi 	= Session('nama').' Menghapus data Presensi Finger '.$getdatalama->nama.' Scan Finger '.$getdatalama->tanggalscan.' pada '.date('Y-m-d H:i:s');
-			$kalimat 	= $deskripsi;
+			$getdatalama= DB::table('db_presensifinger')->where('pin', $idne)->where('tanggal', $tanggalscan)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+			if (isset($getdatalama->id)){
+				$busek		= DB::table('db_presensifinger')->where('pin', $idne)->where('tanggal', $tanggalscan)->where('id_sekolah', session('sekolah_id_sekolah'))->delete();
+				$deskripsi 	= Session('nama').' Menghapus data Presensi Finger '.$getdatalama->nama.' Scan Finger '.$getdatalama->tanggal.' pada '.date('Y-m-d H:i:s');
+				$kalimat 	= $deskripsi;
+			} else {
+				$kalimat	= 'ID '.$idne.' Tidak ditemukan';
+			}
+		}
+		if ($tabel == 'notifikasi'){
+			if ($idne == 'all'){
+				$busek	= DB::table('notifications')->where('user_id', Session('id'))->update([
+					'user_id'		=> Session('username'),
+					'read_at'		=> date('Y-m-d H:i:s'),
+					'notifiable_id'	=> 1
+				]);
+				$kalimat = 'Archived All';
+			} else if ($idne == 'lama'){
+				$busek	= DB::table('notifications')->where('user_id', Session('id'))->where('created_at', '<', Carbon::now()->subDays(30))->update([
+					'user_id'		=> Session('username'),
+					'read_at'		=> date('Y-m-d H:i:s'),
+					'notifiable_id'	=> 1
+				]);
+				$kalimat = 'Archived Data Yang Lebih dari 30 Hari';
+			} else {
+				$busek	= DB::table('notifications')->where('id', $idne)->update([
+					'user_id'		=> Session('username'),
+					'read_at'		=> date('Y-m-d H:i:s'),
+					'notifiable_id'	=> 1
+				]);
+				$kalimat = 'Archived ID '.$idne;
+			}
+		}
+		if ($tabel == 'hapusbimbinganguru'){
+			$getdatalama= DB::table('db_konselinggguru')->where('id', $idne)->first();
+			$busek		= DB::table('db_konselinggguru')->where('id', $idne)->delete();
+			$kalimat 	= Session('nama').' Menghapus data Bimbingan Guru an. '.$getdatalama->nama.' Terkait '.$getdatalama->deskripsi.' pada '.date('Y-m-d H:i:s');
 		}
 		if ($busek){
 			if ($tabel == 'perpusmini' OR $tabel == 'db_programpip' OR $tabel == 'presensifinger'){
@@ -7888,23 +8513,12 @@ class AdminController extends Controller
 			}
 			return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => $kalimat]);
 			return back();
-		}else {
+		} else {
 			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Data Gagal di Hapus, Mohon Ulangi Beberapa Saat Lagi.!!']);
 			return back();
 		}
 	}
 	public function exPengumuman(Request $request) {
-		$domain 		= parse_url(request()->root())['host'];
-		$cekteks 		= explode("/", $domain);
-		if (isset($cekteks[1])){
-			$domain		= $cekteks[0];
-		}
-		$getdomainid 	= DB::table('app_menu')->where('domain', $domain)->first();
-		if (isset($getdomainid->id)){
-			$subsubdomainapps01			= $getdomainid->subsubdomainapps;
-		} else {
-			$subsubdomainapps01			= config('global.sekolah');
-		}
 		$siapa			= $request->val01;
 		$pengumuman		= $request->val02;
 		if($request->hasFile('file')) {
@@ -7916,23 +8530,7 @@ class AdminController extends Controller
 			$gambar     = '';
 		}
 		if ($siapa == '' OR is_null($siapa)){ $siapa = Session('nama'); }
-		if (session('sekolah_id_sekolah') !== null){ 
-		    $id_sekolah = Session('sekolah_id_sekolah');
-		} else {
-		    $id_sekolah = '';
-		}
-		if (session('sekolah_nama_sekolah') !== null){ 
-		    $fakultas = Session('sekolah_nama_sekolah');
-		} else if (session('subdomainapps01') !== null){ 
-		    $fakultas = Session('subsubdomainapps01');
-		} else {
-		    $fakultas = $subsubdomainapps01;
-		}
-		if (session('id') !== null){ 
-		    $nim = Session('id');
-		} else {
-		    $nim = Session('iduser');
-		}
+		$nim 			= Session('id');
 		$input 			= Pengumuman::create([
 			'jenis'			=> Session('previlage'), 
 			'siapa'			=> $siapa,
@@ -7940,12 +8538,12 @@ class AdminController extends Controller
 			'pengumuman'	=> $pengumuman,
 			'tanggal'		=> date('d - m - Y'),
 			'kapan'			=> date('Y-m-d h:i:s'),
-			'id_sekolah' 	=> $id_sekolah,
-			'fakultas'		=> $fakultas,
+			'id_sekolah' 	=> session('sekolah_id_sekolah'),
 			'gambar'		=> $gambar
 		]);
 		if ($input){	
-			SendMail::mobilenotif('1', 'all', 'Pengumuman', $pengumuman);		
+			SendMail::mobilenotif('1', 'all', 'Pengumuman', $pengumuman);
+			event(new \App\Events\NotifController('Penggumuman: '.$pengumuman));
 			return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Pengumuman Berhasil di Tambahkan']);
 			return back();
 		}else {
@@ -7975,8 +8573,42 @@ class AdminController extends Controller
 			'nama_rek' 			=> $request->edit_nama_rek,
 			'nama_bank_rek' 	=> $request->edit_nama_bank_rek,
 		]);
+		$layananData = [
+			[
+				'layanan' 	=> 'namabank',
+				'status' 	=> $request->edit_nama_bank_rek,
+				'message' 	=> 'Setting Nama Bank :  '.$request->edit_nama_bank_rek
+			],
+			[
+				'layanan' 	=> 'norek',
+				'status' 	=> $request->edit_no_rek,
+				'message' 	=> 'Setting Norek Bank :  '.$request->edit_no_rek
+			],
+			[
+				'layanan' 	=> 'namapdnorek',
+				'status' 	=> $request->edit_nama_rek,
+				'message' 	=> 'Setting Nama Pemilik :  '.$request->edit_nama_rek
+			],
+		];
 		$gagal 		= '';
 		$sukses 	= '';
+		foreach ($layananData as $layanan) {
+			$cek = Layanan::where('layanan', $layanan['layanan'])->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+			if (isset($cek->id)){
+				Layanan::where('id', $cek->id)->update([
+					'status' 		=> $layanan['status'],
+				]);
+				$sukses = $sukses . '<br />Update ' . $layanan['message'];
+			} else {
+				Layanan::create([
+					'layanan' 		=> $layanan['layanan'],
+					'status' 		=> $layanan['status'],
+					'id_sekolah' 	=> session('sekolah_id_sekolah')
+				]);
+				$sukses = $sukses . '<br />Tambah ' . $layanan['message'];
+			}
+		}
+		
 		$homebase	= url("/");
 		$domain		= str_replace('http://', '', $homebase);
 		$domain		= str_replace('https://', '', $domain);
@@ -7985,7 +8617,7 @@ class AdminController extends Controller
 		$domain		= str_replace('-', '', $domain);
 		$domain		= str_replace('.', '', $domain);
 		$fileserti 	= $domain.'.crt';
-		if (file_exists(public_path('tte/'.$fileserti))){
+		if (Storage::disk('local')->exists('/tte/' . $fileserti)) {
 			$certificate 	= 'file://'.base_path().'/public/tte/'.$fileserti;
 		} else {
 			try {
@@ -8008,7 +8640,8 @@ class AdminController extends Controller
 				openssl_x509_export($sscert, $certout);
 				openssl_pkey_export($privkey, $pkeyout);
 				Storage::disk('local')->put('/tte/'.$domain.'.crt', $pkeyout);
-				file_put_contents(public_path()."/tte/".$domain.".crt", $certout, FILE_APPEND | LOCK_EX);
+				Storage::disk('local')->append('/tte/' . $domain.'.crt', $certout);
+				$certificate 	= 'file://'.base_path().'/public/tte/'.$domain.'.crt';
 			} catch (\Exception $e) {
 				$sendstatus = $e->getMessage();
 				$gagal 		= $gagal.$sendstatus;
@@ -8021,7 +8654,7 @@ class AdminController extends Controller
 			} else {
 				$namafile		= session('sekolah_id_sekolah').'-'.time().'logo.'.$request->file('edit_logo')->getClientOriginalExtension();
 				$uploadedFile 	= $request->file('edit_logo');
-				Storage::putFileAs('logo',$uploadedFile,$namafile);
+				Storage::disk('local')->putFileAs('logo',$uploadedFile,$namafile);
 				$update 		= Sekolah::where('id', session('sekolah_id_sekolah'))->update([
 					'logo' => 'logo/'.$namafile
 				]);
@@ -8034,7 +8667,7 @@ class AdminController extends Controller
 			} else {
 				$background 	= session('sekolah_id_sekolah').'-'.time().'logo-gray.png';
 				$uploadedFile 	= $request->file('edit_logo_grey');
-				Storage::putFileAs('logo',$uploadedFile,$background);
+				Storage::disk('local')->putFileAs('logo',$uploadedFile,$background);
 				$update 		= Sekolah::where('id', session('sekolah_id_sekolah'))->update([
 					'logo_grey' => 'logo/'.$background
 				]);
@@ -8047,7 +8680,7 @@ class AdminController extends Controller
 			} else {
 				$frontlogo 		= session('sekolah_id_sekolah').'-'.time().'logofront.png';
 				$uploadedFile 	= $request->file('edit_frontpage');
-				Storage::putFileAs('logo',$uploadedFile,$frontlogo);
+				Storage::disk('local')->putFileAs('logo',$uploadedFile,$frontlogo);
 				$update 		= Sekolah::where('id', session('sekolah_id_sekolah'))->update([
 					'frontpage' => 'logo/'.$frontlogo 
 				]);
@@ -8060,7 +8693,7 @@ class AdminController extends Controller
 			} else {
 				$kopsurat 		= session('sekolah_id_sekolah').'-'.time().'kopsurat.png';
 				$uploadedFile 	= $request->file('edit_kopsurat');
-				Storage::putFileAs('logo',$uploadedFile,$kopsurat);
+				Storage::disk('local')->putFileAs('logo',$uploadedFile,$kopsurat);
 				$update 		= Sekolah::where('id', session('sekolah_id_sekolah'))->update([
 					'kopsurat' => 'logo/'.$kopsurat 
 				]);
@@ -8080,21 +8713,21 @@ class AdminController extends Controller
 			$rstatus		= Layanan::where('layanan', 'daftarekskul')->where('id_sekolah',session('sekolah_id_sekolah'))->first();
 			if (isset($rstatus->status)){
 				$status 	= $rstatus->status;
-				if ($status == ''){
+				if ($status == 'Ditutup' OR $status == ''){
 					$update = Layanan::where('layanan', 'daftarekskul')->where('id_sekolah',session('sekolah_id_sekolah'))->update([
-						'status' 	=> 'mati',
+						'status' 	=> 'Di Buka',
 						'id_sekolah'=>session('sekolah_id_sekolah')
 					]);
 				} else {
 					$update = Layanan::where('layanan', 'daftarekskul')->where('id_sekolah',session('sekolah_id_sekolah'))->update([
-						'status' 	=> '',
+						'status' 	=> 'Ditutup',
 						'id_sekolah'=>session('sekolah_id_sekolah')
 					]);
 				}
 			} else { 
 				$update = Layanan::create([
 					'layanan' 	=> 'daftarekskul',
-					'status' 	=> 'mati',
+					'status' 	=> 'Ditutup',
 					'id_sekolah'=>session('sekolah_id_sekolah')
 				]);
 			}
@@ -8146,143 +8779,19 @@ class AdminController extends Controller
 					'status' 	=> $isi
 				]);
 			}
-		}
-		if ($update){			
-			return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => $layanan.' Berhasil di Update']);
-			return back();
-		}else {
+			if ($update){			
+				return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => $layanan.' Berhasil di Update']);
+				return back();
+			} else {
+				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Isi Tidak Boleh Kosong']);
+				return back();
+			}
+		} else {
 			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Isi Tidak Boleh Kosong']);
 			return back();
 		}
+		
 	}
-	public function getallkendaraan() {
-		$arraykendaraan = [];
-    	$jruang 		= Kendaraan::where('fakultas', Session('sekolah_id_sekolah'))->orderBy('garasi', 'asc')->orderBy('merek', 'asc')->get();
-    	foreach ($jruang as $result) {
-			$kapasitas 	= $result->kapasitas;
-			$marking 	= $result->marking;
-			$pjgedung 	= $result->pjgedung;
-			$pejabat	= $pjgedung;
-			if ($kapasitas == 0){ $kapasitas = '';}
-			if ($marking == 'OK'){
-				$arraykendaraan[] = array(
-					'dot' 			=> $result->id,
-					'merek' 		=> $result->merek,
-					'garasi' 		=> $result->garasi,
-					'kodegarasi' 	=> $result->kodegarasi,
-					'kodekendaraan' => $result->kodekendaraan,
-					'driver' 		=> $result->driver,
-					'marking' 		=> $result->marking,
-					'nopol' 		=> $result->nopol,
-					'kondisi' 		=> $result->kondisi,
-					'utilitas' 		=> $result->utilitas,
-					'kapasitas' 	=> $kapasitas,
-					'statpinjam' 	=> $result->statpinjam,
-					'tarif' 		=> $result->tarif,
-					'fakpanjang' 	=> $result->fakpanjang,
-					'fakultas' 		=> $result->fakultas,
-					'inputor' 		=> $result->inputor,
-					'pjgedung' 		=> $pjgedung,
-					'pejabat' 		=> $pejabat,
-					'foto' 			=> $result->foto,
-				);
-			}else {
-				$arraykendaraan[] = array(
-					'dot' 			=> $result->id,
-					'merek' 		=> $result->merek,
-					'namagd' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'kodegd' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'koderg' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'petugas' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'marking' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'luas' 			=> '<span class="badge badge-danger">INACTIVE</span>',
-					'kondisi' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'utilitas' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'kapasitas' 	=> '<span class="badge badge-danger">INACTIVE</span>',
-					'statpinjam' 	=> '<span class="badge badge-danger">INACTIVE</span>',
-					'tarif' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'fakpanjang' 	=> '<span class="badge badge-danger">INACTIVE</span>',
-					'fakultas' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'inputor' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'pjgedung' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'pejabat' 		=> '<span class="badge badge-danger">INACTIVE</span>',
-					'foto' 			=> '',
-				);
-			}
-    	}
-    	echo json_encode($arraykendaraan);	
-    }
-	public function getallgarasi() {
-		$jruang 	= Garasi::where('fakultas', Session('sekolah_id_sekolah'))->orderBy('namagd', 'asc')->get();
-    	echo json_encode($jruang);	
-	}
-	public function getAktifitaskendaraan(Request $request) {
-		$arrayjadwal 	= array();
-		$jenis       	= $request->val01;
-		$bulan       	= $request->val02;
-		$tahun       	= $request->val03;
-		$fakultas		= Session('sekolah_id_sekolah');	
-		if ($jenis == 'BBM'){
-			if ($bulan == 'INI'){
-				$tahun 		= date("Y");
-				$jadwals   	= Kendaraanactivity::where('jenis', 'BBM')->where('fakultas', $fakultas)->whereYear('tanggal', $tahun)->get();
-			} else if ($bulan == 'ALL'){
-				$jadwals   	= Kendaraanactivity::where('jenis', 'BBM')->where('fakultas', $fakultas)->whereYear('tanggal', $tahun)->get();
-			} else {
-				$valcar 	= $tahun.'-'.$bulan;
-				$jadwals   	= Kendaraanactivity::where('jenis', 'BBM')->where('fakultas', $fakultas)->where('tanggal', 'LIKE', $valcari.'%')->get();
-			}
-		} else if ($jenis == 'SERVICE'){
-			if ($bulan == 'INI'){
-				$tahun 		= date("Y");
-				$jadwals   	= Kendaraanactivity::where('jenis', 'SERVICE')->where('fakultas', $fakultas)->whereYear('tanggal', $tahun)->get();
-			} else if ($bulan == 'ALL'){
-				$jadwals   	= Kendaraanactivity::where('jenis', 'SERVICE')->where('fakultas', $fakultas)->whereYear('tanggal', $tahun)->get();
-			} else {
-				$valcar 	= $tahun.'-'.$bulan;
-				$jadwals   	= Kendaraanactivity::where('jenis', 'SERVICE')->where('fakultas', $fakultas)->where('tanggal', 'LIKE', $valcari.'%')->get();
-			}
-		} else if ($jenis == 'TOL'){
-			if ($bulan == 'INI'){
-				$tahun 		= date("Y");
-				$jadwals   	= Kendaraanactivity::where('jenis', 'TOL')->where('fakultas', $fakultas)->whereYear('tanggal', $tahun)->get();
-			} else if ($bulan == 'ALL'){
-				$jadwals   	= Kendaraanactivity::where('jenis', 'TOL')->where('fakultas', $fakultas)->whereYear('tanggal', $tahun)->get();
-			} else {
-				$valcar 	= $tahun.'-'.$bulan;
-				$jadwals   	= Kendaraanactivity::where('jenis', 'TOL')->where('fakultas', $fakultas)->where('tanggal', 'LIKE', $valcari.'%')->get();
-			}
-		} else {
-			if ($bulan == 'INI'){
-				$tahun 		= date("Y");
-				$jadwals   	= Kendaraanactivity::where('fakultas', $fakultas)->whereYear('tanggal', $tahun)->get();
-			} else if ($bulan == 'ALL'){
-				$jadwals   	= Kendaraanactivity::where('fakultas', $fakultas)->whereYear('tanggal', $tahun)->get();
-			} else {
-				$valcari 	= $tahun.'-'.$bulan;
-				$jadwals   	= Kendaraanactivity::where('fakultas', $fakultas)->where('tanggal', 'LIKE', $valcari.'%')->get();
-			}
-		}
-		if (!empty($jadwals)){
-			foreach ($jadwals as $rjadwal) {
-				$arrayjadwal[] = array(
-					'idne'			=> $rjadwal->id,
-					'idkendaraan'   => $rjadwal->idkendaraan,
-					'merek'  		=> $rjadwal->merek,
-					'garasi'  		=> $rjadwal->garasi,
-					'driver'    	=> $rjadwal->driver,
-					'nopol'			=> $rjadwal->nopol,
-					'keterangan'	=> addslashes($rjadwal->keterangan),
-					'jenis' 		=> $rjadwal->jenis,
-					'tanggal' 		=> $rjadwal->tanggal,
-					'nominal' 		=> $rjadwal->nominal,
-					'inputor' 		=> $rjadwal->inputor,
-					'fakultas' 		=> $rjadwal->fakultas,
-				);
-			}
-		}
-        echo json_encode($arrayjadwal);
-    }
 	public function exKendaraan(Request $request) {
 		$namarg		= $request->input('set01');
 		$koderg		= $request->input('set02');
@@ -8297,15 +8806,13 @@ class AdminController extends Controller
 		$pjgedung 	= $request->input('set11');
 		$statpinjam = $request->input('set12');
 		$tarif 		= $request->input('set13');
-		$fakultas	= Session('sekolah_id_sekolah');
-		$fakpanjang	= Session('sekolah_nama_sekolah');
 		$sinten     = Session('nama');
 		if ($namarg == 'hapus') {
 			$getdata 	= Kendaraan::where('id', $idne)->first();
 			$nama		= $getdata->merek;
 			$kode 		= $getdata->kodekendaraan;
-			$fakultas	= $getdata->fakultas;
-			$kelakuan 	= Session('nama').' Menghapus data ruang '.$nama.' Kode Ruang : '.$kode.' Unit : '.$fakultas;
+			$id_sekolah	= $getdata->id_sekolah;
+			$kelakuan 	= Session('nama').' Menghapus data ruang '.$nama.' Kode Ruang : '.$kode;
 			Logstaff::create([
 				'jenis'			=> 'Data Ruang', 
 				'sopo'			=> Session('nip'), 
@@ -8316,15 +8823,27 @@ class AdminController extends Controller
 			$user->delete();
 			return response()->json(['status' => 'Sukses', 'message' => 'Marking Data Hapus, Sukses di Lakukan']);
 			return back();
-		}
-		else if ($namarg == 'hapusgarasi') {
+		} else if ($namarg == 'hapusaktifitas') {
+			$getdata 	= Kendaraan::where('id', $koderg)->first();
+			$getdatalm 	= Kendaraanactivity::where('id', $idne)->first();
+			$kelakuan 	= Session('nama').' Menghapus data aktifitas Kendaraan '.$getdatalm->nama.' Nopol : '.$getdatalm->kodekendaraan.json_encode($getdatalm);
+			Logstaff::create([
+				'jenis'			=> 'Data Aktifitas Kendaraan', 
+				'sopo'			=> Session('nip'), 
+				'kelakuan'		=> $kelakuan,
+				'id_sekolah' 	=> session('sekolah_id_sekolah')
+			]);
+			$user     	=   Kendaraanactivity::find($idne);
+			$user->delete();
+			return response()->json(['status' => 'Sukses', 'message' => 'Marking Data Aktifitas Kendaraan, Sukses di Lakukan']);
+			return back();
+		} else if ($namarg == 'hapusgarasi') {
 			$getdata 	= Garasi::where('id', $idne)->first();
 			$namagd		= $getdata->namagd;
 			$kodegd		= $getdata->kodegd;
-			$fakultas	= $getdata->fakultas;
-			$cekfas 	= Kendaraan::where('kodegarasi', $kodegd)->count();
+			$cekfas 	= Kendaraan::where('kodegarasi', $kodegd)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
 			if ($cekfas == 0){				
-				$kelakuan 	= Session('nama').' Menghapus data Garasi '.$namagd.' Kode : '.$kodegd.' Unit : '.$fakultas;
+				$kelakuan 	= Session('nama').' Menghapus data Garasi '.$namagd.' Kode : '.$kodegd;
 				Logstaff::create([
 					'jenis'			=> 'Data Garasi', 
 					'sopo'			=> Session('nip'), 
@@ -8332,14 +8851,13 @@ class AdminController extends Controller
 					'id_sekolah' 	=> session('sekolah_id_sekolah')
 				]);
 				Garasi::where('id', $idne)->delete();
-				return response()->json(['status' => 'Sukses', 'message' => 'data garasi '.$namagd.' Kode : '.$kodegd.' Unit : '.$fakultas.' berhasil di hapus']);
+				return response()->json(['status' => 'Sukses', 'message' => 'data garasi '.$namagd.' Kode : '.$kodegd.' berhasil di hapus']);
 				return back();
 			} else {
-				return response()->json(['status' => 'Gagal', 'message' => 'Dalam Gedung ini masih ada ruang yang belum di hapus']);
+				return response()->json(['status' => 'Gagal', 'message' => 'Dalam Garasi ini masih ada kendaraan yang belum di hapus']);
 				return back();
 			}
-		}
-		else if ($namarg == 'gedung') {
+		} else if ($namarg == 'gedung') {
 			if ($koderg != ''){
 				if ($idne == 'new'){
 					$cekwes1 = Garasi::where('namagd', $namarg)->count();
@@ -8355,9 +8873,8 @@ class AdminController extends Controller
 							'namagd'  	=>  $koderg,
 							'singgd'   	=>  $luas,
 							'kodegd'	=>  $luas,
-							'fakpanjang'=>  $fakpanjang,
-							'fakultas'	=>  $fakultas,
-							'inputor'	=>  Session('nama'),
+							'id_sekolah' => session('sekolah_id_sekolah'),
+							'inputor'	=>  Session('nip'),
 						]);
 						return response()->json(['status' => 'Sukses', 'message' => 'Data Garasi '.$koderg.' Berhasil di Simpan']);
 						return back();
@@ -8376,9 +8893,8 @@ class AdminController extends Controller
 							'namagd'  	=>  $koderg,
 							'singgd'   	=>  $luas,
 							'kodegd'	=>  $luas,
-							'fakpanjang'=>  $fakpanjang,
-							'fakultas'	=>  $fakultas,
-							'inputor'	=>  Session('nama'),
+							'id_sekolah' => session('sekolah_id_sekolah'),
+							'inputor'	=>  Session('nip'),
 						]);
 						return response()->json(['status' => 'Sukses', 'message' => 'Data Garasi '.$koderg.' Berhasil di Simpan']);
 						return back();
@@ -8388,8 +8904,7 @@ class AdminController extends Controller
 				return response()->json(['status' => 'Gagal', 'message' => 'Mohon Lengkapi Isian Data Garasi Anda..!!']);
 				return back();
 			}
-		}
-		else if ($namarg == 'aktifitaskendaraan') {
+		} else if ($namarg == 'aktifitaskendaraan') {
 			$nama		= $request->input('set02');
 			$garasi		= $request->input('set03');
 			$nopol		= $request->input('set04');
@@ -8415,8 +8930,8 @@ class AdminController extends Controller
 						'tanggal'		=> $tanggal,
 						'nominal'		=> $nominal,
 						'keterangan'	=> $keterangan,
-						'inputor'		=> Session('nama'),
-						'fakultas'		=> $fakultas
+						'inputor'		=> Session('nip'),
+						'id_sekolah' 	=> session('sekolah_id_sekolah'),
 					]);
 					if ($input){
 						return response()->json(['status' => 'Sukses', 'message' => 'Data '.$jenis.' Tanggal '.$tanggal.' Sejumlah '.$nominal.' Berhasil di Simpan']);
@@ -8437,8 +8952,8 @@ class AdminController extends Controller
 						'tanggal'		=> $tanggal,
 						'nominal'		=> $nominal,
 						'keterangan'	=> $keterangan,
-						'inputor'		=> Session('nama'),
-						'fakultas'		=> $fakultas
+						'inputor'		=> Session('nip'),
+						'id_sekolah' => session('sekolah_id_sekolah'),
 					]);
 					if ($input){
 						return response()->json(['status' => 'Sukses', 'message' => 'Data '.$jenis.' Tanggal '.$tanggal.' Sejumlah '.$nominal.' Berhasil di Update']);
@@ -8448,13 +8963,11 @@ class AdminController extends Controller
 						return back();
 					}
 				}
-			}else {
+			} else {
 				return response()->json(['status' => 'Gagal', 'message' => 'Mohon Lengkapi Isian Data Anda..!!']);
 				return back();
 			}
-			
-		}
-		else {
+		} else {
 			if ($idne == 'new'){
 				if ($namarg != '' and $koderg != '' and $namagd != '' ){
 					$cekwes1 = Kendaraan::where('merek', $namarg)->count();
@@ -8481,26 +8994,25 @@ class AdminController extends Controller
 							'merek'  		=>  $namarg,
 							'garasi'   		=>  $gdnama,
 							'kodegarasi'	=>  $gdkode,
-							'kodekendaraan'	=>  $koderg,
-							'driver'		=>  $petugas,
+							'kodekendaraan'	=>  $koderg ?? time(),
+							'driver'		=>  $petugas ?? '',
 							'marking'		=>  'OK',
-							'nopol'			=>  $luas,
-							'kapasitas'		=>  $kapas,
-							'kondisi'		=>  $kondisi,
-							'utilitas'		=>  $utitilitas,
-							'pjgedung'		=>  $pjgedung,
-							'statpinjam'	=>  $statpinjam,
-							'tarif'			=>  $tarif,
-							'fakpanjang'	=>  $fakpanjang,
-							'fakultas'		=>  $fakultas,
-							'inputor'		=>  Session('nama'),
+							'nopol'			=>  $luas ?? '40',
+							'kapasitas'		=>  $kapas ?? '40',
+							'kondisi'		=>  $kondisi ?? 'Baik',
+							'utilitas'		=>  $utitilitas ?? '40',
+							'pjgedung'		=>  $pjgedung ?? '',
+							'statpinjam'	=>  $statpinjam ?? 'Tidak dipinjamkan',
+							'tarif'			=>  $tarif ?? '0',
+							'id_sekolah' 	=> 	Session('sekolah_id_sekolah'),
+							'inputor'		=>  Session('nip'),
 						]);
 						if ($input){
 							if ($request->hasFile('file')) {
-								$namafile 		= $fakultas.'-KND-'.$input;
+								$namafile 		= Session('sekolah_id_sekolah').'-KND-'.$input;
 								$namafile		= $namafile.'.'.$request->file->getClientOriginalExtension();
 								$uploadedFile 	= $request->file('file');
-								Storage::putFileAs('images/kendaraan/',$uploadedFile,$namafile);
+								Storage::disk('local')->putFileAs('images/kendaraan/',$uploadedFile,$namafile);
 								Kendaraan::where('id', $input)->update([
 									'foto'  	=>  $namafile,
 								]);
@@ -8553,9 +9065,8 @@ class AdminController extends Controller
 								'pjgedung'		=>  $pjgedung,
 								'statpinjam'	=>  $statpinjam,
 								'tarif'			=>  $tarif,
-								'fakpanjang'	=>  $fakpanjang,
-								'fakultas'		=>  $fakultas,
-								'inputor'		=>  Session('nama'),
+								'id_sekolah'	=>  Session('sekolah_id'),
+								'inputor'		=>  Session('nip'),
 							]);
 						}else {
 							$input 	= Kendaraan::where('id', $idne)->update([
@@ -8572,24 +9083,25 @@ class AdminController extends Controller
 								'pjgedung'		=>  $pjgedung,
 								'statpinjam'	=>  $statpinjam,
 								'tarif'			=>  $tarif,
-								'fakpanjang'	=>  $fakpanjang,
-								'fakultas'		=>  $fakultas,
-								'inputor'		=>  Session('nama'),
+								'id_sekolah' 	=> 	Session('sekolah_id_sekolah'),
+								'inputor'		=>  Session('nip'),
 							]);
 						}
 						if ($input){
 							if ($request->hasFile('file')) {
 								$cekfoto = Ruang::where('id', $idne)->first();
 								if (isset($cekfoto->foto)){
-									$fotolama= $cekfoto->foto;
-									if (File::exists(base_path() ."/public/images/kendaraan/". $fotolama)) {
-									  File::delete(base_path() ."/public/images/kendaraan/". $fotolama);
+									$fotolama	= $cekfoto->foto;
+									$draft =  public_path('images/kendaraan/'.$fotolama);
+									try {
+										unlink($draft);
+									} catch (\Exception $e) {
 									}
 								}								
-								$namafile 		= $fakultas.'-RG-'.$idne;
+								$namafile 		= Session('sekolah_id_sekolah').'-RG-'.$idne;
 								$namafile		= $namafile.'.'.$request->file->getClientOriginalExtension();
 								$uploadedFile 	= $request->file('file');
-								Storage::putFileAs('images/kendaraan/',$uploadedFile,$namafile);
+								Storage::disk('local')->putFileAs('images/kendaraan/',$uploadedFile,$namafile);
 								Kendaraan::where('id', $idne)->update([
 									'foto'  	=>  $namafile,
 								]);
@@ -8606,121 +9118,8 @@ class AdminController extends Controller
 					return back();
 				}
 			}
-		}        
+		}
 	}
-	public function getallruang() {
-		$arrayruang = [];
-		$fakultas	= Session('sekolah_id_sekolah');
-		if ($fakultas == '' OR is_null($fakultas)){ $fakultas = Session('fakultas'); }
-    	$jruang 	= Ruang::where('fakultas', $fakultas)->orderBy('kodegd', 'asc')->orderBy('namarg', 'asc')->get();
-    	foreach ($jruang as $result) {
-			$kapasitas 	= $result->kapasitasujian;
-			$marking 	= $result->marking;
-			$pjgedung 	= $result->pjgedung;
-			$pejabat 	= $pjgedung;
-			$foto 		= $result->foto;
-			if (is_null($foto)){ $foto = '';}
-			
-			if ($kapasitas == 0){ $kapasitas = '';}
-				$arrayruang[] = array(
-					'dot' 			=> $result->id,
-					'namarg' 		=> $result->namarg,
-					'namagd' 		=> $result->namagd,
-					'kodegd' 		=> $result->kodegd,
-					'koderg' 		=> $result->koderg,
-					'petugas' 		=> $result->petugas,
-					'marking' 		=> $result->marking,
-					'luas' 			=> $result->luas,
-					'kondisi' 		=> $result->kondisi,
-					'utilitas' 		=> $result->utilitas,
-					'kapasitas' 	=> $kapasitas,
-					'statpinjam' 	=> $result->pinjam,
-					'tarif' 		=> $result->tarif,
-					'fakpanjang' 	=> $result->fakpanjang,
-					'fakultas' 		=> $result->fakultas,
-					'inputor' 		=> $result->inputor,
-					'pjgedung' 		=> $pjgedung,
-					'pejabat' 		=> $pejabat,
-					'foto' 			=> $foto,
-				);
-    	}
-    	echo json_encode($arrayruang);	
-    }
-    public function getallgedung() {
-		$arrayruang = [];
-		$fakultas	= Session('sekolah_id_sekolah');
-		if ($fakultas == '' OR is_null($fakultas)){ $fakultas = Session('fakultas'); }
-    	$jruang 	= Gedung::where('fakultas', $fakultas)->orderBy('namagd', 'asc')->get();
-    	foreach ($jruang as $result) {
-			$pjgedung 	= $result->pjgedung;
-			$foto 		= $result->foto;
-			if (is_null($foto)){ $foto = '';}
-			$arrayruang[] = array(
-				'dot' 			=> $result->id,
-				'namagd' 		=> $result->namagd,
-				'singgd' 		=> $result->singgd,
-				'kodegd' 		=> $result->kodegd,
-				'statpinjam' 	=> $result->statpinjam,
-				'tarif' 		=> $result->tarif,
-				'fakpanjang' 	=> $result->fakpanjang,
-				'fakultas' 		=> $result->fakultas,
-				'inputor' 		=> $result->inputor,
-				'pjgedung' 		=> $pjgedung,
-				'pejabat' 		=> $pjgedung,
-				'foto' 			=> $foto,
-			);
-			
-    	}
-    	echo json_encode($arrayruang);	
-    }
-	public function getdetailruang(Request $request) {
-    	$idruang 	= $request->input('val01');
-		$namarg 	= $request->input('val02');
-		$jfasruang	= Fasruang::where('idruang', $idruang)->orderBy('jenis', 'asc')->get();
-    	$arrayfiles = [];
-    	foreach ($jfasruang as $file) {
-	    	$arrayfiles[] = array(
-				'idne' 			=> $file->id,
-				'idruang' 		=> $file->idruang,
-				'namarg' 		=> $namarg,		
-				'namabrg' 		=> $file->namabrg,
-				'jenis' 		=> $file->jenis,
-				'merek' 		=> $file->merek,
-				'tahunterima' 	=> $file->tahunterima,
-				'jumlah' 		=> $file->jumlah,
-				'sumberdana' 	=> $file->sumberdana,
-				'keterangan' 	=> $file->keterangan,
-				'kondisi' 		=> $file->kondisi,
-				'kodebarang' 	=> $file->kodebarang,
-			);
-    	}
-    	echo json_encode($arrayfiles);
-    }
-	public function getrekapdetailruang(Request $request) {
-    	$idruang 	= $request->input('val01');
-		$namarg 	= $request->input('val02');
-		$arrayfiles	= [];
-		$jfasruang	= Fasruang::where('idruang', $idruang)->groupBy('jenis')->get();
-    	foreach ($jfasruang as $file) {			
-			$jenis 		= $file->jenis;
-			$getallnama	= Fasruang::where('idruang', $idruang)->where('jenis', $jenis)->groupBy('namabrg')->get();
-			foreach($getallnama as $rnama){
-				$namabrg 	= $rnama->namabrg;
-				$getallstat	= Fasruang::where('idruang', $idruang)->where('jenis', $jenis)->where('namabrg', $namabrg)->groupBy('kondisi')->get();
-				foreach($getallstat as $rstat){
-					$kondisi 	= $rstat->kondisi;
-					$jumlah		= Fasruang::where('kondisi', $kondisi)->where('idruang', $idruang)->where('jenis', $jenis)->where('namabrg', $namabrg)->count();
-					$arrayfiles[] = array(
-						'namabrg' 		=> $namabrg,
-						'jenis' 		=> $jenis,
-						'jumlah' 		=> $jumlah,
-						'kondisi' 		=> $kondisi,
-					);
-				}
-			}
-    	}
-    	echo json_encode($arrayfiles);
-    }
 	public function exfasruang(Request $request) {
 		$idne		= $request->input('set01');
 		$jenis		= $request->input('set02');
@@ -8802,21 +9201,16 @@ class AdminController extends Controller
 		$pjgedung 	= $request->input('set11');
 		$statpinjam = $request->input('set12');
 		$tarif 		= $request->input('set13');
-		$fakultas	= Session('sekolah_id_sekolah');
-		$fakpanjang	= Session('sekolah_nama_sekolah');
 		$sinten     = Session('nama');
-		if ($fakultas == '' OR is_null($fakultas)){ $fakultas = Session('fakultas'); }
-		if ($fakpanjang == '' OR is_null($fakpanjang)){ $fakpanjang = Session('fakpanjang'); }
-
-		if ($namarg == 'hapus') {			
+		
+		if ($namarg == 'hapus') {
 			$user     	=   Ruang::find($idne);
-			$cekfas 	= 	Fasruang::where('idruang', $idne)->count();
+			$cekfas 	= 	Fasruang::where('idruang', $idne)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
 			if ($cekfas == 0){
 				$getdata 	= Ruang::where('id', $idne)->first();
 				$nama		= $getdata->namarg;
 				$kode 		= $getdata->koderg;
-				$fakultas	= $getdata->fakultas;
-				$kelakuan 	= Session('nama').' Menghapus data ruang '.$nama.' Kode Ruang : '.$kode.' Unit : '.$fakultas;
+				$kelakuan 	= Session('nama').' Menghapus data ruang '.$nama.' Kode Ruang : '.$kode;
 				Logstaff::create([
 					'jenis'			=> 'Data Ruang', 
 					'sopo'			=> Session('nip'), 
@@ -8824,21 +9218,19 @@ class AdminController extends Controller
 					'id_sekolah' 	=> session('sekolah_id_sekolah')
 				]);
 				$user->delete();
-				return response()->json(['status' => 'Sukses', 'message' => 'data ruang '.$nama.' Kode Ruang : '.$kode.' Unit : '.$fakultas.' berhasil di hapus']);
+				return response()->json(['status' => 'Sukses', 'message' => 'data ruang '.$nama.' Kode Ruang : '.$kode.' berhasil di hapus']);
 				return back();
 			} else {
 				return response()->json(['status' => 'Gagal', 'message' => 'Dalam Ruang ini masih ada inventaris yang belum di hapus']);
 				return back();
 			}
-		}
-		else if ($namarg == 'hapusgedung') {
+		} else if ($namarg == 'hapusgedung') {
 			$getdata 	= Gedung::where('id', $idne)->first();
 			$namagd		= $getdata->namagd;
 			$kodegd		= $getdata->kodegd;
-			$fakultas	= $getdata->fakultas;
-			$cekfas 	= Ruang::where('kodegd', $kodegd)->count();
+			$cekfas 	= Ruang::where('kodegd', $kodegd)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
 			if ($cekfas == 0){				
-				$kelakuan 	= Session('nama').' Menghapus data Gedung '.$namagd.' Kode : '.$kodegd.' Unit : '.$fakultas;
+				$kelakuan 	= Session('nama').' Menghapus data Gedung '.$namagd.' Kode : '.$kodegd;
 				Logstaff::create([
 					'jenis'			=> 'Data Gedung', 
 					'sopo'			=> Session('nip'), 
@@ -8846,23 +9238,21 @@ class AdminController extends Controller
 					'id_sekolah' 	=> session('sekolah_id_sekolah')
 				]);
 				Gedung::where('id', $idne)->delete();
-				return response()->json(['status' => 'Sukses', 'message' => 'data Gedung '.$namagd.' Kode : '.$kodegd.' Unit : '.$fakultas.' berhasil di hapus']);
+				return response()->json(['status' => 'Sukses', 'message' => 'data Gedung '.$namagd.' Kode : '.$kodegd.' berhasil di hapus']);
 				return back();
 			} else {
 				return response()->json(['status' => 'Gagal', 'message' => 'Dalam Gedung ini masih ada ruang yang belum di hapus']);
 				return back();
 			}
-		}
-		else if ($namarg == 'gedung') {
+		} else if ($namarg == 'gedung') {
 			if ($koderg != '' or $luas != ''){
 				$idne 		= $kapas;
 				$pjgedung 	= $namagd;
 				$statpinjam = $petugas;
 				$tarif 		= $marking;
-				if ($fakpanjang == ''){ $fakpanjang = 'Kantor Pusat'; }
 				if ($idne == 'new'){
-					$cekwes1 = Gedung::where('namagd', $koderg)->count();
-					$cekwes2 = Gedung::where('kodegd', $luas)->count();
+					$cekwes1 = Gedung::where('namagd', $koderg)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
+					$cekwes2 = Gedung::where('kodegd', $luas)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
 					if ($statpinjam == 'Di Sewa/Pinjamkan untuk kalangan internal' OR $statpinjam == 'Di Sewa/Pinjamkan untuk umum'){
 						$wajibada = 1;
 					} else {
@@ -8885,16 +9275,15 @@ class AdminController extends Controller
 							'pjgedung'	=>  $pjgedung,
 							'statpinjam'=>  $statpinjam,
 							'tarif'		=>  $tarif,
-							'fakpanjang'=>  $fakpanjang,
-							'fakultas'	=>  $fakultas,
-							'inputor'	=>  Session('nama'),
+							'id_sekolah' => session('sekolah_id_sekolah'),
+							'inputor'	=>  Session('nip'),
 						]);
 						if ($input){
 							if ($request->hasFile('file')) {								
-								$namafile 		= $fakultas.'-GDG-'.$input;
+								$namafile 		= Session('sekolah_id_sekolah').'-GDG-'.$input;
 								$namafile		= $namafile.'.'.$request->file->getClientOriginalExtension();
 								$uploadedFile 	= $request->file('file');
-								Storage::putFileAs('images/gedung/',$uploadedFile,$namafile);
+								Storage::disk('local')->putFileAs('images/gedung/',$uploadedFile,$namafile);
 								Gedung::where('id', $input)->update([
 									'foto'  	=>  $namafile,
 								]);
@@ -8908,8 +9297,8 @@ class AdminController extends Controller
 						
 					}
 				} else {
-					$cekwes1 = Gedung::where('namagd', $koderg)->where('id', '!=', $idne)->count();
-					$cekwes2 = Gedung::where('kodegd', $luas)->where('id', '!=', $idne)->count();
+					$cekwes1 = Gedung::where('namagd', $koderg)->where('id', '!=', $idne)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
+					$cekwes2 = Gedung::where('kodegd', $luas)->where('id', '!=', $idne)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
 					if ($statpinjam == 'Di Sewa/Pinjamkan untuk kalangan internal' OR $statpinjam == 'Di Sewa/Pinjamkan untuk umum'){
 						$wajibada = 1;
 					} else {
@@ -8932,23 +9321,25 @@ class AdminController extends Controller
 							'pjgedung'	=>  $pjgedung,
 							'statpinjam'=>  $statpinjam,
 							'tarif'		=>  $tarif,
-							'fakpanjang'=>  $fakpanjang,
-							'fakultas'	=>  $fakultas,
-							'inputor'	=>  Session('nama'),
+							'id_sekolah' => session('sekolah_id_sekolah'),
+							'inputor'	=>  Session('nip'),
+							'updated_at'=> date('Y-m-d H:i:s')
 						]);
 						if ($input){
 							if ($request->hasFile('file')) {
 								$cekfoto = Gedung::where('id', $idne)->first();
 								if (isset($cekfoto->foto)){
-									$fotolama= $cekfoto->foto;
-									if (File::exists(base_path() ."/public/images/gedung/". $fotolama)) {
-									  File::delete(base_path() ."/public/images/gedung/". $fotolama);
+									$fotolama	= $cekfoto->foto;
+									$draft 		=  public_path('images/gedung/'.$fotolama);
+									try {
+										unlink($draft);
+									} catch (\Exception $e) {
 									}
 								}								
-								$namafile 		= $fakultas.'-GDG-'.$idne;
+								$namafile 		= Session('sekolah_id_sekolah').'-GDG-'.$idne;
 								$namafile		= $namafile.'.'.$request->file->getClientOriginalExtension();
 								$uploadedFile 	= $request->file('file');
-								Storage::putFileAs('images/gedung/',$uploadedFile,$namafile);
+								Storage::disk('local')->putFileAs('images/gedung/',$uploadedFile,$namafile);
 								Gedung::where('id', $idne)->update([
 									'foto'  	=>  $namafile,
 								]);
@@ -8966,12 +9357,11 @@ class AdminController extends Controller
 				return back();
 			}
 			
-		}
-		else {
+		} else {
 			if ($idne == 'new'){
 				if ($namarg != '' and $koderg != '' and $namagd != '' ){
-					$cekwes1 = Ruang::where('namarg', $namarg)->count();
-					$cekwes2 = Ruang::where('koderg', $koderg)->count();
+					$cekwes1 = Ruang::where('namarg', $namarg)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
+					$cekwes2 = Ruang::where('koderg', $koderg)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
 					if ($statpinjam == 'Di Sewa/Pinjamkan untuk kalangan internal' OR $statpinjam == 'Di Sewa/Pinjamkan untuk umum'){
 						$wajibada = 1;
 					} else {
@@ -8994,26 +9384,25 @@ class AdminController extends Controller
 							'namarg'  		=>  $namarg,
 							'namagd'   		=>  $gdnama,
 							'kodegd'		=>  $gdkode,
-							'koderg'		=>  $koderg,
-							'petugas'		=>  $petugas,
-							'marking'		=>  $marking,
-							'luas'			=>  $luas,
-							'kapasitasujian'=>  $kapas,
-							'kondisi'		=>  $kondisi,
-							'utilitas'		=>  $utitilitas,
-							'pjgedung'		=>  $pjgedung,
-							'pinjam'		=>  $statpinjam,
-							'tarif'			=>  $tarif,
-							'fakpanjang'	=>  $fakpanjang,
-							'fakultas'		=>  $fakultas,
-							'inputor'		=>  Session('nama'),
+							'koderg'		=>  $koderg ?? time(),
+							'petugas'		=>  $petugas ?? '',
+							'marking'		=>  $marking ?? time(),
+							'luas'			=>  $luas ?? '40',
+							'kapasitasujian'=>  $kapas ?? '40',
+							'kondisi'		=>  $kondisi ?? 'Baik',
+							'utilitas'		=>  $utitilitas ?? '40',
+							'pjgedung'		=>  $pjgedung ?? '',
+							'pinjam'		=>  $statpinjam ?? 'Tidak dipinjamkan',
+							'tarif'			=>  $tarif ?? '0',
+							'id_sekolah'	 => session('sekolah_id_sekolah'),
+							'inputor'		=>  Session('nip'),
 						]);
 						if ($input){
 							if ($request->hasFile('file')) {
-								$namafile 		= $fakultas.'-RG-'.$input;
-								$namafile		= $namafile.'.'.$request->file->getClientOriginalExtension();
+								$namafile 		= Session('sekolah_id_sekolah').'-RG-'.$input;
+								$namafile		= $namafile.'.'.$request->file('file')->getClientOriginalExtension();
 								$uploadedFile 	= $request->file('file');
-								Storage::putFileAs('images/ruang/',$uploadedFile,$namafile);
+								Storage::disk('local')->putFileAs('images/ruang/',$uploadedFile,$namafile);
 					
 								Ruang::where('id', $input)->update([
 									'foto'  	=>  $namafile,
@@ -9032,8 +9421,8 @@ class AdminController extends Controller
 				}
 			}else{
 				if ($namarg != '' and $koderg != '' and $namagd != '' ){
-					$cekwes1 = Ruang::where('namarg', $namarg)->where('id', '!=', $idne)->count();
-					$cekwes2 = Ruang::where('koderg', $koderg)->where('id', '!=', $idne)->count();
+					$cekwes1 = Ruang::where('namarg', $namarg)->where('id', '!=', $idne)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
+					$cekwes2 = Ruang::where('koderg', $koderg)->where('id', '!=', $idne)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
 					if ($statpinjam == 'Di Sewa/Pinjamkan untuk kalangan internal' OR $statpinjam == 'Di Sewa/Pinjamkan untuk umum'){
 						$wajibada = 1;
 					} else {
@@ -9057,53 +9446,53 @@ class AdminController extends Controller
 								'namarg'  		=>  $namarg,
 								'namagd'   		=>  $gdnama,
 								'kodegd'		=>  $gdkode,
-								'koderg'		=>  $koderg,
-								'petugas'		=>  $petugas,
-								'marking'		=>  $marking,
-								'luas'			=>  $luas,
-								'kapasitasujian'=>  $kapas,
-								'kondisi'		=>  $kondisi,
-								'utilitas'		=>  $utitilitas,
-								'pjgedung'		=>  $pjgedung,
-								'pinjam'		=>  $statpinjam,
-								'tarif'			=>  $tarif,
-								'fakpanjang'	=>  $fakpanjang,
-								'fakultas'		=>  $fakultas,
-								'inputor'		=>  Session('nama'),
+								'koderg'		=>  $koderg ?? time(),
+								'petugas'		=>  $petugas ?? '',
+								'marking'		=>  $marking ?? time(),
+								'luas'			=>  $luas ?? '40',
+								'kapasitasujian'=>  $kapas ?? '40',
+								'kondisi'		=>  $kondisi ?? 'Baik',
+								'utilitas'		=>  $utitilitas ?? '40',
+								'pjgedung'		=>  $pjgedung ?? '',
+								'pinjam'		=>  $statpinjam ?? 'Tidak dipinjamkan',
+								'tarif'			=>  $tarif ?? '0',
+								'id_sekolah' 	=>  Session('sekolah_id_sekolah'),
+								'inputor'		=>  Session('nip'),
 							]);
 						}else {
 							$input = Ruang::where('id', $idne)->update([
 								'namarg'  		=>  $namarg,
 								'namagd'   		=>  $gdnama,
 								'kodegd'		=>  $gdkode,
-								'koderg'		=>  $koderg,
-								'petugas'		=>  $petugas,
-								'marking'		=>  $marking,
-								'luas'			=>  $luas,
-								'kapasitasujian'=>  $kapas,
-								'kondisi'		=>  $kondisi,
-								'utilitas'		=>  $utitilitas,
-								'pjgedung'		=>  $pjgedung,
-								'pinjam'		=>  $statpinjam,
-								'tarif'			=>  $tarif,
-								'fakpanjang'	=>  $fakpanjang,
-								'fakultas'		=>  $fakultas,
-								'inputor'		=>  Session('nama'),
+								'koderg'		=>  $koderg ?? time(),
+								'petugas'		=>  $petugas ?? '',
+								'marking'		=>  $marking ?? time(),
+								'luas'			=>  $luas ?? '40',
+								'kapasitasujian'=>  $kapas ?? '40',
+								'kondisi'		=>  $kondisi ?? 'Baik',
+								'utilitas'		=>  $utitilitas ?? '40',
+								'pjgedung'		=>  $pjgedung ?? '',
+								'pinjam'		=>  $statpinjam ?? 'Tidak dipinjamkan',
+								'tarif'			=>  $tarif ?? '0',
+								'id_sekolah' 	=> 	Session('sekolah_id_sekolah'),
+								'inputor'		=>  Session('nip'),
 							]);
 						}
 						if ($input){
 							if ($request->hasFile('file')) {
 								$cekfoto = Ruang::where('id', $idne)->first();
 								if (isset($cekfoto->foto)){
-									$fotolama= $cekfoto->foto;
-									if (File::exists(base_path() ."/public/images/ruang/". $fotolama)) {
-									  File::delete(base_path() ."/public/images/ruang/". $fotolama);
+									$fotolama	= $cekfoto->foto;
+									$draft =  public_path('images/ruang/'.$fotolama);
+									try {
+										unlink($draft);
+									} catch (\Exception $e) {
 									}
 								}								
-								$namafile 		= $fakultas.'-RG-'.$idne;
-								$namafile		= $namafile.'.'.$request->file->getClientOriginalExtension();
+								$namafile 		= Session('sekolah_id_sekolah').'-RG-'.$idne;
+								$namafile		= $namafile.'.'.$request->file('file')->getClientOriginalExtension();
 								$uploadedFile 	= $request->file('file');
-								Storage::putFileAs('images/ruang/',$uploadedFile,$namafile);
+								Storage::disk('local')->putFileAs('images/ruang/',$uploadedFile,$namafile);
 								Ruang::where('id', $idne)->update([
 									'foto'  	=>  $namafile,
 								]);
@@ -9122,6 +9511,306 @@ class AdminController extends Controller
 			}
 		}        
     }
+	public function exSimpanprestasi(Request $request) {
+		$noinduk		= $request->val02;
+		$namakegiatan	= $request->val03;
+		$peringkat		= $request->val04;
+		$bidang			= $request->val05;
+		$tingkat		= $request->val06;
+		$penyelenggara	= $request->val07;
+		$tanggal1		= $request->val08;
+		$tempat			= $request->val09;
+		$idne			= $request->val10;
+		$tanggal2		= $request->val11;
+		$tapel			= $request->val12;
+		$getkelas		= Datainduk::where('noinduk', $noinduk)->first();
+		if (isset($getkelas->klspos)){
+			$kelas 		= $getkelas->klspos;
+			$nama 		= $getkelas->nama;
+		} else { $kelas = ''; $nama = '';}
+		
+		if ($tanggal2 == ''){ 
+			$tanggal = $tanggal1;
+		} else { $tanggal = $tanggal1.' s/d '.$tanggal2; }
+		if ($noinduk == 'hapus'){
+			$getdata 	= Prestasi::where('id', $idne)->first();
+			$hapus 		= Prestasi::where('id', $idne)->delete();
+			if ($hapus){
+				$deskripsi 	= Session('nama').' Menghapus data Prestasi '.json_encode($getdata);
+				Logstaff::create([
+					'jenis'			=> 'Data Prestasi', 
+					'sopo'			=> Session('nip'), 
+					'kelakuan'		=> $deskripsi,
+					'id_sekolah' 	=> session('sekolah_id_sekolah')
+				]);
+				XFiles::where('xmarking', $getdata->namafile)->update([
+					'xfile'		=> $request->val01
+				]);
+				return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Prestasi Telah di Hapus']);
+				return back();
+			} else {
+				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Silahkan ulangi beberapa saat lagi, atau hubungi admin TI anda']);
+				return back();
+			}
+		} else {
+			if ($nama == ''){
+				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'No Induk Tidak di Temukan']);
+				return back();
+			} else {
+				if ($idne == 'new'){
+					$cekdata = Prestasi::where('noinduk', $noinduk)->where('namakegiatan', $namakegiatan)->where('tanggal', $tanggal)->count();
+					if ($cekdata != 0){
+						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Double Detected', 'message' => 'Data Sudah Ada']);
+						return back();
+					} else {
+						$marking	= Session('sekolah_id_sekolah').'-'.$namakegiatan.'-'.$bidang.'-'.$tingkat.'-'.$noinduk.'-'.$tanggal.'-'.$penyelenggara.'-'.$peringkat;
+						$marking 	= md5($marking);
+						$input 		= Prestasi::create([
+							'namakegiatan'	=> $namakegiatan,
+							'bidang'		=> $bidang,
+							'tingkat'		=> $tingkat,
+							'juara'			=> $peringkat,
+							'penyelenggara'	=> $penyelenggara,
+							'tempat'		=> $tempat,
+							'tanggal'		=> $tanggal,
+							'tapel'			=> $tapel,
+							'nama'			=> $nama,
+							'noinduk'		=> $noinduk,
+							'kelas'			=> $kelas,
+							'namafile'		=> $marking,
+							'inputor'		=> Session('nip'),
+							'id_sekolah'	=> Session('sekolah_id_sekolah')
+							
+						]);
+						if ($input){
+							$idne = $input->id;
+							XFiles::create([
+								'xmarking'	=> $marking,
+								'xtabel'	=> 'db_prestasi',
+								'xjenis'	=> Session('sekolah_id_sekolah').';'.$noinduk,
+								'xfile'		=> $request->val01
+							]);
+							return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Prestasi Telah di Tambahkan']);
+							return back();
+						}else {
+							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Input Gagal', 'message' => 'Silahkan ulangi beberapa saat lagi, atau hubungi admin TI anda']);
+							return back();
+						}
+					}
+				} else {
+					$cekdata = Prestasi::where('id','!=', $idne)->where('noinduk', $noinduk)->where('namakegiatan', $namakegiatan)->where('tanggal', $tanggal)->count();
+					if ($cekdata != 0){
+						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Double Detected', 'message' => 'Data Sudah Ada']);
+						return back();
+					} else {
+						$input = Prestasi::where('id', $idne)->update([
+							'namakegiatan'	=> $namakegiatan,
+							'bidang'		=> $bidang,
+							'juara'			=> $peringkat,
+							'penyelenggara'	=> $penyelenggara,
+							'tempat'		=> $tempat,
+							'tanggal'		=> $tanggal,
+							'tapel'			=> $tapel,
+							'nama'			=> $nama,
+							'noinduk'		=> $noinduk,
+							'kelas'			=> $kelas,
+							'inputor'		=> Session('nip'),
+							'updated_at'	=> date("Y-m-d H:i:s")
+						]);
+						if ($input){
+							$cekdatalama = Prestasi::where('id',$idne)->first();
+							if ($request->val01 == '' OR $request->val01 == null){
+								XFiles::where('xmarking', $cekdatalama->namafile)->update([
+									'xfile'		=> $request->val01
+								]);
+							}
+							return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Prestasi Telah di Tambahkan']);
+							return back();
+						}else {
+							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Update Gagal', 'message' => 'Silahkan ulangi beberapa saat lagi, atau hubungi admin TI anda']);
+							return back();
+						}
+					}
+				}
+			}
+		}
+	}
+	public function exSimpanpendaftaran(Request $request) {
+		if (Session('sekolah_id_sekolah') != null ){
+			if (Session('sekolah_id_sekolah') != ''){
+				$id_sekolah = Session('sekolah_id_sekolah');
+			} else {
+				$id_sekolah =   $request->id_sekolah;
+			}
+		} else {
+			$id_sekolah =   $request->id_sekolah;
+		}
+		$homebase	= 	url("/");
+		$nominal   	=   $request->val07;
+		$zakatmal   =   $request->val08;
+		$donasi   	=   $request->val09;
+		$idinput   	=   $request->val11;
+		$nominal 	= 	str_replace(',','',$nominal);
+		$zakatmal 	= 	str_replace(',','',$zakatmal);
+		$donasi 	= 	str_replace(',','',$donasi);
+		$marking	= 	$id_sekolah.'-'.$request->val02.'-'.$request->val03.'-'.$request->val04.'-'.$request->val05.'-'.$request->val06;
+		$marking	=	md5($marking);
+		if ($idinput == 'new'){
+			$idinput 	= 	Pembayaranzis::insertGetId([
+				'namawali'		=> $request->val02, 
+				'namasiswa'		=> $request->val03, 
+				'kelas'			=> $request->val04, 
+				'jeniszakat'	=> $request->val05, 
+				'orang'			=> $request->val06, 
+				'nominal'		=> $nominal, 
+				'zakatmaal'		=> $zakatmal, 
+				'donasi'		=> $donasi,
+				'hape'			=> $request->val10, 
+				'validator'		=> '', 
+				'tglvalidasi'	=> '',
+				'marking'		=> $marking,
+				'id_sekolah'	=> $id_sekolah,
+			]);
+			$alamatweb		= $homebase.'/ceking/'.$idinput;
+			if ($request->hasFile('file')) {
+				$jenfile	= 	$request->file->getClientOriginalExtension();
+				$file_tmp	= 	$request->file('file');
+				$data 		= 	file_get_contents($file_tmp);
+				$bukti 		= 	'data:image/' . $jenfile . ';base64,' . base64_encode($data);
+				XFiles::create([
+					'xmarking'	=> $marking,
+					'xtabel'	=> 'db_pembayaranzis',
+					'xjenis'	=> $jenfile,
+					'xfile'		=> $bukti
+				]);
+			} else {
+				XFiles::create([
+					'xmarking'	=> $marking,
+					'xtabel'	=> 'db_pembayaranzis',
+					'xjenis'	=> '',
+					'xfile'		=> ''
+				]);
+			}
+		} else {
+			$alamatweb		= $homebase.'/ceking/'.$idinput;
+			$idinput 		= Pembayaranzis::where('id', $idinput)->update([
+				'namawali'		=> $request->val02, 
+				'namasiswa'		=> $request->val03, 
+				'kelas'			=> $request->val04, 
+				'jeniszakat'	=> $request->val05, 
+				'orang'			=> $request->val06, 
+				'nominal'		=> $nominal, 
+				'zakatmaal'		=> $zakatmal, 
+				'donasi'		=> $donasi,
+				'hape'			=> $request->val10, 
+			]);
+			if ($request->hasFile('file')) {
+				$jenfile	= 	$request->file->getClientOriginalExtension();
+				$file_tmp	= 	$request->file('file');
+				$data 		= 	file_get_contents($file_tmp);
+				$bukti 		= 	'data:image/' . $jenfile . ';base64,' . base64_encode($data);
+				XFiles::where('xmarking',$marking)->update([
+					'xtabel'	=> 'db_pembayaranzis',
+					'xjenis'	=> $jenfile,
+					'xfile'		=> $bukti
+				]);
+			}
+		}
+		if ($idinput){			
+			echo '<div class="alert alert-success alert-dismissable">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<h4><i class="icon fa fa-check"></i> Sukses</h4>
+					Pembayaranzis Zakat, Infaq dan Shodaqoh Anda Telah Kami Terima, Mohon Simpan Link Berikut untuk mengetahui tindak lanjut dari Pembayaranzis anda.!<br />
+					<strong><h3><a href="'.$alamatweb.'">'.$alamatweb.'</a></h3></strong>
+				  </div>';
+		} else {
+			echo '<div class="alert alert-danger alert-dismissable">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<h4><i class="icon fa fa-ban"></i> Error</h4>
+					 System Down, Mohon di Coba Beberapa Saat Lagi
+				  </div>';
+		}
+    }
+	public function exSimpandataPIP(Request $request) {
+		$idne 		= $request->val01;
+		$datamasuk 	= $request->val02;
+		$nama 		= $request->val03;
+		$kelaslama 	= $request->val04;
+		$kelasbaru 	= $request->val05;
+		$tahap 		= $request->val06;
+		$norek 		= $request->val07;
+		$virtual 	= $request->val08;
+		$keterangan = $request->val09;
+		if ($idne == 'new'){
+			$ceksek 	= ProgramPIP::where('norek', $norek)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
+			$ceksek2 	= ProgramPIP::where('virtualacc', $virtual)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
+			$ceksek3 	= ProgramPIP::where('nama', $nama)->where('kelaslama', $kelaslama)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
+		} else {
+			$ceksek 	= ProgramPIP::where('id', '!=', $idne)->where('norek', $norek)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
+			$ceksek2 	= ProgramPIP::where('id', '!=', $idne)->where('virtualacc', $virtual)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
+			$ceksek3 	= ProgramPIP::where('id', '!=', $idne)->where('nama', $nama)->where('kelaslama', $kelaslama)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
+		}
+		if ($ceksek != 0){
+			echo '<div class="alert alert-danger alert-dismissable">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<h4><i class="icon fa fa-ban"></i> Error</h4>
+					Gagal menyimpan, No. Rekening Terdeteksi Ganda
+					</div>';
+		} else if ($ceksek2 != 0){
+			echo '<div class="alert alert-danger alert-dismissable">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<h4><i class="icon fa fa-ban"></i> Error</h4>
+					Gagal menyimpan, No. Virtual Acc Terdeteksi Ganda
+					</div>';
+		} else if ($ceksek3 != 0){
+			echo '<div class="alert alert-danger alert-dismissable">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					<h4><i class="icon fa fa-ban"></i> Error</h4>
+					Gagal menyimpan, Nama Siswa dan Kelas Lama Terdeteksi Ganda
+					</div>';
+		} else {
+			if ($idne == 'new'){
+				$input = ProgramPIP::create([
+					'idsekolah'		=> Session('sekolah_id_sekolah'),
+					'datamasuk'		=> $datamasuk,
+					'nama'			=> $nama,
+					'kelaslama'		=> $kelaslama,
+					'kelasbaru'		=> $kelasbaru,
+					'tahap'			=> $tahap,
+					'norek'			=> $norek,
+					'virtualacc'	=> $virtual,
+					'keterangan'	=> $keterangan,
+					'created_by'	=> Session('nip')
+				]);
+			} else {
+				$input = ProgramPIP::where('id', $idne)->update([
+					'datamasuk'		=> $datamasuk,
+					'nama'			=> $nama,
+					'kelaslama'		=> $kelaslama,
+					'kelasbaru'		=> $kelasbaru,
+					'tahap'			=> $tahap,
+					'norek'			=> $norek,
+					'virtualacc'	=> $virtual,
+					'keterangan'	=> $keterangan,
+					'created_by'	=> Session('nip'),
+					'updated_at'	=> date("Y-m-d H:i:s")
+				]);
+			}
+		}
+		if ($input){
+			echo '<div class="alert alert-success alert-dismissable">
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+				<h4><i class="icon fa fa-check"></i> Sukses </h4>
+				Data PIP an '.$nama.' Kelas Lama '.$kelaslama.' Tahap/Tahun '.$tahap.' Berhasil Di Simpan
+				</div>';
+		} else {
+			echo '<div class="alert alert-danger alert-dismissable">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+			<h4><i class="icon fa fa-ban"></i> Error</h4>
+			Gagal menyimpan Log Error
+			</div>';
+		}
+	}
 	public function ctkDir(Request $request) {
 		$idne			= $request->input('valkirim');
 		$dd				= date('d');
@@ -9131,8 +9820,6 @@ class AdminController extends Controller
 		$intbln 		= (int)$mm;
 		$namabulan 		= $bulan[$intbln];
 		$tanggal		= $dd.' '.$namabulan.' '.$yy;
-		$fakultas		= Session('sekolah_id_sekolah');
-		$fakpanjang		= Session('sekolah_nama_sekolah');
 		$rsetting		= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
 		if (isset($rsetting->nama_sekolah)){
 			$sekolah 		= $rsetting->nama_sekolah;
@@ -9142,9 +9829,9 @@ class AdminController extends Controller
 			$nipkasub 		= $rsetting->kepala_sekolah->niy;
 			$jabkasub		= 'Kepala Sekolah';
 		} else {
-			$sekolah 		= Session('fakultas');
-			$yayasan 		= Session('fakpanjang');
-			$alamat 		= Session('addressapps01');
+			$sekolah 		= Session('sekolah_nama_sekolah');
+			$yayasan 		= Session('sekolah_nama_yayasan');
+			$alamat 		= Session('sekolah_alamat');
 			$kasub 			= '....................';
 			$nipkasub 		= '....................';
 			$jabkasub		= '......................';
@@ -9396,447 +10083,275 @@ class AdminController extends Controller
 		</table>';
 		echo $generate;
 	}
-	public function viewPrestasisiswa() {
-		$tasks							= [];
-		if (Session('previlage') == 'level1' OR Session('previlage') == 'level4'){
-			$sekolah					= Session('sekolah_id_sekolah');
-			$datethn1 					= date("Y"); 
-			$datethn2 					= $datethn1 + 1; 
-			$datethn3 					= $datethn1 - 1;
-			$datethn4 					= $datethn1 - 2;
-			$tapel1 					= $datethn4.'-'.$datethn3;
-			$tapel2						= $datethn3.'-'.$datethn1;
-			$tapel3 					= $datethn1.'-'.$datethn2;
-			$tasks['datethn1']			= $datethn1;
-			$tasks['datethn2']			= $datethn2;
-			$tasks['datethn3']			= $datethn3;
-			$tasks['datethn4']			= $datethn4;
-			$tasks['tahunne']			= date("Y");
-			$tasks['tapel1']			= $tapel1;
-			$tasks['tapel2']			= $tapel2;
-			$tasks['tapel3']			= $tapel3;
-			$tasks['tanggal']			= date("d-m-Y");
-			$tasks['countregional']		= Prestasi::where('id_sekolah', $sekolah)->where('tanggal', 'LIKE', '%'.$datethn1.'%')->where('tingkat', 'Regional')->count();
-			$tasks['countnasional']		= Prestasi::where('id_sekolah', $sekolah)->where('tanggal', 'LIKE', '%'.$datethn1.'%')->where('tingkat', 'Nasional')->count();
-			$tasks['countinter']		= Prestasi::where('id_sekolah', $sekolah)->where('tanggal', 'LIKE', '%'.$datethn1.'%')->where('tingkat', 'Internasional')->count();
-			$tasks['datasiswa']			= Datainduk::where('id_sekolah', $sekolah)->where('nokelulusan', '')->get();
-			$tasks['namaapps01']  		= Session('sekolah_nama_aplikasi');
-			$tasks['domainapps01']  	= Session('sekolah_nama_yayasan');
-			$tasks['subdomainapps01']  	= Session('sekolah_nama_sekolah');
-			$tasks['subsubdomainapps01']= Session('sekolah_kode_sekolah');
-			$tasks['addressapps01']  	= Session('sekolah_alamat');
-			$tasks['emailapps01']  		= Session('sekolah_email');
-			$tasks['lamanapps01']  		= parse_url(request()->root())['host'];
-			$tasks['logofrontapps01']  	= Session('sekolah_frontpage');
-			$tasks['logo01']  			= url("/").'/'.Session('sekolah_logo');
-			$tasks['sidebar']			= 'prestasisiswa';
-			return view('simaster.prestasisiswa', $tasks);
+	public function ctkViewdetailtu(Request $request) {
+		$marking	= $request->valkirim;
+		return redirect('ctkkwt/'.$marking);
+	}
+	public function ctkKwitansimulti(Request $request) {
+		$arridne	= $request->valkirim;
+		$jeneng		= Session('nama');
+		$tanggal	= $request->tanggal;
+		$bulanlist 	= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
+		if ($tanggal != ''){
+			$arrayttl 	= explode("-", $tanggal);
+			$tgliki 	= $arrayttl[0];
+			$mthiki 	= (int)$arrayttl[1];
+			$thniki 	= $arrayttl[2];
+			$blniki 	= $bulanlist[$mthiki];
 		} else {
-			$tasks['kalimatheader']  = 'Mohon Maaf';
-            $tasks['kalimatbody']  	= 'Laman Terbatas untuk Kalangan Tertentu, Mohon Kembali Ke Laman Sebelum atau Hubungi Tim ADMIN';
-            return view('errors.notready', $tasks);
-        }
-	}
-	public function jsonPrestasithnini() {
-		$arrrekap 		= [];
-		$tahun			= date("Y");
-		$fakultas		= Session('sekolah_id_sekolah');
-		$fakpanjang		= Session('sekolah_nama_sekolah');
-		$rsetting		= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
-		$sekolah 		= $rsetting->nama_sekolah;
-		$yayasan 		= $rsetting->nama_yayasan;
-		$alamat 		= $rsetting->alamat;
-		if (isset($rsetting->kepala_sekolah->nama)){
-			$kasub 			= $rsetting->kepala_sekolah->nama;
-			$nipkasub 		= $rsetting->kepala_sekolah->niy;
-		} else {
-			$kasub 			= config('global.swandhananama');
-			$nipkasub 		= '-';
+			$tgliki 	= date('d');
+			$mthiki 	= date('m');
+			$mthiki 	= (int)$mthiki;
+			$thniki 	= date('Y');
+			$blniki 	= $bulanlist[$mthiki];
 		}
-		$getallthn 	= Prestasi::where('id_sekolah', Session('sekolah_id_sekolah') )->where('tanggal', 'LIKE', '%'.$tahun.'%')->groupBy('kelas')->get();
-		if (!empty($getallthn)){
-			foreach ($getallthn as $rdatane) {
-				$kelas		= $rdatane->kelas;
-				$total 		= Prestasi::where('id_sekolah', Session('sekolah_id_sekolah') )->where('tanggal', 'LIKE', '%'.$tahun.'%')->where('kelas', $kelas)->count();
-				$arrrekap[] 	= array(
-					'jenis' 	=> $kelas,
-					'jumlah' 	=> $total,
-				);
-			}
-		}
-		echo json_encode($arrrekap);
-	}
-	public function jsonPrestasithniniperbidang() {
-		$arrrekap 	= [];
-		$tahun		= date("Y");
-		$getallthn 	= Prestasi::where('id_sekolah', Session('sekolah_id_sekolah') )->where('tanggal', 'LIKE', '%'.$tahun.'%')->groupBy('bidang')->get();
-		if (!empty($getallthn)){
-			foreach ($getallthn as $rdatane) {
-				$bidang		= $rdatane->bidang;
-				$total 		= Prestasi::where('id_sekolah', Session('sekolah_id_sekolah') )->where('tanggal', 'LIKE', '%'.$tahun.'%')->where('bidang', $bidang)->count();
-				$arrrekap[] 	= array(
-					'jenis' 	=> $bidang,
-					'jumlah' 	=> $total,
-				);
-			}
-		}
-		echo json_encode($arrrekap);
-	}
-	public function exSimpanprestasi(Request $request) {
-		$noinduk		= $request->val02;
-		$namakegiatan	= $request->val03;
-		$peringkat		= $request->val04;
-		$bidang			= $request->val05;
-		$tingkat		= $request->val06;
-		$penyelenggara	= $request->val07;
-		$tanggal1		= $request->val08;
-		$tempat			= $request->val09;
-		$idne			= $request->val10;
-		$tanggal2		= $request->val11;
-		$tapel			= $request->val12;
-		$getkelas		= Datainduk::where('noinduk', $noinduk)->first();
-		if (isset($getkelas->klspos)){
-			$kelas 		= $getkelas->klspos;
-			$nama 		= $getkelas->nama;
-		} else { $kelas = ''; $nama = '';}
+		$tanggalctk = $tgliki.' '.$blniki.' '.$thniki;
 		
-		if ($tanggal2 == ''){ 
-			$tanggal = $tanggal1;
-		} else { $tanggal = $tanggal1.' s/d '.$tanggal2; }
-		if ($noinduk == 'hapus'){
-			$getdata 	= Prestasi::where('id', $idne)->first();
-			$namafile	= $getdata->namafile;
-			if ($namafile != ''){
-				if (File::exists(base_path() ."/public/dist/img/sertifikat/". $namafile)) {
-				  File::delete(base_path() ."/public/dist/img/sertifikat/". $namafile);
-				}
-			}
-			$hapus 	= Prestasi::where('id', $idne)->delete();
-			if ($hapus){
-				$deskripsi 	= Session('nama').' Menghapus data Prestasi '.$getdata->nama.' No.Induk : '.$getdata->noinduk.' Pada Lomba/Kegiatan '.$getdata->namakegiatan;
-				Logstaff::create([
-					'jenis'			=> 'Data Prestasi', 
-					'sopo'			=> Session('nip'), 
-					'kelakuan'		=> $deskripsi,
-					'id_sekolah' 	=> session('sekolah_id_sekolah')
-				]);
-				return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Prestasi Telah di Hapus']);
-				return back();
-			}else {
-				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Silahkan ulangi beberapa saat lagi, atau hubungi admin TI anda']);
-				return back();
-			}
-		} else {
-			if ($nama == ''){
-				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'No Induk Tidak di Temukan']);
-				return back();
-			} else {
-				if ($idne == 'new'){
-					$cekdata = Prestasi::where('noinduk', $noinduk)->where('namakegiatan', $namakegiatan)->where('tanggal', $tanggal)->count();
-					if ($cekdata != 0){
-						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Double Detected', 'message' => 'Data Sudah Ada']);
-						return back();
-					} else {
-						$input = Prestasi::create([
-							'namakegiatan'	=> $namakegiatan,
-							'bidang'		=> $bidang,
-							'tingkat'		=> $tingkat,
-							'juara'			=> $peringkat,
-							'penyelenggara'	=> $penyelenggara,
-							'tempat'		=> $tempat,
-							'tanggal'		=> $tanggal,
-							'tapel'			=> $tapel,
-							'nama'			=> $nama,
-							'noinduk'		=> $noinduk,
-							'kelas'			=> $kelas,
-							'namafile'		=> '',
-							'inputor'		=> Session('nama'),
-							'id_sekolah'	=> Session('sekolah_id_sekolah')
-							
-						]);
-						if ($input){
-							$idne = $input->id;
-							if ($request->hasFile('file')) {
-								$ekstensi		= $request->file('file')->getClientOriginalExtension();
-								$namafile 		= $idne.'.'.$ekstensi;
-								$uploadedFile 	= $request->file('file');
-								Storage::putFileAs('dist/img/sertifikat/',$uploadedFile,$namafile);
-								Prestasi::where('id', $idne)->update([
-									'namafile'	=> $namafile,
-								]);
-							}			
-							return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Prestasi Telah di Tambahkan']);
-							return back();
-						}else {
-							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Input Gagal', 'message' => 'Silahkan ulangi beberapa saat lagi, atau hubungi admin TI anda']);
-							return back();
-						}
+		$total		= 0;
+		$ekskula	= '';
+		$ekskulb	= '';
+		$ekskulc	= '';
+		$ekskuld	= ''; 
+		$ekskula2	= 0;
+		$ekskulb2	= 0;
+		$ekskulc2	= 0;
+		$ekskuld2	= 0;
+		$bulan		= '';
+		$tahun		= '';
+		$kelas		= '';
+		$biayaspp	= 0;
+		$biayadpp	= 0;
+		$paguyuban	= 0;
+		$bkegiatan  = 0;
+		$bbukupaket	= 0;
+		$bbukutulis	= 0;
+		$lain1		= '';
+		$lain1a		= 0;
+		$lain2		= '';
+		$lain2a		= 0;
+		$lain3		= '';
+		$lain3a		= 0;
+		$tbukutulis = '';
+		$tkegiatan  = '';
+		$lain4 		= '';
+		$lain4a		= 0;
+		$ekskule 	= '';
+		$ekskule2	= 0;
+		$tbukupaket = '';
+		$noinduk	= '';
+		$nama		= '';
+		$tulisbln	= '';
+		$tlsbulan	= '';
+		$gaksama	= '';
+		foreach ($arridne as $idne) {
+			$getmarking 	= Pembayaran::where('id', $idne)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+			$marking		= $getmarking->marking;			
+			$sql 			= Pembayaran::where('marking', $marking)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+			if (!empty($sql)){
+				foreach ($sql as $rrincian){
+					$nama 		= $rrincian->nama;
+					$noinduk 	= $rrincian->noinduk;
+					$jenis 		= $rrincian->jenis;		
+					$biaya 		= $rrincian->biaya;
+					$bulane 	= $rrincian->bulan;
+					$tahune 	= $rrincian->tahun;
+					$kelas 		= $rrincian->kelas;
+					if ($gaksama == ''){ $gaksama = $noinduk; }
+					else { 
+						if ($gaksama != $noinduk){ $gaksama = 'benar'; }
+						else { $gaksama = $noinduk; }
 					}
-				} else {
-					$cekdata = Prestasi::where('id','!=', $idne)->where('noinduk', $noinduk)->where('namakegiatan', $namakegiatan)->where('tanggal', $tanggal)->count();
-					if ($cekdata != 0){
-						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Double Detected', 'message' => 'Data Sudah Ada']);
-						return back();
+					$bulan		= $bulane.'-'.$tahune.',';
+					if ($tulisbln != $bulan){ $tulisbln = $bulan; $tlsbulan = $tlsbulan.' '.$bulan; }
+					$tahun		= $tahune;
+					$total		= $total + $biaya;
+					$cekekskul	= Ekstrakulikuler::where('nama', $jenis)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+					if ($cekekskul != 0){
+						if ( $ekskula == $jenis ){ $ekskula2 = $ekskula2 + $biaya; }
+						else if ( $ekskulb == $jenis ){ $ekskulb2 = $ekskulb2 + $biaya; }
+						else if ( $ekskulc == $jenis ){ $ekskulc2 = $ekskulc2 + $biaya; }
+						else if ( $ekskuld == $jenis ){ $ekskuld2 = $ekskuld2 + $biaya; }
+						else if ( $ekskule == $jenis ){ $ekskule2 = $ekskule2 + $biaya; }
+						else if ($ekskula == ''){ $ekskula = $jenis; $ekskula2 = $ekskula2 + $biaya;}
+						else if ($ekskulb == ''){ $ekskulb = $jenis; $ekskulb2 = $ekskulb2 + $biaya; }
+						else if ($ekskulc == ''){ $ekskulc = $jenis; $ekskulc2 = $ekskulc2 + $biaya; }
+						else if ($ekskuld == ''){ $ekskuld = $jenis; $ekskuld2 = $ekskuld2 + $biaya; }
+						else { $ekskule = $jenis; $ekskule2 = $ekskule2 + $biaya; }		
 					} else {
-						$input = Prestasi::where('id', $idne)->update([
-							'namakegiatan'	=> $namakegiatan,
-							'bidang'		=> $bidang,
-							'juara'			=> $peringkat,
-							'penyelenggara'	=> $penyelenggara,
-							'tempat'		=> $tempat,
-							'tanggal'		=> $tanggal,
-							'tapel'			=> $tapel,
-							'nama'			=> $nama,
-							'noinduk'		=> $noinduk,
-							'kelas'			=> $kelas,
-							'inputor'		=> Session('nama'),
-							'updated_at'	=> date("Y-m-d H:i:s")
-						]);
-						if ($input){	
-							if ($request->hasFile('file')) {
-								$getdata 	= Prestasi::where('id', $idne)->first();
-								$namafile	= $getdata->namafile;
-								if ($namafile != ''){
-									if (File::exists(base_path() ."/public/dist/img/sertifikat/". $namafile)) {
-										File::delete(base_path() ."/public/dist/img/sertifikat/". $namafile);
-									}
+						if ($jenis == 'spp'){
+							$biayaspp = $biayaspp + $biaya;
+						} elseif ($jenis == 'dpp'){
+							$biayadpp = $biayadpp + $biaya;
+						} elseif ($jenis == 'Uang Makan'){
+							$paguyuban = $paguyuban + $biaya;
+						} else {
+							$cekinsidental = Insidental::where('kode', $jenis)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+							if (isset($cekinsidental->jenis)){
+								$termasuk = $cekinsidental->jenis;
+								$jenislain = $cekinsidental->deskripsi;
+							} else {
+								$termasuk 	= '';
+								$jenislain 	= 'Deleted Insidental';
+							}
+							if ($termasuk == 'kegiatan'){ $bkegiatan = $bkegiatan + $biaya; }
+							else if ($termasuk == 'bukupaket'){ $bbukupaket = $bbukupaket + $biaya; }
+							else if ($termasuk == 'bukutulis'){ $bbukutulis = $bbukutulis + $biaya; }
+							else {
+								if ($lain1 == $jenislain){ $lain1a = $lain1a + $biaya; }
+								else if ($lain2 == $jenislain){ $lain2a = $lain2a + $biaya; }
+								else if ($lain3 == $jenislain){ $lain3a = $lain3a + $biaya; }
+								else if ($lain4 == $jenislain){ $lain4a = $lain4a + $biaya; }
+								else if ($lain1 == ''){
+									$lain1 	= $jenislain;
+									$lain1a = $lain1a + $biaya;
 								}
-								$ekstensi		= $request->file('file')->getClientOriginalExtension();
-								$namafile 		= $idne.'.'.$ekstensi;
-								$uploadedFile 	= $request->file('file');
-								Storage::putFileAs('dist/img/sertifikat/',$uploadedFile,$namafile);
-								Prestasi::where('id', $idne)->update([
-									'namafile'	=> $namafile,
-								]);
-							}		
-							return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data Prestasi Telah di Tambahkan']);
-							return back();
-						}else {
-							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Update Gagal', 'message' => 'Silahkan ulangi beberapa saat lagi, atau hubungi admin TI anda']);
-							return back();
+								else if ($lain2 == ''){
+									$lain2 	= $jenislain;
+									$lain2a = $lain2a + $biaya;
+								}
+								else if ($lain3 == ''){
+									$lain3 	= $jenislain;
+									$lain3a = $lain3a + $biaya;
+								}
+								else {
+									$lain4 	= $jenislain;
+									$lain4a = $lain4a + $biaya;
+								}
+							}
 						}
 					}
 				}
 			}
 		}
+		$x 			= SendMail::terbilang($total);
+		if ($ekskula2 != 0){
+			$tekskula2	= number_format( $ekskula2 , 0 , '.' , ',' );
+		} else { $tekskula2 = ''; }
+		if ($ekskulb2 != 0){
+			$tekskulb2	= number_format( $ekskulb2 , 0 , '.' , ',' );
+		} else { $tekskulb2 = ''; }
+		if ($ekskulc2 != 0){
+			$tekskulc2	= number_format( $ekskulc2 , 0 , '.' , ',' );
+		} else { $tekskulc2 = ''; }
+		if ($ekskuld2 != 0){
+			$tekskuld2	= number_format( $ekskuld2 , 0 , '.' , ',' );
+		} else { $tekskuld2 = ''; }
+		if ($ekskule2 != 0){
+			$tekskule2	= number_format( $ekskule2 , 0 , '.' , ',' );
+		} else { $tekskule2 = ''; }
+		if ($biayaspp != 0){
+			$tbiayaspp	= number_format( $biayaspp , 0 , '.' , ',' );
+		} else { $tbiayaspp = ''; }
+		if ($biayadpp != 0){
+			$tbiayadpp	= number_format( $biayadpp , 0 , '.' , ',' );
+		} else { $tbiayadpp = ''; }
+		if ($paguyuban != 0){
+			$tpaguyuban	= number_format( $paguyuban , 0 , '.' , ',' );
+		} else { $tpaguyuban = ''; }
+		if ($bkegiatan != 0){
+			$tkegiatan	= number_format( $bkegiatan , 0 , '.' , ',' );
+		} else { $tkegiatan = ''; }
+		if ($bbukupaket != 0){
+			$tbukupaket	= number_format( $bbukupaket , 0 , '.' , ',' );
+		} else { $tbukupaket = ''; }
+		if ($bbukutulis != 0){
+			$tbukutulis	= number_format( $bbukutulis , 0 , '.' , ',' );
+		} else { $tbukutulis = ''; }
+		if ($lain1a != 0){
+			$tlain1a	= number_format( $lain1a , 0 , '.' , ',' );
+		} else { $tlain1a = ''; }
+		if ($lain2a != 0){
+			$tlain2a	= number_format( $lain2a , 0 , '.' , ',' );
+		} else { $tlain2a = ''; }
+		if ($lain3a != 0){
+			$tlain3a	= number_format( $lain3a , 0 , '.' , ',' );
+		} else { $tlain3a = ''; }
+		if ($lain4a != 0){
+			$tlain4a	= number_format( $lain4a , 0 , '.' , ',' );
+		} else { $tlain4a = ''; }
+		$tulisan					= number_format( $total , 0 , '.' , ',' );
+		$y 							= $x.' rupiah';
+		$niy 						= Session('nip');
+		$asline 					= Session('nama');
+		$rsetting					= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
+		$sekolah 					= $rsetting->nama_sekolah;
+		$yayasan 					= $rsetting->nama_yayasan;
+		$alamat 					= $rsetting->alamat;
+		$kepalasekolah 				= $rsetting->kepala_sekolah->nama;
+		$mutiara 					= $rsetting->slogan;
+		$logo 						= $rsetting->logo;
+		$logogrey 					= $rsetting->logo_grey;
+		$tasks						= [];
+		$tasks['logo']				= $logo;
+		$tasks['logo_grey']			= url('/').'/'.$rsetting->logo_grey;
+		$tasks['rsetting']			= $rsetting;
+		$tasks['yayasan']			= $yayasan;
+		$tasks['sekolah']			= $sekolah;
+		$tasks['alamat']			= $alamat;
+		$tasks['nama']				= $nama;
+		$tasks['kelas']				= $kelas;
+		$tasks['y']					= $y;
+		$tasks['tlsbulan']			= $tlsbulan;
+		$tasks['tbiayaspp']			= $tbiayaspp;
+		$tasks['tbukutulis']		= $tbukutulis;
+		$tasks['tkegiatan']			= $tkegiatan;
+		$tasks['tbukupaket']		= $tbukupaket;
+		$tasks['tbiayadpp']			= $tbiayadpp;
+		$tasks['tpaguyuban']		= $tpaguyuban;
+		$tasks['ekskula']			= $ekskula;
+		$tasks['tekskula2']			= $tekskula2;
+		$tasks['lain1']				= $lain1;
+		$tasks['tlain1a']			= $tlain1a;
+		$tasks['ekskulb']			= $ekskulb;
+		$tasks['tekskulb2']			= $tekskulb2;
+		$tasks['lain2']				= $lain2;
+		$tasks['tlain2a']			= $tlain2a;
+		$tasks['ekskulc']			= $ekskulc;
+		$tasks['tekskulc2']			= $tekskulc2;
+		$tasks['lain3']				= $lain3;
+		$tasks['tlain3a']			= $tlain3a;
+		$tasks['ekskuld']			= $ekskuld;
+		$tasks['tekskuld2']			= $tekskuld2;
+		$tasks['lain4']				= $lain4;
+		$tasks['tlain4a']			= $tlain4a;
+		$tasks['ekskule']			= $ekskule;
+		$tasks['tekskule2']			= $tekskule2;
+		$tasks['tanggalctk']		= $tanggalctk;
+		$tasks['tulisan']			= $tulisan;
+		$tasks['mutiara']			= $mutiara;
+		$tasks['asline']			= $asline;
+		$tasks['namaapps01']  		= Session('sekolah_nama_aplikasi');
+		$tasks['domainapps01']  	= Session('sekolah_nama_yayasan');
+		$tasks['subdomainapps01']  	= Session('sekolah_nama_sekolah');
+		$tasks['subsubdomainapps01']= Session('sekolah_kode_sekolah');
+		$tasks['addressapps01']  	= Session('sekolah_alamat');
+		$tasks['emailapps01']  		= Session('sekolah_email');
+		$tasks['lamanapps01']  		= parse_url(request()->root())['host'];
+		$tasks['logofrontapps01']  	= Session('sekolah_frontpage');
+		$tasks['logo01']  			= url("/").'/'.Session('sekolah_logo');
+		return view('cetak.kwitansimulti', $tasks);
 	}
-	public function jsonAlldataprestasi(Request $request) {
-		$bulan 		= $request->val01;
-		$tahun 		= $request->val02;
-		$tahunini 	= date("Y");
-		$query 		= Prestasi::where('id_sekolah', session('sekolah_id_sekolah'))->where('tanggal', 'LIKE', "%$tahunini%");
-		if ($bulan == 'REGIONAL') {
-			$query->where('tingkat', 'Regional');
-		} elseif ($bulan == 'NASIONAL') {
-			$query->where('tingkat', 'Nasional');
-		} elseif ($bulan == 'INTERNASIONAL') {
-			$query->where('tingkat', 'Internasional');
-		} elseif ($bulan == 'ALL') {
-			if ($tahun == 'TAHUNINI') {
-				$query->where('tanggal', 'LIKE', "%$tahunini%");
-			} else {
-				$query->where('tanggal', 'LIKE', "%$tahun%");
-			}
-		} else {
-			if ($bulan == 'ALL') {
-				$query->where('tanggal', 'LIKE', "%$tahun%");
-			} else {
-				$query->where('tanggal', 'LIKE', "%$bulan-$tahun%");
-			}
-		}
-		$getallthn 	= $query->get();
-		$alldata 	= [];
-		$homebase 	= url("/");
-
-		if ($getallthn->isNotEmpty()) {
-			foreach ($getallthn as $rdatane) {
-				$namafile 	= $rdatane->namafile;
-				$tanggal 	= $rdatane->tanggal;
-				if ($namafile != '') {
-					$sertifikat = $homebase . '/dist/img/sertifikat/' . $namafile;
-					$geteks = explode(".", $namafile);
-					$ekstensi = $geteks[1];
-				} else {
-					$sertifikat = '';
-					$ekstensi = '';
-				}
-				$cektanggal = explode(" s/d ", $tanggal);
-				$tanggal1 	= $cektanggal[0];
-				$tanggal2 	= isset($cektanggal[1]) ? $cektanggal[1] : $tanggal1;
-
-				$alldata[] = [
-					'id' 			=> $rdatane->id,
-					'kegiatan' 		=> $rdatane->namakegiatan,
-					'bidang' 		=> $rdatane->bidang,
-					'peringkat' 	=> $rdatane->juara,
-					'penyelenggara' => $rdatane->penyelenggara,
-					'tanggal' 		=> $rdatane->tanggal,
-					'tempat' 		=> $rdatane->tempat,
-					'tingkat' 		=> $rdatane->tingkat,
-					'tapel' 		=> $rdatane->tapel,
-					'nama' 			=> $rdatane->nama,
-					'noinduk' 		=> $rdatane->noinduk,
-					'kelas'	 		=> $rdatane->kelas,
-					'sertifikat' 	=> $sertifikat,
-					'nmfile' 		=> $namafile,
-					'typefile' 		=> $ekstensi,
-					'tanggal1' 		=> $tanggal1,
-					'tanggal2' 		=> $tanggal2,
-					'inputor' 		=> $rdatane->inputor,
-				];
-			}
-		}
-		echo json_encode($alldata);
+	public function exKwitansi(Request $request) {
+		$idne   	= $request->input('valkirim');
+		return redirect('ctkkwt/'.$idne);
 	}
-	public function zis() {
+	public function ctkKwitansipsb(Request $request) {
 		$rsetting				= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
-		if (isset($rsetting->id)){
-			$id 					= $rsetting->id;
-			$sekolah 				= $rsetting->nama_sekolah;
-			$yayasan 				= $rsetting->nama_yayasan;
-			$alamat 				= $rsetting->alamat;
-			$kepalasekolah 			= $rsetting->kepala_sekolah->nama;
-			$mutiara 				= $rsetting->slogan;
-			$logo 					= $rsetting->logo;
-			$frontpage 				= $rsetting->frontpage;
-			$pengumuman 			= $rsetting->pengumuman;
-			$pendaftaran 			= $rsetting->pendaftaran;
-			$no_rek 				= $rsetting->no_rek;
-			$nama_rek 				= $rsetting->nama_rek;
-			$nama_bank_rek 			= $rsetting->nama_bank_rek;
-	
-			$tasks					= [];
-			$tasks['id_sekolah']	= $id;
-			$tasks['logo']			= $logo;
-			$tasks['frontpage']		= $frontpage;
-			$tasks['yayasan']		= $yayasan;
-			$tasks['sekolah']		= $sekolah;
-			$tasks['alamat']		= $alamat;
-			$tasks['kepalasekolah']	= $kepalasekolah;
-			$tasks['pengumuman']	= $pengumuman;
-			$tasks['pendaftaran']	= $pendaftaran;
-			$tasks['no_rek']		= $no_rek;
-			$tasks['nama_rek']		= $nama_rek;
-			$tasks['nama_bank_rek']	= $nama_bank_rek;
-			
-			$rstatuszis				= Layanan::where('layanan', 'pembayaranzis')->where('id_sekolah', $id)->first();
-			if (isset($rstatuszis->status)){
-				$ijinzis 			= $rstatuszis->status;
-			} else { $ijinzis		= ''; }
-			if ($ijinzis == 'mati'){
-				$tasks['kalimatheader']  	= 'Mohon Maaf';
-				$tasks['kalimatbody']  		= 'Laman ini sementara di Tutup dan Akan dibuka saat Jadwal Penerimaan sudah di tentukan';
-				return view('errors.notready', $tasks);
-			} else {
-				$tasks['sidebar']	= 'zis';
-				return view('zis', $tasks);
-			}
-		} else {
-			$tasks['kalimatheader']  	= 'Mohon Maaf';
-            $tasks['kalimatbody']  		= 'Session Tidak Valid, Silahkan Relogin untuk mengakses Halaman Ini';
-            return view('errors.notready', $tasks);
-        }
-    }
-	public function exSimpanpendaftaran(Request $request) {
-		if (Session('sekolah_id_sekolah') != null ){
-			if (Session('sekolah_id_sekolah') != ''){
-				$id_sekolah = Session('sekolah_id_sekolah');
-			} else {
-				$id_sekolah =   $request->id_sekolah;
-			}
-		} else {
-			$id_sekolah =   $request->id_sekolah;
-		}
-		$homebase	= 	url("/");
-		$nominal   	=   $request->val07;
-		$zakatmal   =   $request->val08;
-		$donasi   	=   $request->val09;
-		$idinput   	=   $request->val11;
-		$nominal 	= 	str_replace(',','',$nominal);
-		$zakatmal 	= 	str_replace(',','',$zakatmal);
-		$donasi 	= 	str_replace(',','',$donasi);
-		
-		if ($idinput == 'new'){
-			$idinput 	= 	Pembayaranzis::insertGetId([
-				'namawali'		=> $request->val02, 
-				'namasiswa'		=> $request->val03, 
-				'kelas'			=> $request->val04, 
-				'jeniszakat'	=> $request->val05, 
-				'orang'			=> $request->val06, 
-				'nominal'		=> $nominal, 
-				'zakatmaal'		=> $zakatmal, 
-				'donasi'		=> $donasi,
-				'hape'			=> $request->val10, 
-				'validator'		=> '', 
-				'tglvalidasi'	=> '',
-				'namafile'		=> '',
-				'id_sekolah'	=> $id_sekolah,
-			]);
-			$alamatweb		= $homebase.'/ceking/'.$idinput;
-			if ($request->hasFile('file')) {
-				$jenfile	= 	$request->file->getClientOriginalExtension();
-				$file_tmp	= 	$request->file('file');
-				$data 		= 	file_get_contents($file_tmp);
-				$bukti 		= 	'data:image/' . $jenfile . ';base64,' . base64_encode($data);
-				Pembayaranzis::where('id', $idinput)->update([
-					'namafile'		=> $bukti,
-				]);
-			}
-		} else {
-			$alamatweb		= $homebase.'/ceking/'.$idinput;
-			$idinput 		= Pembayaranzis::where('id', $idinput)->update([
-				'namawali'		=> $request->val02, 
-				'namasiswa'		=> $request->val03, 
-				'kelas'			=> $request->val04, 
-				'jeniszakat'	=> $request->val05, 
-				'orang'			=> $request->val06, 
-				'nominal'		=> $nominal, 
-				'zakatmaal'		=> $zakatmal, 
-				'donasi'		=> $donasi,
-				'hape'			=> $request->val10, 
-			]);
-			if ($request->hasFile('file')) {
-				$jenfile	= 	$request->file->getClientOriginalExtension();
-				$file_tmp	= 	$request->file('file');
-				$data 		= 	file_get_contents($file_tmp);
-				$bukti 		= 	'data:image/' . $jenfile . ';base64,' . base64_encode($data);
-				Pembayaranzis::where('id', $idinput)->update([
-					'namafile'		=> $bukti,
-				]);
-			}
-		}
-		if ($idinput){			
-			echo '<div class="alert alert-success alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<h4><i class="icon fa fa-check"></i> Sukses</h4>
-					Pembayaranzis Zakat, Infaq dan Shodaqoh Anda Telah Kami Terima, Mohon Simpan Link Berikut untuk mengetahui tindak lanjut dari Pembayaranzis anda.!<br />
-					<strong><h3><a href="'.$alamatweb.'">'.$alamatweb.'</a></h3></strong>
-				  </div>';
-		} else {
-			echo '<div class="alert alert-danger alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<h4><i class="icon fa fa-ban"></i> Error</h4>
-					 System Down, Mohon di Coba Beberapa Saat Lagi
-				  </div>';
-		}
-		
-    }
-	public function pip(Request $request) {
-		$id 					= $request->input('id');
-		$rsetting				= Sekolah::where('id', $id)->first();
-		if(!$rsetting){
-			return view('accessdenided');	
-		}
-		$tasks					= [];		
 		$sekolah 				= $rsetting->nama_sekolah;
 		$yayasan 				= $rsetting->nama_yayasan;
 		$alamat 				= $rsetting->alamat;
 		$kepalasekolah 			= $rsetting->kepala_sekolah->nama;
+		$niykasek				= $rsetting->kepala_sekolah->niy;
 		$mutiara 				= $rsetting->slogan;
 		$logo 					= $rsetting->logo;
+		$kota 					= $rsetting->kota;
+		$logo_grey 				= $rsetting->logo_grey;
 		$frontpage 				= $rsetting->frontpage;
-		$pengumuman 			= $rsetting->pengumuman;
-		$pendaftaran 			= $rsetting->pendaftaran;
+		$akreditasi 			= $rsetting->akreditasi;
+		$kopsurat 				= $rsetting->kopsurat;
+		$nis 					= $rsetting->nis;
+		$email 					= $rsetting->email;
+		$tamasuk				= $rsetting->pendaftaran;
 		$homebase				= url("/");
 		$statppdb				= '';
 		$kodebaru				= '';
@@ -9850,8 +10365,30 @@ class AdminController extends Controller
 		$setspp3 				= '';
 		$setdpp1 				= '';
 		$setdpp2 				= '';
-		$setdpp3 				= '';
-		$sql 					= Layanan::orderBy('layanan', 'ASC')->where('id_sekolah',$id)->get();
+		if ($kopsurat == '' OR $kopsurat == null){
+			$kopsurat 			= '<tr>
+										<td colspan="3" rowspan="7" align="center" valign="middle" style="border-bottom:double"><img src="'.$homebase.'/'.$logo.'" width="75" /></td>
+										<td colspan="8"><b>'.$yayasan.'</b></td>
+									</tr>
+									<tr><td colspan="8"><b>'.$sekolah.'</b></td></tr>
+									<tr><td colspan="8"><b>'.$akreditasi.'</b></td></tr>
+									<tr><td colspan="8">'.$nis.'</td></tr>
+									<tr><td colspan="8">'.$alamat.'</td></tr>
+									<tr><td colspan="8">'.$email.'</td></tr>
+									<tr>
+										<td width="157" style="border-bottom:double">&nbsp;</td>
+										<td width="26" style="border-bottom:double">&nbsp;</td>
+										<td width="87" style="border-bottom:double">&nbsp;</td>
+										<td width="22" style="border-bottom:double">&nbsp;</td>
+										<td width="25" style="border-bottom:double">&nbsp;</td>
+										<td width="198" style="border-bottom:double">&nbsp;</td>
+										<td width="39" style="border-bottom:double">&nbsp;</td>
+										<td width="129" style="border-bottom:double">&nbsp;</td>
+									</tr>';
+		} else {
+			$kopsurat			= '<tr><td colspan="11"><img src="'.$homebase.'/'.$kopsurat.'" width="100%" /></tr>';
+		}
+		$sql 					= Layanan::orderBy('layanan', 'ASC')->where('id_sekolah',session('sekolah_id_sekolah'))->get();
 		if (!empty($sql)){
 			foreach ($sql as $rlayanan){
 				$status 		= $rlayanan->status;
@@ -9870,147 +10407,133 @@ class AdminController extends Controller
 				if ($layanan == 'dpp2') { $setdpp2 = $status; }
 			}
 		}
-		$tasks['id_sekolah']	= $id;
-		$tasks['logo']			= $logo;
-		$tasks['tabel']			= ProgramPIP::where('idsekolah', $id)->get();
-		$tasks['frontpage']		= $frontpage;
-		$tasks['yayasan']		= $yayasan;
-		$tasks['sekolah']		= $sekolah;
-		$tasks['alamat']		= $alamat;
-		$tasks['kepalasekolah']	= $kepalasekolah;
-		$tasks['pengumuman']	= $pengumuman;
-		$tasks['pendaftaran']	= $pendaftaran;
-		$tasks['statppdb']		= $statppdb;
-		$tasks['tahun']			= date("Y");
-		$tasks['hargaformulir']	= $hargaformulir;
-		$tasks['norek']			= $norek;
-		$tasks['namabank']		= $namabank;
-		$tasks['lvlsekolah']	= $rsetting->level;
-		$tasks['sidebar']		= 'pip';
-		return view('pip', $tasks);
-    }
-	public function exSimpandataPIP(Request $request) {
-		$idne 		= $request->val01;
-		$datamasuk 	= $request->val02;
-		$nama 		= $request->val03;
-		$kelaslama 	= $request->val04;
-		$kelasbaru 	= $request->val05;
-		$tahap 		= $request->val06;
-		$norek 		= $request->val07;
-		$virtual 	= $request->val08;
-		$keterangan = $request->val09;
-		if ($idne == 'new'){
-			$ceksek 	= ProgramPIP::where('norek', $norek)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
-			$ceksek2 	= ProgramPIP::where('virtualacc', $virtual)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
-			$ceksek3 	= ProgramPIP::where('nama', $nama)->where('kelaslama', $kelaslama)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
+		if (isset($request->valkirim)){
+			$idne = $request->valkirim;
+		} else { $idne = ''; }
+		$bulanlist 				= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
+		$tgliki 				= date("d");
+		$mthiki 				= (int)date("m");
+		$thniki 				= date("Y");
+		$blniki 				= $bulanlist[$mthiki];
+		$tanggalctk 			= $tgliki.' '.$blniki.' '.$thniki;
+		$niy 					= Session('nip');
+		$asline 				= Session('nama');
+		$costumid				= $kodebaru;
+		if ($idne != ''){
+			$rmaster2	= Datapsb::where('id', $idne)->first();
+			$nama 		= $rmaster2->nama;
+			$tamasuk	= $rmaster2->tamasuk;
+			$jeneng		= $request->jeneng;
+			$nominal	= $hargaformulir;
+			$nomhuruf 	= SendMail::terbilang($nominal);
+			$nomangka	= number_format( $nominal , 0 , '.' , ',' );
+			$idlws		= $idne;
 		} else {
-			$ceksek 	= ProgramPIP::where('id', '!=', $idne)->where('norek', $norek)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
-			$ceksek2 	= ProgramPIP::where('id', '!=', $idne)->where('virtualacc', $virtual)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
-			$ceksek3 	= ProgramPIP::where('id', '!=', $idne)->where('nama', $nama)->where('kelaslama', $kelaslama)->where('idsekolah', Session('sekolah_id_sekolah'))->count();
-		}
-		if ($ceksek != 0){
-			echo '<div class="alert alert-danger alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<h4><i class="icon fa fa-ban"></i> Error</h4>
-					Gagal menyimpan, No. Rekening Terdeteksi Ganda
-					</div>';
-		} else if ($ceksek2 != 0){
-			echo '<div class="alert alert-danger alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<h4><i class="icon fa fa-ban"></i> Error</h4>
-					Gagal menyimpan, No. Virtual Acc Terdeteksi Ganda
-					</div>';
-		} else if ($ceksek3 != 0){
-			echo '<div class="alert alert-danger alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<h4><i class="icon fa fa-ban"></i> Error</h4>
-					Gagal menyimpan, Nama Siswa dan Kelas Lama Terdeteksi Ganda
-					</div>';
-		} else {
-			if ($idne == 'new'){
-				$input = ProgramPIP::create([
-					'idsekolah'		=> Session('sekolah_id_sekolah'),
-					'datamasuk'		=> $datamasuk,
-					'nama'			=> $nama,
-					'kelaslama'		=> $kelaslama,
-					'kelasbaru'		=> $kelasbaru,
-					'tahap'			=> $tahap,
-					'norek'			=> $norek,
-					'virtualacc'	=> $virtual,
-					'keterangan'	=> $keterangan,
-					'created_by'	=> Session('nama')
-				]);
-			} else {
-				$input = ProgramPIP::where('id', $idne)->update([
-					'datamasuk'		=> $datamasuk,
-					'nama'			=> $nama,
-					'kelaslama'		=> $kelaslama,
-					'kelasbaru'		=> $kelasbaru,
-					'tahap'			=> $tahap,
-					'norek'			=> $norek,
-					'virtualacc'	=> $virtual,
-					'keterangan'	=> $keterangan,
-					'created_by'	=> Session('nama'),
-					'updated_at'	=> date("Y-m-d H:i:s")
-				]);
+			$jenis		= $request->val01;
+			$nama		= $request->val02;
+			$nominal	= str_replace(',','',$request->val03);
+			$nomor		= $request->val04;
+			$jeneng		= $request->val05;
+			$idlws 		= '';
+			if (isset($request->val06)) {
+				$idlws	= $request->val06;
 			}
-		}
-		if ($input){
-			echo '<div class="alert alert-success alert-dismissable">
-				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-				<h4><i class="icon fa fa-check"></i> Sukses </h4>
-				Data PIP an '.$nama.' Kelas Lama '.$kelaslama.' Tahap/Tahun '.$tahap.' Berhasil Di Simpan
-				</div>';
-		} else {
-			echo '<div class="alert alert-danger alert-dismissable">
-			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-			<h4><i class="icon fa fa-ban"></i> Error</h4>
-			Gagal menyimpan Log Error
-			</div>';
-		}
-	}
-	public function jsonPresensiPIPview(Request $request) {
-        $mulai   	= $request->input('val01');
-		$akhir  	= $request->input('val02');
-		if ($akhir == ''){
-			$getalldata = AbsenProgramPIP::where('idsekolah', Session('sekolah_id_sekolah'))->whereDate('created_at', 'LIKE', $mulai.'%')->get();
-		} else {
-			$getalldata = AbsenProgramPIP::where('idsekolah', Session('sekolah_id_sekolah'))->whereBetween('created_at', [$mulai, $akhir])->orderBy('created_at', 'ASC')->get();
-		}
-		
-		$arrrekap	= [];
-		if (!empty($getalldata)){
-			foreach($getalldata as $rdata){
-				$pejabat 	= $rdata->pejabat;
-				$arrrekap[] = array(
-					'nama' 		=> $rdata->nama,
-					'kelas' 	=> $rdata->kelas,
-					'tanggal' 	=> $rdata->created_at->tostring()
-				);
+			$tglcetak 		= '';
+			if (isset($request->val07)) {
+				$tglcetak	= $request->val07;
 			}
-		}
-		echo json_encode($arrrekap);
-    }
-	public function jsonDataprogramPIP() {
-		$arrayruang = [];
-		$jruang 	= ProgramPIP::where('idsekolah', Session('sekolah_id_sekolah'))->orderBy('nama', 'asc')->get();
-    	foreach ($jruang as $result) {
-			$arrayruang[] = array(
-				'id' 				=> $result->id,
-				'idsekolah' 		=> $result->idsekolah,
-				'datamasuk' 		=> $result->datamasuk,
-				'nama' 				=> $result->nama,
-				'kelaslama' 		=> $result->kelaslama,
-				'kelasbaru' 		=> $result->kelasbaru,
-				'tahap' 			=> $result->tahap,
-				'norek' 			=> $result->norek,
-				'virtualacc' 		=> $result->virtualacc,
-				'keterangan' 		=> $result->keterangan,
-				'created_by' 		=> $result->created_by,
-				'created_at' 		=> $result->created_at,
-			);
+			if ($nomor == '' OR $nomor == null){
+				$gennomor	= Formulirpsb::where('tapel', $tamasuk)->orderBy('nomor', 'DESC')->first();
+				if (isset($gennomor->id)){
+					$nomor	= (int)$gennomor->nomor;
+					$nomor++;
+				} else {
+					$nomor = 1;
+				}
+			}
+			$nomhuruf 	= SendMail::terbilang($nominal);
+			$nomangka	= number_format( $nominal , 0 , '.' , ',' );
+			$tahunne	= date("Y");
+			$kodethn 	= substr($tahunne, -2);
 			
-    	}
-    	echo json_encode($arrayruang);	
-    }
+			if ($jenis == 'Reguler'){
+				$costumid 	= $kodebaru.'-'.$nomor;
+				$jenis		= $kodebaru;
+			}
+			else {
+				$costumid 	= $kodepindahan.'-'.$nomor;
+				$jenis		= $kodepindahan;
+			}
+			if ($idlws == ''){
+				$input = Formulirpsb::create([
+					'tapel'		=> $tamasuk, 
+					'nama'		=> $nama ?? 'Pendaftar Nomor '.$nomor,
+					'jenis'		=> $jenis, 
+					'nomor'		=> $nomor,
+					'nominal'	=> $nominal, 
+					'tanggal'	=> $tanggalctk,
+					'id_sekolah'=> session('sekolah_id_sekolah')
+				]);
+				$idlws = $input->id;
+				if ($input){
+					$marking 	= session('sekolah_id_sekolah').'-Pembelian Formulir an. '.$nama.' TA.'.$tamasuk.'- Tanggal '.$tanggalctk;
+					$marking	= md5($marking);
+					HPTKeuangan::updateOrCreate(
+						[
+							'marking'		=> $marking,
+							'id_sekolah'	=> session('sekolah_id_sekolah'),
+							'jenis'			=> 'pendaftaran',
+						],
+						[
+							'tanggal'		=> date('d'),
+							'bulan'			=> date('m'),
+							'tahun'			=> date('Y'),
+							'pemasukan'		=> $nominal,
+							'deskripsi'		=> 'Pembelian Formulir an. '.$nama.' TA.'.$tamasuk,
+							'created_by'	=> Session('nip')
+						]
+					);
+					XFiles::updateOrCreate(
+						[
+							'xmarking'		=> $marking,
+						],
+						[
+							'xtabel'		=> 'db_pembayaranzis',
+						]
+					);
+				}
+			}
+			else {
+				$tanggalctk = $tglcetak;
+			}
+		}
+		$alamatcetak				= $homebase.'/kwitansipsb/'.$idlws;
+		try {
+			$qrcode 				= base64_encode(QrCode::format('png')->size(100)->generate($alamatcetak));
+		} catch (\Exception $e) {
+			$qrcode					= 'iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAb1UlEQVR4nHXdy3Xj2BJE0TuGCXSDdtAN2kE3aAfcgB10g2+gOtBWNt5AS1USeD/5iYwIsqvX+/3ens/ndr/ft/v9vh3Hse37vt1ut23f9+31em33+3273W7b4/HYjuPY7vf79nq9trXWdrvdttfrdX7dbrftOI7t+Xxu7/d7O45jezwe2+fz2R6Px7bv+7nf6/XaHo/H9nq9tn3ft/f7vd3v9+3z+Wzf7/dc6/1+/zlLa38+n+04ju3z+Wz3+/187jiO89njOLa11vb9frfH47Hdbrft+/1un8/nPO/tdtuez+e27/v5zOv12j6fz/b5fLa11rbv+/nnz+ezPZ/P7fP5bO/3+z8xejwe2/P53NZa5/fu9P1+t+M4zvh2tu63SkgPtZkXaKPP53M+836/z8U7eJftciWhNdq4RBWIEl2iuuRa69y3Ink+n+d5S2pJN6Ez0T1fMgv6WusspvYtMcXi+Xyed9j3/bx365q0+Xx3KiHv9/v8ut1u555nguZDVkkbFuTb7XZeqtdVSWutc5MC2SHrhIJilVRRVbJdZ/ANYs8XgIqk4Bd0O6R9u2N/L6EVUK+tqAro4/E416s7SqLdUDF414qjovl+v2fhFYu6ZQUjQpYHr6pboCSVAKt13/ezkgusXVLAvZRd2QWsxqq/S5mQEl9Aqm6LQggySc/nc3u9Xtv3+z3PZUKs9tbp2aCneBTDCrPk1SE9I5J0fiH99Xr9dEiBrBI6kD8r4AWyaqyjSoDzqNd3qTC/IHYxX1/FFtyCV+IMpu1eURSIgl3BTPiqc+vSnmvP0KDAi/ndyfnVWq7fa01K56hL+vMZh4Jblm3vWTVt3ldBLtNVn8F6v99nVXWJhmqBrsJ7fWdybpS0gic2m5gSHZQ2JwyqUNi+xaDnSnKJqSvbv3Xba862irWzdV6humQZi1UAOmyJCdtsNTcr8LWybd3vCkhBs7qFkw5TMKykOkZmJnMpafMc3ctkVaUGVnyXjMzZcxzHnzUjKc5VmWDrzucqiO4uo308HttyILahENWB+ioQBrALGNDWqiK6UAeps6yWukBKWsWbyF5bxcmyhAThpUqcRRWstKczpnPWDXVkv694pbrd23VLaPct1pf370JN/DZusR6UiXUQ4aUKqcJKaHgqM7JrpMDhf4XgbKhICrh02TPHdrqog7Vua73OUteJ7RWA0CxpkKj0u/btzyKPFN15VgdVbKtLK8S6qGyipAVfUuECfvX3mM0cvl6qJPeznu/ndYnVLv+vALrDLBjXdn07WFp7BucfbbfzhZ9mp/FpXsmg2sP1ZH3F+H6//ySkVuxiVpEqsuzLz6v6Lmm1FYDw1A5osDskxVYrs0NXcSY/OBF2dQik5AVRyip0OEtmR9jJfjkbFc/OxpLdeYpFQ92CW11UmHK4CUcOOAd12S8YsTAZj5S2TinRvkaxNoWVMyKoLXjiducRGq/0hbaFVF5i4PC1Wwq4RKX9LFY7p4LsTsqIczYqCEvMhBKrr4VlIFWFynjaDSVAPq54qkJUzlPrqG7tPl2DIGNqjumB6Ux0lpIjCakQtDrsttadJMWzTWtGVBICP5/PthROYZz4W0Bn56gvPLywMqm0B+rZLqcN0uVV7xZOVTddBqHIWSLUFpjOeWXNOCPUGuqGuloUmBTWGaGa904K0Ofz+cOyelAlLe5qtmkN6KK2RhVeAoUNkxV02SleUqjpmS7t8xVRFab+mVUvztdJkz1aFHXDJAp1qnNC6JP2m2SFt6xPRraEqCpWuhvsqOidAZpsLV6SotG9Xt0ifBXYXiOEtr/BEuZMiN6UuKyqL1ESALWOToRU2g7rrCVtdts0JOfAVwLo7621fiBLauqQrgOELeeEl9a7kSF18QJdUDpUMyGodGAbUOdIAXIu9NXanaEBbgfKbhz0dq0zTHe2gOsiqPrtIuM5Z5Po45lWQe7iwZammW1vVjtEl1IJ6x9ZhXaGs8dOqq21M9IFfbVfwVK8/T8l3vo6AYo1v19pCTtJZjgLQXgs6NJzY1zBN/hXEORgUijOi0qDO4hdU4JU7jGOLmH1ddCeV4tYsSXYrmvPzq23JcSozDX75sxyyJaUU7BRYL6+RM/4aaxKUHrWc5jAVXXbAVbPbPEy3N+1JcTvKmpaEHaWyttDBX9qFZV/GkLu3zknVKjWhRih0IQbeB0DtVd76h4It+0TIkjrS4qWSvsdx/E3IQUrPBWLlf4FRCYiBE0qWyUHZ0Hk9IUm9Y4c6O46MLVj6mIv3h7OQhnWHOomt8KTWPi8SXVGKGztMJlhRSBROmGyIKgy28DLay+0uTaLbqwaxAsYQN8TcaB6eFW+1ozus6q8100WVwBKdM8pgH3GuSEJ0eZplvS9GHnOEmuBOEtN+Pm2dxcuUIqvAl97TidU1duM6OC2sFhdZVrlUt8Oro1jgOviOSSnVnEQ20UWkpClU2BRTCGoe9AdvF/3La7t6b0rdqH4hCxhQGo6/RnFVcmQ/eg/6dfYHXVByVUhe6nW03q4EqMmtmT3/GRpkgQFrJTcPQvclaHpm3D9XBNWZW+haiuJDNLkNU0/Z4Hm4vR/CmAD3BkjpsqyumTwp7nn4KwQdAiuFLRzQBPSewSZFZwdJUOad7XAjIf7q4GuCnh6ZxWHDkJrnZDV5ucPxvvPXdA37L2swZv2SRsbICvTpMo2pJayuyvRpmNgRcrgptEp5qtPVOpVfWfvfBWX8GrhtY4sMng0OUJid/l8Ptsq6FLaqq02MvsGukO2WFWkop/JsnquWIuB1cJQV+ghNa8UkMGFsGHROX8MePea76ELO7HFK/o/9VTQZfdOV9tu3ff9NyGKHAfuZEC2Z1jfYdzYznHg2lVd1sSLqbWy7Ky9pZV2lsxKpT7NReeCbyVMShq81o1CeneWDOhwSE66n3ZMBSupOs3FMF+RYguaiDSC8CX9FBocplosVlvBswOEu/bR0JOlVNV1SBBb1+tpdS5hRVbkXPgTKIiLRSgKeO/gb+oN46Br0ZnPhLh4wVVV2iUOuF4z+bo4q7jsmQIlY2qdimEGWPWvmu7yWjUluMQIj86T1i2h3c+3mKW7fYUQ7S1c9XvZndptCldft6SUZV7hdGXaaabZXYqxgqc1rZBUmYfH2iZ1jYO8YKppeq3Y7p1Krup82iiKQuHFedO9petBmrqm32sTqbEsDIuzYlxtYjYdqh2sQIiLtrpBN0AdTNNvDvESWTvPgelAnV7TtCim5SN11Reza+2ukiYcO5N6tkS5j5pHS8ozlTBn9R/hW2XqN9nOVoZ0V7GoptCL8mBzxliRUk55vhS15Kjs1Up2yvzgRl/CsEGw85wBE1JU5u3XgHdOSmzsJtexkILI4zh+3sKt0n2nT/tDHPx/lFCF3/NnG67fT4z3vKo/JqOeaE3fydPwk810UYuryvT3zaKetfvFd+HOu8r06twpBB38nUNV7vysMITQVcWIk3P6i7EeoEWsYiFLiLCznAlaLwa/v/shg87aRat6u+qsNIaswqvASMNLfEES3kxQ553zrDtaiNo6EqEKvvN6l+fz+ZOQHiw4siyzP2miargFrfqJv76BZfAdeLV+pKJuukp+3aQXZlUGKecnOnj7QIo9mZOCU19PLeYbUsXN+JWckEH06AzO5JMk2OotrqjSLEzFmwSxuMzLJFpT2mtCZUZBRp0pAyq4MRshojNYrTIY1b/ve/hmmtWuFaIqdzbVCcJmRdH80MoRNVrDOdyaS2yrQjqMlsW0PhQ3Zb/vqtA5zObsKAl6W8JmFVx16Q64lvCjkKzr7No6rfVcR9XdGlMYO6eExhKta24S6xZ1m1C91vr5KGlVICzZjnLlkqOd0aXsKiujNTxAF2lvK632l10VALFdJd48KQBXbK5ElBjXnkreypXWS3/dcxIhxaoEQCfAvUKXVeU4M1SOBUBI0i6p+rQ0ZsUXfB1bHVaHuupYBS9dLVEyGbtJM7COnszHJHV+dcjUWwXU10/2pLWk6PU8dmsx/6P4C9wUhVJIcbTqKyFu0t+nrR12T2uhPVW66gedgKBCgVnXtYddUNAmMwxSJSoSB4PaOSyuXifUdf/mZLDf69RfziVp9jln5PQGqIvLVKY5KGzIsFTxao6GpR/dkZL2bHtMlaugE0KmKq6ip4AU2uZ80ypSTFb5Ehs1ltAk/DvgjVvncSZr9yxnhGJl4qmfGmkBLRf9rysbWmfXtzGtsmaHM8bOmDrGgSvkdIdmlo6BbE4rRp/qqnqFFe/oDOguFpfOgsRDQd1z3+/3x8vqYRWjw0vGpMCTKsv/rbICX/uXBAfvDHzB8rNZwuB0D/THglLfQHPuqGGqbElMiVEHCaHOtJ6fat/nfJ1wL+ss/vu+/9BeRZcHkAZ6UCFOvt9a4bQtqbk24cU2d8jrCJtwz9fezagp9ubv2sMgSQbqjF4bLCsInW0VijOvGaKu0VKZg94z/PkoqfxdiuZFHfwKxF6n43ri4vr9DyOdN+Fo7VrQHX7TILS6Ta5uc/v0nA5Bz3jXOT/by+JTCF8J2CBM/0xB7HeJhLpn3/dfHaJl0Vdw1EJl2Xb3QNowXt5BVvd0aH2r9rOtLZA560674d8cmN6RnpJB9UN/Ogcqe/0z56nao+KQAgs/Mr7m6AlNfDix+O/7/tMh+jxVlMJFLHTQ9zotFA+nJSJj0xNypsw/O1Mm9jtQr7Beqly39foJGULHdAS6U3GRQsuU5gccnEu6xv1dGBXalhcWqmwzu6eqkwVpHfSc3lGQoe1iB1mpwqGqX6qoHTKZ05XtUfdZPKd3xDuNOq/SXAtIiOx7RaRtolA84Wit/xSieuf5/PeftE0+f6pG3hFT9MiwprXQRlOz9GftGZVxAdLv8m1XLRrXsdqaXVJo3QSh1E6r8qt+g29hSAL8u5rM85cUR8Ic7ML07Xb7nSFlsj9baVJH6aHeTr8TNrqUw9HusBKdF4q3zqCV4dwKqoQj59n82KlzxQ7RhzPoJb+fqZm6V8+WBAWxzLRzCF0lrb+vxJFQJKOq+q2CMuvBrBAhQejTPpCrF2z9KOeWtr5moYXjvjoCik/hTYYlxW+dXi90VSizAIXjzt/rJuO8YmGd6ziO338NyAOfqnH9/udjXcyF/fLDBylXPS8vKzTM+TVtDpW4Ca+iJRp+4lKhpi6SqFS5rj/9NdmZnRrtVpHLrHqtbkJnswmaSafbO9WpLSXzqFo6TPDQYs2PrGh1ga15ZTtUBF5IjJcJCp3BhZZElVlnqYbtuAkzqn8tkAKlHTIT0R7ete/dTwE5tYxzb51/WL//lZGzomqU8jXce+7M7r8uETe7YBCgJ1WV98zUGNLvLi9Tc3b8vyEaHAlvrSOzkwQ4N+ywgm7hSAx6nWva8cKsZq1uxDIYMqUu2KWmKi7bHWwyJ404fTHb9mQW4/33qcy7dEmYgsvfCRFXg1ibQ7p5BZkVqZCqmNP/q4Bda67fWWWidsnj8e8/+pTnGzR/11eZn8NQ2my3CU1aGdLJAtU6+lHCToFqPk0HQShtTqgVCu60bSZhqGK1jYqNhuKksvOtW2ekdlEFWmId+ssWLOC+DVoAJtY2dLukFaIQOlsRrl/nWQBB1wxWl1YTlYzgRGdAXWPRzM61ExziU9VLAISvnm+dYiiCiD76aVOM/zEmVbhWqmxDKml7mQxFky1a67excFHiHKiK0PbqfHpH/WwyNOl1BWax6dWpjVpvkhbP5J991t/PTnI+d686vDv5PszycuKefo5WyKxyW9FB24F1YkuKXamYqyCmqWggbX8TpDugiu+rAuh1zQKVthReQSyBmZ3r3rK+YMwO8q42gCJ0zUA2vLuEh/ODEHNAy0gcnn58VLgRSnwPuoBOvWLnVBQl2stdJcN9hCghKzguAQa8AjJ5siQDrAPRmhWD8ak7nKnHcfx+UM4f6slIhc10l+iwBaagdiirotfbHTKo6QJUza0pRNYpXlSImj+vEruTc8SuUCMomp2N7VOhVFDaT1o1xkzSoS46G6CHCqAV5xxJuff3AjsDHD42L0qKyvjK7iiZtb7sp8BWTVW9882ZYNfbNXV5HWqgheoSrhMr4xJiNFjtOAu8bjJhxVwmeBzHz+eypJElQwVtVruQrMP2bp4IDa3rs7NyDWKvCbq0UXRHC+CEg7rHAtNjuhrEk1nZsRbb1ZllS1LxSc0b8MWwEVBs9n3//feyDJY2RjhZden3eEgrTjtFCCtw08uZNLRDyrz0iApqzxRsK7OkTqU+/TGr+s9wHcrbDlQ4T9HoTCjBxdSPlfqupaRoKYr0ZibWlVGf0QKpNavgabR5WBMhRE0C0GVUuXlltntdoIelDihgEg4xvo7SKQgZ1F4Vp3d2Ztg1QlznlrgU78k2lx0RJjbIVZ4FtTbzIHpBbe77DD0jjZT+Gnjn07QVZuJ0mKdbYFJV1FoWU9/Y6ToQ2jEVmfRWyFI7GTv3lc1qjh4Hn35XDEr3xGId0EkTe43VfwVRBkJImn6ULd4l21sLpUSqiAuyTMyKFiKcJVJhZ6KJ6M8m0A5x9gWhxUMbqS6cxGf5kK0rzetCXbSLeFCVcNBghznwS67sSLUc/On6luhavE6VDTobrjpwqmgHawEUugz61GtCZbDksJY+hwzFUee4Lv9jLorB0yMqc9ohXtoETEUqnjp466SJq9Jv6XVnmFAgbZ1Ucs6Gfq5SPw299d9/fagvvTvhp+eKWYkombJItVj7VVTBew1xfnJxMoUuXGBbvGpQAU8HtMGr9uiyBbBDavhJaYMyXVPJR1Xbs64bFPTdj+iUYOm1GN/Z6za1xnQZTKo+nwm0iCzGziUBWGv9QNb0XdQOYrTDtdfYslMMdhg1xKSj87BCpu+l64v5d5PU2aWXV3pKC0f6KtZ7pmnj9LOZNOF27ueMlSBV1D1z/u8qZDZi5qzILqyVMumcVFfC4MDuZ356w/2seGfW/NxTA3VWZzBgt14VQJUvFXad7mOnFjPFpIk3Rp2jGRNUKTPUa+e/5KAeceAGadLIkiDbKvhqFTWJHzfq0OcgW78fzSx4Dl49JOGpJFUszjJxW91kx0pa/DBHz185C3W9glB2V/xKih6fFNv5pj93/ksOVYBYOytGT6nkNCRLrIJysiRJg7pEeixsOoyr6l4jA2pvL9jeFpLJ0cPS2ih4czBbdP3+9J9wedVC7SXKCGGd188VrCrUTQtmQbKtG9xVW61dAt3ACtHr0b6okhRYYm4/16JXHIrVYna4PyGwbu8MUubOqSapW6fnVQF7t6re+akmExYtzGD5OI7f99TVIgqVOHwV6nsK0karREVuC1ddQlYJn6Zha2ubSGGtUL0i6a8wYVf2GsmJFslMUPfve50uI5VUWFCtWVJKZjHXtXi9/v2PJdUEihXhQRyXaqpQ1RDTARBHrUQtkC7mxf2ZBaLBJ6sR81u3fTqfLsG+/34Iu25XvEkEJnuTKisoS76itZ/3TAkp9sVlVZFt4Ixw+jtUw9sOWZc1vDUdDeqcC5PNTaiYLEtTTrgrkFWfLNDu0uIQFbpTZ/Z13V+fqljFEkMG6bW6TfVeAdRRrXMyMbXElejre5cKeqqIgjyho8BbJVcMS+2ibujPBsxZ5hw42533caZn5J97NpWs86BzIXEoidLZglos/Jmf4AwRdAiKqcj0eDx+/4MdeXYX8qM3VphWhbqlwIupMjhtAw/qXOr1DVw/kmTnVVUKR3VD+yhG9bVU53a2r50Q6ufNlAoTqiYz6/nuWNzUI2fHVRVWigPHICuM5vvSHb6WDBclAwXOWTC7K7ppddopfoJSeqp+kR1Je4Uo7aAr306xWjyqcKWBndjPRJfW8fyhg3E5ddzk4LqsdUMXFrLCU4ez360cCYJzSiHZPNCicJ51wbrWS/QaHYCely1Kgzt/Q7lE2hme244tMa3jG2ZSdOm9jNKYFqcQaAU1KsYWbBB1kapAKLPCZ0WL224qc5GdTNVdYsJaSUYtrmOs3SJFdi2LSUuj4dxcdI5V8QXes1dQsqcgOPrbPOmM3s+3ir/f7+//T902llGopsVY4aiqElLERw07L6MlM5Os51RRVDDODgWl80+Bd8VoJuQWKCmwKNBrtEXqcN/38Rl1meRCsfgf+11888CTxtWyBlIFqh9Tcidrc6gXKA/vMJTWuk5JV+Q1w6ryCkEm1x5aFpqZJt6i88tZYgeIEN1LR0IyUeE0t5tv5ywPh+XrqscOYAWogn1zpwvPqpmV2rrtp/3R+l1KptTZHKbT5CzImnoFZs4BnWFp/fxsWZ0bhHVGP13izNAJcN65Znfu3J33/JCDGNjGBcjB2cayogIgU/F3+lpaCUJWAdEsnPS2itRRnlRb8apl4htmwpZr2d3tJZxOAS2R0UyVmlt0vr47K4Rfr9fv/4PK4Wswa80yr2p2mHrRAp+G6EBeJkbX4U1KzzhE+3mBjg22v8n2mc4r+SjIdv+cfVWvwfY+kpYKtTtYSCWi7yaqgviDLuJXVVSlOjDNqvohqJEeKrb0xvS7HM5TYKoD5uDt8ApCqWXB7TmHq79zhukOlKRJOjqHhaenFew1I2VxEiJpvPsVh1VganMtDB1SKyO4KSC1nIyhdZ0jVV3BdF7oEXn4AqiT0MVNhlqj4uq57jRFcIU0GY96qYBWRLrTFqOD3diIMt2tP89R8Xw+f/81II0wA1UGtRqkvIq6Ai8kiefzMAVDYiETEVa64NQ/+kP9TFZWwIQ4PbQCPgmCiSoOxkSdJjt0zrZ3nT1JhOyrdZbZl510QDHf74q6cNALWmF2jZBT5duyCr8SI6wU7II83z4oudLYYHAyLrtYUVhR6nU5L0uqH1JwaLuunTStEgVuBbhq36q+yxWwLlD3OLB7jS07Kaqisd9P3i7UVbkd0jP0/PxYj8LPmTGD1Zka+GoACYkmYr9XzXuHztvrZpeGHBWf1pJk5RTIXbBMeXi1QslQnc5Ocv7I668UuzZNh5bbq/rF2qlN5sCtirUlmj+t5WBXJ7XupOAyL8Vk9/OOQVlFJqmRmak9WvM4/v33ITIcLYcOKC9XwbdhVVPFhY+TLqoZpMqSBf0fBWgXl3JLRhRdwVn36jVXtlCF4YwoBsHo9OlKrtBlkYoodreiVY2isFxWeMEoy23mBwpauE7xwMGOA9KWNLAyqypNDVGAZERXdLX15oBUeHrW1vE54cpurCt8b2VaISawewufQmhrtl/r1dHf7/fXfg8DtTZ6UYf08gZQhdzPNB6tQCFDNqSAE/unkakVYVdWLCZ8GotdXqEr6yuYQrGzcFox2k12RcUgiREVphPS8/u+//67vZOadREv7PvHvs6Bq84Q7qTO7XVy7/X7b6RMJaw14UB1Hk0NVcdZ3eJ2AbIzTGrfpa8OZoeyRTjhVRng28VaNhVNhbcULg6nNncI93vfaFGMdfAu6gC2gmz9qkUR1kVP5rH+/r8Efabhb8fIWpwxQqLWjmq6eMz55lB3Fsy5IgTGIO1SZ7D0vXj/D1qZ7VFrqtW0AAAAAElFTkSuQmCC';
+		}
+		$tasks						= [];
+		$tasks['logo_grey']			= $homebase.'/'.$rsetting->logo_grey;
+		$tasks['kopsurat']			= $kopsurat;
+		$tasks['rsetting']			= $rsetting;
+		$tasks['qrcode']			= $qrcode;
+		$tasks['costumid']			= $costumid;
+		$tasks['nama']				= $nama;
+		$tasks['nomhuruf']			= $nomhuruf;
+		$tasks['tamasuk']			= $tamasuk;
+		$tasks['tanggalctk']		= $tanggalctk;
+		$tasks['nomangka']			= $nomangka;
+		$tasks['asline']			= $asline;
+		$tasks['namaapps01']  		= Session('sekolah_nama_aplikasi');
+		$tasks['domainapps01']  	= Session('sekolah_nama_yayasan');
+		$tasks['subdomainapps01']  	= Session('sekolah_nama_sekolah');
+		$tasks['subsubdomainapps01']= Session('sekolah_kode_sekolah');
+		$tasks['addressapps01']  	= Session('sekolah_alamat');
+		$tasks['emailapps01']  		= Session('sekolah_email');
+		$tasks['lamanapps01']  		= parse_url(request()->root())['host'];
+		$tasks['logofrontapps01']  	= Session('sekolah_frontpage');
+		$tasks['logo01']  			= url("/").'/'.Session('sekolah_logo');
+		return view('cetak.kwitansipsb', $tasks);
+	}
 }

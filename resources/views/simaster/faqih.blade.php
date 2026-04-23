@@ -18,298 +18,285 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12" id="sectiontahfid">
+                <div id="loading">
+                    <img src="{{ asset('dist/img/loading.gif') }}" class="img-responsive" alt="Photo">
+                </div>
+                <div class="col-lg-4 col-md-4 sectiontahfid">
                     <div class="card card-primary shadow">
                         <div class="card-header">
-                            <h3 class="card-title" id="juduldetailalquran">Perkembangan Santri</h3>
+                            <h3 class="card-title">List Santri</h3>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool btnboxrefresh"><i class="fa fa-refresh"></i></button>
                             </div>
                         </div>
-                        <div class="card-body" id="divawalperkemsantri">
-                            <div id="gridperkembangansantri"></div>
-                        </div>
-                        <div class="card-footer" id="divdetperkemsantri">
-                            <button class="btn btn-success" id="btnclosedetailperkembangan">Close Detail</button>
-                            <div id="griddetailperkembangansantri"></div>
+                        <div class="card-body  table-responsive p-0" id="divawalperkemsantri">
+                            @if(isset($listanak) && !empty($listanak))
+                                <ul class="products-list product-list-in-card pl-2 pr-2">
+                                @foreach($listanak as $rows)
+                                    <li class="item">
+                                        <div class="product-img">
+                                            <a href="#" class="btn btn-sm btn-primary btnstatistik" id="{{$rows['id']}}" noinduk="{{$rows['noinduk']}}" nama="{{$rows['nama']}}" kelas="{{$rows['jilid']}}">
+                                                <img src="{{ $rows['foto'] }}" alt="{{ $rows['nama'] }}" class="img-circle img-size-32 mr-2">
+                                            </a>
+                                        </div>
+                                        <div class="product-info">
+                                            <a href="#" class="product-title btnpill" id="{{$rows['id']}}" noinduk="{{$rows['noinduk']}}" nama="{{$rows['nama']}}" kelas="{{$rows['jilid']}}">{{$rows['nama']}}
+                                            <span class="badge badge-warning float-right"><i class="fa fa-search"></i> Detail</span></a>
+                                            <span class="product-description">
+                                                Data Terakhir {{$rows['tanggal']}}
+                                            </span>
+                                        </div>
+                                    </li>
+                                @endforeach
+                                </ul>
+                            @endif
                         </div>
                     </div>
                 </div>
-                <div class="col-md-5 sectionsetoran">
-                    <div class="card card-info shadow">
+                <div class="col-lg-8 col-md-8 sectionsetoran">
+                    <div class="card card-primary shadow">
                         <div class="card-header">
-                            <h3 class="card-title">Setoran Santri</h3>
+                            <h3 class="card-title" id="juduldetailalquran">Data Halaqoh</h3>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool btnsimpansetoran"><i class="fa fa-database"></i> Save All</button>
-                                <button type="button" class="btn btn-tool" id="btnkembalidarisetoran"><i class="fa fa-close"></i></button>
+                                <button type="button" class="btn btn-tool btnboxrefresh"><i class="fa fa-refresh"></i></button>
                             </div>
                         </div>
-                        <form id="formtambahsetoran" enctype="multipart/form-data">
+                        <div class="card-body">
+                            <form id="formtambahsetoran" enctype="multipart/form-data">
+                                <div class="form-group row">
+                                    <label for="id_nama" class="col-sm-4 col-form-label">Nama :</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" name="nama" id="id_nama" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="mas_noinduk" class="col-sm-4 col-form-label">No Induk :</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" name="noinduk" id="mas_noinduk" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="mas_kelas" class="col-sm-4 col-form-label">Kelas Halaqoh :</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" name="kelas" id="mas_kelas" readonly />
+                                       
+                                    </div>
+                                </div>
+                                <div style="overflow: hidden; display: none;">
+                                    <input type="text" name="tekspersiapanhafalanbesok" id="mas_persiapanhafalanbesok" />
+                                    <input type="text" name="teksmurojaahsabtuahad" id="mas_murojaahsabtuahad" />
+                                    <input type="text" name="teksmurojaahdirumah" id="mas_murojaahdirumah" />
+                                    <input type="text" name="tekstilawah" id="mas_tilawah" />
+                                </div>
+                                <div class="form-group row">
+                                    <label for="id_tanggal" class="col-sm-4 col-form-label"><font color="red">Tanggal (Pastikan sesuai dengan Tgl lapor)</font> <span class="text-danger">*</span> :</label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                                            <input type="text" class="form-control" value="{{date('Y-m-d')}}" id="id_tanggal" name="tanggal" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask/>
+                                            <div class="input-group-append">
+                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                             <div class="card-body">
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <label>Nama</label>
-                                            <input type="text" id="setoran_nama" name="setoran_nama" class="form-control" readonly> 
+                                <ul class="todo-list" data-widget="todo-list">
+                                    <li>
+                                        <span class="handle">
+                                            <i class="fa fa-ellipsis-v"></i>
+                                            <i class="fa fa-ellipsis-v"></i>
+                                        </span>
+                                        <div class="icheck-primary d-inline ml-2">
+                                            <input type="checkbox" value name="lap_tilawah" id="lap_tilawah">
+                                            <label for="lap_tilawah"></label>
                                         </div>
-                                        <div class="col-lg-2">
-                                            <label>No.INDUK</label>
-                                            <input type="text" id="setoran_noinduk" name="setoran_noinduk" class="form-control" readonly> 
+                                        <small class="badge badge-danger">Tilawah</small>
+                                        <span class="text" id="rpa_tilawah">-</span>
+                                    </li>
+                                    <li>
+                                        <span class="handle">
+                                            <i class="fa fa-ellipsis-v"></i>
+                                            <i class="fa fa-ellipsis-v"></i>
+                                        </span>
+                                        <div class="icheck-primary d-inline ml-2">
+                                            <input type="checkbox" value name="lap_murojaahdirumah" id="lap_murojaahdirumah">
+                                            <label for="lap_murojaahdirumah"></label>
                                         </div>
-                                        <div class="col-lg-2">
-                                            <label>Kelas</label>
-                                            <input type="text" id="setoran_kelas" name="setoran_kelas" class="form-control" readonly> 
+                                        <small class="badge badge-success">Voice Note di Rumah</small>
+                                        <span class="text" id="rpa_murojaahdirumah">-</span>
+                                    </li>
+                                    <li>
+                                        <span class="handle">
+                                            <i class="fa fa-ellipsis-v"></i>
+                                            <i class="fa fa-ellipsis-v"></i>
+                                        </span>
+                                        <div class="icheck-primary d-inline ml-2">
+                                            <input type="checkbox" value name="lap_murojaahsabtuahad" id="lap_murojaahsabtuahad">
+                                            <label for="lap_murojaahsabtuahad"></label>
                                         </div>
-                                        <div class="col-lg-2">
-                                            <label>Tanggal</label>
-                                            <input type="text" id="setoran_tanggal" name="setoran_tanggal" class="form-control" readonly>
+                                        <small class="badge badge-warning">Murojaah di Rumah</small>
+                                        <span class="text" id="rpa_murojaahsabtuahad">-</span>
+                                    </li>
+                                    <li>
+                                        <span class="handle">
+                                            <i class="fa fa-ellipsis-v"></i>
+                                            <i class="fa fa-ellipsis-v"></i>
+                                        </span>
+                                        <div class="icheck-primary d-inline ml-2">
+                                            <input type="checkbox" value name="persiapanhafalanbesok" id="lap_persiapanhafalanbesok">
+                                            <label for="lap_persiapanhafalanbesok"></label>
+                                        </div>
+                                        <small class="badge badge-info">Persipan Hafalan Besok</small>
+                                        <span class="text" id="rpa_persiapanhafalanbesok">-</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="form-group">
+                                <a href="#" class="btn btn-sm btn-warning float-right" id="btnsimpandata"><i class="fa fa-save"></i> Simpan</a>
+                            </div>
+                        </div>
+                        <div class="card-footer p-0">
+                            <div id="tabelriwayat"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8 sectionstatistik">
+                    <div class="card card-primary shadow">
+                        <div class="card-header">
+                            <h3 class="card-title" id="judulstatistik">Statistik</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool btnboxrefresh"><i class="fa fa-refresh"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="tabelstatistik"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8 sectionisisetoran">
+                    <div class="card card-primary shadow">
+                        <div class="card-header">
+                            <h3 class="card-title" id="judullaporan">Pelaporan Setoran</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" id="btntutupsetoran"><i class="fa fa-close"></i></button>
+                            </div>
+                        </div>
+                       
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>PR Murojaah Mulai</label>
+                                            <select id="rpa_ziyadahsurahawal" name="ziyadahsurahawal" class="form-control" readonly>
+                                                <option value="">Pilih Salah Satu</option>
+                                                @foreach($mushaflist as $rows)
+                                                    @php
+                                                        $akhir = $rows->jumlah;
+                                                        $akhir = $akhir+2;
+                                                        for ($i = 1; $i < $akhir; $i++){
+                                                            echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
+                                                        }
+                                                    @endphp
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="card card-primary shadow">
-                                                <div class="card-header">
-                                                    <h3 class="card-title">Ziyadah</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="form-group">
-                                                        <label>Mulai Surah</label>
-                                                        <select id="setoran_ziyadahsurahawal" name="setoran_ziyadahsurahawal" class="form-control select2">
-                                                            <option value="">Pilih Salah Satu</option>
-                                                            @foreach($mushaflist as $rows)
-                                                                @php
-                                                                    $akhir = $rows->jumlah;
-                                                                    $akhir = $akhir+2;
-                                                                    for ($i = 1; $i < $akhir; $i++){
-                                                                        echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
-                                                                    }
-                                                                @endphp
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Mulai Surah</label>
-                                                        <select id="setoran_ziyadahsurahakhir" name="setoran_ziyadahsurahakhir" class="form-control select2">
-                                                            <option value="">Pilih Salah Satu</option>
-                                                            @foreach($mushaflist as $rows)
-                                                                @php
-                                                                    $akhir = $rows->jumlah;
-                                                                    $akhir = $akhir+2;
-                                                                    for ($i = 1; $i < $akhir; $i++){
-                                                                        echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
-                                                                    }
-                                                                @endphp
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="card card-success shadow">
-                                                <div class="card-header">
-                                                    <h3 class="card-title">Murojaah</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="form-group">
-                                                        <label>Mulai Surah</label>
-                                                        <select id="setoran_msurahawal" name="setoran_msurahawal" class="form-control select2">
-                                                            <option value="">Pilih Salah Satu</option>
-                                                            @foreach($mushaflist as $rows)
-                                                                @php
-                                                                    $akhir = $rows->jumlah;
-                                                                    $akhir = $akhir+2;
-                                                                    for ($i = 1; $i < $akhir; $i++){
-                                                                        echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
-                                                                    }
-                                                                @endphp
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Mulai Surah</label>
-                                                        <select id="setoran_msurahakhir" name="setoran_msurahakhir" class="form-control select2">
-                                                            <option value="">Pilih Salah Satu</option>
-                                                            @foreach($mushaflist as $rows)
-                                                                @php
-                                                                    $akhir = $rows->jumlah;
-                                                                    $akhir = $akhir+2;
-                                                                    for ($i = 1; $i < $akhir; $i++){
-                                                                        echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
-                                                                    }
-                                                                @endphp
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="card card-primary shadow">
-                                                <div class="card-header">
-                                                    <h3 class="card-title">Tilawah</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="form-group">
-                                                        <label>Mulai Surah</label>
-                                                        <select id="setoran_tilawahsurahawal" name="setoran_tilawahsurahawal" class="form-control select2">
-                                                            <option value="">Pilih Salah Satu</option>
-                                                            @foreach($mushaflist as $rows)
-                                                                @php
-                                                                    $akhir = $rows->jumlah;
-                                                                    $akhir = $akhir+2;
-                                                                    for ($i = 1; $i < $akhir; $i++){
-                                                                        echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
-                                                                    }
-                                                                @endphp
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Mulai Surah</label>
-                                                        <select id="setoran_tilawahsurahakhir" name="setoran_tilawahsurahakhir" class="form-control select2">
-                                                            <option value="">Pilih Salah Satu</option>
-                                                            @foreach($mushaflist as $rows)
-                                                                @php
-                                                                    $akhir = $rows->jumlah;
-                                                                    $akhir = $akhir+2;
-                                                                    for ($i = 1; $i < $akhir; $i++){
-                                                                        echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
-                                                                    }
-                                                                @endphp
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="card card-success shadow">
-                                                <div class="card-header">
-                                                    <h3 class="card-title">Tahsin</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="form-group">
-                                                        <label>Mulai Surah</label>
-                                                        <select id="setoran_tahsinawal" name="setoran_tahsinawal" class="form-control select2">
-                                                            <option value="">Pilih Salah Satu</option>
-                                                            @foreach($mushaflist as $rows)
-                                                                @php
-                                                                    $akhir = $rows->jumlah;
-                                                                    $akhir = $akhir+2;
-                                                                    for ($i = 1; $i < $akhir; $i++){
-                                                                        echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
-                                                                    }
-                                                                @endphp
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Mulai Surah</label>
-                                                        <select id="setoran_tahsinakhir" name="setoran_tahsinakhir" class="form-control select2">
-                                                            <option value="">Pilih Salah Satu</option>
-                                                            @foreach($mushaflist as $rows)
-                                                                @php
-                                                                    $akhir = $rows->jumlah;
-                                                                    $akhir = $akhir+2;
-                                                                    for ($i = 1; $i < $akhir; $i++){
-                                                                        echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
-                                                                    }
-                                                                @endphp
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>PR Murojaah Akhir</label>
+                                            <select id="rpa_ziyadahsurahakhir" name="ziyadahsurahakhir" class="form-control" readonly>
+                                                <option value="">Pilih Salah Satu</option>
+                                                @foreach($mushaflist as $rows)
+                                                    @php
+                                                        $akhir = $rows->jumlah;
+                                                        $akhir = $akhir+2;
+                                                        for ($i = 1; $i < $akhir; $i++){
+                                                            echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
+                                                        }
+                                                    @endphp
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-footer">
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="input-group">
-                                                <select id="setoran_nilai" name="setoran_nilai" class="form-control">
-                                                    <option value="">Pilih Salah Satu</option>
-                                                    @php 
-                                                        for ($i = 1; $i < 101; $i++){
-                                                            echo '<option value="'.$i.'">'.$i.'</option>';
+                                <div class="form-group row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Voice Note Mulai</label>
+                                            <select id="setoran_murojaah_mulaiayat" name="murojaah_mulaiayat" class="form-control select2">
+                                                <option value="">Pilih Salah Satu</option>
+                                                @foreach($mushaflist as $rows)
+                                                    @php
+                                                        $akhir = $rows->jumlah;
+                                                        $akhir = $akhir+2;
+                                                        for ($i = 1; $i < $akhir; $i++){
+                                                            echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
                                                         }
                                                     @endphp
-                                                </select>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text">Nilai</div>
-                                                </div>
-                                            </div>
+                                                @endforeach
+                                            </select>
                                         </div>
-                                        <div class="col-lg-6">
-                                            <div class="input-group">
-                                                <select id="setoran_status" name="setoran_status"  class="form-control">
-                                                    <option value="Lulus">Lulus</option>
-                                                    <option value="Tidak Lulus">Tidak Lulus</option>
-                                                </select>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text">Predikat</div>
-                                                </div>
-                                            </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Voice Note Akhir</label>
+                                            <select id="setoran_murojaah_akhirayat" name="murojaah_akhirayat" class="form-control select2">
+                                                <option value="">Pilih Salah Satu</option>
+                                                @foreach($mushaflist as $rows)
+                                                    @php
+                                                        $akhir = $rows->jumlah;
+                                                        $akhir = $akhir+2;
+                                                        for ($i = 1; $i < $akhir; $i++){
+                                                            echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
+                                                        }
+                                                    @endphp
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-10">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" id="setoran_catatan" name="setoran_catatan" placeholder="Catatan Penting Lainnya"/>
-                                                <div class="input-group-append">
-                                                    <div class="input-group-text"><i class="fa fa-book"></i></div>
-                                                </div>
-                                            </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Ziyadah di Rumah Mulai</label>
+                                            <select id="setoran_ziyadah_mulaiayat" name="ziyadah_mulaiayat" class="form-control select2">
+                                                <option value="">Pilih Salah Satu</option>
+                                                @foreach($mushaflist as $rows)
+                                                    @php
+                                                        $akhir = $rows->jumlah;
+                                                        $akhir = $akhir+2;
+                                                        for ($i = 1; $i < $akhir; $i++){
+                                                            echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
+                                                        }
+                                                    @endphp
+                                                @endforeach
+                                            </select>
                                         </div>
-                                        <div class="col-lg-2">
-                                            <button type="button" class="btn btn-primary btnsimpansetoran">
-                                                <i class="fa fa-save"></i> Simpan
-                                            </button>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>Ziyadah di Rumah Akhir</label>
+                                            <select id="setoran_ziyadah_akhirayat" name="ziyadah_akhirayat" class="form-control select2">
+                                                <option value="">Pilih Salah Satu</option>
+                                                @foreach($mushaflist as $rows)
+                                                    @php
+                                                        $akhir = $rows->jumlah;
+                                                        $akhir = $akhir+2;
+                                                        for ($i = 1; $i < $akhir; $i++){
+                                                            echo '<option value="'.$rows->id.'.'.$i.'">'.$rows->id.'.'.$i.' ('.$rows->surah.' Ayat '.$i.')</option>';
+                                                        }
+                                                    @endphp
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
+                                
                             </div>
                         </form>
-                    </div>
-                </div>
-                <div class="col-md-7 sectionsetoran">
-                    <div class="card card-primary shadow">
-                        <div class="card-header">
-                            <h3 class="card-title">Mushaf</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" id="btnclosemushaf"><i class="fa fa-ban"></i></button>
-                            </div>
-                        </div>
-                        <div class="card-body row">
-                            <div class="col-lg-12">
-                                <select id="mushaf_list" name="mushaf_list" class="form-control select2">
-                                    <option value="">Pilih Salah Satu</option>
-                                    @foreach($mushaflist as $rows)
-                                        <option value="{{ $rows['id'] }}" surah="{{ $rows['surah'] }}" >{{ $rows['surah'] }} ( {{ $rows['makna'] }} - {{ $rows['jumlah'] }} - {{ $rows['jenis'] }} )</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-12">
-                                <section class="jumbotron">
-                                    <div class="container-fluid">
-                                        <div style="text-align: center;" id="loadingview"></div>
-                                    </div>
-                                    <h1 class="mt-4" id="surahtitle" style="text-align: center;"></h1>
-                                    <div id="surah" style="margin: 20;" class="direct-chat-messages"></div>
-                                </section>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -320,8 +307,9 @@
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
 </div>
-<input type="hidden" id="mas_semester" name="mas_semester" value="{{ $smt }}">
+<input type="hidden" id="mas_semester" name="mas_semester" value="{{ $semester }}">
 <input type="hidden" id="mas_tapel" name="mas_tapel" value="{{ $tapel }}">
+
 <input type="hidden" name="set_tanggal" id="set_tanggal" value="{{ date('Y-m-d') }}">
 @endsection
 
@@ -330,405 +318,425 @@
     $(function () {
         $('.select2').select2({width: '100%'});
 		CKEDITOR.env.isCompatible = true;
-		$('#set_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
-		$('#absen_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
+        $('#reservationdate').datetimepicker({
+            format: 'YYYY-MM-DD'
+        });
+		$('#id_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
+        $('#divawalperkemsantri').on('click', '.btnpill', function () {
+            var id          = $(this).attr('id');
+            var noinduk     = $(this).attr('noinduk');
+            var nama        = $(this).attr('nama');
+            var kelas       = $(this).attr('kelas');
+            var judul       = 'Data Halaqoh an. '+nama;
+            $('#juduldetailalquran').html(judul);
+            $('#id_nama').val(nama);
+            $('#mas_noinduk').val(noinduk);
+            $('#mas_kelas').val(kelas);
+            $('.sectiontahfid').show();
+            $('.sectionstatistik').hide();
+            $('.sectionisisetoran').hide();
+            openedpage();
+            getPR();
+            $('.sectionsetoran').show();
+        });
+        $('#divawalperkemsantri').on('click', '.btnstatistik', function () {
+            var id          = $(this).attr('id');
+            var noinduk     = $(this).attr('noinduk');
+            var nama        = $(this).attr('nama');
+            var kelas       = $(this).attr('kelas');
+            var judul       = 'Data Statistik an. '+nama;
+            $('#judulstatistik').html(judul);
+            var tapel	    = document.getElementById('mas_tapel').value;
+            var semester    = document.getElementById('mas_semester').value;
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+            var btn = $(this);
+                btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+            var formdata = new FormData();
+                formdata.set('val01', noinduk);
+                formdata.set('tapel', tapel);
+                formdata.set('semester', semester);
+                formdata.set('workcode','getstatistikbyid');
+                formdata.set('_token', '{{ csrf_token() }}');
+            url='{{ route("jsonDataRPA") }}';
+            $('#loading').show();
+            $.ajax({
+                type        : 'ajax',
+                url         : url,
+                method      : 'post',
+                data        : formdata,
+                cache       : false,
+                contentType : false,
+                processData : false,
+                dataType    : 'json',
+                success: function(response, status, xhr) {
+                    $('#loading').hide();
+                    btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+                    $('.sectiontahfid').hide();
+                    $('.sectionsetoran').hide();
+                    $('.sectionisisetoran').hide();
+                    $('.sectionstatistik').show();
+                    $('#tabelstatistik').html(response.generatesurat);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $('#loading').hide();
+                    btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+                    swal({
+                        title: textStatus,
+                        text:  jqXHR.responseText,
+                        type: 'info',
+                    });
+                }
+            });
+        });
 	});
-    var baseurl = '{{url("/")}}/Surat/';
-    var isLoading = document.getElementById("loadingview");
-    function getSurat(id, title) {
-        isLoading.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span>'
-        document.getElementById("surahtitle").innerHTML = title;
-        var mainContainer = document.getElementById("surah");
-            mainContainer.innerHTML = '';
-        fetch(baseurl + id + '.json').then(function (response) {
-            return response.json();
-        }).then(function (data) {
-            for (var i = 0; i < data.data.length; i++) {
-                var div = document.createElement("div");
-                    div.innerHTML = '<p class="arabic pull-right"><span class="badge badge-primary">' + data.data[i].aya_number + '</span> ' + data.data[i].aya_text + '</p><div class="clearfix"></div><p style="terjemah">' + data.data[i].translation_aya_text + '</p>';
-                    mainContainer.appendChild(div);
+    function openedpage( jQuery ){
+        var tapel	    = document.getElementById('mas_tapel').value;
+        var semester	= document.getElementById('mas_semester').value;
+        var noinduk	    = document.getElementById('mas_noinduk').value;
+        var kelas	    = document.getElementById('mas_kelas').value;
+        var formdata = new FormData();
+            formdata.set('workcode', 'dataperanakallday');
+            formdata.set('tapel', tapel);
+            formdata.set('semester', semester);
+            formdata.set('noinduk', noinduk);
+            formdata.set('kelas', kelas);
+            formdata.set('_token', '{{ csrf_token() }}');
+        $.ajax({
+            url         : '{{ route("jsonDataRPA") }}',
+            data        : formdata,
+            type        : 'POST',
+            contentType : false,
+            processData : false,
+            success: function (data) {
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                timelinetekssekolah = '';
+                timelineteksrumah   = '';
+                dtruang             = '';
+                states              = ['info', 'primary', 'warning', 'info', 'primary', 'secondary'];
+                if (data.data){
+                    for(i=0;i<data.data.length;i++){
+                        stateNum            = Math.floor(Math.random() * 6);
+                        state1 		        = states[stateNum];
+                        stateNum            = Math.floor(Math.random() * 6);
+                        state2 		        = states[stateNum];
+                        zsn                 = data.data[i].zsn;
+                        msn                 = data.data[i].msn;
+                        tsn                 = data.data[i].tsn;
+                        tasn                = data.data[i].tasn;
+                        catatan             = data.data[i].catatan;
+
+                        mrn                 = data.data[i].mrn;
+                        tarn                = data.data[i].tarn;
+                        trn                 = data.data[i].trn;
+                        zrn                 = data.data[i].zrn;
+                        catrumah            = data.data[i].catrumah;
+
+                        timelinetekssekolah = timelinetekssekolah+'<div class="timeline"><div class="time-label"><span class="bg-'+state1+'"><i class="fa fa-building"></i> Setoran di Sekolah Tgl. '+data.data[i].tanggal+'</span></div>';
+                        if (zsn == '' || zsn  == '0' || zsn == null){
+                            timelinetekssekolah = timelinetekssekolah+'<div><i class="fa fa-ban bg-danger"></i><div class="timeline-item"><h3 class="timeline-header">Ziyadah</h3></div></div>';
+                        } else {
+                            timelinetekssekolah = timelinetekssekolah+'<div><i class="fa fa-check bg-success"></i><div class="timeline-item"><h3 class="timeline-header">Ziyadah</h3><div class="timeline-body">'+ data.data[i].zsm+' <span class="badge badge-'+state1+'">s/d</span> '+data.data[i].zsa+' ('+data.data[i].zsn+')</div></div></div>';
+                        }
+                        if (msn == '' || msn  == '0' || msn == null){
+                            timelinetekssekolah = timelinetekssekolah+'<div><i class="fa fa-ban bg-danger"></i><div class="timeline-item"><h3 class="timeline-header">Murojaah</h3></div></div>';
+                        } else {
+                            timelinetekssekolah = timelinetekssekolah+'<div><i class="fa fa-check bg-success"></i><div class="timeline-item"><h3 class="timeline-header">Murojaah</h3><div class="timeline-body">'+ data.data[i].msm+' <span class="badge badge-'+state2+'">s/d</span> '+data.data[i].msa+' ('+data.data[i].msn+')</div></div></div>';
+                        }
+                        if (tsn == '' || tsn  == '0' || tsn == null){
+                            timelinetekssekolah = timelinetekssekolah+'<div><i class="fa fa-ban bg-danger"></i><div class="timeline-item"><h3 class="timeline-header">Tilawah</h3></div></div>';
+                        } else {
+                            timelinetekssekolah = timelinetekssekolah+'<div><i class="fa fa-check bg-success"></i><div class="timeline-item"><h3 class="timeline-header">Tilawah</h3><div class="timeline-body">'+ data.data[i].tsm+' <span class="badge badge-'+state1+'">s/d</span> '+data.data[i].tsa+' ('+data.data[i].tsn+')</div></div></div>';
+                        }
+                        if (tasn == '' || tasn  == '0' || tasn == null){
+                            timelinetekssekolah = timelinetekssekolah+'<div><i class="fa fa-ban bg-danger"></i><div class="timeline-item"><h3 class="timeline-header">Tahsin</h3></div></div>';
+                        } else {
+                            timelinetekssekolah = timelinetekssekolah+'<div><i class="fa fa-check bg-success"></i><div class="timeline-item"><h3 class="timeline-header">Tahsin</h3><div class="timeline-body">'+ data.data[i].tast+'  ('+data.data[i].tasn+')</div></div></div>';
+                        }
+                        if (catatan == '' || catatan  == '0' || catatan == null){
+                        } else {
+                            timelinetekssekolah = timelinetekssekolah+'<div class="time-label"><span class="bg-primary">Catatan</span></div>';
+                            timelinetekssekolah = timelinetekssekolah+'<div><i class="fa fa-book bg-info"></i><div class="timeline-item"><h3 class="timeline-header">Catatan</h3><div class="timeline-body">'+ data.data[i].catatan+'</div></div></div>';
+                        }
+                        timelinetekssekolah = timelinetekssekolah+'</div>';
+
+                        timelineteksrumah = timelineteksrumah+'<div class="timeline"><div class="time-label"><span class="bg-'+state2+'"><i class="fa fa-bank"></i> Setoran di Rumah Tgl. '+data.data[i].tanggal+'</span></div>';
+                        if (mrn == '' || mrn  == '0' || mrn == null){
+                            timelineteksrumah = timelineteksrumah+'<div><i class="fa fa-ban bg-danger"></i><div class="timeline-item"><h3 class="timeline-header">Voice Note</h3></div></div>';
+                        } else {
+                            timelineteksrumah = timelineteksrumah+'<div><i class="fa fa-check bg-success"></i><div class="timeline-item"><h3 class="timeline-header">Voice Note</h3><div class="timeline-body">'+ data.data[i].mrm+'</div></div></div>';
+                        }
+                        if (tarn == '' || tarn  == '0' || tarn == null){
+                            timelineteksrumah = timelineteksrumah+'<div><i class="fa fa-ban bg-danger"></i><div class="timeline-item"><h3 class="timeline-header">Murojaah di Rumah</h3></div></div>';
+                        } else {
+                            timelineteksrumah = timelineteksrumah+'<div><i class="fa fa-check bg-success"></i><div class="timeline-item"><h3 class="timeline-header">Murojaah di Rumah</h3><div class="timeline-body">'+ data.data[i].tart+'</div></div></div>';
+                        }
+                        if (trn == '' || trn  == '0' || trn == null){
+                            timelineteksrumah = timelineteksrumah+'<div><i class="fa fa-ban bg-danger"></i><div class="timeline-item"><h3 class="timeline-header">Tilawah</h3></div></div>';
+                        } else {
+                            timelineteksrumah = timelineteksrumah+'<div><i class="fa fa-check bg-success"></i><div class="timeline-item"><h3 class="timeline-header">Tilawah</h3><div class="timeline-body">'+ data.data[i].trm+'</div></div></div>';
+                        }
+                        if (zrn == '' || zrn  == '0' || zrn == null){
+                            timelineteksrumah = timelineteksrumah+'<div><i class="fa fa-ban bg-danger"></i><div class="timeline-item"><h3 class="timeline-header">Persipan Hafalan Besok</h3></div></div>';
+                        } else {
+                            timelineteksrumah = timelineteksrumah+'<div><i class="fa fa-check bg-success"></i><div class="timeline-item"><h3 class="timeline-header">Persipan Hafalan Besok</h3><div class="timeline-body">'+ data.data[i].zrm+'</div></div></div>';
+                        }
+                        if (catrumah == '' || catrumah  == '0' || catrumah == null){
+                        } else {
+                            timelineteksrumah = timelineteksrumah+'<div class="time-label"><span class="bg-primary">Catatan</span></div>';
+                            timelineteksrumah = timelineteksrumah+'<div><i class="fa fa-book bg-info"></i><div class="timeline-item"><h3 class="timeline-header">Catatan'+ data.data[i].catrumah+'</h3></div></div>';
+                        }
+                        timelineteksrumah = timelineteksrumah+'</div>';
+                        
+                    }
+                    
+                }
+                dtruang = dtruang +'<div class="card shadow">'+
+                                                '<div class="card-header">'+
+                                                    '<div class="card-tools"><button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fa fa-minus"></i></button><button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fa fa-times"></i></button></div>'+
+                                                '</div>'+
+                                                '<div class="card-body">'+
+                                                    '<div class="row">'+
+                                                        '<div class="col-lg-6 col-md-6"><div class="card card-'+state1+' shadow"><div class="card-header"><div class="card-tools"><button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fa fa-minus"></i></button><button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fa fa-times"></i></button></div></div><div class="card-body">'+timelinetekssekolah+'</div></div></div>'+
+                                                        '<div class="col-lg-6 col-md-6"><div class="card card-'+state2+' shadow"><div class="card-header"><div class="card-tools"><button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fa fa-minus"></i></button><button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fa fa-times"></i></button></div></div><div class="card-body">'+timelineteksrumah+'</div></div></div>'+
+                                                    '</div></div></div>';
+                $('#tabelriwayat').html(dtruang);
+            },
+            error: function (xhr, status, error) {
+                swal({
+                    title	: 'Stop',
+                    text	: xhr.responseText,
+                    type	: 'warning',
+                })
             }
-            isLoading.innerHTML = ''
-        })
-        .catch(function (err) {
-            alert('error: ' + err);
         });
     }
-    function openedpage( jQuery ){
-        $('#divdetperkemsantri').hide();
-        $('#divawalperkemsantri').show();
-        $('#sectiontahfid').show();
-        $('.sectionsetoran').hide();
-        var judul = 'Perkembangan santri';
-        $('#juduldetailalquran').html(judul);
-        var set01	= '';
-        var set02	= 'ortu';
-        var source 	= {
-            datatype: "json",
-            datafields: [
-                { name: 'id'},
-                { name: 'noinduk', type: 'text'},
-                { name: 'nama', type: 'text'},
-                { name: 'jilid', type: 'text'},
-                { name: 'kelas', type: 'text'},
-                { name: 'foto', type: 'text'},
-                { name: 'tapel', type: 'text'},
-                { name: 'tanggal', type: 'text'},
-                { name: 'ziyadah_tanggal', type: 'text'},
-                { name: 'ziyadah_mulaisurah', type: 'text'},
-                { name: 'ziyadah_mulaiayat', type: 'text'},
-                { name: 'ziyadah_akhirsurah', type: 'text'},
-                { name: 'ziyadah_akhirayat', type: 'text'},
-                { name: 'murojaah_tanggal', type: 'text'},
-                { name: 'murojaah_mulaisurah', type: 'text'},
-                { name: 'murojaah_mulaiayat', type: 'text'},
-                { name: 'murojaah_akhirsurah', type: 'text'},
-                { name: 'murojaah_akhirayat', type: 'text'},
-                { name: 'tahsin_tanggal', type: 'text'},
-                { name: 'tahsin_mulaisurah', type: 'text'},
-                { name: 'tahsin_mulaiayat', type: 'text'},
-                { name: 'tahsin_akhirsurah', type: 'text'},
-                { name: 'tahsin_akhirayat', type: 'text'},
-                { name: 'tilawah_tanggal', type: 'text'},
-                { name: 'tilawah_mulaisurah', type: 'text'},
-                { name: 'tilawah_mulaiayat', type: 'text'},
-                { name: 'tilawah_akhirsurah', type: 'text'},
-                { name: 'tilawah_akhirayat', type: 'text'},
-            ],
-            type: 'POST',
-            data: {val01:set01, val02:set02, val03:'last', _token: '{{ csrf_token() }}'},
-            url: '{{ route("jsonSetoranTahfid") }}',
-        };
-        var dataAdapter = new $.jqx.dataAdapter(source);
-        $("#gridperkembangansantri").jqxGrid({
-            width           : '100%',
-            pageable        : true,
-            rowsheight      : 40,
-            autoheight      :true,
-            filterable      : true,
-            filtermode      : 'excel',
-            source          : dataAdapter,
-            theme           : "energyblue",
-            selectionmode   : 'singlecell',
-            columns: [
-                { text: 'Detail', editable: false, filterable: false, columntype: 'button', width: 50, align: 'center', cellsrenderer: function () {
-                    return "Detail";
-                    }, buttonclick: function (row) {
-                        editrow = row;
-                        var offset 		= $("#gridperkembangansantri").offset();
-                        var dataRecord 	= $("#gridperkembangansantri").jqxGrid('getrowdata', editrow);
-                        var tapel	    = document.getElementById('mas_tapel').value;
-                        var sourcerinciannilai = {
-                            datatype: "json",
-                            datafields: [
-                                { name: 'id'},
-                                { name: 'noinduk', type: 'text'},
-                                { name: 'nama', type: 'text'},
-                                { name: 'jilid', type: 'text'},
-                                { name: 'kelas', type: 'text'},
-                                { name: 'tapel', type: 'text'},
-                                { name: 'tanggal', type: 'text'},
-                                { name: 'ziyadah_tanggal', type: 'text'},
-                                { name: 'ziyadah_mulaisurah', type: 'text'},
-                                { name: 'ziyadah_mulaiayat', type: 'text'},
-                                { name: 'ziyadah_akhirsurah', type: 'text'},
-                                { name: 'ziyadah_akhirayat', type: 'text'},
-                                { name: 'murojaah_tanggal', type: 'text'},
-                                { name: 'murojaah_mulaisurah', type: 'text'},
-                                { name: 'murojaah_mulaiayat', type: 'text'},
-                                { name: 'murojaah_akhirsurah', type: 'text'},
-                                { name: 'murojaah_akhirayat', type: 'text'},
-                                { name: 'tahsin_tanggal', type: 'text'},
-                                { name: 'tahsin_mulaisurah', type: 'text'},
-                                { name: 'tahsin_mulaiayat', type: 'text'},
-                                { name: 'tahsin_akhirsurah', type: 'text'},
-                                { name: 'tahsin_akhirayat', type: 'text'},
-                                { name: 'tilawah_tanggal', type: 'text'},
-                                { name: 'tilawah_mulaisurah', type: 'text'},
-                                { name: 'tilawah_mulaiayat', type: 'text'},
-                                { name: 'tilawah_akhirsurah', type: 'text'},
-                                { name: 'tilawah_akhirayat', type: 'text'},
-                                { name: 'nilai', type: 'text'},
-                                { name: 'kelulusan', type: 'text'},
-                                { name: 'catatan', type: 'text'},
-                                { name: 'inputor', type: 'text'},
-                            ],
-                            type: 'POST',
-                            data: {	val01:dataRecord.noinduk, val02:tapel, val03:'individu', _token: '{{ csrf_token() }}' },
-                            url: '{{ route("jsonSetoranTahfid") }}',
-                        };
-                        $('#divdetperkemsantri').show();
-                        $('#divawalperkemsantri').hide();
-                        var judul = 'Perkembangan an. '+dataRecord.nama;
-                        $('#juduldetailalquran').html(judul);
-                        var datarincianharian = new $.jqx.dataAdapter(sourcerinciannilai);
-                        $("#griddetailperkembangansantri").jqxGrid({
-                            width           : '100%',
-                            source          : datarincianharian,
-                            autoheight      : true,
-                            filterable      : true,
-                            theme           : "orange",
-                            columnsresize   : true,
-                            selectionmode   : 'multiplecellsextended',
-                            columns: [
-                                { text: 'Edit', columntype: 'button', width: 50, align: 'center', cellsrenderer: function () {
-                                    return "Edit";
-                                    }, buttonclick: function (row) {
-                                        editrow = row;
-                                        var offset 		= $("#griddetailperkembangansantri").offset();
-                                        var dataRecord 	= $("#griddetailperkembangansantri").jqxGrid('getrowdata', editrow);
-                                        $('.sectionsetoran').show();
-                                        $('#sectiontahfid').hide();
-                                        $("#setoran_tanggal").val(dataRecord.tanggal);
-                                        $("#setoran_nama").val(dataRecord.nama);
-                                        $("#setoran_noinduk").val(dataRecord.noinduk);
-                                        $("#setoran_kelas").val(dataRecord.kelas);
-                                        $("#setoran_jilid").val(dataRecord.jilid);
-                                        $("#setoran_nilai").val(dataRecord.nilai);
-                                        $("#setoran_status").val(dataRecord.kelulusan);
-                                        $("#setoran_catatan").val(dataRecord.catatan);
-                                        $("#setoran_ziyadahsurahawal").val(dataRecord.ziyadah_akhirayat).select2().trigger('change');
-                                        $("#setoran_ziyadahsurahakhir").val(dataRecord.ziyadah_akhirayat).select2().trigger('change');
-                                        $("#setoran_msurahawal").val(dataRecord.murojaah_akhirayat).select2().trigger('change');
-                                        $("#setoran_msurahakhir").val(dataRecord.murojaah_akhirayat).select2().trigger('change');
-                                        $("#setoran_tahsinawal").val(dataRecord.tahsin_akhirayat).select2().trigger('change');
-                                        $("#setoran_tahsinakhir").val(dataRecord.tahsin_akhirayat).select2().trigger('change');
-                                        $("#setoran_tilawahsurahawal").val(dataRecord.tilawah_akhirayat).select2().trigger('change');
-                                        $("#setoran_tilawahsurahakhir").val(dataRecord.tilawah_akhirayat).select2().trigger('change');
-                                    }
-                                },
-                                { text: 'Ustad / Ustadzah', datafield: 'inputor', width: 120, cellsalign: 'left', align: 'center' },
-                                { text: 'Tanggal', datafield: 'tanggal', editable: false, width: 100, cellsalign: 'center', align: 'center' },
-                                { text: 'Z. Mulai Surah', columngroup: 'kelompok01', datafield: 'ziyadah_mulaisurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                                { text: 'Z. Mulah Ayat', columngroup: 'kelompok01', datafield: 'ziyadah_mulaiayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                                { text: 'Z. Sampai Surat', columngroup: 'kelompok01', datafield: 'ziyadah_akhirsurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                                { text: 'Z. Sampai Ayat', columngroup: 'kelompok01', datafield: 'ziyadah_akhirayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                                { text: 'Ti Mulai Surah', columngroup: 'kelompok02', datafield: 'tilawah_mulaisurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                                { text: 'Ti Mulai Ayat', columngroup: 'kelompok02', datafield: 'tilawah_mulaiayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                                { text: 'Ti Sampai Surah', columngroup: 'kelompok02', datafield: 'tilawah_akhirsurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                                { text: 'Ti Sampai Ayat', columngroup: 'kelompok02', datafield: 'tilawah_akhirayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                                { text: 'Ta Mulai Surah', columngroup: 'kelompok03', datafield: 'tahsin_mulaisurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                                { text: 'Ta Mulah Ayat', columngroup: 'kelompok03', datafield: 'tahsin_mulaiayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                                { text: 'Ta Sampai Surat', columngroup: 'kelompok03', datafield: 'tahsin_akhirsurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                                { text: 'Ta Sampai Ayat', columngroup: 'kelompok03', datafield: 'tahsin_akhirayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                                { text: 'M. Mulai Surah', columngroup: 'kelompok04', datafield: 'murojaah_mulaisurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                                { text: 'M. Mulai Ayat', columngroup: 'kelompok04', datafield: 'murojaah_mulaiayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                                { text: 'M. Sampai Surah', columngroup: 'kelompok04', datafield: 'murojaah_akhirsurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                                { text: 'M. Sampai Ayat', columngroup: 'kelompok04', datafield: 'murojaah_akhirayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                                { text: 'Nilai', columngroup: 'kelompok05', datafield: 'nilai', width: 50, cellsalign: 'center', align: 'center' },
-                                { text: 'Kelulusan', columngroup: 'kelompok05', datafield: 'kelulusan', filtertype: 'checkedlist', width: 100, cellsalign: 'left', align: 'center' },
-                                { text: 'Catatan', columngroup: 'kelompok05', datafield: 'catatan', width: 200, cellsalign: 'center', align: 'center' },
-                            ],
-                            columngroups: 
-                            [
-                                { text: 'ZIYADAH', align: 'center', name: 'kelompok01' },
-                                { text: 'TILAWAH', align: 'center', name: 'kelompok02' },
-                                { text: 'TAHSIN', align: 'center', name: 'kelompok03' },
-                                { text: 'MUROJAAH', align: 'center', name: 'kelompok04' },
-                                { text: 'PENILAIAN', align: 'center', name: 'kelompok05' },
-                            ]
-                        });
-                    }
-                },
-                { text: 'Tambah',editable: false, filterable: false,  columntype: 'button', width: 50, align: 'center', cellsrenderer: function () {
-                    return "NEW";
-                    }, buttonclick: function (row) {
-                        editrow = row;
-                        var offset 		= $("#gridperkembangansantri").offset();
-                        var dataRecord 	= $("#gridperkembangansantri").jqxGrid('getrowdata', editrow);
-                        $('.sectionsetoran').show();
-                        $('#sectiontahfid').hide();
-                        var tanggal	= document.getElementById('set_tanggal').value;
-                        $("#setoran_nama").val(dataRecord.nama);
-                        $("#setoran_noinduk").val(dataRecord.noinduk);
-                        $("#setoran_kelas").val(dataRecord.kelas);
-                        $("#setoran_jilid").val(dataRecord.jilid);
-                        $("#setoran_tanggal").val(tanggal);
-                        $("#setoran_nilai").val('');
-                        $("#setoran_status").val('');
-                        $("#setoran_catatan").val('');
-                        $("#setoran_ziyadahsurahawal").val(dataRecord.ziyadah_akhirayat).select2().trigger('change');
-                        $("#setoran_ziyadahsurahakhir").val(dataRecord.ziyadah_akhirayat).select2().trigger('change');
-                        $("#setoran_msurahawal").val(dataRecord.murojaah_akhirayat).select2().trigger('change');
-                        $("#setoran_msurahakhir").val(dataRecord.murojaah_akhirayat).select2().trigger('change');
-                        $("#setoran_tahsinawal").val(dataRecord.tahsin_akhirayat).select2().trigger('change');
-                        $("#setoran_tahsinakhir").val(dataRecord.tahsin_akhirayat).select2().trigger('change');
-                        $("#setoran_tilawahsurahawal").val(dataRecord.tilawah_akhirayat).select2().trigger('change');
-                        $("#setoran_tilawahsurahakhir").val(dataRecord.tilawah_akhirayat).select2().trigger('change');
-                    }
-                },
-                { text: 'Photo', datafield: 'foto', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'Nama', datafield: 'nama', width: 200, cellsalign: 'left', align: 'center' },
-                { text: 'Setoran Akhir', datafield: 'tanggal', width: 100, cellsalign: 'center', align: 'center' },
-                { text: 'Z. Mulai Surah', columngroup: 'kelompok01', datafield: 'ziyadah_mulaisurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                { text: 'Z. Mulah Ayat', columngroup: 'kelompok01', datafield: 'ziyadah_mulaiayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'Z. Sampai Surat', columngroup: 'kelompok01', datafield: 'ziyadah_akhirsurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                { text: 'Z. Sampai Ayat', columngroup: 'kelompok01', datafield: 'ziyadah_akhirayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'Ti Mulai Surah', columngroup: 'kelompok02', datafield: 'tilawah_mulaisurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                { text: 'Ti Mulai Ayat', columngroup: 'kelompok02', datafield: 'tilawah_mulaiayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'Ti Sampai Surah', columngroup: 'kelompok02', datafield: 'tilawah_akhirsurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                { text: 'Ti Sampai Ayat', columngroup: 'kelompok02', datafield: 'tilawah_akhirayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'Ta Mulai Surah', columngroup: 'kelompok03', datafield: 'tahsin_mulaisurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                { text: 'Ta Mulah Ayat', columngroup: 'kelompok03', datafield: 'tahsin_mulaiayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'Ta Sampai Surat', columngroup: 'kelompok03', datafield: 'tahsin_akhirsurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                { text: 'Ta Sampai Ayat', columngroup: 'kelompok03', datafield: 'tahsin_akhirayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'M. Mulai Surah', columngroup: 'kelompok04', datafield: 'murojaah_mulaisurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                { text: 'M. Mulai Ayat', columngroup: 'kelompok04', datafield: 'murojaah_mulaiayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-                { text: 'M. Sampai Surah', columngroup: 'kelompok04', datafield: 'murojaah_akhirsurah', editable: false, filterable: false, width: 90, cellsalign: 'left', align: 'center' },
-                { text: 'M. Sampai Ayat', columngroup: 'kelompok04', datafield: 'murojaah_akhirayat', editable: false, filterable: false, width: 50, cellsalign: 'center', align: 'center' },
-            ],
-            columngroups: 
-            [
-                { text: 'ZIYADAH', align: 'center', name: 'kelompok01' },
-                { text: 'TILAWAH', align: 'center', name: 'kelompok02' },
-                { text: 'TAHSIN', align: 'center', name: 'kelompok03' },
-                { text: 'MUROJAAH', align: 'center', name: 'kelompok04' },
-            ]
+    function btnisikandata(id){
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+        var formdata = new FormData();
+            formdata.set('val01',id);
+            formdata.set('workcode','getdatabyid');
+            formdata.set('_token', '{{ csrf_token() }}');
+        url='{{ route("jsonDataRPA") }}';
+        $('#loading').show();
+        $.ajax({
+            type        : 'ajax',
+            url         : url,
+            method      : 'post',
+            data        : formdata,
+            cache       : false,
+            contentType : false,
+            processData : false,
+            dataType    : 'json',
+            success: function(response, status, xhr) {
+                $('#loading').hide();
+                $('.sectiontahfid').hide();
+                $('.sectionsetoran').hide();
+                $('.sectionisisetoran').show();
+                $('.sectionstatistik').hide();
+                var judul       = 'Peloporan Setoran an. '+response.nama;
+                $('#judullaporan').html(judul);
+                $('#id_tanggal').val(response.tanggal);
+                $('#rpa_mendengaraudio').html(response.mendengaraudio);
+                $('#rpa_persiapanhafalanbesok').html(response.persiapanhafalanbesok);
+                $('#rpa_ziyadahsurahawal').val(response.murojaahdirumaha);
+                $('#rpa_ziyadahsurahakhir').val(response.murojaahdirumahb);
+                $('#setoran_murojaah_mulaiayat').val(response.murojaah_mulaiayat).select2().trigger('change');
+                $('#setoran_murojaah_akhirayat').val(response.murojaah_akhirayat).select2().trigger('change');
+                $('#setoran_ziyadah_mulaiayat').val(response.ziyadah_mulaiayat).select2().trigger('change');
+                $('#setoran_ziyadah_akhirayat').val(response.ziyadah_akhirayat).select2().trigger('change');
+                $('#id_nama').val(response.nama);
+                $('#id_noinduk').val(response.noinduk);
+                $('#id_kelas').val(response.kelas);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                $('#loading').hide();
+                swal({
+                    title: textStatus,
+                    text:  jqXHR.responseText,
+                    type: 'info',
+                });
+            }
+        });
+    }
+    function getPR( jQuery ){
+        var tapel	    = document.getElementById('mas_tapel').value;
+        var semester	= document.getElementById('mas_semester').value;
+        var noinduk	    = document.getElementById('mas_noinduk').value;
+        var kelas	    = document.getElementById('mas_kelas').value;
+        var tanggal	    = document.getElementById('id_tanggal').value;
+        var formdata = new FormData();
+            formdata.set('noinduk', noinduk);
+            formdata.set('kelas', kelas);
+            formdata.set('tanggal', tanggal);
+            formdata.set('tapel', tapel);
+            formdata.set('semester', semester);
+            formdata.set('workcode','getdatabynoinduktgl');
+            formdata.set('_token', '{{ csrf_token() }}');
+        url='{{ route("jsonDataRPA") }}';
+        $.ajax({
+            type        : 'ajax',
+            url         : url,
+            method      : 'post',
+            data        : formdata,
+            cache       : false,
+            contentType : false,
+            processData : false,
+            dataType    : 'json',
+            success: function(response, status, xhr) {
+                $('#rpa_persiapanhafalanbesok').html(response.persiapanhafalanbesok);
+                $('#rpa_murojaahsabtuahad').html(response.murojaahsabtuahad);
+                $('#rpa_murojaahdirumah').html(response.murojaahdirumah);
+                $('#rpa_tilawah').html(response.tilawah);
+                $('#mas_persiapanhafalanbesok').val(response.persiapanhafalanbesok);
+                $('#mas_murojaahsabtuahad').val(response.murojaahsabtuahad);
+                $('#mas_murojaahdirumah').val(response.murojaahdirumah);
+                $('#mas_tilawah').val(response.tilawah);
+                var ziyadah = response.ziyadah_nilai;
+                var murojaah= response.murojaah_nilai;
+                var tilawah = response.tilawah_nilai;
+                var tahsin  = response.tahsin_nilai;
+                if (ziyadah == '' || ziyadah == null){
+                    $('#lap_persiapanhafalanbesok').prop('checked', false);
+                } else {
+                    $('#lap_persiapanhafalanbesok').prop('checked', true);
+                }
+                if (murojaah == '' || murojaah == null){
+                    $('#lap_murojaahdirumah').prop('checked', false);
+                } else {
+                    $('#lap_murojaahdirumah').prop('checked', true);
+                }
+                if (tilawah == '' || tilawah == null){
+                    $('#lap_tilawah').prop('checked', false);
+                } else {
+                    $('#lap_tilawah').prop('checked', true);
+                }
+                if (tahsin == '' || tahsin == null){
+                    $('#lap_murojaahsabtuahad').prop('checked', false);
+                } else {
+                    $('#lap_murojaahsabtuahad').prop('checked', true);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                swal({
+                    title: textStatus,
+                    text:  jqXHR.responseText,
+                    type: 'info',
+                });
+            }
         });
     }
     $(document).ready(function () {
+        $('.sectiontahfid').show();
+        $('.sectionsetoran').hide();
+        $('.sectionstatistik').hide();
+        $('.sectionisisetoran').hide();
+        $('#loading').hide();
         var token = document.getElementById('token').value;
-        openedpage();
-        $("#mushaf_list").on('change', function () {		
-            var id      = $(this).find('option:selected').attr('value');
-            var surah   = $(this).find('option:selected').attr('surah');
-            surah.replace(/[^\w\s]/gi, '');
-            getSurat(id, surah);
-        });
         $('.btnboxrefresh').click(function () {
             var uri = window.location.href.split("#")[0];
             window.location=uri
         });
-        $('#btnclosedetail').click(function () {
-            $('#divgriddetailpresensi').hide();
-            var judul = 'Perkembangan santri';
-            $('#juduldetailalquran').html(judul);
+        $('#btntutupsetoran').click(function () {
+            $('.sectionsetoran').show();
+            $('.sectionstatistik').hide();
+            $('.sectionisisetoran').hide();
+            openedpage();
+            $('.sectionsetoran').show();
         });
-        $('#btnclosedetailperkembangan').click(function () {
-            $('#divawalperkemsantri').show();
-            $('#divdetperkemsantri').hide();
-            var judul = 'Perkembangan santri';
-            $('#juduldetailalquran').html(judul);
-        });
-        $('#btnclosemushaf').click(function () {
-            $('.divumum').hide();
-            $('#sectiontahfid').show();
-            $('.sectionsetoran').hide();
-        });
-        $('#btnkembalidarisetoran').click(function () {
-            $('.sectionsetoran').hide();
-            $('#sectiontahfid').show();
-            $("html, body").animate({ scrollTop: 0 }, "slow");
-        });
-        $('.btnsimpansetoran').click(function () {
-            var formdata = new FormData($('#formtambahsetoran')[0]);
-                formdata.set('_token', '{{ csrf_token() }}');
-            $.ajax({
-                url         : '{{ route("exInputsetoran") }}',
-                data        : formdata,
-                type        : 'POST',
-                contentType : false,
-                processData : false,
-                success: function (data) {
-                    var status  = data.status;
-                    var message = data.message;
-                    var warna 	= data.warna;
-                    var icon 	= data.icon;
-                    $("html, body").animate({ scrollTop: 0 }, "slow");
-                    swal({
-                        title	: status,
-                        text	: message,
-                        type	: icon,
-                    })
-                    $('.sectionsetoran').hide();
-                    $('#sectiontahfid').show();
-                    $("html, body").animate({ scrollTop: 0 }, "slow");
-                    $("#gridperkembangansantri").jqxGrid('updatebounddata');
-                    return false;
-                },
-                error: function (xhr, status, error) {
-                    swal({
-                        title	: 'Stop',
-                        text	: xhr.responseText,
-                        type	: 'warning',
-                    })
-                }
-            });
-        });
-        $('.btnexport').click(function () {
-            var gridContent = $("#gridnilai").jqxGrid('exportdata', 'json');
-            data = $.parseJSON(gridContent);
-            var noOfContacts = data.length;
-            if(noOfContacts>0){
-                var table = document.createElement("table");
-                    table.style.width = '100%';
-                    table.setAttribute('border', '1');
-                    table.setAttribute('cellspacing', '0');
-                    table.setAttribute('cellpadding', '5');
-                    table.setAttribute('id', 'tabelcetak');
-                    table.setAttribute('class', 'text');
-                var col = [];
-                for (var i = 0; i < noOfContacts; i++) {
-                    for (var key in data[i]) {
-                        if (col.indexOf(key) === -1) {
-                            col.push(key);
-                        }
-                    }
-                }
-                var tHead = document.createElement("thead");
-                var hRow = document.createElement("tr");
-                for (var i = 0; i < col.length; i++) {
-                        var th = document.createElement("th");
-                        th.innerHTML = col[i];
-                        hRow.appendChild(th);
-                }
-                tHead.appendChild(hRow);
-                table.appendChild(tHead);
-                var tBody = document.createElement("tbody");
-                for (var i = 0; i < noOfContacts; i++) {
-                    var bRow = document.createElement("tr");
-                    for (var j = 0; j < col.length; j++) {
-                        var td 		= document.createElement("td");
-                        var isi 	= data[i][col[j]];
-                        var isi2 	= isi.toString();
-                        var pjg 	= isi2.length;
-                        if (pjg > 8){
-                            if (pjg == 9 || pjg == 10){
-                                if( isi2.indexOf(',') != -1 ){
-                                    var res = isi2.replace(/,/g, "");
-                                    td.innerHTML = res;
-                                }
-                                else {
-                                    var res = isi2;
-                                    td.setAttribute('style', 'mso-number-format: "\@";');
-                                    td.innerHTML = res;
-                                }
-                            }
-                            else {
-                                var res = isi2;
-                                td.setAttribute('style', 'mso-number-format: "\@";');
-                                td.innerHTML = res;
-                            }
-                        }
-                        else {
-                            var res = isi2.replace(/,/g, "");
-                            td.innerHTML = res;
-                        }
-
-                        bRow.appendChild(td);
-                    }
-                    tBody.appendChild(bRow)
-                }
-                table.appendChild(tBody);
-                var divContainer = document.getElementById("tabel_cetak");
-                    divContainer.innerHTML = "";
-                    divContainer.appendChild(table);
+        $('#btnsimpandata').click(function () {
+            var tapel	    = document.getElementById('mas_tapel').value;
+            var semester	= document.getElementById('mas_semester').value;
+            var checkbox01  = document.getElementById("lap_tilawah");
+            if (checkbox01.checked) {
+                var tilawah = 1;
+            } else {
+                var tilawah = 0;
             }
-            $("#tabel_cetak").btechco_excelexport({
-                containerid: "tabel_cetak"
-                , datatype: $datatype.Table
-            });
-            return false;
+            var checkbox02  = document.getElementById("lap_murojaahdirumah");
+            if (checkbox02.checked) {
+                var murojaahdirumah = 1;
+            } else {
+                var murojaahdirumah = 0;
+            }
+            var checkbox03  = document.getElementById("lap_murojaahsabtuahad");
+            if (checkbox03.checked) {
+                var murojaahsabtuahad = 1;
+            } else {
+                var murojaahsabtuahad = 0;
+            }
+            var checkbox04  = document.getElementById("lap_persiapanhafalanbesok");
+            if (checkbox04.checked) {
+                var persiapanhafalanbesok = 1;
+            } else {
+                var persiapanhafalanbesok = 0;
+            }
+            var total = Number(tilawah) + Number(murojaahdirumah) + Number(murojaahsabtuahad) + Number(persiapanhafalanbesok);
+            if (total == 0){
+                swal({
+                    title: 'Peringatan',
+                    text: 'Data Yang di Centang Tidak Ada',
+                    type: 'info',
+                });
+            } else if (tapel == '' || tapel == null || semester == '' || semester == null) {
+                swal({
+                    title: 'Gagal',
+                    text: 'Session Invalid, Refresh Laman Ini Sebelum Mengulang Kembali',
+                    type: 'error',
+                });
+            } else {
+                var btn = $(this);
+                    btn.addClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', true);
+                var formdata = new FormData($('#formtambahsetoran')[0]);
+                    formdata.set('workcode', 'laporprharian');
+                    formdata.set('tapel', tapel);
+                    formdata.set('semester', semester);
+                    formdata.set('tilawah', tilawah);
+                    formdata.set('murojaahdirumah', murojaahdirumah);
+                    formdata.set('murojaahsabtuahad', murojaahsabtuahad);
+                    formdata.set('persiapanhafalanbesok', persiapanhafalanbesok);
+                    formdata.set('_token', '{{ csrf_token() }}');
+                $.ajax({
+                    url         : '{{ route("jsonDataRPA") }}',
+                    data        : formdata,
+                    type        : 'POST',
+                    contentType : false,
+                    processData : false,
+                    success: function (data) {
+                        var status  = data.status;
+                        var message = data.message;
+                        var warna 	= data.warna;
+                        var icon 	= data.icon;
+                        $.toast({
+                            heading     : status,
+                            text        : message,
+                            position    : 'top-right',
+                            loaderBg    : warna,
+                            icon        : icon,
+                            hideAfter   : 5000,
+                            stack       : 1
+                        });
+                        $('.sectionsetoran').show();
+                        $('.sectionstatistik').hide();
+                        $('.sectionisisetoran').hide();
+                        $("html, body").animate({ scrollTop: 0 }, "slow");
+                        openedpage();
+                        btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+                        $('.sectionsetoran').show();
+                    },
+                    error: function (xhr, status, error) {
+                        btn.removeClass('fa fa-spinner fa-spin orange bigger-125').attr('disabled', false);
+                        swal({
+                            title	: 'Stop',
+                            text	: xhr.responseText,
+                            type	: 'warning',
+                        })
+                    }
+                });
+            }
+            
+        });
+        $("#id_tanggal").on('change', function () {
+            getPR();
         });
     });
 </script>

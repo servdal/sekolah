@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="center"><a href="https://duidev.com" target="_blank"><img src="https://github.com/servdal/sekolah/blob/master/public/header.png" width="400"></a></p>
 
 <p align="center">
@@ -6,76 +7,71 @@
 <a href="https://sdtqdu.sch.id/"><img src="https://sdtqdu.sch.id/logo.png" width="35" alt="SDTQ Daarul Ukhuwwah"></a>
 <a href="https://sisfo.mutiarahati.sch.id/"><img src="https://sisfo.mutiarahati.sch.id/logo/3-1728523474logo.png" width="35" alt="Mutiara Hati"></a>
 
+=======
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+>>>>>>> c0ad38e8 (update)
 </p>
 
-## Sistem Manajemen Sekolah Terpadu
+## About Laravel
 
-Aplikasi Sistem Manajemen Sekolah Terpadu adalah sebuah aplikasi yang dikembangkan untuk membantu manajemen sekolah dalam mengelola berbagai aspek kegiatan sehari-hari di sekolah.
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-## Deskripsi
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-Aplikasi ini dirancang untuk memudahkan administrasi sekolah dalam mengelola data siswa, data guru, jadwal pelajaran, absensi, catatan rapat, dan masih banyak lagi. Dengan antarmuka yang intuitif dan fitur-fitur yang lengkap, aplikasi ini dapat membantu meningkatkan efisiensi dan kualitas layanan pendidikan di sekolah.
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Learning Laravel
 
-## Fitur Utama
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-- Manajemen Data Siswa: Tambah, edit, dan hapus data siswa dengan mudah.
-- Manajemen Data Guru: Kelola informasi guru termasuk data pribadi, pengalaman kerja, dan lainnya.
-- Jadwal Pelajaran: Buat jadwal pelajaran yang dapat diakses oleh semua pihak terkait.
-- Absensi Siswa: Rekam absensi siswa secara elektronik dan pantau kehadiran mereka dengan mudah.
-- Catatan Alquran: Simpan catatan murojaah / tahsin / Ziyadah / Tilawah.
-- Database Keuangan : Tabungan Siswa, Neraca Pemasukan dan Pengeluaran Sekolah, Laporan SPP / DPP / Insidental
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-## Instalasi Mobile Apps
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-1. Unduh aplikasi dari [Google Play Store](https://play.google.com/store/apps/details?id=com.duidev.simaster).
-2. Instal aplikasi di perangkat Android Anda.
-3. Buka aplikasi dan ikuti panduan konfigurasi yang disediakan.
+## Laravel Sponsors
 
-**Catatan**: Aplikasi ini menggunakan WebView untuk mengakses aplikasi berbasis web yang terletak di [simbian.duidev.com](https://simbian.duidev.com/), yang dikembangkan oleh [Duidev](https://duidev.com/).
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-### Instalasi dari GitHub
+### Premium Partners
 
-1. Unduh aplikasi dari [halaman GitHub repository](https://github.com/servdal/sekolah).
-2. Ekstrak file ZIP yang telah diunduh ke dalam direktori web server Anda.
-3. Buka terminal atau command prompt dan arahkan ke direktori aplikasi.
-4. Jalankan perintah `php composer.phar update` untuk menginstal semua dependensi PHP.
-5. Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database Anda.
-6. Pastikan untuk Email sudah di isikan username dan password dan server SMTP anda (karena default pendaftaran menggunakan email untuk aktivasi)
-7. Jalankan perintah `php artisan key:generate` untuk menghasilkan kunci aplikasi yang unik.
-8. import file sql yg ada di folder database/scheme/.
-9. Jalankan perintah `php artisan config:cache`.
-10. Akses aplikasi melalui browser Anda (Username dan Password Default : simaster@duidev.com | bismillah).
+- **[Vehikl](https://vehikl.com/)**
+- **[Tighten Co.](https://tighten.co)**
+- **[WebReinvent](https://webreinvent.com/)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+- **[Cyber-Duck](https://cyber-duck.co.uk)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Jump24](https://jump24.co.uk)**
+- **[Redberry](https://redberry.international/laravel/)**
+- **[Active Logic](https://activelogic.com)**
+- **[byte5](https://byte5.de)**
+- **[OP.GG](https://op.gg)**
 
-### Instalasi Local Webserver (XAMPP / Linux dengan Apache/Nginx)
+## Contributing
 
-Pastikan Anda telah menginstal XAMPP atau konfigurasi server web yang sesuai di lingkungan Linux Anda. Pastikan juga PHP minimal versi 8 dan MySQL telah terinstal.
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-1. Unduh aplikasi dari [halaman GitHub repository](https://github.com/servdal/sekolah).
-2. Ekstrak file ZIP yang telah diunduh ke dalam direktori web server Anda.
-3. Buka terminal dan arahkan ke direktori aplikasi.
-4. Jalankan perintah `php composer.phar update` untuk menginstal semua dependensi PHP.
-5. Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database Anda.
-6. Pastikan untuk Email sudah di isikan username dan password dan server SMTP anda (karena default pendaftaran menggunakan email untuk aktivasi)
-7. Jalankan perintah `php artisan key:generate` untuk menghasilkan kunci aplikasi yang unik.
-8. import file sql yg ada di folder database/scheme/.
-9. Jalankan perintah `php artisan config:cache`.
-9. Buka web browser Anda dan arahkan ke alamat URL tempat aplikasi telah diinstal (Username dan Password Default : simaster@duidev.com | bismillah).
+## Code of Conduct
 
-## Kontribusi
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-Kami terbuka terhadap kontribusi dari komunitas. Jika Anda menemukan masalah atau ingin berkontribusi dalam pengembangan aplikasi ini, silakan buka [laporan masalah](https://github.com/servdal/sekolah/issues) atau kirimkan pull request.
+## Security Vulnerabilities
 
-## Lisensi
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-Aplikasi ini dilisensikan di bawah [MIT License](LICENSE).
+## License
 
-## Donasi
-
-Jika Anda ingin mendukung pengembangan aplikasi ini, Anda dapat berdonasi melalui transfer bank ke rekening berikut:
-- BRI, Norek : 005101142079504
-- Mandiri, Norek : 1440019278099
-- BSI, Norek : 7167036915
-
-An. Dwi Swandhana Rahmadi Putra
-
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

@@ -1,0 +1,17 @@
+[
+{"id":"1","layanan":"daftarekskul","status":"mati","id_sekolah":"1"},
+{"id":"2","layanan":"ppdb","status":"umum","id_sekolah":"1"},
+{"id":"3","layanan":"kodebaru","status":"MH19","id_sekolah":"1"},
+{"id":"4","layanan":"kodepindahan","status":"MHP19","id_sekolah":"1"},
+{"id":"5","layanan":"hargaformulir","status":"150000","id_sekolah":"1"},
+{"id":"6","layanan":"namabank","status":"Bank Mandiri Syariah","id_sekolah":"1"},
+{"id":"7","layanan":"norek","status":"12345","id_sekolah":"1"},
+{"id":"8","layanan":"periodepsb","status":"Gelombang Inden","id_sekolah":"1"},
+{"id":"9","layanan":"spp1","status":"350000","id_sekolah":"1"},
+{"id":"10","layanan":"spp2","status":"400000","id_sekolah":"1"},
+{"id":"11","layanan":"spp3","status":"450000","id_sekolah":"1"},
+{"id":"12","layanan":"dpp1","status":"8000000","id_sekolah":"1"},
+{"id":"13","layanan":"dpp2","status":"9000000","id_sekolah":"1"},
+{"id":"14","layanan":"dpp3","status":"8000000","id_sekolah":"1"},
+{"id":"15","layanan":"pembayaranzis","status":"mati","id_sekolah":"1"}
+]

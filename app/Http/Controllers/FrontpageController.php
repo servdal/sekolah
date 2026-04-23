@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use App\Http\Controllers\SendMail;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\NewMessageNotification;
 use App\Models\User;
+use App\Models\ShortLink;
 use App\Chatting;
 use App\Pengumuman;
 use App\Sekolah;
@@ -20,8 +22,6 @@ use App\Datapsb;
 use App\Datapelengkappsb;
 use App\Setting;
 use App\Tesppdb;
-use App\Blogdata;
-use App\Blogkomendata;
 use App\Pembayaran;
 use App\Ekstrakulikuler;
 use App\Suratkeluar;
@@ -30,17 +30,24 @@ use App\AbsenProgramPIP;
 use App\HPTKeuangan;
 use App\Inboxsurat;
 use App\Suratmasuk;
-use App\Disposisi;
-use App\Suratkeluartnpnomor;
-use App\Macamdisposisi;
-use App\Filess;
-use App\Histories;
-use App\Detailpegawai;
-use App\Banksoalujian;
 use App\Insidental;
-use App\Penerimasurat;
 use App\Formulirpsb;
+use App\Bukutamu;
+use App\XFiles;
+use App\RencanaKegiatan;
+use App\RABKegiatan;
+use App\Dataindukstaff;
+use App\EfikasiKeuangan;
+use App\KurikulumAlquran;
+use App\MushafHalaman;
+use App\MushafUjian;
+use App\MushafUjianLisan;
+use App\Perpumini;
+use App\Datanilai;
+use App\Datakd;
+
 use Carbon\Carbon;
+use setasign\Fpdi\Tcpdf\Fpdi;
 use GuzzleHttp\Client;
 use Validator;
 use Session;
@@ -52,11 +59,157 @@ use PDFCREATOR;
 use DateTime;
 use FeedReader;
 use Redirect;
-
+function angka_ke_teks_arab($angka) {
+	$digit_arab = array(
+		0 => '٠',
+		1 => '١',
+		2 => '٢',
+		3 => '٣',
+		4 => '٤',
+		5 => '٥',
+		6 => '٦',
+		7 => '٧',
+		8 => '٨',
+		9 => '٩'
+	);
+	$teks_arab 		= '';
+	$angka_str 		= strval($angka);
+	$panjang_angka 	= strlen($angka_str);
+	for ($i = 0; $i < $panjang_angka; $i++) {
+		$teks_arab .= $digit_arab[$angka_str[$i]];
+	}
+	return $teks_arab;
+}
+function formatPesan($pesan) {
+	$pengganti = [
+		':)' 	=> '&#128522;',
+		'T_T' 	=> '&#128557;',
+		'>.<' 	=> '&#128518;',
+		'^_v' 	=> '&#128540;',
+		'<' 	=> '&#60;',
+		'>' 	=> '&#62;',
+		'"' 	=> '&#34;',
+		'#' 	=> '&#35;',
+		'$' 	=> '&#36;',
+		'%' 	=> '&#37;',
+		'&' 	=> '&#38;',
+		'+' 	=> '&#43;',
+		'@' 	=> '&#64;',
+		'?' 	=> '&#63;',
+		'^' 	=> '&#94;',
+		'{' 	=> '&#123;',
+		'}' 	=> '&#125;',
+		'`' 	=> '&#96;',
+		"'" 	=> "&#39;",
+		'(' 	=> "&#40;",
+		')' 	=> "&#41;"
+	];
+	return str_replace(array_keys($pengganti), array_values($pengganti), $pesan);
+}
 class FrontpageController extends Controller
 {
-	protected static function genSurat($id, $tabel){
+	public function show($slug)
+    {
+        $link = ShortLink::where('slug', $slug)->firstOrFail();
+        $link->increment('clicks');
+        return redirect()->away($link->destination_url);
+    }
+	protected function ppdbUploadAccessKey()
+	{
+		return 'ppdb_upload_access';
+	}
+	protected function storePpdbUploadAccess($idSekolah, $nik, $tgllahir)
+	{
+		Session::put($this->ppdbUploadAccessKey(), [
+			'id_sekolah' => (string) $idSekolah,
+			'nik' => trim((string) $nik),
+			'tgllahir' => trim((string) $tgllahir),
+			'verified_at' => Carbon::now()->timestamp,
+		]);
+	}
+	protected function hasPpdbUploadAccess($idSekolah, $nik, $tgllahir = null)
+	{
+		if (Auth::check()) {
+			return true;
+		}
+		$access = Session::get($this->ppdbUploadAccessKey());
+		if (!is_array($access) || !isset($access['verified_at'])) {
+			return false;
+		}
+		if (($access['verified_at'] + 1800) < Carbon::now()->timestamp) {
+			Session::forget($this->ppdbUploadAccessKey());
+			return false;
+		}
+		if ((string) ($access['id_sekolah'] ?? '') !== (string) $idSekolah) {
+			return false;
+		}
+		if (trim((string) ($access['nik'] ?? '')) !== trim((string) $nik)) {
+			return false;
+		}
+		if ($tgllahir !== null && trim((string) ($access['tgllahir'] ?? '')) !== trim((string) $tgllahir)) {
+			return false;
+		}
+		return true;
+	}
+	protected function validatePpdbImageData($data)
+	{
+		if (!is_string($data)) {
+			return null;
+		}
+		$data = trim($data);
+		if ($data === '') {
+			return null;
+		}
+		if (!preg_match('/^data:image\/(png|jpe?g);base64,/i', $data)) {
+			return false;
+		}
+		$parts = explode(',', $data, 2);
+		if (count($parts) !== 2) {
+			return false;
+		}
+		$binary = base64_decode($parts[1], true);
+		if ($binary === false || strlen($binary) > (2 * 1024 * 1024)) {
+			return false;
+		}
+		$imageInfo = @getimagesizefromstring($binary);
+		if ($imageInfo === false || !isset($imageInfo['mime'])) {
+			return false;
+		}
+		if (!in_array($imageInfo['mime'], ['image/jpeg', 'image/png'], true)) {
+			return false;
+		}
+		return $data;
+	}
+	protected function getAuthorizedPpdbRecord($id)
+	{
+		$datapsb = Datapsb::where('id', $id)->first();
+		if (!isset($datapsb->id)) {
+			return null;
+		}
+		if ($this->hasPpdbUploadAccess($datapsb->id_sekolah, $datapsb->nik, $datapsb->tgllahir)) {
+			return $datapsb;
+		}
+		return null;
+	}
+	public static function genSurat($id, $tabel){
+		$data		= [];
 		$homebase 	= url("/");
+		$kalender 	= array('wulan','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember');
+		$bulan_arab = array(
+			"wulan",
+			"يناير", // Januari
+			"فبراير", // Februari
+			"مارس", // Maret
+			"أبريل", // April
+			"مايو", // Mei
+			"يونيو", // Juni
+			"يوليو", // Juli
+			"أغسطس", // Agustus
+			"سبتمبر", // September
+			"أكتوبر", // Oktober
+			"نوفمبر", // November
+			"ديسمبر" // Desember
+		);
         if ($tabel == 'zis'){
 			$getdata 					= Pembayaranzis::where('id', $id)->first();
 			if (isset($getdata->namafile)){
@@ -135,7 +288,11 @@ class FrontpageController extends Controller
 					$kopsurat				= '<tr><td colspan="11"><img src="'.$homebase.'/'.$kopsurat.'" width="100%" /></tr>';
 				}
 				$alamatcetak				= $homebase.'/kwitansipsb/'.$rmaster2->id;
-				$qrcode 					= base64_encode(QrCode::format('png')->size(100)->generate($alamatcetak));
+				try {
+					$qrcode 				= base64_encode(QrCode::format('png')->size(100)->generate($alamatcetak));
+				} catch (\Exception $e) {
+					$qrcode 				= '';
+				}
 				$tasks						= [];
 				$tasks['logo_grey']			= $homebase.'/'.$rsetting->logo_grey;
 				$tasks['kopsurat']			= $kopsurat;
@@ -163,218 +320,781 @@ class FrontpageController extends Controller
 				return view('cetak.suratgenerator', $data);
 			}
 		} else if ($tabel == 'rapot'){
-			$niy 					= Session('nip');
-			$asline 				= Session('nama');
-			$rsetting				= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
-			$sekolah 				= $rsetting->nama_sekolah;
-			$yayasan 				= $rsetting->nama_yayasan;
-			$alamat 				= $rsetting->alamat;
-			$kepalasekolah 			= $rsetting->kepala_sekolah->nama;
-			$niykasek				= $rsetting->kepala_sekolah->niy;
-			$mutiara 				= $rsetting->slogan;
-			$logo 					= $rsetting->logo;
-			$kota 					= $rsetting->kota;
-			$logo_grey 				= $rsetting->logo_grey;
-			$frontpage 				= $rsetting->frontpage;
-			$akreditasi 			= $rsetting->akreditasi;
-			$kopsurat 				= $rsetting->kopsurat;
-			$nis 					= $rsetting->nis;
-			$email 					= $rsetting->email;
-			$iduser					= Session('id');
-			$getdatauser			= User::where('id', $iduser)->first();
-			if (isset($getdatauser->klsajar)){
-				$klsajar			= $getdatauser->klsajar;
-				$semester 			= $getdatauser->smt;
-				$tapel 				= $getdatauser->tapel;
-			} else {
-				$klsajar			= '';
-				$semester 			= '';
-				$tapel 				= '';
-			}
-			if ($kopsurat == '' OR $kopsurat == null){
-				$kopsurat 			= '<table width="100%" border="0" cellpadding="0" cellspacing="0">
-										<tr>
-											<td colspan="3" rowspan="7" align="center" valign="middle" style="border-bottom:double"><img src="'.$homebase.'/'.$logo.'" width="75" /></td>
-											<td colspan="8"><b>'.$yayasan.'</b></td>
-										</tr>
-										<tr><td colspan="8"><b>'.$sekolah.'</b></td></tr>
-										<tr><td colspan="8"><b>'.$akreditasi.'</b></td></tr>
-										<tr><td colspan="8">'.$nis.'</td></tr>
-										<tr><td colspan="8">'.$alamat.'</td></tr>
-										<tr><td colspan="8">'.$email.'</td></tr>
-										<tr>
-											<td width="157" style="border-bottom:double">&nbsp;</td>
-											<td width="26" style="border-bottom:double">&nbsp;</td>
-											<td width="87" style="border-bottom:double">&nbsp;</td>
-											<td width="22" style="border-bottom:double">&nbsp;</td>
-											<td width="25" style="border-bottom:double">&nbsp;</td>
-											<td width="198" style="border-bottom:double">&nbsp;</td>
-											<td width="39" style="border-bottom:double">&nbsp;</td>
-											<td width="129" style="border-bottom:double">&nbsp;</td>
-										</tr>
-									</table>';
-			} else {
-				$kopsurat			= '<img src="'.$homebase.'/'.$kopsurat.'" width="100%" />';
-			}
 			$cekdata		= Rapotan::where('id', $id)->first();
 			if (isset($cekdata->id)){
-				$tasks['titel']			= 'Rapot Ananda '.$cekdata->nama.' TA '.$cekdata->tapel.' Semester '.$cekdata->semester;
-				$tasks['background']	= $homebase.'/'.$logo_grey;
-				$tasks['logo']			= $homebase.'/'.$logo;
-				$tasks['kopsurat']		= $kopsurat;
-				$tasks['sekolah']		= $sekolah;
-				$tasks['alamat']		= $alamat;
-				$tasks['rapot']			= Rapotan::where('id', $cekdata->id)->first();
-				return view('cetak.rapot', $tasks);
+				$marking		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotDinas';
+				$markingguru 	= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-TTDGURU';
+				$ttdks 			= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-TTDKS';
+				$cettdguru 		= XFiles::where('xmarking', $markingguru)->first();
+				$cekttdks 		= XFiles::where('xmarking', $ttdks)->first();
+				$ttdkasek		= $cekttdks->xfile ?? '[ttdks]';
+				$ttdguru		= $cettdguru->xfile ?? '[ttdguru]';
+				if ($ttdkasek != 'locked'){
+					$arrtanggal				= explode(' ', $cekdata->tanggal);
+					$tanggal				= $arrtanggal[0];
+					$arrtanggal				= explode('-', $tanggal);
+					if (isset($arrtanggal[2])){
+						$yy 				= $arrtanggal[0];
+						$mm 				= (int)$arrtanggal[1];
+						$dd 				= $arrtanggal[2];
+						$mm 				= $kalender[$mm];
+						$tanggal			= $dd.' '.$mm.' '.$yy;
+					}
+					
+					$tabelatas				= '';
+					$nomor 					= 1;
+					$totalsum 				= 0;
+					$pembagisum 			= 0;
+					$headerwajib 			= '';
+					$headermulok 			= '';
+					$rowswajib				= [];
+					$rowsmulok 				= [];
+					$semester				= $cekdata->semester;
+					$semestercari 			= mb_substr($semester, 0, 1);
+					for ($index = 1; $index <= 30; $index++) {
+						$kode 			= 'k'.sprintf("% 02s", $index);
+						$field_huruf 	= 'h'.sprintf("% 02s", $index);
+						$field_nilai 	= 'n'.sprintf("% 02s", $index);
+						$matpel 		= $cekdata->$field_huruf;
+						$kkm 			= $cekdata->$field_nilai;
+						$afektif		= '';
+						$angka			= 0;
+						$terbilang		= '';
+						$cekmatpel 		= explode('; ', $matpel);
+						if (isset($cekmatpel[1])){
+							$jenis 		= $cekmatpel[0];
+							$matpel		= $cekmatpel[1];
+						} else {
+							$jenis 		= 'Wajib';
+						}
+						if ($cekdata->$kode !== '' && $cekdata->$kode !== null) {
+							$datacari 	= $cekdata->$kode;
+							$cekjenis 	= explode('[pisah]', $datacari);
+							if (isset($cekjenis[1])) {
+								$afektif 	= $cekjenis[0];
+								$muatan 	= $cekjenis[1];
+								$deskripsi 	= $cekjenis[2] ?? '';
+								$angka 		= $cekjenis[3] ?? 0;
+								if ($angka == 0){
+									$golekakhir = DB::table('db_nilai')->whereIn('jennilai', ['pts', 'pat'])->where('noinduk', $cekdata->noinduk)->where('semester', $semestercari)->where('tapel', $cekdata->tapel)->where('matpel', $muatan)->select('noinduk', DB::raw('AVG(nilai) as rata_rata'))->groupBy('noinduk')->first();
+									$golekharian= DB::table('db_nilai')->whereIn('jennilai', ['p01', 'p02', 'p03', 'p04', 'p05', 'e01', 'e02', 'e03', 'e04', 'e05'])->where('noinduk', $cekdata->noinduk)->where('semester', $semestercari)->where('tapel', $cekdata->tapel)->where('matpel', $muatan)->select('noinduk', DB::raw('AVG(nilai) as rata_rata'))->groupBy('noinduk')->first();
+									$rataakhir 	= isset($golekakhir->rata_rata) ? $golekakhir->rata_rata : 0;
+									$rataharian = isset($golekharian->rata_rata) ? $golekharian->rata_rata : 0;
+									$angka 		= ($rataakhir != 0 && $rataharian != 0) ? round(((($rataharian * 2) + $rataakhir) / 3), 0) : 0;
+								}
+								$totalsum	= $totalsum + $angka;
+								$pembagisum++;
+								if ($angka == 0){
+									$terbilang = 'Nol';
+								} else {
+									if ($deskripsi == ''){
+										$idterbesar 		= 0;
+										$golekterterbesar	= Datanilai::whereIn('jennilai', ['p01', 'p02', 'p03', 'p04', 'p05', 'e01', 'e02', 'e03', 'e04', 'e05'])
+															->where('noinduk', $cekdata->noinduk)
+															->where('semester', $semestercari)
+															->where('tapel', $cekdata->tapel)
+															->where('matpel', $muatan)
+															->orderBY('nilai', 'DESC')
+															->first();
+										if (isset($golekterterbesar->id)){
+											$idterbesar 		= $golekterterbesar->id;
+											$deskripsi			= $deskripsi.$cekdata->nama.' menunjukkan penguasaan yang baik dalam '.$golekterterbesar->deskripsi.' <br />';
+										}
+										$golekterkecil	= Datanilai::whereIn('jennilai', ['p01', 'p02', 'p03', 'p04', 'p05', 'e01', 'e02', 'e03', 'e04', 'e05'])
+															->where('noinduk', $cekdata->noinduk)
+															->where('semester', $semestercari)
+															->where('tapel', $cekdata->tapel)
+															->where('matpel', $muatan)
+															->where('id', '!=', $idterbesar)
+															->orderBY('nilai', 'ASC')
+															->first();
+										if (isset($golekterkecil->id)){
+											$deskripsi			= $deskripsi.$cekdata->nama.' perlu pendampingan dalam '.$golekterkecil->deskripsi;
+										}
+									}
+									if ($jenis == 'Wajib'){
+										$rowswajib[] = array(
+											'teks' => '<tr><td style="border-left: 1px solid #000000; border-right: 1px solid #000000" align="center" valign="top">[nomor]</td><td style="border-right: 1px solid #000000" align="left" valign="top" colspan="3">'.$matpel.'</td><td style="border-right: 1px solid #000000" align="center" valign="top">'.$angka.'</td><td style="border-right: 1px solid #000000" align="left" valign="top" colspan="3">'.$deskripsi.'</td></tr>'
+										);
+									} else {
+										$rowsmulok[] = array(
+											'teks' => '<tr><td style="border-left: 1px solid #000000; border-right: 1px solid #000000" align="center" valign="top">[nomor]</td><td style="border-right: 1px solid #000000" align="left" valign="top" colspan="3">'.$matpel.'</td><td style="border-right: 1px solid #000000" align="center" valign="top">'.$angka.'</td><td style="border-right: 1px solid #000000" align="left" valign="top" colspan="3">'.$deskripsi.'</td></tr>'
+										);
+									}
+								}
+							}
+						}
+					}
+					foreach($rowswajib as $rteks){
+						$teks 		= $rteks['teks'];
+						$teks 		= str_replace('[nomor]', $nomor, $teks);
+						$tabelatas 	= $tabelatas.$teks;
+						$nomor++;
+					}
+					$tabelatas 		= $tabelatas.'<tr><td style="border-top: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; border-bottom: 1px solid #000000;" align="left" valign="top" bgcolor="#F2F2F2" colspan="8">Muatan Lokal</td></tr>';
+					foreach($rowsmulok as $rteks){
+						$teks 		= $rteks['teks'];
+						$teks 		= str_replace('[nomor]', $nomor, $teks);
+						$tabelatas 	= $tabelatas.$teks;
+						$nomor++;
+					}
+					$data['ttdortu']		= '';
+					$data['ttdguru']		= '';
+					$data['ttdkasek']		= '';
+					$data['rapot']			= $cekdata;
+					$data['sekolah']		= $cekdata->namasekolah  ?? Session('sekolah_nama_sekolah');
+					$data['alamat']			= Session('sekolah_alamat');
+					$data['tanggal']		= $tanggal;
+					$data['tabelatas']		= $tabelatas;
+					$generatesurat 			= view('cetak.rapot', $data)->render();
+					XFiles::updateOrCreate(
+						[
+							'xmarking'	=> $marking,
+						],
+						[
+							'xtabel'	=> 'db_rapotan',
+							'xjenis'	=> $cekdata->id_sekolah.';'.$cekdata->noinduk,
+							'xfile'		=> $generatesurat
+						]
+					);
+					return $generatesurat;
+				} else {
+					$ceksudah 		= XFiles::where('xmarking', $marking)->first();
+					if (isset($ceksudah->xfile)){
+						$surat 		= $ceksudah->xfile ?? '<img src="'.url('/').'/dist/img/takadagambar.jpg" />';
+						return $surat;
+					} else {
+						$data['generatetbl']  = '<iframe src="'.url('/').'/printmark/'.$marking.'"></iframe>';
+						return view('cetak.suratgenerator', $data);
+					}
+				}
 			} else {
 				$data['generatetbl']  = '<img src="'.url('/').'/dist/img/takadagambar.jpg" />';
 				return view('cetak.suratgenerator', $data);
+			}
+			
+		} else if ($tabel == 'rapotkhas'){
+			$data 			= [];
+			$tabelatas 		= [];
+			$x 				= 0;
+			$totalsum 		= 0;
+			$pembagisum 	= 0;
+			$cekdata		= Rapotan::where('id', $id)->first();
+			if (isset($cekdata->id)){
+				$nama 			= $cekdata->nama;
+				$kelas			= $cekdata->kelas;
+				$noinduk 		= $cekdata->noinduk;
+				$nisn			= $cekdata->nisn;
+				$tapel 			= $cekdata->tapel;
+				$semester		= $cekdata->semester;
+				$id_sekolah		= $cekdata->id_sekolah;
+				$semestercari 	= mb_substr($semester, 0, 1);
+				$markingguru 	= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-TTDGURU';
+				$ttdks 			= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-TTDKS';
+				$markingguru2 	= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'A-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-TTDGURU';
+				$ttdks2 		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'A-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-TTDKS';
+				$cekortu		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-ORTU';
+				$marking		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotKhas';
+				$cettdguru 		= XFiles::where('xmarking', $markingguru)->first();
+				$cekttdks 		= XFiles::where('xmarking', $ttdks)->first();
+				$cettdortu 		= XFiles::where('xmarking', $cekortu)->first();
+				$ttdkasek		= $cekttdks->xfile ?? '[ttdks]';
+				$ttdguru		= $cettdguru->xfile ?? '[ttdguru]';
+				$ttdortu		= $cettdortu->xfile ?? '[ttdortu]';
+				if ($ttdkasek == '[ttdks]'){
+					$cekttdks2 	= XFiles::where('xmarking', $ttdks2)->first();
+					$ttdkasek	= $cekttdks2->xfile ?? '[ttdks]';
+				}
+				if ($ttdguru == '[ttdguru]'){
+					$cettdguru2 = XFiles::where('xmarking', $markingguru2)->first();
+					$ttdguru	= $cettdguru2->xfile ?? '[ttdguru]';
+				}
+				if ($ttdkasek != 'final'){
+					if ($id_sekolah == '2'){
+						$jumlah 				= 0;
+						if ($ttdortu != '[ttdortu]'){
+							$ttdortu 	= '<img src="'.$ttdortu.'" height="100" />';
+						} else {
+							$ttdortu = '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
+						}
+						if ($ttdkasek != '[ttdks]'){
+							try {
+								$keterangan = 'Rapot Link '.url('/').'/printmark/'.$marking.' Di Tandatangani Oleh '.$cekdata->namakepalasekolah.' Pada '.date('Y-m-d H:i:s');
+								$qrcode		= base64_encode(QrCode::format('png')->size(100)->generate($keterangan));
+								$ttdkasek	= '<img src="data:image/png;base64, '.$qrcode.'" height="100" />';
+							} catch (\Exception $e) {
+								$ttdkasek 	= '<img src="'.$ttdkasek.'" height="100" />';
+							}
+							$jumlah++;
+						} else {
+							$ttdkasek = '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
+						}
+						if ($ttdguru != '[ttdguru]'){ 
+							try {
+								$keterangan = 'Rapot Link '.url('/').'/printmark/'.$marking.' Di Tandatangani Oleh '.$cekdata->namaguru.' Pada '.date('Y-m-d H:i:s');
+								$qrcode		= base64_encode(QrCode::format('png')->size(100)->generate($keterangan));
+								$ttdguru	= '<img src="data:image/png;base64, '.$qrcode.'" height="100" />';
+							} catch (\Exception $e) {
+								$ttdguru 	= '<img src="'.$ttdguru.'" height="100" />';
+							}
+							$jumlah++;
+						} else {
+							$ttdguru = '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
+						}
+						$getdata 				= $cekdata;
+						$data['ttdortu']		= $ttdortu;
+						$data['ttdguru']		= $ttdguru;
+						$data['ttdkasek']		= $ttdkasek;
+						$data['kopsurat']		= url('/').'/format/kop_rapot_mataba.png';
+						$data['datarapot']		= $getdata;
+						$data['tanggal']		= $cekdata->tanggal;
+						$generatesurat 			= view('cetak.rapottpq', $data)->render();
+		
+						if ($jumlah == 2){
+							XFiles::updateOrCreate(
+								[
+									'xmarking'	=> $ttdks,
+								],
+								[
+									'xfile'		=> 'final'
+								]
+							);
+							XFiles::updateOrCreate(
+								[
+									'xmarking'	=> $markingguru,
+								],
+								[
+									'xfile'		=> 'final'
+								]
+							);
+							XFiles::updateOrCreate(
+								[
+									'xmarking'	=> $marking,
+								],
+								[
+									'xfile'		=> $generatesurat
+								]
+							);
+						}
+						return $generatesurat;
+					} else {
+						$arrtanggal		= explode(' ', $cekdata->tanggal);
+						$tanggal		= $arrtanggal[0];
+						$arrtanggal		= explode('-', $tanggal);
+						if (isset($arrtanggal[2])){
+							$yy 		= $arrtanggal[0];
+							$mm 		= (int)$arrtanggal[1];
+							$dd 		= $arrtanggal[2];
+							$mm 		= $kalender[$mm];
+							$tanggal	= $dd.' '.$mm.' '.$yy;
+						} else {
+							$tanggal 	= $cekdata->tanggal;
+						}
+						$cekrapotakhlak	= '';
+						$akhlak			= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-AKHLAK';
+						$akhlak2		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'A-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-AKHLAK';
+						$cekakhlak 		= XFiles::where('xmarking', $akhlak)->first();
+						$cekakhlak2 	= XFiles::where('xmarking', $akhlak2)->first();
+						if (isset($cekakhlak->xfile)){
+							$rapotakhlak 	= $cekakhlak->xfile;
+							if ($rapotakhlak == 'arsip'){
+								$cekrapotakhlak	= 'arsip';
+							}
+						} else if (isset($cekakhlak2->xfile)){
+							$rapotakhlak 	= $cekakhlak2->xfile;
+							if ($rapotakhlak == 'arsip'){
+								$cekrapotakhlak	= 'arsip';
+							}
+						} else {
+							$rapotakhlak	= '<table cellspacing="0" border="1" style="width:100%">
+													<thead><tr><th style="width:10%" bgcolor="#F2F2F2"><strong>No</strong></th><th style="width:60%" bgcolor="#F2F2F2"><strong>Jenis Kegiatan</strong></th><th style="width:30%" bgcolor="#F2F2F2"><strong>Nilai</strong></th></tr>
+													</thead>
+													<tbody>
+														<tr><td style="text-align:center">1</td><td><strong>CERIA</strong> (Terbiasa mengucapkan salam dan ramah)</td><td style="text-align:center">A/B/C/D</td></tr>
+														<tr><td style="text-align:center">2</td><td><strong>ENERJIK</strong> (Semangat menuntut ilmu dalam menggapai ridho Allah SWT)</td><td style="text-align:center">A/B/C/D</td></tr>
+														<tr><td style="text-align:center">3</td><td>Gemar membaca</td><td style="text-align:center">A/B/C/D</td></tr>
+														<tr><td style="text-align:center">4</td><td><strong>RAJIN</strong> (Aktif berbahasa Arab dan Ingris)</td><td style="text-align:center">A/B/C/D</td></tr>
+														<tr><td style="text-align:center">5</td><td><strong>DISIPLIN</strong> (Berakidah kuat)</td><td style="text-align:center">A/B/C/D</td></tr>
+														<tr><td style="text-align:center">6</td><td>Terbiasa sholat fardhu</td><td style="text-align:center">A/B/C/D</td></tr>
+														<tr><td style="text-align:center">7</td><td>Senantiasa berdoa dalam setiap aktifitas</td><td style="text-align:center">A/B/C/D</td></tr>
+														<tr><td style="text-align:center">8</td><td>Terbiasa mengucapkan kalimat toyibah</td><td style="text-align:center">A/B/C/D</td></tr>
+														<tr><td style="text-align:center">9</td><td><strong>AL QURAN</strong> (Istiqomah dalam membaca, menghafal dan memahami Al Quran)</td><td style="text-align:center">A/B/C/D</td></tr>
+														<tr><td style="text-align:center">10</td><td><strong>SANTUN</strong> (Menjadi pribadi yang berakhlakul karimah)</td><td style="text-align:center">A/B/C/D</td></tr>
+														<tr><td style="text-align:center">11</td><td>Mencintai lingkungan</td><td style="text-align:center">A/B/C/D</td></tr>
+													</tbody>
+												</table>';
+						}
+						$nomor 			= 1;
+						for ($index = 1; $index <= 30; $index++) {
+							$kode 			= 'k'.sprintf("% 02s", $index);
+							$field_huruf 	= 'h'.sprintf("% 02s", $index);
+							$field_nilai 	= 'n'.sprintf("% 02s", $index);
+							$matpel 		= $cekdata->$field_huruf;
+							$kkm 			= $cekdata->$field_nilai;
+							$afektif		= '';
+							$angka			= 0;
+							$terbilang		= '';
+							if ($cekdata->$kode !== '' && $cekdata->$kode !== null) {
+								$datacari 	= $cekdata->$kode;
+								$cekjenis 	= explode('[pisah]', $datacari);
+								if (isset($cekjenis[1])) {
+									$afektif 	= $cekjenis[0];
+									$muatan 	= $cekjenis[1];
+									$deskripsi 	= $cekjenis[2] ?? '';
+									$angka 		= $cekjenis[3] ?? 0;
+									if ($angka == 0){
+										$golekakhir = DB::table('db_nilai')
+														->whereIn('jennilai', ['pts', 'pat'])
+														->where('noinduk', $noinduk)
+														->where('semester', $semestercari)
+														->where('tapel', $tapel)
+														->where('matpel', $muatan)
+														->where('id_sekolah', $cekdata->id_sekolah)
+														->select('noinduk', DB::raw('AVG(nilai) as rata_rata'))
+														->groupBy('noinduk')
+														->first();
+										
+										$golekharian = DB::table('db_nilai')
+														->whereIn('jennilai', ['p01', 'p02', 'p03', 'p04', 'p05', 'e01', 'e02', 'e03', 'e04', 'e05'])
+														->where('noinduk', $noinduk)
+														->where('semester', $semestercari)
+														->where('tapel', $tapel)
+														->where('matpel', $muatan)
+														->where('id_sekolah', $cekdata->id_sekolah)
+														->select('noinduk', DB::raw('AVG(nilai) as rata_rata'))
+														->groupBy('noinduk')
+														->first();
+						
+										$rataakhir 	= isset($golekakhir->rata_rata) ? $golekakhir->rata_rata : 0;
+										$rataharian = isset($golekharian->rata_rata) ? $golekharian->rata_rata : 0;
+										if ($semester == '1.1' OR $semester == '2.1'){
+											if ($rataakhir > 0 && $rataharian > 0){
+												$angka 		= ($rataakhir != 0 && $rataharian != 0) ? round(((($rataharian * 2) + $rataakhir) / 3), 0) : 0;
+											} else {
+												if ($rataakhir > 0){
+													$angka 		= round($rataakhir, 0);
+												} else {
+													$angka 		= round($rataharian, 0);
+												}
+											}
+										} else {
+											$angka 		= ($rataakhir != 0 && $rataharian != 0) ? round(((($rataharian * 2) + $rataakhir) / 3), 0) : 0;
+										}
+									}
+									$totalsum	= $totalsum + $angka;
+									$pembagisum++;
+									
+									if ($angka == 0){
+										$terbilang = 'Nol';
+									} else {
+										$terbilang 	= ($angka != 0) ? SendMail::terbilang($angka) : '';
+									}
+								}
+								$matpel = str_replace('Mulok; ', '', $matpel);
+								$matpel = str_replace('Wajib; ', '', $matpel);
+								$tabelatas[] = [
+									'nomor' 		=> $nomor,
+									'matpel' 		=> $matpel,
+									'kkm' 			=> $kkm,
+									'angka' 		=> $angka,
+									'terbilang' 	=> $terbilang,
+									'afektif' 		=> $afektif,
+									'kode' 			=> $kode,
+									'field_huruf' 	=> $field_huruf,
+									'field_nilai' 	=> $field_nilai,
+								];
+								$nomor++;
+							}
+						}
+						if ($totalsum != 0 AND $pembagisum != 0){
+							$ratareal 			= $totalsum/$pembagisum;
+							$rataakhir 			= round($ratareal, 0);
+						} else {
+							$rataakhir			= 0;
+							$ratareal			= 0;
+						}
+						$terbilang 				= ($totalsum != 0) ? SendMail::terbilang($totalsum) : '';
+						Rapotan::where('noinduk', $noinduk)->where('semester', $cekdata->semester)->where('tapel', $cekdata->tapel)->where('id_sekolah', $cekdata->id_sekolah)->update([
+							'ratarata'			=> $ratareal,
+							'total'				=> $totalsum,
+							'jumlahmatpel'		=> $pembagisum,
+						]);
+						$jumlah 				= 0;
+						if ($ttdkasek != '[ttdks]'){
+							try {
+								$keterangan = 'Rapot Link '.url('/').'/printmark/'.$marking.' Di Tandatangani Oleh '.$cekdata->namakepalasekolah.' Pada '.date('Y-m-d H:i:s');
+								$qrcode		= base64_encode(QrCode::format('png')->size(100)->generate($keterangan));
+								$ttdkasek	= '<img src="data:image/png;base64, '.$qrcode.'" height="100" />';
+							} catch (\Exception $e) {
+								$ttdkasek 	= '<img src="'.$ttdkasek.'" height="100" />';
+							}
+							$jumlah++;
+						} else {
+							$ttdkasek = '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
+						}
+						if ($ttdortu != '[ttdortu]'){
+							$ttdortu 	= '<img src="'.$ttdortu.'" height="100" />';
+						} else {
+							$ttdortu = '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
+						}
+						if ($ttdguru != '[ttdguru]'){ 
+							try {
+								$keterangan = 'Rapot Link '.url('/').'/printmark/'.$marking.' Di Tandatangani Oleh '.$cekdata->namaguru.' Pada '.date('Y-m-d H:i:s');
+								$qrcode		= base64_encode(QrCode::format('png')->size(100)->generate($keterangan));
+								$ttdguru	= '<img src="data:image/png;base64, '.$qrcode.'" height="100" />';
+							} catch (\Exception $e) {
+								$ttdguru 	= '<img src="'.$ttdguru.'" height="100" />';
+							}
+							$jumlah++;
+						} else {
+							$ttdguru = '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
+						}
+						$data['terbilang']		= $terbilang;
+						$data['rataakhir']		= $rataakhir;
+						$data['totalsum']		= $totalsum;
+						$data['ttdortu']		= $ttdortu;
+						$data['ttdguru']		= $ttdguru;
+						$data['ttdkasek']		= $ttdkasek;
+						$data['kopsurat']		= url('/').'/format/kop_rapot_sdtq.jpg';
+						$data['tabelatas']		= $tabelatas;
+						$data['datarapot']		= $cekdata;
+						$data['sekolah']		= $cekdata->namasekolah ?? Session('sekolah_nama_sekolah');
+						$data['tanggal']		= $tanggal;
+						$data['rapotakhlak']	= $rapotakhlak;
+						$data['saran']			= $cekdata->saran;
+						if ($cekdata->semester == '1.1' OR $cekdata->semester == '2.1'){
+							$generatesurat			= view('cetak.rapottengahkhas', $data)->render();
+						} else {
+							$generatesurat			= view('cetak.rapotkhas', $data)->render();
+						}
+						XFiles::updateOrCreate(
+							[
+								'xmarking'	=> $marking,
+							],
+							[
+								'xtabel'	=> 'db_rapotan',
+								'xfile'		=> $generatesurat
+							]
+						);
+						if ($jumlah == 2 AND $cekrapotakhlak != 'arsip'){
+							XFiles::updateOrCreate(
+								[
+									'xmarking'	=> $ttdks,
+								],
+								[
+									'xfile'		=> 'final'
+								]
+							);
+							/*
+							XFiles::updateOrCreate(
+								[
+									'xmarking'	=> $akhlak,
+								],
+								[
+									'xfile'		=> 'arsip'
+								]
+							);
+							*/
+						}
+						return $generatesurat;
+					}
+				} else {
+					$ceksurat 	= XFiles::where('xmarking', $marking)->first();
+					$surat 		= $ceksurat->xfile ?? '<img src="'.url('/').'/dist/img/takadagambar.jpg" />';
+					return $surat;
+				}
+			} else {
+				$data['generatetbl']  = '<img src="'.url('/').'/dist/img/takadagambar.jpg" />';
+				return view('cetak.suratgenerator', $data);
+			}
+			
+		} else if ($tabel == 'rapotalquran'){
+			$getarrayid 		= explode('.', $id);
+			$tapelsemester 		= $getarrayid[0];
+			$semester 			= $getarrayid[1];
+			$kelas 				= $getarrayid[2] ?? '';
+			$niyguru 			= $getarrayid[3] ?? '';
+			$noinduk 			= $getarrayid[4] ?? '';
+			$gettapelonly 		= explode('-', $tapelsemester);
+			$tahun1 			= $gettapelonly[0] ?? '';
+			$tahun2 			= $gettapelonly[1] ?? '';
+			$nama				= '';
+			$foto				= '';
+			$hariefektif		= '';
+			$harisetorsekolah	= '';
+			$harisetorrumah		= '';
+			$niywaka			= '';
+			$waka				= '';
+			$niykasek			= '';
+			$kasek				= '';
+			$sakit				= '';
+			$ijin				= '';
+			$alpha				= '';
+			$namaguru			= '';
+			$id_sekolah			= '';
+			$tapel				= '';
+			$tanggal 			= date('Y-m-d');
+			if (Session('sekolah_id_sekolah') !== null){
+				$getdata 			= MushafUjian::where('noinduk', $noinduk)->where('tapelsemester', $tapelsemester)->where('id_sekolah',  Session('sekolah_id_sekolah'))->groupBy('juz')->orderByRaw('CAST(SUBSTRING_INDEX(Juz, " ", -1) AS UNSIGNED) ASC')->get();
+			} else {
+				$getdata 			= MushafUjian::where('noinduk', $noinduk)->where('tapelsemester', $tapelsemester)->where('kelas', $kelas)->groupBy('juz')->orderByRaw('CAST(SUBSTRING_INDEX(juz, " ", -1) AS UNSIGNED) ASC')->get();
+			}
+			$i					= 0;
+			foreach ($getdata as $rgrpklas) {
+				$j  			= 0;
+				$juz			= $rgrpklas->juz;
+				$id_sekolah		= $rgrpklas->id_sekolah;
+				$jklas  		= MushafUjian::where('juz', $juz)->where('noinduk', $noinduk)->where('tapelsemester', $tapelsemester)->where('id_sekolah',  $id_sekolah)->orderBy('halaman', 'ASC')->get();
+				foreach ($jklas as $rklas) {
+					$nama 										= $rklas->nama;
+					$foto 										= $rklas->foto;
+					$hariefektif 								= $rklas->hariefektif;
+					$harisetorsekolah 							= $rklas->setoransekolah;
+					$harisetorrumah 							= $rklas->setoranrumah;
+					$niywaka 									= $rklas->niywaka;
+					$waka 										= $rklas->namawakaalquran;
+					$niykasek 									= $rklas->niyks;
+					$kasek 										= $rklas->namaks;
+					$sakit 										= $rklas->sakit;
+					$ijin 										= $rklas->ijin;
+					$alpha 										= $rklas->alpha;
+					$niyguru 									= $rklas->niyguru;
+					$namaguru 									= $rklas->namaguru;
+					$tapel 										= $rklas->tapel;
+					$created_at 								= $rklas->created_at;
+					$gettanggalonly 							= explode(' ', $created_at);
+					$tanggal									= $gettanggalonly[0];
+					$data['perjuz'][$i][$j]['juz']				= $rklas->juz;
+					$data['perjuz'][$i][$j]['namasurah']		= $rklas->namasurah;
+					$data['perjuz'][$i][$j]['halaman']			= $rklas->halaman;
+					$data['perjuz'][$i][$j]['jumlahkata']		= $rklas->jumlahkata;
+					$data['perjuz'][$i][$j]['jumlahkesalahan']	= $rklas->jumlahkesalahan;
+					$data['perjuz'][$i][$j]['nilaikesalahan']	= $rklas->nilaikesalahan;
+					$data['perjuz'][$i][$j]['nilaipersurat']	= $rklas->nilaipersurat;
+					$data['perjuz'][$i][$j]['predikat']			= $rklas->predikat;
+					$data['perjuz'][$i][$j]['nilaiperjuz']		= $rklas->nilaiperjuz;
+					$j++;
+				}
+				$i++;
+			}
+			$x  = 0;
+			foreach ($getdata as $kgrpklas) {
+				$data['juznumber'][$x]  	= $kgrpklas->juz;
+				$x++;
+			}
+			if ($i == 0){
+				$data['juznumber'][0]  					=   '-';
+				$data['perjuz'][0][0]['juz']			=   '0';
+				$data['perjuz'][0][0]['namasurah']		=   'No Data';
+				$data['perjuz'][0][0]['halaman']		=   '0';
+				$data['perjuz'][0][0]['jumlahkata']		=   '0';
+				$data['perjuz'][0][0]['jumlahkesalahan']=   '0';
+				$data['perjuz'][0][0]['nilaikesalahan']	=   '-';
+				$data['perjuz'][0][0]['nilaipersurat']	=   '-';
+				$data['perjuz'][0][0]['predikat']		=   '-';
+				$data['perjuz'][0][0]['nilaiperjuz']	=   '0';
+			}
+			$markingguru		= $tapelsemester.'-'.$kelas.'-'.$noinduk.'-'.$id_sekolah.'-RapotAlQuran';
+			$markingttdks 		= $tapelsemester.'-'.$kelas.'-'.$noinduk.'-'.$id_sekolah.'-TTDKS';
+			$markingwaka 		= $tapelsemester.'-'.$kelas.'-'.$noinduk.'-'.$id_sekolah.'-TTDWAKA';
+
+			$ceksudah 			= XFiles::where('xmarking', $markingguru)->first();
+			if (isset($ceksudah->xfile) AND $ceksudah->xfile != ''){
+				$data['generatetbl']  = $ceksudah->xfile;
+				return view('cetak.suratgenerator', $data);
+			} else {
+				$final1 	= 0;
+				$final2 	= 0;
+				$cekttdwaka = XFiles::where('xmarking', $markingwaka)->first();
+				if (isset($cekttdwaka->xfile) AND $cekttdwaka->xfile != ''){
+					try {
+						$keterangan = 'Rapot Link '.url('/').'/rapotalquran/'.$id.' Di Tandatangani Oleh '.$waka.' Pada '.$cekttdwaka->created_at;
+						$qrcode		= base64_encode(QrCode::format('png')->size(100)->generate($keterangan));
+						$ttdwaka	= '<img src="data:image/png;base64, '.$qrcode.'" height="100" />';
+					} catch (\Exception $e) {
+						$ttdwaka	= '<img src="'.$cekttdwaka->xfile.'" height="100" />';
+					}
+					$final1  = 1;
+				} else {
+					$ttdwaka = '<img src="'.url('/').'/boxed-bg.jpg" height="100" />';
+				}
+				$cekttdkasek 	= XFiles::where('xmarking', $markingttdks)->first();
+				if (isset($cekttdkasek->xfile) AND $cekttdkasek->xfile != ''){
+					try {
+						$keterangan = 'Rapot Link '.url('/').'/rapotalquran/'.$id.' Di Tandatangani Oleh '.$kasek.' Pada '.$cekttdkasek->created_at;
+						$qrcode		= base64_encode(QrCode::format('png')->size(100)->generate($keterangan));
+						$ttdkasek	= '<img src="data:image/png;base64, '.$qrcode.'" height="100" />';
+					} catch (\Exception $e) {
+						$ttdkasek 	= '<img src="'.$cekttdkasek->xfile.'" height="100" />';
+					}
+					$final2   = 1;
+				} else {
+					$ttdkasek =  '<img src="'.url('/').'/boxed-bg.jpg" height="100" />';
+				}
+				$cekarraytapelsemester = explode('-', $tapelsemester);
+				if (isset($cekarraytapelsemester[3])){
+					$jenisujian = $cekarraytapelsemester[3];
+				} else {
+					$jenisujian	= '';
+				}
+				if ($semester == '1'){
+					$kopsurat = url('/').'/format/kop_ujian_alquran_ganjil.jpg';
+					$semester = 'GANJIL';
+				} else if ($semester == '2'){
+					$kopsurat = url('/').'/format/kop_ujian_alquran_genap.jpg';
+					$semester = 'GENAP';
+				} else {
+					$kopsurat = url('/').'/format/kop_ujian_alquran.jpg';
+				}
+				if ($id_sekolah == '2'){
+					$kopsurat = url('/').'/format/kop_rapot_mataba.png';
+				}
+				
+				if ($jenisujian == 'UTS'){
+					$semester = 'TENGAH SEMESTER '.$semester;
+				} else if ($jenisujian == 'UAS'){
+					$semester = 'AKHIR SEMESTER '.$semester;
+				} else {
+					$semester = 'JUZ '.$jenisujian.' SEMESTER '.$semester;
+				}
+				$getkelasalquran 			= Datainduk::where('id_sekolah', $id_sekolah)->where('noinduk', $noinduk)->first();
+				$jilid 						= $getkelasalquran->jilid ?? '';
+				$arrtangggal				= explode('-', $tanggal);
+				$dd         				= $arrtangggal[2];
+				$mm         				= (int)$arrtangggal[1];
+				$mm							= $kalender[$mm];
+				$tahuniki   				= $arrtangggal[0];
+				$sakniki					= $dd.' '.$mm.' '.$tahuniki;
+				$data['id_sekolah']  		= $id_sekolah;
+				$data['kopsurat']  			= $kopsurat;
+				$data['tapel']  			= $tapel;
+				$data['semester']  			= $semester;
+				$data['jilid']  			= $jilid;
+				$data['kelas']  			= $kelas;
+				$data['namaguru']  			= $namaguru;
+				$data['niyguru']  			= $niyguru;
+				$data['nama']  				= strtoupper($nama);
+				$data['foto']  				= $foto;
+				$data['hariefektif']  		= $hariefektif;
+				$data['harisetorsekolah']  	= $harisetorsekolah;
+				$data['harisetorrumah']  	= $harisetorrumah;
+				$data['niywaka']  			= $niywaka;
+				$data['waka']  				= $waka;
+				$data['niykasek']  			= $niykasek;
+				$data['kasek']  			= $kasek;
+				$data['sakit']  			= $sakit;
+				$data['ijin']  				= $ijin;
+				$data['alpha']  			= $alpha;
+				$data['ttdkasek']  			= $ttdkasek;
+				$data['ttdwaka']  			= $ttdwaka;
+				$data['tanggal']  			= $sakniki;
+				$final 						= $final1 + $final2;
+				if ($final == 2){
+					$generatesurat 			= view('cetak.rapotalquran', $data)->render();
+					XFiles::updateOrCreate(
+						[
+							'xmarking'		=> $markingguru,
+						],
+						[
+							'xtabel'	=> 'mushaf_ujian',
+							'xjenis'	=> $id_sekolah.';'.$noinduk,
+							'xfile'		=> $generatesurat
+						]
+					);
+				} else {
+					return view('cetak.rapotalquran', $data);
+				}
+			}
+		} else if ($tabel == 'hasilujianlisan'){
+			$getarrayid 	= MushafUjianLisan::where('id', $id)->first();
+			$semester		= $getarrayid->semester;
+			$updated_at		= $getarrayid->updated_at;
+			$hasilujianlisan= $getarrayid->tapel.'-'.$getarrayid->semester.'-'.$getarrayid->kelas.'-'.$getarrayid->noinduk.'-'.$getarrayid->id_sekolah.'-HasilUjianLisan';
+			$ttdks 			= $getarrayid->tapel.'-'.$getarrayid->semester.'-'.$getarrayid->kelas.'-'.$getarrayid->noinduk.'-'.$getarrayid->id_sekolah.'-TTDKS';
+			$ceksudah 		= XFiles::where('xmarking', $hasilujianlisan)->first();
+			if (isset($ceksudah->xfile) AND $ceksudah->xfile != ''){
+				$data['generatetbl']  = $ceksudah->xfile;
+				return view('cetak.suratgenerator', $data);
+			} else {
+				if ($semester == '1'){
+					$kopsurat = url('/').'/format/kop_ujian_lisan_ganjil.jpg';
+					$semester = 'GANJIL';
+				} else if ($semester == '2'){
+					$kopsurat = url('/').'/format/kop_ujian_lisan_genap.jpg';
+					$semester = 'GENAP';
+				} else {
+					$kopsurat = url('/').'/format/kop_ujian_lisan.jpg';
+				}
+				$arrtangggal				= explode(' ', $updated_at);
+				$tanggal         			= $arrtangggal[0];
+				$arrtangggal				= explode('-', $tanggal);
+				$dd         				= $arrtangggal[2];
+				$mm         				= (int)$arrtangggal[1];
+				$mm							= $bulan_arab[$mm];
+				$tahuniki   				= $arrtangggal[0];
+				$dd 						= angka_ke_teks_arab($dd);
+				$tahuniki 					= angka_ke_teks_arab($tahuniki);
+				$formatArab					= $dd.' '.$mm.' '.$tahuniki;
+				$teksKotaArab 				= "تحريرا في مالانج ";
+				$hasilAkhir 				= $teksKotaArab.' '.$formatArab;
+				$data['kopsurat']  			= $kopsurat;
+				$data['tanggal']  			= $hasilAkhir;
+				$data['getdata']  			= $getarrayid;
+				if (isset($getarrayid->penandatangan)){
+					try {
+						$keterangan 	= 'Rapot Link '.url('/').'/printmark/'.$hasilujianlisan.' Di Tandatangani Oleh '.$getarrayid->penandatangan.' Pada '.$getarrayid->updated_at;
+						$qrcode			= base64_encode(QrCode::format('png')->size(100)->generate($keterangan));
+						$ttdks			= '<img src="data:image/png;base64, '.$qrcode.'" height="100" />';
+					} catch (\Exception $e) {
+						$ttdks 			= '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
+					}
+				} else {
+					$ttdks 				= '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>';
+				}
+				$data['ttdks']  		= $ttdks;
+				$generatesurat 			= view('cetak.hasilujianalquran', $data)->render();
+				if ($ttdks != '<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>'){
+					XFiles::updateOrCreate(
+						[
+							'xmarking'	=> $hasilujianlisan,
+						],
+						[
+							'xtabel'	=> 'mushaf_ujianlisan',
+							'xjenis'	=> $getarrayid->id_sekolah.';'.$getarrayid->noinduk,
+							'xfile'		=> $generatesurat
+						]
+					);
+				}
+				return $generatesurat;
 			}
 		}
     }
     public function index() {
 		$data 		= [];
-		$tahun		= date("Y");
-		$urutanwerno= array('red','green','blue','yellow','navy','teal','orange','maroon','black','aqua');
-		$urutanbg	= array('primary','success','warning','info','danger','secondary','primary','success','warning','info');
-		$groups     = Pengumuman::where('id_sekolah', Session('sekolah_id_sekolah'))->select('tanggal')->groupBy('tanggal')->orderBy('tanggal', 'DESC')->limit(30)->get();
-		$y      	= 0;
-		$x      	= 0;
-		foreach ($groups as $group) {
-			$tanggal    = $group->tanggal;
-			$rsurat     = Pengumuman::where('id_sekolah', Session('sekolah_id_sekolah'))->where('tanggal', 'like', '%'. $tanggal . '%')->orderBy('id', 'DESC')->limit(30)->get();
-			foreach ($rsurat as $rowpeng) {
-				$id             =   $rowpeng->id;
-				$jenis          =   $rowpeng->jenis;
-				$siapa          =   $rowpeng->siapa;
-				$nim            =   $rowpeng->nim;
-				$pengumuman     =   $rowpeng->pengumuman;   
-				$created_at     =   $rowpeng->kapan;
-				$kapan          =   SendMail::timeago($created_at);
-				if ($jenis == 'mahasiswa') { 
-					$nama 		= $siapa.'('.$nim.')';
-					$iconne 	= 'fa-user';
-					$jencolor 	= 'green';
-				} else { 
-					$nama 		= $siapa; 
-					$iconne 	= 'fa-bullhorn';
-					$jencolor 	= 'red';
-				}
-				$data['pengumumans'][$x]['id']          =   $id;
-				$data['pengumumans'][$x]['tanggal']     =   $tanggal;
-				$data['pengumumans'][$x]['kapan']       =   $kapan;
-				$data['pengumumans'][$x]['jencolor']    =   $jencolor;
-				$data['pengumumans'][$x]['jenis']       =   $jenis;
-				$data['pengumumans'][$x]['siapa']       =   $siapa;
-				$data['pengumumans'][$x]['pengumuman']  =   $pengumuman;
-				$data['pengumumans'][$x]['icon']        =   $iconne;
-				$data['pengumumans'][$x]['urutanwerno'] =   $urutanwerno[$y];
-				$data['pengumumans'][$x]['urutanbg'] 	=   $urutanbg[$y];
-				if ($y == 9) {
-					$y = 0; 
-				} else {
-					$y++; 
-				}
-				$x++;
-			}
-		}
-		$data['namaapps01']  		= Session('sekolah_nama_aplikasi');
-		$data['domainapps01']  		= Session('sekolah_nama_yayasan');
-		$data['subdomainapps01']  	= Session('sekolah_nama_sekolah');
-		$data['subsubdomainapps01'] = Session('sekolah_kode_sekolah');
-		$data['addressapps01']  	= Session('sekolah_alamat');
-		$data['emailapps01']  		= Session('sekolah_email');
-		$data['lamanapps01']  		= parse_url(request()->root())['host'];
-		$data['logofrontapps01']  	= Session('sekolah_frontpage');
-		$data['logo01']  			= url("/").'/'.Session('sekolah_logo');
-		$data['sidebar']		    = 'dashbord';
-		return view('simaster.index', $data);
-    }
-	public function FrontPageindex(Request $request) {
-		$data			= [];
-		$id 			= $request->input('id');
-		$firebaseid 	= $request->input('firebaseid');
-		$sql 			= Sekolah::where('id', $id)->first();
-		if(!$sql){
-			return view('accessdenided');
-		}
 		$previlage  =  Session('previlage');
-		if ($firebaseid == null OR $firebaseid == ''){
-			$ceksek = explode("?firebaseid=", $id);
-			if (isset($ceksek[1])){
-				$firebaseid = $ceksek[1];
-			}
-		}
-        if ($previlage != '') {
-			return redirect('dashbord');
-        } else {
-			if ($firebaseid != '' AND $firebaseid !== null){
-				$user  	= User::where('firebaseid', $firebaseid)->first();
-			} else {
-				$user 	= null;
-			}
-			if (isset($user->previlage)){
-				Auth::login($user);
-				$previlage 			= $user->previlage;
-				$idsekolah 			= $user->id_sekolah;
-				$idne 				= $user->id;
-				$fakultas 			= $user->fakultas;
-				session(['id' 		=> $user->id]);
-				session(['nama' 	=> $user->nama]);
-				session(['username' => $user->username]);
-				session(['previlage'=> $previlage]);
-				session(['fakultas' => $fakultas]);
-				session(['nip'		=> $user->nip]);
-				session(['spesial' 	=> $user->spesial]);
-				$sql = Sekolah::where('id', $idsekolah)->first();
-				session(['sekolah_nama_aplikasi'=> 'SIMASTER']);
-				session(['sekolah_id_sekolah'	=> $idsekolah]);
-				session(['sekolah_level'		=> $sql->level]);
-				session(['sekolah_nama_yayasan'	=> $sql->nama_yayasan]);
-				session(['sekolah_nama_sekolah'	=> $sql->nama_sekolah]);
-				session(['sekolah_kode_sekolah'	=> $sql->kode_sekolah]);
-				session(['sekolah_nis'			=> $sql->nis]);
-				session(['sekolah_nss'			=> $sql->nss]);
-				session(['sekolah_npsn'			=> $sql->npsn]);
-				session(['sekolah_alamat'		=> $sql->alamat]);
-				session(['sekolah_kota'			=> $sql->kota]);
-				session(['sekolah_telp'			=> $sql->telp]);
-				session(['sekolah_email'		=> $sql->email]);
-				session(['sekolah_slogan'		=> $sql->slogan]);
-				session(['sekolah_logo'			=> $sql->logo]);
-				session(['sekolah_frontpage'	=> $sql->frontpage]);
-				return redirect('dashbord');
-			} else {
-				$profile 				= '';
-				$visimisi 				= '';
-				$strukturorganisasi 	= '';
-				$pendidik 				= '';
-				$jadwal 				= '';
-				$kontak 				= '';
-				$sertamerta 			= '';
-				$setiapsaat 			= '';
-				$pengumuman 			= '';
-				$getdata 				= Layanan::orderBy('layanan', 'ASC')->where('id_sekolah',$id)->get();
-				if (!empty($getdata)){
-					foreach ($getdata as $rlayanan){
-						$status 		= $rlayanan->status;
-						$layanan 		= $rlayanan->layanan;
-						if ($layanan == 'profile') { $profile = $status; }
-						if ($layanan == 'visimisi') { $visimisi = $status; }
-						if ($layanan == 'strukturorganisasi') { $strukturorganisasi = $status; }
-						if ($layanan == 'pendidik') { $pendidik = $status; }
-						if ($layanan == 'jadwal') { $jadwal = $status; }
-						if ($layanan == 'kontak') { $kontak = $status; }
-						if ($layanan == 'sertamerta') { $sertamerta = $status; }
-						if ($layanan == 'setiapsaat') { $setiapsaat = $status; }
-					}
-				}
-				$groups     = Pengumuman::where('id_sekolah', $id)->select('tanggal')->groupBy('tanggal')->orderBy('tanggal', 'DESC')->limit(30)->get();
+		if ($previlage == null OR $previlage == ''){
+			return redirect('/');
+		} else {
+			$tahun						= date("Y");
+			$urutanwerno				= array('red','green','blue','yellow','navy','teal','orange','maroon','black','aqua');
+			$urutanbg					= array('primary','success','warning','info','danger','secondary','primary','success','warning','info');
+			$data['namaapps01']  		= Session('sekolah_nama_aplikasi');
+			$data['domainapps01']  		= Session('sekolah_nama_yayasan');
+			$data['subdomainapps01']  	= Session('sekolah_nama_sekolah');
+			$data['subsubdomainapps01'] = Session('sekolah_kode_sekolah');
+			$data['addressapps01']  	= Session('sekolah_alamat');
+			$data['emailapps01']  		= Session('sekolah_email');
+			$data['lamanapps01']  		= parse_url(request()->root())['host'];
+			$data['logofrontapps01']  	= Session('sekolah_frontpage');
+			$data['logo01']  			= url("/").'/'.Session('sekolah_logo');
+			$data['sidebar']		    = 'dashbord';
+			if ($previlage == 'ortu'){
+				$groups     = Pengumuman::where('id_sekolah', Session('sekolah_id_sekolah'))->select('tanggal')->groupBy('tanggal')->orderBy('tanggal', 'DESC')->limit(30)->get();
 				$y      	= 0;
 				$x      	= 0;
 				foreach ($groups as $group) {
 					$tanggal    = $group->tanggal;
-					$rsurat     = Pengumuman::where('id_sekolah', $id)->where('tanggal', 'like', '%'. $tanggal . '%')->orderBy('id', 'DESC')->limit(30)->get();
+					$rsurat     = Pengumuman::where('id_sekolah', Session('sekolah_id_sekolah'))->where('tanggal', 'like', '%'. $tanggal . '%')->orderBy('id', 'DESC')->limit(30)->get();
 					foreach ($rsurat as $rowpeng) {
 						$id             =   $rowpeng->id;
 						$jenis          =   $rowpeng->jenis;
@@ -410,99 +1130,225 @@ class FrontpageController extends Controller
 						$x++;
 					}
 				}
-				$data['firebaseid']			= $firebaseid;
-				$data['sidebar']			= 'frontpage';
-				$data['profile']			= $profile;
-				$data['visimisi']			= $visimisi;
-				$data['strukturorganisasi']	= $strukturorganisasi;
-				$data['pendidik']			= $pendidik;
-				$data['jadwal']				= $jadwal;
-				$data['kontak']				= $kontak;
-				$data['sertamerta']			= $sertamerta;
-				$data['setiapsaat']			= $setiapsaat;
-				$data['pengumuman']			= $pengumuman;
-				$data['id_sekolah']			= $id;
-				$data['nama_yayasan']		= $sql->nama_yayasan;
-				$data['nama_sekolah']		= $sql->nama_sekolah;
-				$data['kode_sekolah']		= $sql->kode_sekolah;
-				$data['nis']				= $sql->nis;
-				$data['nss']				= $sql->nss;
-				$data['npsn']				= $sql->npsn;
-				$data['alamat']				= $sql->alamat;
-				$data['kota']				= $sql->kota;
-				$data['telp']				= $sql->telp;
-				$data['email']				= $sql->email;
-				$data['slogan']				= $sql->slogan;
-				$data['logo']				= $sql->logo;
-				$data['frontpage']			= $sql->frontpage;
-				$data['domain']				= $sql->domain;
-				return view('simaster.default', $data);
+				return view('simaster.index', $data);
+			} else {
+				$data['allkegiatan'] = RencanaKegiatan::where('tahun', date('Y'))->orderBy('status', 'ASC')->orderBy('mulai', 'ASC')->paginate(10);
+				return view('simaster.indexmanagement', $data);
+			}
+		}
+    }
+	public function FrontPageindex(Request $request) {
+		$data			= [];
+		$urutanwerno	= array('red','green','blue','yellow','navy','teal','orange','maroon','black','aqua');
+		$urutanbg		= array('primary','success','warning','info','danger','secondary','primary','success','warning','info');
+		$id 			= $request->input('id');
+		$firebaseid 	= $request->input('firebaseid');
+		$previlage  	= Session('previlage');
+        if ($previlage !== null) {
+			return redirect('dashbord');
+        } else {
+			$ceksek = explode('?firebaseid=', $id);
+			if (isset($ceksek[1])){
+				$id 		= $ceksek[0];
+				$firebaseid = $ceksek[1];
+			}
+			if ($firebaseid != '' AND $firebaseid !== null){
+				$user  	= User::where('firebaseid', $firebaseid)->where('id_sekolah', $id)->first();
+			} else {
+				$user 	= null;
+			}
+			$sql = Sekolah::where('id', $id)->first();
+			if (isset($user->previlage) AND isset($sql->id)){
+				Auth::login($user);
+				$previlage 			= $user->previlage;
+				$idsekolah 			= $user->id_sekolah;
+				$idne 				= $user->id;
+				$fakultas 			= $user->fakultas;
+				$cekidmark1 		= XFiles::where('xmarking', 'Foto-'.$user->username)->first();
+				if (isset($cekidmark1->xfile)){
+					$foto 			= $cekidmark1->xfile;
+				} else {
+					$foto 			= url('/').'/'.$sql->logo;
+				}
+				session(['id' 					=> $user->id]);
+				session(['nama' 				=> $user->nama]);
+				session(['username' 			=> $user->username]);
+				session(['previlage'			=> $user->previlage]);
+				session(['fakultas' 			=> $user->fakultas]);
+				session(['fakpanjang' 			=> $user->fakpanjang]);
+				session(['email' 				=> $user->email]);
+				session(['nip'					=> $user->nip]);
+				session(['spesial' 				=> $user->spesial]);
+				session(['fbid' 				=> $user->firebaseid]);
+				session(['avatar' 				=> $foto]);
+				session(['sekolah_nama_aplikasi'=> 'SIMASTER']);
+				session(['sekolah_id_sekolah'	=> $idsekolah]);
+				session(['sekolah_level'		=> $sql->level]);
+				session(['sekolah_nama_yayasan'	=> $sql->nama_yayasan]);
+				session(['sekolah_nama_sekolah'	=> $sql->nama_sekolah]);
+				session(['sekolah_kode_sekolah'	=> $sql->kode_sekolah]);
+				session(['sekolah_nis'			=> $sql->nis]);
+				session(['sekolah_nss'			=> $sql->nss]);
+				session(['sekolah_npsn'			=> $sql->npsn]);
+				session(['sekolah_alamat'		=> $sql->alamat]);
+				session(['sekolah_kota'			=> $sql->kota]);
+				session(['sekolah_telp'			=> $sql->telp]);
+				session(['sekolah_email'		=> $sql->email]);
+				session(['sekolah_slogan'		=> $sql->slogan]);
+				session(['sekolah_logo'			=> $sql->logo]);
+				session(['sekolah_frontpage'	=> $sql->frontpage]);
+				return redirect('dashbord');
+			} else {
+				if (isset($sql->id)){
+					$profile 				= '';
+					$visimisi 				= '';
+					$strukturorganisasi 	= '';
+					$pendidik 				= '';
+					$jadwal 				= '';
+					$kontak 				= '';
+					$sertamerta 			= '';
+					$setiapsaat 			= '';
+					$pengumuman 			= '';
+					$getdata 				= Layanan::where('id_sekolah',$id)->orderBy('layanan', 'ASC')->get();
+					if (!empty($getdata)){
+						foreach ($getdata as $rlayanan){
+							$status 		= $rlayanan->status;
+							$layanan 		= $rlayanan->layanan;
+							if ($layanan == 'profile') { $profile = $status; }
+							if ($layanan == 'visimisi') { $visimisi = $status; }
+							if ($layanan == 'strukturorganisasi') { $strukturorganisasi = $status; }
+							if ($layanan == 'pendidik') { $pendidik = $status; }
+							if ($layanan == 'jadwal') { $jadwal = $status; }
+							if ($layanan == 'kontak') { $kontak = $status; }
+							if ($layanan == 'sertamerta') { $sertamerta = $status; }
+							if ($layanan == 'setiapsaat') { $setiapsaat = $status; }
+						}
+					}
+					$groups     = Pengumuman::where('id_sekolah', $id)->select('tanggal')->groupBy('tanggal')->orderBy('tanggal', 'DESC')->limit(30)->get();
+					$y      	= 0;
+					$x      	= 0;
+					foreach ($groups as $group) {
+						$tanggal    = $group->tanggal;
+						$rsurat     = Pengumuman::where('id_sekolah', $id)->where('tanggal', 'like', '%'. $tanggal . '%')->orderBy('id', 'DESC')->limit(30)->get();
+						foreach ($rsurat as $rowpeng) {
+							$id             =   $rowpeng->id;
+							$jenis          =   $rowpeng->jenis;
+							$siapa          =   $rowpeng->siapa;
+							$nim            =   $rowpeng->nim;
+							$pengumuman     =   $rowpeng->pengumuman;   
+							$created_at     =   $rowpeng->kapan;
+							$kapan          =   SendMail::timeago($created_at);
+							if ($jenis == 'mahasiswa') { 
+								$nama 		= $siapa.'('.$nim.')';
+								$iconne 	= 'fa-user';
+								$jencolor 	= 'green';
+							} else { 
+								$nama 		= $siapa; 
+								$iconne 	= 'fa-bullhorn';
+								$jencolor 	= 'red';
+							}
+							$data['pengumumans'][$x]['id']          =   $id;
+							$data['pengumumans'][$x]['tanggal']     =   $tanggal;
+							$data['pengumumans'][$x]['kapan']       =   $kapan;
+							$data['pengumumans'][$x]['jencolor']    =   $jencolor;
+							$data['pengumumans'][$x]['jenis']       =   $jenis;
+							$data['pengumumans'][$x]['siapa']       =   $siapa;
+							$data['pengumumans'][$x]['pengumuman']  =   $pengumuman;
+							$data['pengumumans'][$x]['icon']        =   $iconne;
+							$data['pengumumans'][$x]['urutanwerno'] =   $urutanwerno[$y];
+							$data['pengumumans'][$x]['urutanbg'] 	=   $urutanbg[$y];
+							if ($y == 9) {
+								$y = 0; 
+							} else {
+								$y++; 
+							}
+							$x++;
+						}
+					}
+					$data['firebaseid']			= $firebaseid;
+					$data['sidebar']			= 'frontpage';
+					$data['profile']			= $profile;
+					$data['visimisi']			= $visimisi;
+					$data['strukturorganisasi']	= $strukturorganisasi;
+					$data['pendidik']			= $pendidik;
+					$data['jadwal']				= $jadwal;
+					$data['kontak']				= $kontak;
+					$data['sertamerta']			= $sertamerta;
+					$data['setiapsaat']			= $setiapsaat;
+					$data['pengumuman']			= $pengumuman;
+					$data['id_sekolah']			= $sql->id;
+					$data['nama_yayasan']		= $sql->nama_yayasan;
+					$data['nama_sekolah']		= $sql->nama_sekolah;
+					$data['kode_sekolah']		= $sql->kode_sekolah;
+					$data['nis']				= $sql->nis;
+					$data['nss']				= $sql->nss;
+					$data['npsn']				= $sql->npsn;
+					$data['alamat']				= $sql->alamat;
+					$data['kota']				= $sql->kota;
+					$data['telp']				= $sql->telp;
+					$data['email']				= $sql->email;
+					$data['slogan']				= $sql->slogan;
+					$data['logo']				= $sql->logo;
+					$data['frontpage']			= $sql->frontpage;
+					$data['domain']				= $sql->domain;
+					return view('simaster.default', $data);
+				} else {
+					return redirect('/');
+				}
 			}
         }
 	}
 	//Chatting
 	public function chatGetlist(Request $request) {
-		$idevent		= $request->input('val02');
-		
+		$idevent 	= $request->input('val02');
 		$kelompok	= Session('previlage');
 		$nmlengkap	= Session('nama');
 		if (Session('sekolah_id_sekolah') !== null){
 			$idsekolah 	= Session('sekolah_id_sekolah');
 			$logo 		= url("/").'/'.Session('sekolah_logo');
-		} else {
-			$idsekolah	= Session('fakultas');
-			$logo 		= Session('avatar');
-		}
-		$isipesan		= '';
-		$getdata 		= User::where('username', Session('username'))->first();
-		if (isset($getdata->id)){
-			$klsajar 	= $getdata->klsajar;
-		} else { $klsajar = ''; }
-	    if ($klsajar == 'test'){
-			$qcatting	= null;
-			echo '
-			<div class="direct-chat-msg left">
-				<div class="direct-chat-info clearfix">
-					<span class="direct-chat-name pull-right">Waktu Terlarang</span>
-					<span class="direct-chat-timestamp pull-left">Now</span>
-				</div><!-- /.direct-chat-info -->
-				<img class="direct-chat-img" src="/mascot.png" alt="message user image" />
-				<div class="direct-chat-text">
-					No Chat While On Test Mode
-				</div>
-			</div>';
-		} else {
-			if ($idevent == '' OR $idevent == '0' OR $idevent == null){
-				$qcatting	= Chatting::where('id_sekolah', $idsekolah)->orderBy('id', 'DESC')->limit(100)->get();
+			$isipesan		= '';
+			$getdata 		= User::where('username', Session('username'))->first();
+			if (isset($getdata->id)){
+				$klsajar 	= $getdata->klsajar;
+			} else { $klsajar = ''; }
+			if (Session('noinduk') !== null){
+				$qcatting	= null;
+				echo '
+				<div class="direct-chat-msg left">
+					<div class="direct-chat-info clearfix">
+						<span class="direct-chat-name pull-right">Waktu Terlarang</span>
+						<span class="direct-chat-timestamp pull-left">Now</span>
+					</div><!-- /.direct-chat-info -->
+					<img class="direct-chat-img" src="/mascot.png" alt="message user image" />
+					<div class="direct-chat-text">
+						No Chat While On Test Mode
+					</div>
+				</div>';
 			} else {
-				$qcatting	= Chatting::where('id_sekolah', $idevent)->orderBy('id', 'DESC')->limit(100)->get();
-			}
-		}
-		if (!empty($qcatting)){
-			foreach ($qcatting as $chat) {
-				$pesan 		= $chat->pesannya;				
-				$waktu 		= $chat->created_at;
-				$nama 		= $chat->nama;
-				$ket 		= $chat->ket;
-				if ($ket == '' OR is_null($ket)){
-					if ($logo == ''){
-						$gravatar1 	= url('/mascot.png');
-						$gravatar2 	= url('/duidev-softwarehouse.png');
-					} else {
-						$gravatar1 	= $logo;
-						$gravatar2	= $logo;
-					}
+				if ($idevent == '' OR $idevent == '0' OR $idevent == null){
+					$qcatting	= Chatting::where('id_sekolah', $idsekolah)->orderBy('id', 'DESC')->limit(100)->get();
 				} else {
-					$gravatar1 = $ket;
-					$gravatar2 = $ket;
+					$qcatting	= Chatting::where('id_sekolah', $idevent)->orderBy('id', 'DESC')->limit(100)->get();
 				}
-				if (Session('theme01') == 'Vuexy'){
-					if ($nama == $nmlengkap){
-						echo 	'<div class="chat"><div class="chat-avatar"><span class="avatar box-shadow-1 cursor-pointer"><img src="'.$gravatar1.'" alt="avatar" height="36" width="36" /></span></div><div class="chat-body"><div class="chat-content">'.$pesan.'</div></div></div>';
+			}
+			if (!empty($qcatting)){
+				foreach ($qcatting as $chat) {
+					$pesan 		= $chat->pesannya;				
+					$waktu 		= $chat->created_at;
+					$nama 		= $chat->nama;
+					$ket 		= $chat->ket;
+					if ($ket == '' OR is_null($ket)){
+						if ($logo == ''){
+							$gravatar1 	= url('/mascot.png');
+							$gravatar2 	= url('/duidev-softwarehouse.png');
+						} else {
+							$gravatar1 	= $logo;
+							$gravatar2	= $logo;
+						}
 					} else {
-						echo 	'<div class="chat chat-left"><div class="chat-avatar"><span class="avatar box-shadow-1 cursor-pointer"><img src="'.$gravatar2.'" alt="avatar" height="36" width="36" /></span></div><div class="chat-body"><div class="chat-content">'.$pesan.'</div></div></div>';
+						$gravatar1 = $ket;
+						$gravatar2 = $ket;
 					}
-				} else {
 					if ($nama == $nmlengkap){
 						echo '<div class="direct-chat-msg left">
 								<div class="direct-chat-info clearfix">
@@ -528,6 +1374,17 @@ class FrontpageController extends Controller
 					}
 				}
 			}
+		} else {
+			echo '<div class="direct-chat-msg left">
+					<div class="direct-chat-info clearfix">
+						<span class="direct-chat-name pull-right">System</span>
+						<span class="direct-chat-timestamp pull-left">now</span>
+					</div>
+					<img class="direct-chat-img" src="logo.png" alt="message user image" />
+					<div class="direct-chat-text">
+						Session Expired, Please Relogin
+					</div>
+				</div>';
 		}
     }
 	public function cattingSurat(Request $request) {
@@ -535,55 +1392,27 @@ class FrontpageController extends Controller
 		$nmlengkap	= Session('nama');
 		$pesan		= $request->input('val01');
 		$idevent	= $request->input('idevent');
-		$logo		= '';
+		$logo 		= url("/").'/'.Session('sekolah_logo');
 		$getdata 	= User::where('username', Session('username'))->first();
 		if (isset($getdata->id)){
 			$klsajar 	= $getdata->klsajar;
 		} else { $klsajar = ''; }
 		if ($idevent == '' OR $idevent == '0' OR $idevent == null){
-			if (Session('sekolah_id_sekolah') !== null){
-				$idsekolah 	= Session('sekolah_id_sekolah');
-			} else {
-				$idsekolah	= Session('fakultas');
-			}
+			$idsekolah 	= Session('sekolah_id_sekolah');
 		} else {
 			$idsekolah 	= $idevent;
 			$logo 		= $request->input('val03');
 		}
-		if ($logo == ''){
-			if (Session('avatar') !== null){
-				$gravatar	= Session('avatar');
-			} else if (Session('sekolah_logo') !== null){
-				$gravatar	= url("/").'/'.Session('sekolah_logo');
-			} else {
-				$gravatar	= url('/duidev-softwarehouse.png');
-			}
+		if (Session('avatar') !== null){
+			$gravatar	= Session('avatar');
+		} else if (Session('sekolah_logo') !== null){
+			$gravatar	= url("/").'/'.Session('sekolah_logo');
 		} else {
-			$gravatar		= $logo;
+			$gravatar	= url('/duidev-softwarehouse.png');
 		}
 		if ($pesan != ''){
-			$pesan			= str_replace(':)', '&#128522;', $pesan);
-			$pesan			= str_replace('T_T', '&#128557;', $pesan);
-			$pesan			= str_replace('>.<', '&#128518;', $pesan);
-			$pesan			= str_replace('^_v', '&#128540;', $pesan);
-			$pesan			= str_replace('<', '&#60;', $pesan);
-			$pesan			= str_replace('>', '&#62;', $pesan);
-			$pesan			= str_replace('"', '&#34;', $pesan);
-			$pesan			= str_replace('#', '&#35;', $pesan);
-			$pesan			= str_replace('$', '&#36;', $pesan);
-			$pesan			= str_replace('%', '&#37;', $pesan);
-			$pesan			= str_replace('&', '&#38;', $pesan);
-			$pesan			= str_replace('+', '&#43;', $pesan);
-			$pesan			= str_replace('@', '&#64;', $pesan);
-			$pesan			= str_replace('?', '&#63;', $pesan);
-			$pesan			= str_replace('^', '&#94;', $pesan);
-			$pesan			= str_replace('{', '&#123;', $pesan);
-			$pesan			= str_replace('}', '&#125;', $pesan);
-			$pesan			= str_replace('`', '&#96;', $pesan);
-			$pesan			= str_replace("'", "&#39;", $pesan);
-			$pesan			= str_replace("(", "&#40;", $pesan);
-			$pesan			= str_replace(")", "&#41;", $pesan);
-			if ($klsajar == 'test'){
+			$pesan = formatPesan($pesan);
+			if (Session('noinduk') !== null){
 			} else {
 				$input = Chatting::insert([
 					'kelompok'  	=>  $kelompok,
@@ -592,13 +1421,11 @@ class FrontpageController extends Controller
 					'ket'			=>  $gravatar,
 					'id_sekolah'	=>	$idsekolah
 				]);
-				event(new \App\Events\NotifController('Pesan dari '.$nmlengkap.': '.$pesan));
+				event(new \App\Events\NotifController('New Message From '.$nmlengkap.': '.$pesan));
 			}
 		}
 		
-		$logo 		= url("/").'/'.Session('sekolah_logo');
-		$isipesan	= '';
-		if ($klsajar == 'test'){
+		if (Session('noinduk') !== null){
 			$qcatting	= null;
 			echo '
 				<div class="direct-chat-msg left">
@@ -615,9 +1442,6 @@ class FrontpageController extends Controller
 			$qcatting	= Chatting::where('id_sekolah', $idsekolah)->orderBy('id', 'DESC')->limit(100)->get();
     	}
 		if (!empty($qcatting)){
-			if (Session('fakultas') == 'iwis'){
-				echo '<table class="table align-items-center mb-0"><thead><tr><th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No Chatting Yet</th></tr></thead></table>';
-			}
 			foreach ($qcatting as $chat) {
 				$pesan 		= $chat->pesannya;				
 				$waktu 		= $chat->created_at;
@@ -661,6 +1485,7 @@ class FrontpageController extends Controller
 			}
 		}
     }
+	//Persuratan Lain-Lain
 	public function viewSurat ($id){
 		$surat = self::genSurat($id, 'suratijin');
 		return $surat;
@@ -683,9 +1508,19 @@ class FrontpageController extends Controller
 		if (isset($sql->id)){
 			$verifikasi	= $sql->verifikasi;
 			$kirim		= $sql->kirim;
+			$id_sekolah	= $sql->id_sekolah;
+			$niy		= $sql->inputor;
+			$asline		= '';
+			$getnama 	= User::where('nip', $niy)->first();
+			if (isset($getnama->nama)){
+				$asline	= $getnama->nama;
+			}
 		} else {
 			$verifikasi	= '';
 			$kirim 		= 'Belum di Verifikasi';
+			$id_sekolah	= session('sekolah_id_sekolah');
+			$niy 		= Session('nip');
+			$asline 	= Session('nama');
 		}
 		
 		if ($verifikasi == ''){
@@ -704,6 +1539,7 @@ class FrontpageController extends Controller
 			$ceknama		= User::where('username', 'LIKE', $jeneng.'%')->first();
 			if (isset($ceknama->nama)){
 				$jeneng		= $ceknama->nama;
+				$asline		= $jeneng;
 			}
 			$tgliki 		= $arrtanggal[0].$arrtanggal[1];
 			$mthiki 		= $arrtanggal[2].$arrtanggal[3];
@@ -749,7 +1585,7 @@ class FrontpageController extends Controller
 		$tulisbln	= '';
 		$tlsbulan	= '';
 		$gaksama	= '';
-		$sql 		= Pembayaran::where('marking', $marking)->where('id_sekolah',session('sekolah_id_sekolah'))->get();
+		$sql 		= Pembayaran::where('marking', $marking)->where('id_sekolah', $id_sekolah)->get();
 		if (!empty($sql)){
 			foreach ($sql as $rrincian){
 				$nama 		= $rrincian->nama;
@@ -768,7 +1604,7 @@ class FrontpageController extends Controller
 				if ($tulisbln != $bulan){ $tulisbln = $bulan; $tlsbulan = $tlsbulan.' '.$bulan; }
 				$tahun		= $tahune;
 				$total		= $total + $biaya;
-				$cekekskul	= Ekstrakulikuler::where('nama', $jenis)->where('id_sekolah',session('sekolah_id_sekolah'))->count();
+				$cekekskul	= Ekstrakulikuler::where('nama', $jenis)->where('id_sekolah', $id_sekolah)->count();
 				if ($cekekskul != 0){
 					if ( $ekskula == $jenis ){ $ekskula2 = $ekskula2 + $biaya; }
 					else if ( $ekskulb == $jenis ){ $ekskulb2 = $ekskulb2 + $biaya; }
@@ -788,7 +1624,7 @@ class FrontpageController extends Controller
 					} elseif ($jenis == 'Uang Makan'){
 						$paguyuban = $paguyuban + $biaya;
 					} else {
-						$cekinsidental = Insidental::where('kode', $jenis)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+						$cekinsidental = Insidental::where('kode', $jenis)->where('id_sekolah', $id_sekolah)->first();
 						if (isset($cekinsidental->jenis)){
 							$termasuk = $cekinsidental->jenis;
 							$jenislain = $cekinsidental->deskripsi;
@@ -899,18 +1735,23 @@ class FrontpageController extends Controller
 			$tlain4a	= number_format( $lain4a , 0 , '.' , ',' );
 		}
 		else { $tlain4a = ''; }
-		$qrcode 					= base64_encode(QrCode::format('png')->size(100)->generate($alamatcetak));
-		
+		try {
+			$qrcode 				= base64_encode(QrCode::format('png')->size(100)->generate($alamatcetak));
+		} catch (\Exception $e) {
+			$qrcode 				= 'iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAMAAAC/MqoPAAABUFBMVEVHcEzT09Py8vLu7u7a2tr09PT09PTBwcHz8/Pp6enz8/Pp6enx8fH09PT09PTz8/Pw8PDt7e3w8PDn5+fu7u7x8fH09PTz8/Py8vLz8/Pz8/P09PTx8fHy8vLz8/Px8fHw8PDy8vLy8vLy8vLz8/OPj4+GhoaJiYmAgICHh4eGhoa1tbXJycmYmJjV1dW5ubm5ubmEhITg4OC/v7/Dw8O4uLiPj4+8vLyBgYF+fn7Nzc2amprR0dHd3d3p6en09PT09PTk5OTy8vKZmZnc3Nzh4eGVlZXw8PBiYmKlpaWQkJB0dHTu7u7s7Oze3t7JycmLi4vq6urU1NSFhYWfn5+9vb1oaGjOzs5vb29XV1fCwsKwsLDR0dGIiIjGxsbo6Oirq6u1tbVsbGxcXFz39/d4eHhfX1/Y2NhUVFS6urpOTk6AgIBERERJSUlBQUE/Pz9TfwEQAAAAQXRSTlMABHAfCaL5Ad0NyBJZ8+bTRCg7GjJO7cGqupOQhn6yYWl3mYyfKBdjvto+imm40qZefp3fTcaRNvCfteWJ7e3//sQynkgAABqbSURBVHja7J35VxrJFoDZpEFUdlziiibGTDIZ38wkmcmb0+zYDQJCAwoiWxCR5P3/P76uql6qQQF718k9Z+bXme989966XbcbLZaf8TN+xs9QGA6PPeRb2T/YPoxGj46i0cPtg/2VcMAfdBAvF9rqCYUPopvetYgzRkoi5lxd864v7ewF7I6X59oe3tnwRpyAc4IbwaN/r7rWt/YCnpfj3+Pb2XU5yUUj4l3aD72xPn/uYHjLu0o+NSK/fvh0/PrNM+Z2+155naSc+FZoJr8C/GdZ/ITftr5Kyo6LajKZzHz9cPruucl3BLZcpKLI1hmWnQ2W/hm5d/g2IqTiSHUgO52hPxy/Jp4J+O4qqUa0R1B7hqbpk0/PQD0R2FAHHCR9keHQabr09tjcVU/YDyOkijGkMrz4UunEzPCOPS+pbsSbSV58qdQ6OTUrfGjDSaod+WpS9N5qmdO8Y99FahAJVPCIvdSqvD12mK7Kj5ykNlGWsLPw78x11PmWSc2iQIn1Dti/fHptpmRfIzWMdEfqfXximqz3vHKSmkZ8gr3y5a/X5ijzDVLraE+wt1jxJnioD62T2seU98rYePEBrw7k5Lf0FDvb6g1u7S5Sn0B9XsL+5dTxbyBnn2KZqZwf//Xm30BOktdMJikO9ND72KikJwJ6kpOJm6RkoIfeT4xhD3lJXSM7krK3APuXYwPmWv8yqXO0m1PslbEBzS64SeoeBQpnN6rZuY9IA4K/qM2UjGO37sSMQM/CC3qgvYKzv9WTfWWVNCTaHY69NJaw6zfVhlykQTFkUx7Cj41hD64bRU4mGgwD2ekcxl7Ri936ijQu2h3Oe+VSf3bCqELnB1rknc7lKnqz+11GkrNDHYsO4CuXgJ3Wkd2xQRobBYpBOT+4zLXwwU7zM27faTA66HQMp33Qwgd6jWcbg9MdXVch9kyOZS9Jbq20nOcdR6TxUWQoyM5qzw1onP1Uu9tKIrxqAvQ21M5A7eB4F9m/HGs3zCyTZogihbyPWXSWPYOxa3Z3cWAKcrbaKeidBtpzFewhdnzy+sX2OO6yioLekwOAPijh7NoccdYt0iSR7iD20qWQ8kLOa9LqAhGzoGerFAXgkzDj2ZTHN3LqtzrCukSaJoYUZGfGUPughbNrUO6+iHnQz7uInYboIOWxG3rVy93w4V16vnU6kD2HtI8lN7WnL1g6+xDTROwo42HKi+wqbybMVOls5EcdyM5mPNQ+oLGtVEvdlA+YSjpJ1juQPZnjtFckN/RqdnnilbnIYcYD9nGP015KYuxqdnmzDHJijx81ATxV6nHaxxmc/ZR4adM7Psw2O4A9c8lrb+FbKfU6nWfZbOhkuQm1Mzle+yCTxLx/Ukt72Gk28m/pbhPCg2JH2ivJpPg+sVrarUemk05ejJqQvVXDtYve1dFO2F3mQ882oPZmpifRLnhXqcnvxcyHnih2ITvT64naGYxdlXHWqmx8TzhRJFTuc90ugKdytR7f5CsMxn6ixkgnL9+dEdfybnTbtrcS9oEIr+zZtqO7y66IOjk0HEH2zqAm0c4Ir14cG9HfV12bW7ZwKOi2so3Cgv7hM8htD4UPlpaV86dGiH1ck2hnhIL/oMK1/PaTsL1LNt/sT7IJwuoJ7UWXld1sp6uIvVXDtCcZLOeVn2+OhV8Zirl2bYt/ie0JHGwqeCgqVKtVwE7XMO0lRmTPfNKr1GOuoxU7yPAnHKjuwM6yU7Z1wD4aZWqY9nESY1fe6BYq9bWlFTvxJGwu+T1hmV+CstZHAD15VuvVhLOdRlf0iF1xo9uZX9/rNr/cO2C28ENbcj4hSVVRMDWJdriY4XrdB4UX09bdecKPfG5FwyJB+A+fDj9sNID3KlWD2vlqz1Ci968KJ7qgd+b/gWs7ZLUonZcJIhR9Ytonyg3AXq12WHRMe4uiKKHeFWZ8YNYZ5D2wq3X559t8UsPL1huIvdk7w6udzXgEzw43SjN+f4ZxFpxQ7T7EbXvK1HhevEHsEB3TnqEobhObTCrM+Ec3bWvbahnn0z70hJeO4zc3iL17eYazw4wX4BVlvOORFwRXl0IWtV9GJ4LRhefb1A3HPoGeGzMdiq93RknGP/KsHvOuaPLiivtwwYLPXheLCH6UO5Nqz0B0BK8o430PdbnVLbtFm3BsLeb9ol6E7I2bau5Wqr3U4bZSAP6dyl3Ou6Ld+zqe3cXyvc6xc+hYkx9TPDsbSub46d1DbNev5ftpC713nS/XeXYeXcx4pil6l//kSlinmu7qtkfTV/OInUX6+3WdZ+fQITvSTnObGcCuoNinZrm1Pa0/pV1g05MdXvPsxUauP6F93GmK3uUfb6GJ+dIVtmgdxPyr73j5WmBvXAL0GlbtA6opsv+i1hOrN2DRPvbnVvqwLLID9AntDNpOQHj5J7tN8t9cDulA/vB5ij+5pMtlyA7hq71+n6927mKaRlf0EP2r7PuKQ4lzXcinimzqTB8Oywgeotf6k9pbzS6nnYX/rMYVvE7k89DzhSFiR96rZ31RO2IfN7uC947cPufGVqwun0Un9JkJn4inUqlhasixX49urya1DzrdrlDucvtcUDxoImGdyB2HM2fZdgqEKL7Zv+rf8tq56xpm1BW8y+1zfuHiyGmz6PPV8JyfPDlPF1JIO2Ivd/pXU9qTaDvRBK8f/CmvzxHiFU1Up0+G7RsznefjacTOey9TV1eYdsROj3h2VrvMeU441teDOtX57O8HAXla6j15dzWlvTKqCt47Mlv8Hj++BvQhD88eYrPxOGRPY97pO0F7jZvke+NuFa2lAPsfiiaamE0XcOv+7GMt245z7IWCwF4B6BPaB82qyP6bovXDrluXBjfniibbhugYO8j5MYeOV3uuCW7oOXaZp9u2juk+7zedshftKXaIDtlvJdo7DbSWAuwy0dF17LYOxxoRmvOCWvb8ArC3J72XELpY7eABjoLbCcSuBN1r14F8ToNjyVl0gV1s9KlR/2662hm4nUDeP8oSR2zp1OPcB3MeWbL580fYhxlcOzfSMdxWCqzgP8ob58CD27L2R7p9aXaDS2Tz+UfZ67npamduGoL3P61y21xsX/vT3DvnAT2RBewIvi0peMDevZ2qdobbSgF6megHbKVrLd2zEyFjc9AF9oe8D+mpaqf4jRzrXSY6O83taD267s5dOiQge/ZB72CwK9Ymqr3WKaKtVEO+dZ9zTdv7CfdCv0CbSEzlvOSAT05o7zWL/DayWpXZ5vxrG1rePRP+BX90eJb3QqEwqf2yy2/kWHh5h5vFsbmn5aXE3sIb9Qn2ycFuotpz1XqR9974KPP/bsWvofKlp7xHMc0uek+zcw2ufXDDb+RYdLk3VFarsVU+kz0uiC/nJNorwlqKRX9vMVnI+GnxR7xDdloy0mWu60WB/TdzgXtsct62fjzn4807XHvnun6NNnIs+2czgROBTXkvRj/qPX7TF7Xf1qplcR35u4l+X9sS3Jb9A9vCAT/BHi/X7kXtgzq2jvzdYxpwa1jJl2OJ6aEWwqcG94L2Pl3G1pF/m+aPRvmjyl6DB+i8eLzeK/ditXeGAnux+F+TgLuV/+WEB4ZaAF+6FzK+d8NvZoB3k5xtgV0nGVOHPTsx0NP3gvaKuJVitZuiwQd31Pn7AQ8Nte3M/R2vncI2cvVfg8+9vc1jb7PWOe21Ir6NNL7LEf4jNX+/apq99YPTfteSbGIN73LyprensI9/cNr73TTGXv/DYOW+TdU/DZ1gj+dYdKD9LlcWVrEsusGlrvLfvXqQPVUD1gE6ExdXseWyoaXuVv3vXj3Afl6+ggl/f1erx4Ubeta7kad6YEOzz/6xwS7fuP8Btd9n8O1E6p/Pz/4on+M9n29+R+i3RclW6m/H8z/K5x3wGRYdsNPxNs7+/kUc5TO8Z/MXg+9Q+21dsp34x/8yjvJZ3tNnAP3Hj4x0M/Mf6ws5yh9nT9TvvwP2s7L0pva9QUe5Tj9wAdjJ5neITp1LLisNmGccK7r+hA/LXvrf/7k7t962lSMAixTF5V13iZJJ3XNeEjhB7CBAkEQr10baU19qF65b10cuUDeG08T9/2/lXkiRFEktJYo+ziZ5sEAx/jizM7Mzs0vE/vejQPZiln/8noN5C7Hf/g2hf3s4DmToczdy8iD3U2zubtBUf/ztPJitfJvz+3AavfwPbbr7FyL/ev8lkKn9XMvXow2Naf7j4L+Ovv/4Z6jtJF/PVus8yblFp/9+/P7415Nghj5Xoav2U4jc0feHH98f/3g/DSzgz/MU+hOJ3BmOa/v2cOcGtSRD/7nxk89yPI6+Pn7/w4F/IecIPj/zztAMtEV9f/zPrX8x47CX8/LpwuAJT6Q7+O1/Xy/ugovYk0Fe4VvpCQ9gvDv8x7fLu9ACvpNPeZVb1ey47Xjmx5/CK/hWJR/7Zj3twcInf/71S3gRa4F87NvBwZMKff6X2/BCLpc9SpwmOeRPCX9weXQX+igXdVctHWcKnpD94GTpEzsHda+ajjU9IPDT383obd+6g0oZBRCE/eB3w55DMMMNPh8f+9C3wA5FMXWMmMOuY9U6R9GyJ/ds57sudUbDfrPZ7NumlAZfHG59ohfNk5Njjz1T+JYyGtTqqGKEKbhiv8ceOWx91zFotB1yH/tBRuyiZPKNJTMl1BgTnbCzdY9eKZ+jym6YfUNyXdlpFrkYw8IkeGXbJg5on8/PEXtI7ht5uFbbriV5pT6D3KXa9k37OR5BuX/ZANzo8Q05+cBCbrT6LtuO4gR7dnuLwBH7MYL/crwRudEbVFcbJ1BdlQVqadsmt2Yo04ulfu6K3cFfk7zV4R1ulgMqwQqxt/pbJpffzmaY/Tag81/Ws+dlqyYwn/6hicnkIC9yqvRI5U+OD9biHjdTuaJEjTe2rO0Ak898csfsayg7lEbNtKsMNSEZtPUD0eS3RwR8duvT+fTKrncGxfTqKcQfXqJs3au9PTqiQvfJPa3IYau03hnT8efUm1uPZD6eoi6NmV/w56mnudFtrFkRkuNOtLW2vkDf/4TAXXYi9+P04OsaYhAz1yVt68W1+u4plrpf7imnuV6qbeCBIi087G2/tsa9PTwNss/O0yk7bDc3WlFWxAi7YedQa9j/dHrqss+O1iA3hhv+lhpcXqPmkXuVdw8PF+xI8KnI4eaKCfrhe278MNnGK9Rx6pAfEvjZUTqZG8PNj3IKSR0dVZ5LdWn3kLJTwd+mIlcyUEwQOHJS7DRzanp+dX9/uIBPSQ7NTI4z8r0kV2xrcj7gBfnD/T2Fxzo/S0MujrOZkqBokkxNq6flt0V3/8Ylx+xHafy5PsxKM4FQsXptk2/k2N/Pfby4uPfJ/SQN+SDTYIsT8u3zru9eYPZDwn6bijznbs2M1y37iNyTe4qJDkX+WZMXCh/xqaVU7qcplizQ4p41OBCwvl/Q+Z5G3Sfy85Z54f3Vzc2Fq/NHKfyaUnzm5IVXNwQd45+niF4rz5288PHGZb+/OE1h4+xnT859wIeRE/gUQm+rzx5d3b3y0A/Zha5nkR/m5HqxWFefyE+A+vzKY09h3s24cFOuh4YqxGT9a0NTkZyh9OxQElctBgd+JWwh6hJ19YcJBv7sirLf3LMH7/HNa30pNMqdrracl5f7bV9dWW/736cFxkboFujpBIDoJUbA4IAd8j1WK7SP0An8EbuN68WuMfilDA6cQmknlEtf2j4k+rLtoBS1QlR4XyGLXgK7AXS67t1hRH+zQGfXdzG+BsbH1I4G/odVicg8L169EokeTIm4lwQoIz9McutnZ1eY/uaCWd9hwhGsfNzTshbs0e+48lri4tDhouqYFTqR+9Uhu5EbF1KjO4GAa6tk35vNoD/dIyejO2FUM0N0gNAJ/Ixd35ur0Zc6DaHnD91Sut6x+1rf8l7d7E4jDx3iEaUZmUmd6Dz7VJeKK9GlgdZHfwYLsqlCjLRAhV6mqUeh4lYa23IAodMngx8vXu3cBVmjO+Q37MvVnrASvY36SHAnyYKMnE8NikbYP6om1YtaDIKquXaRnvmbCfqbszmBZ7dyU6uwGt0XpKilgFRpicl/em+Rkg0DCH7PVVUC/3cm6PuIHP27YI9i++nQQZH+3i0s1b4fk15hTX2PIwIdFCot6lzUzNDfXxOhn92zW7lKOnSHls5VfAz/YBm9UJEMNEh4HCV172W6ZFJkgc7V9+bzlOitRlp090WJJW5RXQsYDLlYraK/IBbdezXRIDOp/7J3TdjZ3bpRTYvudsVhG0/fMSTGvg02Wuqq4vs0E3TuwzVin6dAT/Jt0eiukuNvetU1qdusA2Z096WPWFsyQS+8dNCv52fbRadWHU+VRdcM1MulQU0FTOjuC3oUOSt08AYdNT6fz++3iU4ljW0U6AcCtJaDHyw2xaBTG4HXD9lI/f0lPmd9zu7cjPTotFOG+AbZjOqlBavQaQVeyg5dfofJr69Y0eEaZq7oRwcRb3WDRrexAp2axwzRC6+J1M+Ot+fcglJHJ1gtLdjh1OCFvNH3rwk7czpWr62L7n4TgCKv6MtLeo5B4TOc64X6HmFnXrQmrVmTzdxCXwBQK2MltOVF15LQB77YIBt0AIjGXzObeNhPjU6VNWQl1BpvlvWl5H6yc+tk59cdjb/ERv6G2cQP1w1plhNbXL3G97xGSb2yOqQpgezQwS/vMPucuZ1iJzX6yCex5YCyOnSTdfzqQJakmicRl3CllemzJfaXl5idORnd41Kiu72/3bhvuYnKUTx6ja5aNf+znATQe6vTCeHxYg+zXzCXl9WU6E19YSTkoYVGqBdy6FuwR6PbgTTNOGr51149HyPFfnl9dpLB0i0K3c3G4e/RtyGHggMa5Pdi0YtS4MZuCrAecUmqzVHv9zA7o8bDpFxFFPpA9MmIbncIugngz1pFoQujoIklLgMG/Ky7Gk5X+H/5gNiZY1k+DTrQjIBTpOmW4OEydsRi3IcuW2JA3732ed9d3H5LI92GkRdE7KxRTQkwZGTpL9TYaQVNBI3K4Ng3TyuGT1eXnJRc8c5npslob6sM7LrswlBMciMJiVksdtbVW1ldmYe3bDy6HSMUq3npV9GsEdUQqu7hXkRgLrpCbmGPFjGvVA2XOmBHq6qyWmx6Tydtu4fwGoudrQwBE6L42MLTYt+9vdjf3LWH/qcz4iILT9AzMoMlm+Y8QqOslA3RWwKm7iZ/8Q7J/WLjeC4WfbHvvq7EoFGZxtbcAnOEh8FatlcPTN3GyO070/2BUexT9vq6942iL7kafZKZewZHDDoULX9yXzYza2kDaLo/MAby8VY0Gr0V2K0GKlLkvq4CSEIv94PPu9iLumidnZAchz3cbEP3FoEuSqPgNjAQ8b43vZfYWqCX7SVxqkuvYhDX3QkpOOwPZ2ylt1gPoinB0TGtiFaagtA0DehLT5m+HR/AVtqB0ZkMK/WI7eCgNpIWj1AM3CSl3BH7JduyvRWnWIIcHDEd7gAI1f7YbNOHU+US7iHEA4Ficzjqddqd3sTWqhtsIgAOO6ul62bRD84hSAFsfBdh4y0EjihePbCp/J30NEfyb28A8GaPMaazCz/deP/ukqkG9dOJHdVeX16ebtpb8YyVnoXdaBR+wvHi9SeG+R7ZIlzXNM2J1rmKphH/19CQt5WbGhnohyK+hFzkjErd9fWa/2lWeWvgC2Pkpm3xNc79VhP5Q8F/V64xsGxt8xO69ndX16H0qExQTYeQJ30UE+S15A5OMeOiG6Tr3fEU4vUPPZpDpOdwVPRpZxGl1yTYgm2PvY7jv5bN0RQcNMYqSXZBUvyVcWwHM9hgKwzKa1k61PdRAgiDoKOfd5zffDyZSNPyZGLL+LHgLI6DrnRHzuckp7PjJuJpznVUHS0CZnsqWbwJnQscdGVSaotTC6gWuqs0mYxVMJ6KPXvH+Wnj/eSA5W1lprwcW+rHX8r1wnDaIujjqSSSgjwwSYYcNEWjhRNoDvoQ59RIvrIsSoscOhhNd4DlrY6FDnoKaqc1ROi8s3CzacV3RP6fRguiLtxGeTrJYGsBqKx68wNcPtm0JkqKXiuYYg//Sg6Poz59PzpXmo4n0xGg6ABopCNMg8oALlKsTb1ltjwRcuZUaRa5erVO0HFmt0/RSTablHb45M4H5iFrbTE5XdNfkrpY7k55VZLGGL0Jy/Ux7X+h6FVDrzX/3961LTkKAtHgBTQi4g1j4iVq/kP//6u2m8ZJsjM7W7WVPGzVkDcj0cNp6KaBkw1fEKBDFzgpqyoG4Loy2uRjQiO7239tUKRwTA47dLCD7gH6zW26K9L0NQo+IpHttyp4qv7EejZuoebDhNCRYXgbm3TfoV/XJkgy3AS2KxApKahFoLvvbsMfOF+PZbkLEzKJxya2Jt+hs4FStgQdGm52a7pcv8rRxXr+TvUz0p9Yr1S2rL2H0HO19bqObNTroANbJ61btASAfqtreeG4XxYstdb95pYm2G1tZLSew/vvJ3oCGmZxZ315Zl28lHU3MxxP0R8N/zdtLIDut1xxbaF7Vi6W8tAOemFIQRamvW6YsyDQZVlh2d7l2YE8mXLuAqfSQ6GWYAHnGBB0MpwP6D26zaoOri/q6x+jPfPl+Wi+Jl+N7Jn1BPy28gE6gsqGYWhTXCVx0LtVwaVBQU910JMG3F+R8gYuZy5bn5u0su7OZQFzZQe1aT3GBF2MnAzEQYf63mFK4QfC1x4ew+3dcSW74Z71fQhtuvKJ9VjytWUIvTCpZgGL7WhP0IGsCSbYrCf+mq5bWlw/WtY2gVsLQ2tJ0Bwnjf+jZfrYuQXVj50i+2i7JTTrmT1AD+bVXHCLjnmTThlLcj3289BkkVLGpFCMUdFdr8KynuMbemsIDFOwMmIe00IXtevN4Iclc8NcugQQ5njOf1u/jJlLMLJmgKGOaKcYroWwjXLZZi5d6BNSlyA12o2f3zSlpO39LE5KP6+qAj5V7vsPx/hKTwbB6OWHytOsnmiQKq9wQdQTEFJMdKQtkFPBpIdlLAK8g7ro/r2optt8LRNvJ7EcL7cFFTyoFlai8Nc94xDoDmqM2fZuAU5oAuHaQnzdQYQQ73jq30p+/f9P2/6Un/JT/q38Aq70HcufWb0TAAAAAElFTkSuQmCC';
+		}
 		$tulisan					= number_format( $total , 0 , '.' , ',' );
 		$y 							= $x.' rupiah';
-		$tulis 						= 'Digenerate Tgl. '.$tanggalctk.' Oleh '.Session('nama').' Kwitansi Pembayaran ananda '.$nama.' Kelas '.$kelas.' Untuk '.$tlsbulan.' Sejumlah '.$tulisan;
-		Pembayaran::where('marking', $marking)->update([
-			'kirim' 		=> $tulis,
-			'updated_at'	=> date("Y-m-d H:i:s")
-		]);
-		$niy 						= Session('nip');
-		$asline 					= Session('nama');
-		$rsetting					= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
+		if (Session('nama') !== null){
+			$tulis 					= 'Digenerate Tgl. '.$tanggalctk.' Oleh '.Session('nama').' Kwitansi Pembayaran ananda '.$nama.' Kelas '.$kelas.' Untuk '.$tlsbulan.' Sejumlah '.$tulisan;
+			Pembayaran::where('marking', $marking)->update([
+				'kirim' 		=> $tulis,
+				'updated_at'	=> date("Y-m-d H:i:s")
+			]);
+		} else {
+			$tulis 					= 'Digenerate Tgl. '.$tanggalctk.' Kwitansi Pembayaran ananda '.$nama.' Kelas '.$kelas.' Untuk '.$tlsbulan.' Sejumlah '.$tulisan;
+		}
+		$rsetting					= Sekolah::where('id', $id_sekolah)->first();
 		$sekolah 					= $rsetting->nama_sekolah;
 		$yayasan 					= $rsetting->nama_yayasan;
 		$alamat 					= $rsetting->alamat;
@@ -918,8 +1759,8 @@ class FrontpageController extends Controller
 		$mutiara 					= $rsetting->slogan;
 		$logo 						= $rsetting->logo;
 		$logogrey 					= $rsetting->logo_grey;
-		$tasks['logo']				= $logo;
-		$tasks['logo_grey']			= $rsetting->logo_grey;
+		$tasks['logo']				= url('/').'/'.$rsetting->logo;
+		$tasks['logo_grey']			= url('/').'/'.$rsetting->logo_grey;
 		$tasks['rsetting']			= $rsetting;
 		$tasks['yayasan']			= $yayasan;
 		$tasks['sekolah']			= $sekolah;
@@ -1019,7 +1860,11 @@ class FrontpageController extends Controller
 				$qrcode 		= '';
 				$status 		= '<span class="badge badge-danger">Belum di Validasi</span>';
 			} else {
-				$qrcode 		= QrCode::size(150)->generate($alamatweb);
+				try {
+					$qrcode 	= QrCode::size(150)->generate($alamatweb);
+				} catch (\Exception $e) {
+					$qrcode 	= '';
+				}
 				$status 		= '<a href="'.$alamatcetak.'" target="_blank"><span class="badge badge-primary">Telah di validasi, Klik untuk Cetak Tanda Terima</span></a>';
 			}
 			$data 						= [];
@@ -1033,7 +1878,7 @@ class FrontpageController extends Controller
 			$kopsurat 					= $rsetting->kopsurat;
 			if ($kopsurat == '' OR $kopsurat == null){
 				$kopsurat 			= '<tr>
-											<td colspan="3" rowspan="4" align="center" valign="middle" style="border-bottom:double"><img src="{{ $logo }}" width="98" height="75" /></td>
+											<td colspan="3" rowspan="4" align="center" valign="middle" style="border-bottom:double"><img src="'.$logo.'" width="98" height="75" /></td>
 											<td colspan="8">'.$yayasan.'</td>
 										</tr>
 										<tr>
@@ -1129,7 +1974,11 @@ class FrontpageController extends Controller
 				$dd 			= $arrtanggal[2];
 				$mm 			= $bulan[$mm];
 				$tglvalidasi	= $dd.' '.$mm.' '.$yy;
-				$qrcode 		= QrCode::size(150)->generate($alamatcetak);
+				try {
+					$qrcode 	= QrCode::size(150)->generate($alamatcetak);
+				} catch (\Exception $e) {
+					$qrcode 	= '';
+				}
 				$status 		= '<a href="'.$alamatcetak.'" target="_blank"><span class="label label-primary">Telah di validasi, Klik untuk Cetak Tanda Terima</span></a>';
 			}
 			$rsetting					= Sekolah::where('id', $id_sekolah)->first();
@@ -1138,7 +1987,6 @@ class FrontpageController extends Controller
 			$data['logo']				= $homebase.'/'.$rsetting->logo;
 			$data['logo_grey']			= $homebase.'/'.$rsetting->logo_grey;
 			$data['rsetting']			= $rsetting;
-			
 			$data['nama']   			= $namasiswa;
 			$data['kelas']   			= $kelas;
 			$data['namawali']   		= $namawali;
@@ -1157,8 +2005,8 @@ class FrontpageController extends Controller
 		return view('cekingpembayaran', $data);
 	}
 	public function exKwitansiByID($id) {
+		$file =  public_path('kwitansi/'.$id.'.pdf');
 		if (file_exists(public_path('kwitansi/'.$id.'.pdf'))){
-			$file =  public_path('kwitansi/'.$id.'.pdf');
 			return response(file_get_contents($file),200)->header('Content-Type','application/pdf');
 		} else {
 			$homebase	= url("/");
@@ -1168,14 +2016,14 @@ class FrontpageController extends Controller
 			$info = array(
 				'Name' 			=> config('global.Title2'),
 				'Location' 		=> config('global.alamat'),
-				'Reason' 		=> 'Dokumen ini ditandatangani secara elektronik, verifikasi keaslian dokumen ini merujuk ke '.config('global.kota'),
+				'Reason' 		=> 'Dokumen ini ditandatangani secara elektronik, verifikasi keaslian dokumen ini merujuk ke '.$homebase,
 				'ContactInfo' 	=> $domain,
 			);
 			$domain		= str_replace('#', '', $domain);
 			$domain		= str_replace('-', '', $domain);
 			$domain		= str_replace('.', '', $domain);
 			$fileserti 	= $domain.'.crt';
-			if (file_exists(public_path('tte/'.$fileserti))){
+			if (Storage::disk('local')->exists('/tte/' . $fileserti)) {
 				$certificate 	= 'file://'.base_path().'/public/tte/'.$fileserti;
 			} else {
 				$dn = array(
@@ -1197,20 +2045,32 @@ class FrontpageController extends Controller
 				openssl_x509_export($sscert, $certout);
 				openssl_pkey_export($privkey, $pkeyout);
 				Storage::disk('local')->put('/tte/'.$domain.'.crt', $pkeyout);
-				file_put_contents(public_path()."/tte/".$domain.".crt", $certout, FILE_APPEND | LOCK_EX);
+				Storage::disk('local')->append('/tte/' . $domain.'.crt', $certout);
+				$certificate 	= 'file://'.base_path().'/public/tte/'.$domain.'.crt';
 			}
 			$getdata 	= HPTKeuangan::where('id', $id)->first();
 			if (isset($getdata->id)){
+				try {
+					$draft =  public_path('kwitansi/draft/'.$id.'.pdf');
+					unlink($draft);
+				} catch (\Exception $e) {
+				}
 				$idne 		= $getdata->id;
 				$deskripsi 	= $getdata->deskripsi;
 				$pemasukan 	= $getdata->pemasukan;
 				$pengeluaran= $getdata->pengeluaran;
 				$bendahara 	= $getdata->bendahara;
 				$tglkwitansi= $getdata->tglkwitansi;
-				$tandatangan= $getdata->tandatangan;
 				$id_sekolah	= $getdata->id_sekolah;
 				$jenis		= $getdata->jenis;
 				$email 		= $id.'@'.$domain;
+				$markindttd = $id_sekolah.'-'.$getdata->id.'-kwitansi';
+				$cekttd 	= XFiles::where('xmarking', $markindttd)->first();
+				if (isset($cekttd->xfile)){
+					$tandatangan = $cekttd->xfile;
+				} else {
+					$tandatangan = '';
+				}
 				if ($bendahara == '' OR is_null($bendahara)){
 					$bendahara	= 'Bendahara';
 				}
@@ -1233,8 +2093,8 @@ class FrontpageController extends Controller
 					$tandatangan 	= '<img src="'.$homebase.'/boxed-bg.jpg" width="100">';
 					$imageName 		= "post-".time().".png";
 				} else {
-					$imageInfo 		= explode(";base64,", $getdata->tandatangan);
-					$imgExt 		= str_replace('data:image/', '', $imageInfo[0]);      
+					$imageInfo 		= explode(";base64,", $tandatangan);
+					$imgExt 		= str_replace('data:image/', '', $imageInfo[0]);
 					$image 			= str_replace(' ', '+', $imageInfo[1]);
 					$imageName 		= "post-".time().".".$imgExt;
 					Storage::disk('local')->put('/scan/generate/'.$imageName, base64_decode($image));
@@ -1290,7 +2150,7 @@ class FrontpageController extends Controller
 							</tr>
 							<tr>
 								<td width="400" colspan="5">&nbsp;</td>
-								<td width="350" colspan="3" rowspan="5" align="center">&nbsp;<br /><img src="'.$logo.'" width="150"/></td>
+								<td width="350" colspan="3" rowspan="5" align="center">&nbsp;<br /><img src="'.$homebase.'/'.$logo.'" width="150"/></td>
 							</tr>
 							<tr><td colspan="5">&nbsp;</td></tr>
 							<tr><td colspan="5" width="400">'.$yayasan.'</td></tr>
@@ -1343,70 +2203,90 @@ class FrontpageController extends Controller
 						</table>';
 				} else {
 					$generatetable	= '
-							<table width="760" border="0" cellpadding="0" cellspacing="0" class="isi">
-								<tr>
-									<td width="50">&nbsp;</td>
-									<td width="30">&nbsp;</td>
-									<td width="120">&nbsp;</td>
-									<td width="13">&nbsp;</td>
-									<td width="26">&nbsp;</td>
-									<td width="125">&nbsp;</td>
-									<td width="39">&nbsp;</td>
-									<td width="129">&nbsp;</td>
-								</tr>
-								<tr>
-									<td width="400" colspan="5">&nbsp;</td>
-									<td width="350" colspan="3" rowspan="5" align="center">&nbsp;<br /><img src="'.$logo.'" width="150"/></td>
-								</tr>
-								<tr><td colspan="5">&nbsp;</td></tr>
-								<tr><td colspan="5" width="400">'.$yayasan.'</td></tr>
-								<tr><td colspan="5" width="400">'.$sekolah.'</td></tr>
-								<tr><td colspan="5" width="400">'.$alamat.'</td></tr>
-								<tr><td colspan="5">&nbsp;</td></tr>
-								<tr>
-									<td colspan="8">&nbsp;</td>
-								</tr>
-								<tr>
-									<td colspan="8">&nbsp;</td>
-								</tr>
-								<tr>
-									<td width="50">&nbsp;</td>
-									<td colspan="4" width="200"><strong>TERIMA DARI</strong></td>
-									<td colspan="3" width="360" align="right"><strong>TANGGAL</strong></td>
-								</tr>
-								<tr>
-									<td width="50">&nbsp;</td>
-									<td colspan="4" width="200">'.$deskripsi.'</td>
-									<td colspan="3" width="360" align="right">'.$tanggal.' '.$blniki.' '.$tahun.'</td>
-								</tr>
-								<tr>
-									<td colspan="8">&nbsp;</td>
-								</tr>
-								<tr><td colspan="8">&nbsp;</td></tr>
-								<tr>
-									<td width="50">&nbsp;</td>
-									<td colspan="4" width="400" style="border-bottom:double;"><strong>KETERANGAN</strong></td>
-									<td colspan="3" width="200" align="center" style="border-bottom:double;"><strong>TOTAL</strong></td>
-								</tr>
-								<tr><td colspan="8">&nbsp;</td></tr>
-								<tr>
-									<td width="50">&nbsp;</td>
-									<td colspan="4" width="400">'.$tulisanne.'</td>
-									<td align="center" width="50">Rp</td>
-									<td colspan="3" width="150" align="right">'.$tulisan.'</td>
-								</tr>
-								<tr><td>&nbsp;</td><td width="600" colspan="7" style="border-bottom:double;">&nbsp;</td></tr>
-								<tr><td colspan="8">&nbsp;</td></tr>
-								<tr><td colspan="8" align="right"><strong>TERBILANG :</strong>'.$y.'</td></tr>
-								<tr><td colspan="8">&nbsp;</td></tr>
-								<tr><td colspan="8">&nbsp;</td></tr>
-								<tr>
-									<td colspan="2">&nbsp;</td>
-									<td colspan="3" width="200">&nbsp;</td>
-									<td colspan="3" width="460">VERIFIKATOR<br />'.$tandatangan.'<br />'.$bendahara.'</td>
-								</tr>
-								<tr><td colspan="8">&nbsp;</td></tr>
-							</table>';
+						<table width="760" border="0" cellpadding="0" cellspacing="0" class="isi">
+							<tr>
+								<td width="50">&nbsp;</td>
+								<td width="30">&nbsp;</td>
+								<td width="120">&nbsp;</td>
+								<td width="13">&nbsp;</td>
+								<td width="26">&nbsp;</td>
+								<td width="125">&nbsp;</td>
+								<td width="39">&nbsp;</td>
+								<td width="129">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="400" colspan="5">&nbsp;</td>
+								<td width="350" colspan="3" rowspan="5" align="center">&nbsp;<br /><img src="'.$homebase.'/'.$logo.'" width="150"/></td>
+							</tr>
+							<tr><td colspan="5">&nbsp;</td></tr>
+							<tr><td colspan="5" width="400">'.$yayasan.'</td></tr>
+							<tr><td colspan="5" width="400">'.$sekolah.'</td></tr>
+							<tr><td colspan="5" width="400">'.$alamat.'</td></tr>
+							<tr><td colspan="5">&nbsp;</td></tr>
+							<tr><td colspan="8">&nbsp;</td></tr>
+							<tr>
+								<td colspan="8">
+									<table width="750" border="0" cellpadding="0" cellspacing="0" class="table table-striped">
+										<tr>
+											<td colspan="3" width="150" ><span class="isi">Sudah terima dari </span></td>
+											<td colspan="8" width="600" style="border-bottom:dotted"><span class="isi">: Bendahara '.$sekolah.'</span></td>
+										</tr>
+										<tr>
+											<td colspan="3">Uang Sebesar</td>
+											<td colspan="8" style="border-bottom:dotted">: '.$tulisanne.'</td>
+										</tr>
+										<tr>
+											<td colspan="3">Untuk</td>
+											<td colspan="8" style="border-bottom:dotted">: '.$deskripsi.' dari Buku '.strtoupper($jenis).'</td>
+										</tr>
+										<tr>
+											<td width="30">&nbsp;</td>
+											<td width="30">&nbsp;</td>
+											<td width="30">&nbsp;</td>
+											<td width="101">&nbsp;</td>
+											<td width="25">&nbsp;</td>
+											<td width="118">&nbsp;</td>
+											<td width="13">&nbsp;</td>
+											<td width="26">&nbsp;</td>
+											<td width="150" colspan="3" align="center"><span class="isi">'.$tanggal.' '.$blniki.' '.$tahun.'</span></td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td colspan="3" rowspan="3" align="center">'.$tandatangan.'</td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+											<td colspan="3" rowspan="2" style="border-bottom:thin; border-top:thin; border-left:thin; border-right:thin;" valign="middle" align="center"><span class="isi"><b>Rp. <u>'.$tulisan.'</u></b></span></td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+										</tr>
+										<tr>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+										</tr>
+										<tr>
+											<td colspan="6">&nbsp;</td>
+											<td>&nbsp;</td>
+											<td>&nbsp;</td>
+											<td colspan="3" style="border-bottom:dotted" align="center"><span class="isi">'.$bendahara.'</span></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>';
+			
 				}
 				try {
 					$page_format 		= array(
@@ -1414,9 +2294,10 @@ class FrontpageController extends Controller
 						'Dur' 		=> 3,
 						'PZ' 		=> 1,
 					);
-					PDFCREATOR::setSignature($certificate, $certificate, $id, '', 2, $info, 'A');
+					PDFCREATOR::setSignature($certificate, $certificate, $fileserti, '', 2, $info, 'A');
+					PDFCREATOR::SetProtection(array('modify', 'copy'), '', null, 0, null);
 					PDFCREATOR::SetCreator($sekolah);
-					PDFCREATOR::SetAuthor(Session('nama'));
+					PDFCREATOR::SetAuthor($bendahara);
 					PDFCREATOR::SetTitle('KWITANSI '.$deskripsi);
 					PDFCREATOR::SetSubject($format);
 					PDFCREATOR::SetKeywords($tulisanne);
@@ -1438,24 +2319,33 @@ class FrontpageController extends Controller
 					PDFCREATOR::setFooterMargin(0);
 					$pdfdoc = PDFCREATOR::Output('', 'S');
 					PDFCREATOR::reset();
-					$imageName 	=  'scan/generate/'.$imageName;
-					Storage::disk('local')->delete($imageName);
-					if ($getdata->tandatangan == '' OR is_null($getdata->tandatangan)){
-						$filelama 	=  'scan/generate/Kwitansi-'.$idne.'.pdf';
-						Storage::disk('local')->delete($filelama);
-						Storage::disk('local')->put('/scan/generate/Kwitansi-'.$idne.'.pdf', $pdfdoc);
-						$file 		= public_path('scan/generate/Kwitansi-'.$idne.'.pdf');
+					if ($tandatangan == '' OR is_null($tandatangan)){
+						Storage::disk('local')->put('/kwitansi/draft/'.$idne.'.pdf', $pdfdoc);
+						$file =  public_path('kwitansi/draft/'.$idne.'.pdf');
 					} else {
 						Storage::disk('local')->put('/kwitansi/'.$idne.'.pdf', $pdfdoc);
-						$file 		= public_path('kwitansi/'.$idne.'.pdf');
+						$file =  public_path('kwitansi/'.$idne.'.pdf');
 					}
-					return response(file_get_contents($file),200)->header('Content-Type','application/pdf');
+					$qrcode =  public_path('scan/generate/'.$imageName);
+					try {
+						unlink($qrcode);
+					} catch (\Exception $e) {
+					}
+					if (Storage::disk('local')->exists('/kwitansi/' . $idne.'.pdf')) {
+						return response(file_get_contents($file),200)->header('Content-Type','application/pdf');
+					} else if (Storage::disk('local')->exists('/kwitansi/draft/' . $idne.'.pdf')) {
+						return response(file_get_contents($file),200)->header('Content-Type','application/pdf');
+					} else {
+						$generatetable 			= $generatetable;
+						$data['generatetbl']   	= $generatetable;
+						return view('cetak.biodatarapot', $data);
+					}
 				} catch (\Exception $e) {
+					$generatetable 			= $generatetable.''.$e->getMessage();
 					$data['generatetbl']   	= $generatetable;
 					$data['catatankaki']   	= $e->getMessage();
 					return view('cetak.biodatarapot', $data);
 				}
-				
 			}
 		}
 	}
@@ -1479,11 +2369,13 @@ class FrontpageController extends Controller
 			$pengeluaran= $getdata->pengeluaran;
 			$bendahara 	= $getdata->bendahara;
 			$tglkwitansi= $getdata->tglkwitansi;
-			$tandatangan= $getdata->tandatangan;
+			$tandatangan= $getdata->getTandatangan->xfile ?? '';;
 			$jenis		= $getdata->jenis;
 			$tanggal 	= $dd;
 			$bulan 		= $mm;
-			$tahun 		= $tahuniki;	
+			$tahun 		= $tahuniki;
+			$blniki 	= $bulan;
+
 			if ($jenis == 'pendaftaran') { $tulisanne = '(01). LAPORAN BUKU PENDAFTARAN<br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
 			else if ($jenis == 'spp') { $tulisanne = '(02). LAPORAN KEUANGAN PEMBAYARAN SPP<br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
 			else if ($jenis == 'makan') { $tulisanne = '(03). LAPORAN BUKU UANG MAKAN<br />PERIODE BULAN '.$blniki.' TAHUN '.$tahun; }
@@ -1625,7 +2517,7 @@ class FrontpageController extends Controller
 									</tr>
 									<tr>
 										<td colspan="3">Untuk</td>
-										<td colspan="8" style="border-bottom:dotted">: '.$deskripsi.'</td>
+										<td colspan="8" style="border-bottom:dotted">: '.$deskripsi.' dari Buku '.strtoupper($jenis).'</td>
 									</tr>
 									<tr>
 										<td>&nbsp;</td>
@@ -1694,273 +2586,108 @@ class FrontpageController extends Controller
 			$data['sidebar'] 		= 'ttdkwitansi';
 			$data['kalimatheader'] 	= 'Data Tidak Di Temukan';
 			$data['kalimatbody'] 	= 'Yth. Bapak/Ibu Bendahara<br />Kwitansi dengan ID '.$id.' Tidak ditemukan, periksa kembali URL yang diterima<p></p><a href="/" class="btn btn-primary">Kembali Ke Home</a>';
-				
 			return view('errors.notready', $data);
 		}
 	}
-	public function viewTrackingbyid($id) {
-		$arrbulan 		= array("Bulan", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember");
-		$urutanwerno	= array('red','green','blue','black','navy','teal','orange','maroon','black','aqua');
-		$trackingcode 	= $id;
-		$data 			= [];
-		$domain 		= parse_url(request()->root())['host'];
-		$cekteks 		= explode("/", $domain);
-		if (isset($cekteks[1])){
-			$domain	= $cekteks[0];
-		}
-		$getdomainid 		= DB::table('app_menu')->where('domain', $domain)->first();
-		if (isset($getdomainid->id)){
-			$ceklaman 					= $getdomainid->sequence;
-			if ($ceklaman == 2){
-				$lamanportal			= $getdomainid->route.$getdomainid->created_by.$getdomainid->updated_at;
-			} else if ($ceklaman == 1){
-				$lamanportal			= $getdomainid->route.$getdomainid->updated_at;
+	public function viewTtdProposal($id) {
+        $sql = RencanaKegiatan::where('id', $id)->first();
+        if (isset($sql->id)){
+			$catatanks 					= $sql->catatanks;
+			$ceksudahacc 				= explode(' ', $catatanks);
+			if ($ceksudahacc[0] == 'Disetujui'){
+				return redirect('/laporankegiatan/'.$id);
 			} else {
-				$lamanportal			= $getdomainid->route;
-			}
-			$fakpanjang 				= $getdomainid->subsubdomainapps;
-			$data['namaapps01']  		= $getdomainid->name;
-			$data['domainapps01']  		= $getdomainid->domainapps;
-			$data['subdomainapps01']  	= $getdomainid->subdomainapps;
-			$data['subsubdomainapps01'] = $getdomainid->subsubdomainapps;
-			$data['addressapps01']  	= $getdomainid->addressapps;
-			$data['emailapps01']  		= $getdomainid->emailapps;
-			$data['lamanapps01']  		= $lamanportal;
-			$data['logofrontapps01']  	= $getdomainid->logofrontapps;
-			$data['logo01']  			= $getdomainid->icon;
-		} else {
-			$data['namaapps01']  		= config('global.Title2');
-			$data['domainapps01']  		= config('global.yayasan');
-			$data['subdomainapps01']  	= config('global.singkatan');
-			$data['subsubdomainapps01']	= config('global.sekolah');
-			$data['addressapps01']  	= config('global.alamat');
-			$data['emailapps01']  		= config('global.email');
-			$data['lamanapps01']  		= config('global.homeweb');
-			$data['logofrontapps01']  	= config('global.logosimaster');
-			$data['logo01']  			= $homebase.'/'.config('global.logoapss');
-			$subdomainapps				= config('global.singkatan');
-			$subsubdomainapps			= config('global.sekolah');
-			$fakpanjang					= $subsubdomainapps;
-		}
-		$cekjenis		= explode('-', $trackingcode);
-		$homebase		= url("/");
-		if (isset($cekjenis[1])){
-			$jenis 		= $cekjenis[0];
-			$idne 		= $cekjenis[1];
-			if ($jenis == 'srtmsk'){
-				$marking 	= str_replace("srtmsk-", "", $id);
-				$cekdata	= Suratmasuk::where('marking', $marking)->count();
-				if ($cekdata != 0){
-					$datadiri	= Suratmasuk::where('marking', $marking)->first();
-					$sql		= Inboxsurat::where('marking', $marking)->get();
-						$x = 0;
-						$y = 0;
-						if (!empty($sql)){
-							foreach ($sql as $rowpeng) {
-								$pemberi        = $rowpeng->pengirim;
-								$kepada     	= $rowpeng->penerima;
-								if ($kepada != 'Kotak Sampah'){
-									$isidisposisi   = substr($rowpeng->catatan, 0, 30) . '...';
-								} else {
-									$isidisposisi   = $rowpeng->catatan;
-								}
-								$created_at     = $rowpeng->created_at;
-								$kapan        	= SendMail::timeago($created_at);
-								$updatenya     	= $rowpeng->updated_at;
-								$updatenya      = SendMail::timeago($updatenya);
-								$iconne			= 'fa-hand-o-down';
-								$dipsosisi		= 'Memberikan Disposisi kepada :<br />'.$kepada.'<br />'.$isidisposisi;
-								$data['pengumumans'][$x]['tanggal']     =   $created_at;
-								$data['pengumumans'][$x]['kapan']       =   $kapan;
-								$data['pengumumans'][$x]['jencolor']    =   $urutanwerno[$y];
-								$data['pengumumans'][$x]['siapa']       =   $pemberi;
-								$data['pengumumans'][$x]['pengumuman']  =   $dipsosisi;
-								$data['pengumumans'][$x]['icon']        =   $iconne;
-								$data['pengumumans'][$x]['urutanwerno'] =   $urutanwerno[$y];
-								if ($y == 9) {
-									$y = 0; 
-								} else {
-									$y++; 
-								}
-								$x++;
-							}
-						}
-						$data['datadiri']		= [];
-						return view('errors.trackdisposisi', $data);
+				if ($sql->markingteksproposal == null OR $sql->markingteksproposal == ''){
+					$teksproposal			= '';
 				} else {
-					$cekdata	= Inboxsurat::where('marking', $marking)->count();
-					if ($cekdata == 0){
-						$data['judulpesan']			= 'Unkown Errors';
-						$data['kalimatheader']		= 'Marking '.$marking.' Tidak di Temukan';
-						$data['kalimatbody']		= 'Silahkan Periksa Kembali URL Anda, dan Apabila errors seperti ini berlanjut coba refresh laman anda atau hubungi tim IT Terkait. Mohon Maaf <br /> <a href="/">Kembali Ke Laman Awal</a>';
-						return view('errors.pesanerror', $data);
-					} else {
-						$sql	= Inboxsurat::where('marking', $marking)->get();
-						$x = 0;
-						$y = 0;
-						if (!empty($sql)){
-							foreach ($sql as $rowpeng) {
-								$pemberi        = $rowpeng->pengirim;
-								$kepada     	= $rowpeng->penerima;
-								if ($kepada != 'Kotak Sampah'){
-									$isidisposisi   = substr($rowpeng->catatan, 0, 30) . '...';
-								} else {
-									$isidisposisi   = $rowpeng->catatan;
-								}
-								$created_at     = $rowpeng->created_at;
-								$kapan        	= SendMail::timeago($created_at);
-								$updatenya     	= $rowpeng->updated_at;
-								$updatenya      = SendMail::timeago($updatenya);
-								$iconne			= 'fa-hand-o-down';
-								$dipsosisi		= 'Memberikan Disposisi kepada :<br />'.$kepada.'<br />'.$isidisposisi;
-								$data['pengumumans'][$x]['tanggal']     =   $created_at;
-								$data['pengumumans'][$x]['kapan']       =   $kapan;
-								$data['pengumumans'][$x]['jencolor']    =   $urutanwerno[$y];
-								$data['pengumumans'][$x]['siapa']       =   $pemberi;
-								$data['pengumumans'][$x]['pengumuman']  =   $dipsosisi;
-								$data['pengumumans'][$x]['icon']        =   $iconne;
-								$data['pengumumans'][$x]['urutanwerno'] =   $urutanwerno[$y];
-								if ($y == 9) {
-									$y = 0; 
-								} else {
-									$y++; 
-								}
-								$x++;
-							}
-						}
-						$data['datadiri']		= [];
-						return view('errors.trackdisposisi', $data);
-					}
+					$teksproposal			= $sql->getTeksProposal->xfile ?? '';
 				}
-			} else if ($jenis == 'srtklr'){
-				$marking 	= str_replace("srtklr-", "", $id);
-				$marking 	= str_replace(".pdf", "", $marking);
-				$datadiri	= [];
-				$cekapaid 	= explode('-', $marking);
-				if ($cekapaid[0] == 'keluar'){
-					$idne 		= $cekapaid[1];
-					$cekmarking	= Suratkeluar::where('id', $idne)->first();
-					if (isset($cekmarking->id)){
-						$marking= $cekmarking->marking;
-					}
+				if ($sql->markingteksrab == null OR $sql->markingteksrab == ''){
+					$markingteksrab			= [];
+				} else {
+					$markingteksrab 		= RABKegiatan::where('marking', $sql->markingteksrab)->get();
 				}
-				$cekdata	= Inboxsurat::where('marking', $marking)->count();
-				$iconne		= 'fa-pencil';
-				$perihal 	= '';
-				$lampiran	= '#';
-				$urlfile	= $homebase.'/scan/files/'.$marking.'.pdf';
-				$datadiri	= Suratkeluar::where('marking', $marking)->first();
-				if (!isset($datadiri->id)){
-					$datadiri	= Tabelskdanperaturan::where('marking', $marking)->first();
-					if (!isset($datadiri->id)){
-						$datadiri	= Draftsk::where('marking', $marking)->first();
-						if (!isset($datadiri->id)){
-							$datadiri	= Suratkeluartnpnomor::where('marking', $marking)->first();
-							if (!isset($datadiri->id)){
-								$datadiri	= Suratmasuk::where('marking', $marking)->first();
-								if (isset($datadiri->id)){
-									$perihal 	= $datadiri->perihal;
-									$konseptor 	= $datadiri->pembuat;
-									$pembuatan 	= $datadiri->created_at;
-									$title		= $datadiri->bentuk.' Nomor Agenda '.$datadiri->noagenda.' Tahun '.$datadiri->yersrt;
-									$urlfile	= $homebase.'/viewsurat/94db1c8fae5b94957265aa3a335dfd3d-'.$datadiri->id;
-								} else {
-									$perihal 	= 'File Missing';
-									$konseptor	= 'Data Not Found';
-									$pembuatan 	= 'Data Not Found';
-									$title		= $perihal;
-								}
-							} else {
-								$lampiran 	= $datadiri->lampiran;
-								$perihal 	= $datadiri->perihal;
-								$konseptor 	= $datadiri->pembuat;
-								$pembuatan 	= $datadiri->created_at;
-								$title		= $datadiri->jenissrt.' Tanggal '.$datadiri->tglbuat;
-								$urlfile	= $homebase.'/viewsurat/31a6c48f03aaf7ab8085cc6b5bd34990-'.$datadiri->id;
-							}
+				$tandatangan				= '';
+				$usernameks					= '';
+				$cekpejabat     			= Dataindukstaff::where('jabatan', 'Kepala Sekolah')->where('id_sekolah', $sql->id_sekolah)->first();
+				if (isset($cekpejabat->id)){
+					$nama       			= $cekpejabat->nama;
+					$niy        			= $cekpejabat->niy;
+					$foto 					= $cekpejabat->foto;
+					$getusername 			= User::where('nip', $niy)->first();
+					if (isset($getusername->id)){
+						$usernameks 		= $getusername->username;
+						$cekmarkttdks   	= 'TTDKS-'.Session('sekolah_id_sekolah');
+						$cekttdks           = XFiles::where('xmarking', $cekmarkttdks)->first();
+						if (isset($cekttdks->xfile)){
+							$tandatangan	= $cekttdks->xfile;
 						} else {
-							$lampiran 	= $datadiri->lampiran;
-							$perihal 	= $datadiri->judulsk;
-							$konseptor 	= $datadiri->konseptor;
-							$pembuatan 	= $datadiri->created_at;
-							$title		= $datadiri->jenissk.' Nomor '.$datadiri->nomor.' Tahun '.$datadiri->tahun;
+							$cekmarkttd     = 'TTD-'.$usernameks;
+							$cekttd         = XFiles::where('xmarking', $cekmarkttd)->first();
+							if (isset($cekttd->xfile)){
+								$tandatangan= $cekttd->xfile;
+							}
 						}
+					}
+					if ($foto == '' OR is_null($foto)){
+						$fotoks 			= url("/").'/'.Session('sekolah_logo');
 					} else {
-						$perihal 	= $datadiri->judul;
-						$lampiran 	= $datadiri->namaparaf3;
-						$konseptor 	= $datadiri->inputor;
-						$pembuatan 	= $datadiri->created_at;
-						$title		= $datadiri->kelompok.' Nomor : '.$datadiri->nomor.' Tahun '.$datadiri->tahun;
-						$urlfile	= $homebase.'/viewsurat/SKPP-'.$datadiri->id;
+						$fotoks 			= url("/").'/dist/img/foto/'.$foto;
 					}
 				} else {
-					$lampiran 	= $datadiri->lampiran;
-					$perihal 	= $datadiri->perihal;
-					$konseptor 	= $datadiri->pembuat;
-					$pembuatan 	= $datadiri->created_at;
-					$title		= $datadiri->jenissrt.' Nomor : '.$datadiri->nomor.' Tahun '.$datadiri->yersrt;
-					$urlfile	= $homebase.'/viewsurat/keluar-'.$datadiri->id;
+					$nama 					= 'Kepala Sekolah '.config('global.sekolah');
 				}
-				if ($cekdata != 0){
-					$sql		= Inboxsurat::where('marking', $marking)->get();
-					$x 			= 0;
-					$y 			= 0;
-					if (!empty($sql)){
-						foreach ($sql as $group) {
-							$tanggal    							= 	$group->updated_at;
-							$lampiran    							= 	$group->lampiran;
-							if ($lampiran != ''){
-								$lampiran							= '<a href="'.$homebase.'/scan/files/'.$lampiran.'" target="_blank">File Lampiran</a>';
-							}
-							$kapan        							= 	SendMail::timeago($tanggal);
-							$cektanggal								= 	explode(" ", $tanggal);
-							$tanggal								= 	$cektanggal[0];
-							if ($group->penerima == 'Esign Server'){
-								$pengumuman							= 'Menandatangani Surat Pada tanggal '.$tanggal.'<br /><img src="'.$group->tandatangan.'" width="100">';
-							} else {
-								$pengumuman							= 'Send To '.$group->penerima.' ( '.$group->kerja.' ) at '.$group->created_at.'<br />Catatan : '.$group->footnote.'<br />'.$lampiran;
-							}
-							$data['pengumumans'][$x]['tanggal']     =   $tanggal;
-							$data['pengumumans'][$x]['kapan']       =   $kapan;
-							$data['pengumumans'][$x]['jencolor']    =   $urutanwerno[$y];
-							$data['pengumumans'][$x]['siapa']       =   $group->pengirim;
-							$data['pengumumans'][$x]['pengumuman']  =   $pengumuman;
-							$data['pengumumans'][$x]['icon']        =   $iconne;
-							$data['pengumumans'][$x]['urutanwerno'] =   $urutanwerno[$y];
-							if ($y == 9) {
-								$y = 0; 
-							} else {
-								$y++; 
-							}
-							$x++;
-						}
-					}
-				}
-				if ($lampiran == '#' OR $lampiran == '' OR $lampiran == null){
-					$lampiran 			= '#';
-				} else { $lampiran		= $homebase.'/scan/files/'.$lampiran; }
-				$data['datadiri']		= $datadiri;
-				$data['konseptor']		= $konseptor;
-				$data['pembuatan']		= $pembuatan;
-				$data['keterangan']		= $perihal;
-				$data['name']			= $marking;
-				$data['title']			= $title;
-				$data['lampiran']		= $lampiran;
-				$data['urlfile']		= $urlfile;
-				return view('cetak.tracksuratkeluar', $data);
-			} else {
-				$data['judulpesan']			= 'Unkown Errors';
-				$data['kalimatheader']		= 'Jenis Tracking Belum Di Tentukan';
-				$data['kalimatbody']		= 'Silahkan Periksa Kembali URL Anda, dan Apabila errors seperti ini berlanjut coba refresh laman anda atau hubungi tim IT Terkait. Mohon Maaf <br /> <a href="/">Kembali Ke Laman Awal</a>';
-				return view('errors.pesanerror', $data);
+	
+				$data['usernameks'] 		= $usernameks;
+				$data['tandatangan'] 		= $tandatangan;
+				$data['nama'] 				= $nama;
+				$data['fotoks'] 			= $fotoks;
+				$data['markingteksrab'] 	= $markingteksrab;
+				$data['teksproposal'] 	    = $teksproposal;
+				$data['datakegiatan']       = $sql;
+				return view('simaster.formttdproposal', $data);
 			}
-		} else {
-			$data['judulpesan']			= 'Unkown Errors';
-			$data['kalimatheader']		= 'ID '.$id.' Tidak di Temukan';
-			$data['kalimatbody']		= 'Silahkan Periksa Kembali URL Anda, dan Apabila errors seperti ini berlanjut coba refresh laman anda atau hubungi tim IT Terkait. Mohon Maaf <br /> <a href="/">Kembali Ke Laman Awal</a>';
-			return view('errors.pesanerror', $data);
-		
-		}
+        } else {
+            $data                       = [];
+            $data['kalimatheader']  	= 'Mohon Maaf';
+            $data['kalimatbody']  		= 'Proposal ID '.$id.' Tidak ditemukan';
+            return view('errors.notready', $data);
+        }
+	}
+	public function viewProposal($id) {
+        $sql = RencanaKegiatan::where('id', $id)->first();
+        if (isset($sql->id)){
+			$catatanks 					= $sql->catatanks;
+			if ($sql->markingteksproposal == null OR $sql->markingteksproposal == ''){
+				$teksproposal			= '';
+			} else {
+				$teksproposal			= $sql->getTeksProposal->xfile ?? '';
+			}
+			if ($sql->markingteksrab == null OR $sql->markingteksrab == ''){
+				$markingteksrab			= [];
+			} else {
+				$markingteksrab 		= RABKegiatan::where('marking', $sql->markingteksrab)->get();
+			}
+			$cekpejabat     			= Dataindukstaff::where('jabatan', 'Kepala Sekolah')->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+			$fotoks 					= url("/").'/'.Session('sekolah_logo');
+			$markindttdks = session('sekolah_id_sekolah').'-'.$sql->id.'-persetujuanKS';
+			$cekttdks 					= XFiles::where('xmarking', $markindttdks)->first();
+			if(isset($cekttdks->xid)){
+				$ttdks 					= $cekttdks->xfile;
+			} else { $ttdks				= ''; }
+			$data['ttdks'] 				= $ttdks;
+			$data['fotoks'] 			= $fotoks;
+			$data['markingteksrab'] 	= $markingteksrab;
+			$data['teksproposal'] 	    = $teksproposal;
+			$data['datakeuangan']      	= EfikasiKeuangan::where('realjenis', 'Kegiatan')->where('realnominal', $sql->id)->get();
+			$data['datakegiatan']       = $sql;
+			return view('simaster.previewproposal', $data);
+        } else {
+            $data                       = [];
+            $data['kalimatheader']  	= 'Mohon Maaf';
+            $data['kalimatbody']  		= 'Proposal ID '.$id.' Tidak ditemukan';
+            return view('errors.notready', $data);
+        }
 	}
 	public function expersetujuanBerkas(Request $request) {
         $validator = Validator::make($request->all(), [
@@ -1976,151 +2703,403 @@ class FrontpageController extends Controller
 			$alasan 	= $request->input('set03');
 			$alamatweb 	= $request->input('set04');
 			$jenissurat = $request->input('set05');
-			if ($jenissurat == 'Kwitansi'){
-				$rom  		= HPTKeuangan::where('id', $id)->first();
-				if (isset($rom->id)){
-					if ($rom->pengeluaran == '' OR $rom->pengeluaran == 0) {$realjenis = 'pemasukan'; $realnominal = $rom->pemasukan; }
-					else { $realjenis = 'pengeluaran'; $realnominal = $rom->pengeluaran;}
-					if ($alasan == 'SETUJU'){
-						$update = HPTKeuangan::where('id', $id)->update([
-							'tandatangan'	=> $ttd,
-							'tglkwitansi'	=> date("Y-m-d"),
-							'updated_at'	=> date("Y-m-d H:i:s")
-						]);
-					} else {
-						$update = HPTKeuangan::where('id', $id)->update([
-							'keterangan'	=> 'Tidak Setuju dengan alasan '.$alasan.' pada '.date("Y-m-d H:i:s"),
-							'pemasukan'		=> 0,
-							'pengeluaran'	=> 0,
-							'realnominal'	=> $realnominal,
-							'realjenis'		=> $realjenis,
-							'updated_at'	=> date("Y-m-d H:i:s")
-						]);
-					}
-					if ($update){
-						return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Data Updated']);
-						return back();
-					} else {
-						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Update Gagal, Ulangi Beberapa Saat Lagi.']);
-						return back();
-					}
+			$username 	= $request->input('set06');
+			$password 	= $request->input('set07');
+			if (is_null($username)){ $username = ''; }
+			if (is_null($password)){ $password = ''; }
+			
+			if ($username != '' AND $password != ''){
+				$user 			= User::where('username',$username)->first();
+				if (Hash::check($password, $user->password)) {
+					$lanjut = 1;
 				} else {
-					return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
-					return back();	
+					$lanjut = 0;
 				}
-			} else if ($jenissurat == 'Orang Tua Asuh'){
-				$rom  	= Datainduk::where('id', $id)->first();
-				if (isset($rom->id)){
-					$kodeortuasuh = $rom->kodeortuasuh;
-					if ($kodeortuasuh == '' OR is_null($kodeortuasuh)){
-						$update = Datainduk::where('id', $id)->update([
-							'ttdoratuasuh'	=> $ttd,
-							'kodeortuasuh'	=> Session('email'),
-							'tglkesediaan'	=> date("Y-m-d H:i:s"),
-							'updated_at'	=> date("Y-m-d H:i:s"),
-						]);
+			} else {
+				$lanjut = 1;
+			}
+			if ($lanjut == 1){
+				if ($jenissurat == 'Kwitansi'){
+					$rom  		= HPTKeuangan::where('id', $id)->first();
+					if (isset($rom->id)){
+						if ($rom->pengeluaran == '' OR $rom->pengeluaran == 0) {$realjenis = 'pemasukan'; $realnominal = $rom->pemasukan; }
+						else { $realjenis = 'pengeluaran'; $realnominal = $rom->pengeluaran;}
+						if ($alasan == 'SETUJU'){
+							$update = HPTKeuangan::where('id', $id)->update([
+								'tglkwitansi'	=> date("Y-m-d"),
+								'updated_at'	=> date("Y-m-d H:i:s")
+							]);
+							$cekmailbox = Inboxsurat::where('xmarking', $markindttd)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+							if (isset($cekmailbox->id)){
+								Inboxsurat::where('id', $cekmailbox->id)->update([
+									'status'	=> 2,
+									'penerima'	=> 'Arsip'
+								]);
+							}
+						} else {
+							$markindttd = session('sekolah_id_sekolah').'-'.$rom->id.'-kwitansi';
+							XFiles::updateOrCreate(
+								[
+									'xmarking'	=> $markindttd,
+									'xtabel'	=> 'db_keuangan',
+								],
+								[
+									'xjenis'	=> '',
+									'xfile'		=> $ttd
+								]
+							);
+							$update = HPTKeuangan::where('id', $id)->update([
+								'keterangan'	=> 'Tidak Setuju dengan alasan '.$alasan.' pada '.date("Y-m-d H:i:s"),
+								'pemasukan'		=> 0,
+								'pengeluaran'	=> 0,
+								'realnominal'	=> $realnominal,
+								'realjenis'		=> $realjenis,
+								'updated_at'	=> date("Y-m-d H:i:s")
+							]);
+						}
 						if ($update){
-							return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Permohon Sebagai Orang Tua Asuh Telah Kami Terima. Semoga Allah, Tuhan Yang Maha Kaya dan Maha Mengurusi Segala Sesuatu memudahkan urusan Dunia dan Akherat Bapak / Ibu yang budiman.']);
+							return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Data Updated']);
 							return back();
 						} else {
 							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Update Gagal, Ulangi Beberapa Saat Lagi.']);
 							return back();
 						}
 					} else {
-						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Permohonan Gagal, Siswa ini telah memiliki Orang Tua Asuh. Mohon Refresh Kembali Laman Ini']);
-						return back();
+						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
+						return back();	
 					}
-				} else {
-					return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
-					return back();	
-				}
-			} else if ($jenissurat == 'TAMBAH DATA SISWA'){
-				$noinduk	= $id;
-				$tgllahir	= $ttd;
-				$rom  		= Datainduk::where('noinduk', $noinduk)->where('tgllahir', $tgllahir)->first();
-				if (isset($rom->id)){
-					$update = Datainduk::where('noinduk', $noinduk)->where('tgllahir', $tgllahir)->update([
-						'kodeortu'		=> Session('id'),
-						'updated_at'	=> date("Y-m-d H:i:s"),
-					]);
-					if ($update){
-						return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Setting Sebagai Orang Tua Telah Kami Terima. Semoga Allah, Tuhan Yang Maha Kaya dan Maha Mengurusi Segala Sesuatu memudahkan urusan Dunia dan Akherat Bapak / Ibu yang budiman.']);
-						return back();
-					} else {
-						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Update Gagal, Ulangi Beberapa Saat Lagi.']);
-						return back();
-					}
-				
-				} else {
-					return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
-					return back();	
-				}
-			} else if ($jenissurat == 'Surat Keluar'){
-				$rom  		= Suratkeluar::where('id', $id)->first();
-				if (isset($rom->id)){
-					if ($alasan == 'SETUJU'){
-						$update = Suratkeluar::where('id', $id)->update([
-							'filelampiran'	=> 'Signed at '.date("Y-m-d H:i:s"),
-						]);
-						$penerima 	= 'Esign Server';
-						$status 	= 'Signed';
-						$cekpenerima = Penerimasurat::where('idsurat', $rom->id)->where('penulisan', $rom->alamat)->first();
-						if(isset($cekpenerima->id)){
-							Penerimasurat::where('id',$cekpenerima->id)->update([
-								'status'	=> 'Tertandatangani',
-								'jenis'		=> 'KELUAR'
+				} else if ($jenissurat == 'Orang Tua Asuh'){
+					$rom  	= Datainduk::where('id', $id)->first();
+					if (isset($rom->id)){
+						$kodeortuasuh = $rom->kodeortuasuh;
+						if ($kodeortuasuh == '' OR is_null($kodeortuasuh)){
+							$update = Datainduk::where('id', $id)->update([
+								'ttdoratuasuh'	=> $ttd,
+								'kodeortuasuh'	=> Session('email'),
+								'tglkesediaan'	=> date("Y-m-d H:i:s"),
+								'updated_at'	=> date("Y-m-d H:i:s"),
 							]);
+							if ($update){
+								return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Permohon Sebagai Orang Tua Asuh Telah Kami Terima. Semoga Allah, Tuhan Yang Maha Kaya dan Maha Mengurusi Segala Sesuatu memudahkan urusan Dunia dan Akherat Bapak / Ibu yang budiman.']);
+								return back();
+							} else {
+								return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Update Gagal, Ulangi Beberapa Saat Lagi.']);
+								return back();
+							}
+						} else {
+							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Permohonan Gagal, Siswa ini telah memiliki Orang Tua Asuh. Mohon Refresh Kembali Laman Ini']);
+							return back();
 						}
 					} else {
-						$update = Suratkeluar::where('id', $id)->update([
-							'filelampiran'	=> 'Menolak Tandatangan at '.date("Y-m-d H:i:s"),
-						]);
-						$penerima 	= 'Konseptor';
-						$status 	= 'Menolak';
+						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
+						return back();	
 					}
-					if ($update){
-						Inboxsurat::insert([
-							'marking'  		=> $rom->marking,
-							'pengirim'  	=> $rom->kepada,
-							'penerima'		=> $penerima,
-							'email'			=> $rom->alamat,
-							'sifat'			=> 5,
-							'status'		=> $status,
-							'jenis'			=> 'KELUAR',
-							'kerja'			=> '',
-							'catatan'		=> '',
-							'tandatangan'	=> $ttd,
-							'tanggal'		=> '',
-							'idsurat' 		=> $rom->id,
-							'noagenda' 		=> '',
-							'tglsurat' 		=> $rom->tglsurat,
-							'jenissrt' 		=> $rom->jenissurat,
-							'nosurat' 		=> $rom->nomor.'/'.$rom->fakultas.'/'.$rom->kodefak.'/'.$rom->monsrt.'/'.$rom->yersrt,
-							'kepada' 		=> $rom->kepada,
-							'perihal' 		=> $rom->perihal,
-							'alamat' 		=> $rom->alamat,
-							'lampiran' 		=> '',
-							'kodefak' 		=> '',
-							'klasifikasi' 	=> '',
-							'pembuat' 		=> $rom->kepada,
-							'unit' 			=> '',
-							'tabel' 		=> 'KELUAR',
-							'footnote'		=> $alasan
+				} else if ($jenissurat == 'TAMBAH DATA SISWA'){
+					$noinduk	= $id;
+					$tgllahir	= $ttd;
+					$rom  		= Datainduk::where('noinduk', $noinduk)->where('tgllahir', $tgllahir)->where('id_sekolah',session('sekolah_id_sekolah'))->first();
+					if (isset($rom->id)){
+						$update = Datainduk::where('id', $rom->id)->update([
+							'kodeortu'		=> Session('id'),
+							'updated_at'	=> date("Y-m-d H:i:s"),
 						]);
-						return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Terimakasih, Surat ini kami proses Lebih Lanjut']);
+						if ($update){
+							return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Setting Sebagai Orang Tua Telah Kami Terima. Semoga Allah, Tuhan Yang Maha Kaya dan Maha Mengurusi Segala Sesuatu memudahkan urusan Dunia dan Akherat Bapak / Ibu yang budiman.']);
+							return back();
+						} else {
+							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Update Gagal, Ulangi Beberapa Saat Lagi.']);
+							return back();
+						}
+					} else {
+						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan, Pastikan Pilihan Sekolah Bapak/Ibu sesuai dengan portal loginnya']);
+						return back();	
+					}
+				} else if ($jenissurat == 'Rencana Kegiatan'){
+					$rom  		= RencanaKegiatan::where('id', $id)->first();
+					if (isset($rom->id)){
+						if ($alasan == 'SETUJU'){
+							$update = RencanaKegiatan::where('id', $id)->update([
+								'catatanks'	=> 'Disetujui Pada :'.date("Y-m-d H:i:s"),
+							]);
+							$markindttdks = session('sekolah_id_sekolah').'-'.$rom->id.'-persetujuanKS';
+							XFiles::updateOrCreate(
+								[
+									'xmarking'	=> $markindttdks,
+									'xtabel'	=> 'db_rencanakegiatan',
+								],
+								[
+									'xjenis'	=> 'Kegiatan Tahun '.date('Y'),
+									'xfile'		=> $ttd
+								]
+							);
+							$cekmailbox = Inboxsurat::where('xmarking', $markindttdks)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+							if (isset($cekmailbox->id)){
+								Inboxsurat::where('id', $cekmailbox->id)->update([
+									'status'	=> 2,
+									'penerima'	=> 'Arsip'
+								]);
+							}
+						} else {
+							$update = RencanaKegiatan::where('id', $id)->update([
+								'catatanks'	=> 'Ditolak Pada '.date("Y-m-d H:i:s").' dengan alasan '.$alasan,
+							]);
+						}
+						if ($update){
+							return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Terimakasih atas persetujuan Bapak/Ibu']);
+							return back();
+						} else {
+							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Update Gagal, Ulangi Beberapa Saat Lagi.']);
+							return back();
+						}
+					} else {
+						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
+						return back();	
+					}
+				} else if ($jenissurat == 'Rapot Orang Tua'){
+					$cekdata		= Rapotan::where('id', $id)->first();
+					if (isset($cekdata->id)){
+						$rapotkhas		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotKhas';
+						$rapotdinas		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotDinas';
+						$markingortu	= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-ORTU';
+						$ceksudah 		= XFiles::where('xmarking', $markingortu)->count();
+						if ($ceksudah == 0){
+							XFiles::create([
+								'xmarking'	=> $markingortu,
+								'xtabel'	=> $request->input('set04'),
+								'xjenis'	=> $cekdata->noinduk,
+								'xfile'		=> $ttd
+							]);
+						} else {
+							XFiles::where('xmarking', $markingortu)->update([
+								'xtabel'	=> $request->input('set04'),
+								'xjenis'	=> $cekdata->noinduk,
+								'xfile'		=> $ttd
+							]);
+						}
+						$ceksudah1 		= XFiles::where('xmarking', $rapotdinas)->first();
+						if (isset($ceksudah1->xfile)){
+							$rapotdinas = $ceksudah1->xfile;
+							$rapotdinas	= str_replace('[ttdortu]', '<img src="'.$ttd.'" height="100">', $rapotdinas);
+							XFiles::where('xmarking', $rapotdinas)->update([
+								'xfile'	=> $rapotdinas
+							]);
+						}
+						$ceksudah2 			= XFiles::where('xmarking', $rapotkhas)->first();
+						if (isset($ceksudah2->xfile)){
+							$rapotkhas	= $ceksudah2->xfile;
+							$rapotkhas	= str_replace('[ttdortu]', '<img src="'.$ttd.'" height="100">', $rapotkhas);
+							XFiles::where('xmarking', $rapotkhas)->update([
+								'xfile'	=> $rapotkhas
+							]);
+						}
+						$cekmailbox = Inboxsurat::where('xmarking', $rapotdinas)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+						if (isset($cekmailbox->id)){
+							Inboxsurat::where('id', $cekmailbox->id)->update([
+								'status'	=> 2,
+								'penerima'	=> 'Arsip'
+							]);
+						}
+						$cekmailbox = Inboxsurat::where('xmarking', $rapotkhas)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+						if (isset($cekmailbox->id)){
+							Inboxsurat::where('id', $cekmailbox->id)->update([
+								'status'	=> 2,
+								'penerima'	=> 'Arsip'
+							]);
+						}
+						return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Terimakasih, Atas Respon Bapak/Ibu']);
 						return back();
 					} else {
-						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Update Gagal, Ulangi Beberapa Saat Lagi.']);
+						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
 						return back();
 					}
-				
+				} else if ($jenissurat == 'Rapot Kepala Sekolah'){
+					$cekdata		= Rapotan::where('id', $id)->first();
+					if (isset($cekdata->id)){
+						$marking		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-TTDKS';
+						$rapotkhas		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotKhas';
+						$rapotdinas		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotDinas';
+						$ceksudah 		= XFiles::where('xmarking', $marking)->count();
+						if ($ceksudah == 0){
+							XFiles::create([
+								'xmarking'	=> $marking,
+								'xtabel'	=> $request->input('set04'),
+								'xjenis'	=> $cekdata->noinduk,
+								'xfile'		=> $ttd
+							]);
+						} else {
+							XFiles::where('xmarking', $marking)->update([
+								'xtabel'	=> $request->input('set04'),
+								'xjenis'	=> $cekdata->noinduk,
+								'xfile'		=> $ttd
+							]);
+						}
+						$ceksudah1 		= XFiles::where('xmarking', $rapotdinas)->first();
+						if (isset($ceksudah1->xfile)){
+							$rapotdinas = $ceksudah1->xfile;
+							$rapotdinas	= str_replace('[ttdks]', '<img src="'.$ttd.'" height="100">', $rapotdinas);
+							XFiles::where('xmarking', $rapotdinas)->update([
+								'xfile'	=> $rapotdinas
+							]);
+						}
+						$ceksudah2 			= XFiles::where('xmarking', $rapotkhas)->first();
+						if (isset($ceksudah2->xfile)){
+							$rapotkhas	= $ceksudah2->xfile;
+							$rapotkhas	= str_replace('[ttdks]', '<img src="'.$ttd.'" height="100">', $rapotkhas);
+							XFiles::where('xmarking', $rapotkhas)->update([
+								'xfile'	=> $rapotkhas
+							]);
+						}
+						$ceksudahada 	= MushafUjianLisan::where('noinduk', $cekdata->noinduk)->where('semester', $cekdata->semester)->where('tapel', $cekdata->tapel)->where('id_sekolah', $cekdata->id_sekolah)->first();
+						if (isset($ceksudahada->id)){
+							XFiles::updateOrCreate(
+								[
+									'xmarking'	=> $ceksudahada->marking,
+								],
+								[
+									'xtabel'	=> 'mushaf_ujianlisan',
+									'xjenis'	=> $cekdata->noinduk,
+									'xfile'		=> $ttd
+								]
+							);
+						}
+						$cekmailbox = Inboxsurat::where('xmarking', $rapotdinas)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+						if (isset($cekmailbox->id)){
+							Inboxsurat::where('id', $cekmailbox->id)->update([
+								'status'	=> 2,
+								'penerima'	=> 'Arsip'
+							]);
+						}
+						$cekmailbox = Inboxsurat::where('xmarking', $rapotkhas)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+						if (isset($cekmailbox->id)){
+							Inboxsurat::where('id', $cekmailbox->id)->update([
+								'status'	=> 2,
+								'penerima'	=> 'Arsip'
+							]);
+						}
+						return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Terimakasih, Atas Respon Bapak/Ibu']);
+						return back();
+					} else {
+						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
+						return back();
+					}
 				} else {
-					return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
-					return back();	
+					$rom  		= Suratkeluar::where('id', $id)->first();
+					if (isset($rom->id)){
+						$pembuat 	= $rom->pembuat;
+						$filelama 	= $rom->klasifikasi;
+						$tahun		= $rom->yersrt;
+						if ($alasan == 'SETUJU'){
+							XFiles::where('xmarking', $rom->marking)->update([
+								'xfile' => $ttd
+							]);
+							$update = Suratkeluar::where('id', $id)->update([
+								'status'		=> 'File Uploaded, Signed',
+								'updated_at'	=> date('Y-m-d H:i:s')
+							]);
+							$cekmailbox = Inboxsurat::where('xmarking', $rom->marking)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+							if (isset($cekmailbox->id)){
+								Inboxsurat::where('id', $cekmailbox->id)->update([
+									'status'	=> 2,
+								]);
+							}
+							if ($update){
+								$ceknip 	= User::where('nama', $pembuat)->where('id_sekolah', Session('sekolah_id_sekolah'))->first();
+								if (isset($ceknip->nip)){
+									$tuliskirim = 'Surat Nomor '.$rom->nomor.' Sudah di Tandatangani';
+									SendMail::mobilenotif($ceknip->nip,'perseorangan',$pembuat,$tuliskirim);
+									Notification::send($ceknip, new NewMessageNotification($tuliskirim));
+								}
+								$homebase	= url("/");
+								$domain		= str_replace('http://', '', $homebase);
+								$domain		= str_replace('https://', '', $domain);
+								$domain		= str_replace('/', '', $domain);
+								$domain		= str_replace('#', '', $domain);
+								$domain		= str_replace('-', '', $domain);
+								$domain		= str_replace('.', '', $domain);
+								$fileserti 	= $domain.'.crt';
+								$error		= '';
+								if (Storage::disk('local')->exists('/tte/' . $fileserti)) {
+									$certificate 	= 'file://'.base_path().'/public/tte/'.$fileserti;
+									try {
+										$info = array(
+											'Name' 			=> $rom->namapejabat,
+											'Location' 		=> $homebase,
+											'Reason' 		=> 'Dokumen ini ditandatangani secara elektronik, verifikasi keaslian dokumen ini merujuk ke '.$homebase,
+											'ContactInfo' 	=> $domain,
+										);
+										$page_format 		= array(
+											'MediaBox' 		=> array ('llx' => 0, 'lly' => 0, 'urx' => 210, 'ury' => 330),
+											'Dur' 			=> 3,
+											'PZ' 			=> 1,
+										);
+										$pdf 	= new Fpdi('P','mm',array(210,330));
+										$pages 	= $pdf->setSourceFile(public_path().'/'.$filelama);
+										for ($i = 1; $i <= $pages; $i++)
+										{
+											$page = $pdf->importPage($i);
+											$pdf->AddPage();
+											$pdf->useTemplate($page, ['adjustPageSize' => true]);
+											$pdf->setSignature($certificate, $certificate, $rom->marking, '', 2, $info);
+											$pdf->setPageMark();
+										}
+										$pdf->Output(public_path().'/scan/'.$tahun.'/'.$rom->marking.'.pdf', 'F');
+										if (Storage::disk('local')->exists('/scan/'.$tahun.'/'. $rom->marking.'.pdf')) {
+											$draft 		= public_path($filelama);
+											try {
+												unlink($draft);
+											} catch (\Exception $e) {
+											}
+											Suratkeluar::where('id', $rom->id)->update([
+												'sifat'			=> 'TTE',
+												'klasifikasi'	=> 'scan/'.$tahun.'/'.$rom->marking.'.pdf'
+											]);
+										}
+									} catch (\Exception $e) {
+										$error = $e->getMessage();
+										Suratkeluar::where('id', $rom->id)->update([
+											'sifat'		=> $error,
+										]);
+									}
+								} else {
+									Suratkeluar::where('id', $rom->id)->update([
+										'sifat'		=> 'Non TTE',
+									]);
+								}
+								return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Terimakasih, Surat ini kami proses Lebih Lanjut '.$error]);
+								return back();
+							} else {
+								return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Update Gagal, Ulangi Beberapa Saat Lagi.']);
+								return back();
+							}
+						} else {
+							Suratkeluar::where('id', $id)->update([
+								'status'		=> 'File Uploaded, dan Di Tolak',
+								'perihal'		=> $rom->perihal.'<br />Ditolak dengan alasan '.$alasan,
+							]);
+							$ceknip 	= User::where('nama', $pembuat)->where('id_sekolah', Session('sekolah_id_sekolah'))->first();
+							if (isset($ceknip->nip)){
+								$tuliskirim = 'Surat Nomor '.$rom->nomor.' dikembalikan untuk diperbaiki dengan catatan '.$alasan;
+								SendMail::mobilenotif($ceknip->nip,'perseorangan',$pembuat,$tuliskirim);
+								Notification::send($ceknip, new NewMessageNotification($tuliskirim));
+							}
+							$cekmailbox = Inboxsurat::where('xmarking', $rom->marking)->where('id_sekolah', session('sekolah_id_sekolah'))->first();
+							if (isset($cekmailbox->id)){
+								Inboxsurat::where('id', $cekmailbox->id)->update([
+									'status'	=> 2,
+									'penerima'	=> 'Arsip'
+								]);
+							}
+							return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Thank You', 'message' => 'Terimakasih atas konfirmasinya, surat akan kami revisi sesegera mungkin']);
+							return back();
+						}
+					} else {
+						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
+						return back();	
+					}
 				}
 			} else {
-				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'ID '.$id.' Tidak di Temukan']);
-				return back();	
+				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Password Salah']);
+				return back();
 			}
         }
     }
@@ -2149,198 +3128,437 @@ class FrontpageController extends Controller
 		}
 	}
 	//RAPOT
+	public function viewTtdRapot ($id){
+		$homebase		= url('/');
+		$cekdata		= Rapotan::where('id', $id)->first();
+		if (isset($cekdata->id)){
+			$ttdortu 			= '';
+			$catatanortu 		= '';
+			$foto 				= $cekdata->foto;
+			$id_sekolah 		= $cekdata->id_sekolah;
+			$semester			= $cekdata->semester;
+			$semestercari		= mb_substr($semester, 0, 1);
+			$markingks			= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-TTDKS';
+			$markingguru		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-TTDGURU';
+			$rapotalquran		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotAlQuran';
+			$rapotkhas			= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotKhas';
+			$rapotdinas			= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotDinas';
+			$hasilujianlisan	= $cekdata->tapel.'-'.$semestercari.'-UL-'.$cekdata->kelas.'-'.$cekdata->noinduk;
+			$cekortu			= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-ORTU';
+			$cekttdks 			= XFiles::where('xmarking', $markingks)->first();
+			if (isset($cekttdks->xfile)){
+				$ttdks  		= $cekttdks->xfile;
+				$url 			= $homebase.'/rapot/'.$cekdata->id;
+				return Redirect::to($url);
+			} else {
+				$ceksudah 			= XFiles::where('xmarking', $cekortu)->first();
+				if (isset($ceksudah->xfile)){
+					$ttdortu  		= $ceksudah->xfile;
+					$catatanortu  	= $ceksudah->xtabel;
+				}
+				$ceksudahada		= MushafUjian::where('id_sekolah',$cekdata->id_sekolah)->where('semester', $semestercari)->where('tapel', $cekdata->tapel)->where('noinduk', $cekdata->noinduk)->groupBy('tapelsemester')->select('nama', 'noinduk', 'kelas', 'foto', 'tapel', 'tapelsemester', 'sakit', 'ijin', 'alpha', 'semester', 'hariefektif', 'setoransekolah', 'setoranrumah', 'created_at', 'namaguru', DB::raw("CONCAT('rapotalquran/', tapelsemester, '.', semester, '.', kelas, '.', niyguru, '.', noinduk) AS link"))->get();
+				if (!empty($ceksudahada)){
+					$rapotalquran	= '<table class="table table-striped table-bordered"><thead><tr><th>Kode Semester</th><th>Tanggal</th><th>Link</th></tr></thead><tbody>';
+					foreach ($ceksudahada as $rujianalquran){
+						$rapotalquran = $rapotalquran.'<tr><td>'.$rujianalquran->tapelsemester.'</td><td>'.$rujianalquran->created_at.'</td><td><a href="'.url("/").'/'.$rujianalquran->link.'" target="_blank"><span class="badge badge-primary">View</span></a></td></tr>';
+					}
+					$rapotalquran = $rapotalquran.'</tbody></table>';
+				}
+				$rapotdinas 	= self::genSurat($cekdata->id, 'rapot');
+				$rapotkhas  	= self::genSurat($cekdata->id, 'rapotkhas');
+				$cekdataul 		= MushafUjianLisan::where('noinduk', $cekdata->noinduk)->where('semester', $semestercari)->where('tapel', $cekdata->tapel)->where('id_sekolah', $cekdata->id_sekolah)->first();
+				if (isset($cekdataul->id)){
+					$hasilujianlisan 	= self::genSurat($cekdataul->id, 'hasilujianlisan');
+				}
+				if ($foto == '' OR is_null($foto)){
+					$lampiran = url("/").'/'.Session('sekolah_logo');
+				} else {
+					if (Storage::disk('local')->exists('/dist/img/foto/' . $foto)) {
+						$lampiran = url("/").'/dist/img/foto/'.$foto;
+					} else {
+						$lampiran = url("/").'/'.Session('sekolah_logo');
+					}
+				}
+				$tandatangan				= '';
+				$usernameks					= '';
+				$cekpejabat     			= Dataindukstaff::where('jabatan', 'Kepala Sekolah')->where('id_sekolah', $id_sekolah)->first();
+				if (isset($cekpejabat->id)){
+					$nama       			= $cekpejabat->nama;
+					$niy        			= $cekpejabat->niy;
+					$foto 					= $cekpejabat->foto;
+					$getusername 			= User::where('nip', $niy)->first();
+					if (isset($getusername->id)){
+						$usernameks 		= $getusername->username;
+						$cekmarkttd 		= 'TTD-'.$usernameks;
+						$cekttd				= XFiles::where('xmarking', $cekmarkttd)->first();
+						if (isset($cekttd->xfile)){
+							$tandatangan	= $cekttd->xfile;
+						}
+					}
+					if ($foto == '' OR is_null($foto)){
+						$fotoks 			= url("/").'/'.Session('sekolah_logo');
+					} else {
+						$fotoks 			= url("/").'/dist/img/foto/'.$foto;
+					}
+				} else {
+					$nama 					= 'Kepala Sekolah '.config('global.sekolah');
+				}
+				if ($cekdata->fase == 'MATABA'){
+					$data['usernameks'] 		= $usernameks;
+					$data['tandatangan'] 		= $tandatangan;
+					$data['ttdortu'] 			= $ttdortu;
+					$data['catatanortu'] 		= $catatanortu;
+					$data['foto'] 				= $lampiran;
+					$data['rapot'] 				= $cekdata;
+					$data['rapotdinas'] 		= $rapotdinas;
+					$data['rapotkhas'] 			= $rapotkhas;
+					$data['rapotalquran'] 		= $rapotalquran;
+					$data['hasilujianlisan'] 	= $hasilujianlisan;
+					return view('simaster.erapottpq', $data);
+				} else {
+					$data['usernameks'] 		= $usernameks;
+					$data['tandatangan'] 		= $tandatangan;
+					$data['ttdortu'] 			= $ttdortu;
+					$data['catatanortu'] 		= $catatanortu;
+					$data['foto'] 				= $lampiran;
+					$data['rapot'] 				= $cekdata;
+					$data['rapotdinas'] 		= $rapotdinas;
+					$data['rapotkhas'] 			= $rapotkhas;
+					$data['rapotalquran'] 		= $rapotalquran;
+					$data['hasilujianlisan'] 	= $hasilujianlisan;
+					return view('simaster.erapot', $data);
+				}
+				
+			}
+		} else {
+			$data['generatetbl']  = '<img src="'.url('/').'/dist/img/takadagambar.jpg" />';
+			return view('cetak.suratgenerator', $data);
+		}
+	}
 	public function viewRapot ($id){
-		$surat = self::genSurat($id, 'rapot');
-		return $surat;
+		$cekdata		= Rapotan::where('id', $id)->first();
+		if (isset($cekdata->id)){
+			$ttdortu 			= '';
+			$catatanortu 		= '';
+			$linkrapotdinas 	= url('/').'/rapot/'.$id;
+			$linkrapotkhas 		= url('/').'/rapot/'.$id;
+			$linkrapotalquran 	= url('/').'/rapot/'.$id;
+			$linkrapotlisan 	= url('/').'/rapot/'.$id;
+			$foto 				= $cekdata->foto;
+			$id_sekolah 		= $cekdata->id_sekolah;
+			$semester			= $cekdata->semester;
+			$semestercari		= mb_substr($semester, 0, 1);
+			$rapotalquran		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotAlQuran';
+			$rapotkhas			= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotKhas';
+			$rapotdinas			= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-RapotDinas';
+			$hasilujianlisan	= $cekdata->tapel.'-'.$semestercari.'-UL-'.$cekdata->kelas.'-'.$cekdata->noinduk;
+			$markingguru		= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-TTDGURU';
+			$cekortu			= $cekdata->tapel.'-'.$cekdata->semester.'-'.$cekdata->kelas.'-'.$cekdata->noinduk.'-'.$cekdata->id_sekolah.'-ORTU';
+			$ceksudah 			= XFiles::where('xmarking', $cekortu)->first();
+			if (isset($ceksudah->xfile)){
+				$ttdortu  		= $ceksudah->xfile;
+				$catatanortu  	= $ceksudah->xtabel;
+			}
+			$ceksudahada		= MushafUjian::where('id_sekolah',$cekdata->id_sekolah)->where('semester', $semestercari)->where('tapel', $cekdata->tapel)->where('noinduk', $cekdata->noinduk)->groupBy('tapelsemester')->select('nama', 'noinduk', 'kelas', 'foto', 'tapel', 'tapelsemester', 'sakit', 'ijin', 'alpha', 'semester', 'hariefektif', 'setoransekolah', 'setoranrumah', 'created_at', 'namaguru', DB::raw("CONCAT('rapotalquran/', tapelsemester, '.', semester, '.', kelas, '.', niyguru, '.', noinduk) AS link"))->get();
+			if (!empty($ceksudahada)){
+				$rapotalquran	= '<table class="table table-striped table-bordered"><thead><tr><th>Kode Semester</th><th>Tanggal</th><th>Link</th></tr></thead><tbody>';
+				foreach ($ceksudahada as $rujianalquran){
+					$rapotalquran = $rapotalquran.'<tr><td>'.$rujianalquran->tapelsemester.'</td><td>'.$rujianalquran->created_at.'</td><td><a href="'.url("/").'/'.$rujianalquran->link.'" target="_blank"><span class="badge badge-primary">View</span></a></td></tr>';
+				}
+				$rapotalquran = $rapotalquran.'</tbody></table>';
+			}
+			$linkrapotdinas 	= url('/').'/printmark/'.$cekdata->id;
+			$rapotdinas 		= self::genSurat($cekdata->id, 'rapot');
+			$linkrapotkhas 		= url('/').'/printmarkbyid/'.$cekdata->id;
+			$rapotkhas  		= self::genSurat($cekdata->id, 'rapotkhas');
+			$ceksudahada 		= MushafUjianLisan::where('noinduk', $cekdata->noinduk)->where('semester', $semestercari)->where('tapel', $cekdata->tapel)->where('id_sekolah', $cekdata->id_sekolah)->first();
+			if (isset($ceksudahada->id)){
+				$hasilujianlisan 	= self::genSurat($ceksudahada->id, 'hasilujianlisan');
+				$linkrapotlisan 	= url('/').'/hasilujianlisan/'.$ceksudahada->id;
+			}
+			if ($foto == '' OR is_null($foto)){
+				$lampiran = url("/").'/'.Session('sekolah_logo');
+			} else {
+				if (Storage::disk('local')->exists('/dist/img/foto/' . $foto)) {
+					$lampiran = url("/").'/dist/img/foto/'.$foto;
+				} else {
+					$lampiran = url("/").'/'.Session('sekolah_logo');
+				}
+			}
+			if ($cekdata->fase == 'MATABA'){
+				$data['linkrapotkhas']		= $linkrapotkhas;
+				$data['linkrapotalquran']	= $linkrapotalquran;
+				$data['ttdortu'] 			= $ttdortu;
+				$data['catatanortu'] 		= $catatanortu;
+				$data['foto'] 				= $lampiran;
+				$data['rapot'] 				= $cekdata;
+				$data['rapotkhas'] 			= $rapotkhas;
+				$data['rapotalquran'] 		= $rapotalquran;
+				return view('cetak.erapotmataba', $data);
+			} else {
+				$data['linkrapotdinas']		= $linkrapotdinas;
+				$data['linkrapotkhas']		= $linkrapotkhas;
+				$data['linkrapotalquran']	= $linkrapotalquran;
+				$data['linkrapotlisan']		= $linkrapotlisan;
+				$data['ttdortu'] 			= $ttdortu;
+				$data['catatanortu'] 		= $catatanortu;
+				$data['foto'] 				= $lampiran;
+				$data['rapot'] 				= $cekdata;
+				$data['rapotdinas'] 		= $rapotdinas;
+				$data['rapotkhas'] 			= $rapotkhas;
+				$data['rapotalquran'] 		= $rapotalquran;
+				$data['hasilujianlisan'] 	= $hasilujianlisan;
+				return view('cetak.erapot', $data);
+			}
+		} else {
+			$data['generatetbl']  = '<img src="'.url('/').'/dist/img/takadagambar.jpg" />';
+			return view('cetak.suratgenerator', $data);
+		}
+	}
+	public function viewRapotAlquran ($id){
+		$getarrayid 	= explode('.', $id);
+		if (isset($getarrayid[4])){
+			$surat 		= self::genSurat($id, 'rapotalquran');
+			return $surat;
+		} else {
+			$data                       = [];
+            $data['kalimatheader']  	= 'Mohon Maaf';
+            $data['kalimatbody']  		= 'Rapot AlQuran dengan ID '.$id.' Tidak ditemukan';
+            return view('errors.notready', $data);
+		}
+	}
+	public function viewHasilUjianLisan ($id){
+		$getarrayid 	= MushafUjianLisan::where('id', $id)->first();
+		if (isset($getarrayid->id)){
+			$surat = self::genSurat($id, 'hasilujianlisan');
+			return $surat;
+		} else {
+			$data                       = [];
+            $data['kalimatheader']  	= 'Mohon Maaf';
+            $data['kalimatbody']  		= 'Hasil Ujian Lisan dengan ID '.$id.' Tidak ditemukan';
+            return view('errors.notready', $data);
+		}
+	}
+	public function viewPrintWithMark ($id){
+		$rapotkhas  		= self::genSurat($id, 'rapot');
+		return $rapotkhas;
+		/*
+		$cekprintmark 					= XFiles::where('xmarking', $id)->first();
+		if (isset($cekprintmark->xfile) AND $cekprintmark->xfile != ''){
+			$generatetbl 	= $cekprintmark->xfile;
+			$generatetbl	= str_replace('[ttdortu]', '<p>&nbsp;</p><p>&nbsp;</p>', $generatetbl);
+			$generatetbl	= str_replace('[ttdguru]', '<p>&nbsp;</p><p>&nbsp;</p>', $generatetbl);
+			$generatetbl	= str_replace('[ttdks]', '<p>&nbsp;</p><p>&nbsp;</p>', $generatetbl);
+			$generatetbl	= str_replace('720', '800', $generatetbl);
+			$data['generatetbl']  = $generatetbl;
+			return view('cetak.suratgenerator', $data);
+		} else {
+			$data                       = [];
+            $data['kalimatheader']  	= 'Mohon Maaf';
+            $data['kalimatbody']  		= 'Print Mark '.$id.' Tidak ditemukan';
+            return view('errors.notready', $data);
+		}
+		*/
+	}
+	public function viewPrintWithMarkID ($id){
+		$rapotkhas  		= self::genSurat($id, 'rapotkhas');
+		return $rapotkhas;
+		/*
+		$cekprintmark		= XFiles::where('xid', $id)->first();
+		if (isset($cekprintmark->xfile) AND $cekprintmark->xfile != ''){
+			$generatetbl 	= $cekprintmark->xfile;
+			$generatetbl	= str_replace('[ttdortu]', '<p>&nbsp;</p><p>&nbsp;</p>', $generatetbl);
+			$generatetbl	= str_replace('[ttdguru]', '<p>&nbsp;</p><p>&nbsp;</p>', $generatetbl);
+			$generatetbl	= str_replace('[ttdks]', '<p>&nbsp;</p><p>&nbsp;</p>', $generatetbl);
+			$generatetbl	= str_replace('720', '800', $generatetbl);
+			$data['generatetbl']  = $generatetbl;
+			return view('cetak.suratgenerator', $data);
+		} else {
+			$data                       = [];
+            $data['kalimatheader']  	= 'Mohon Maaf';
+            $data['kalimatbody']  		= 'Print Mark '.$id.' Tidak ditemukan';
+            return view('errors.notready', $data);
+		}
+			*/
 	}
 	public function jsonStatistikkd(Request $request) {
 		$idrapot 	= $request->val01;
-		$rdata 		= Rapotan::where('id', $idrapot)->first();
-		$PAI3		= $rdata->PAI3;
-		$PAI4		= $rdata->PAI4;
-		$PPKN3		= $rdata->PPKN3;
-		$PPKN4		= $rdata->PPKN4;
-		$BI3		= $rdata->BI3;
-		$BI4		= $rdata->BI4;
-		$MAT3		= $rdata->PAI3;
-		$MAT4		= $rdata->MAT4;
-		$IPA3		= $rdata->IPA3;
-		$IPA4		= $rdata->IPA4;
-		$IPS3		= $rdata->IPS3;
-		$IPS4		= $rdata->IPS4;
-		$SBDP3		= $rdata->SBDP3;
-		$SBDP4		= $rdata->SBDP4;
-		$PJOK3		= $rdata->PJOK3;
-		$PJOK4		= $rdata->PJOK4;
-		$BJ3		= $rdata->BJ3;
-		$BJ4		= $rdata->BJ4;
-		$BING3		= $rdata->BING3;
-		$BING4		= $rdata->BING4;
-		$BA3		= $rdata->BA3;
-		$BA4		= $rdata->BA4;
-		$TIK3		= $rdata->TIK3;
-		$TIK4		= $rdata->TIK4;
-		$total3 	= 0;
-		$total4		= 0;
-		$count3		= 0;
-		$count4		= 0;
-		if ($PAI3 != 0){ $total3 = $total3 + $PAI3; $count3++; }
-		if ($PPKN3 != 0){ $total3 = $total3 + $PPKN3; $count3++; }
-		if ($BI3 != 0){ $total3 = $total3 + $BI3; $count3++; }
-		if ($MAT3 != 0){ $total3 = $total3 + $MAT3; $count3++; }
-		if ($IPA3 != 0){ $total3 = $total3 + $IPA3; $count3++; }
-		if ($IPS3 != 0){ $total3 = $total3 + $IPS3; $count3++; }
-		if ($SBDP3 != 0){ $total3 = $total3 + $SBDP3; $count3++; }
-		if ($PJOK3 != 0){ $total3 = $total3 + $PJOK3; $count3++; }
-		if ($BJ3 != 0){ $total3 = $total3 + $BJ3; $count3++; }
-		if ($BING3 != 0){ $total3 = $total3 + $BING3; $count3++; }
-		if ($BA3 != 0){ $total3 = $total3 + $BA3; $count3++; }
-		if ($TIK3 != 0){ $total3 = $total3 + $TIK3; $count3++; }
-		
-		if ($PAI4 != 0){ $total4 = $total4 + $PAI4; $count4++; }
-		if ($PPKN4 != 0){ $total4 = $total4 + $PPKN4; $count4++; }
-		if ($BI4 != 0){ $total4 = $total4 + $BI4; $count4++; }
-		if ($MAT4 != 0){ $total4 = $total4 + $MAT4; $count4++; }
-		if ($IPA4 != 0){ $total4 = $total4 + $IPA4; $count4++; }
-		if ($IPS4 != 0){ $total4 = $total4 + $IPS4; $count4++; }
-		if ($SBDP4 != 0){ $total4 = $total4 + $SBDP4; $count4++; }
-		if ($PJOK4 != 0){ $total4 = $total4 + $PJOK4; $count4++; }
-		if ($BJ4 != 0){ $total4 = $total4 + $BJ4; $count4++; }
-		if ($BING4 != 0){ $total4 = $total4 + $BING4; $count4++; }
-		if ($BA4 != 0){ $total4 = $total4 + $BA4; $count4++; }
-		if ($TIK4 != 0){ $total4 = $total4 + $TIK4; $count4++; }
+		$ratap 		= 0;
+		$ratae 		= 0;
+		$ratau		= 0;
+		$getdata 		= Rapotan::where('id', $idrapot)->first();
+		if (isset($getdata->id)){
+			$nama 			= $getdata->nama;
+			$kelas			= $getdata->kelas;
+			$noinduk 		= $getdata->noinduk;
+			$nisn			= $getdata->nisn;
+			$tapel 			= $getdata->tapel;
+			$semester		= $getdata->semester;
+			$id_sekolah		= $getdata->id_sekolah;
+			$semestercari	= mb_substr($semester, 0, 1);
 
-		if ($total3 != 0){ $rata3 = round(($total3/$count3), 2); } else { $rata3 = 0; }
-		if ($total4 != 0){ $rata4 = round(($total4/$count4), 2); } else { $rata4 = 0; }
+			$goleknilaiu = DB::table('db_nilai')
+							->whereIn('jennilai', ['pts', 'pat'])
+							->where('noinduk', $getdata->noinduk)
+							->where('semester', $semestercari)
+							->where('tapel', $getdata->tapel)
+							->where('id_sekolah', $id_sekolah)
+							->select('noinduk', DB::raw('AVG(nilai) as rata_rata'))
+							->groupBy('noinduk')
+							->first();
+			$goleknilaip = DB::table('db_nilai')
+							->whereIn('jennilai', ['p01', 'p02', 'p03', 'p04', 'p05'])
+							->where('noinduk', $getdata->noinduk)
+							->where('semester', $semestercari)
+							->where('tapel', $getdata->tapel)
+							->where('id_sekolah', $id_sekolah)
+							->select('noinduk', DB::raw('AVG(nilai) as rata_rata'))
+							->groupBy('noinduk')
+							->first();
+			$goleknilaie = DB::table('db_nilai')
+							->whereIn('jennilai', ['e01', 'e02', 'e03', 'e04', 'e05'])
+							->where('noinduk', $getdata->noinduk)
+							->where('semester', $semestercari)
+							->where('tapel', $getdata->tapel)
+							->where('id_sekolah', $id_sekolah)
+							->select('noinduk', DB::raw('AVG(nilai) as rata_rata'))
+							->groupBy('noinduk')
+							->first();
+			$ratap 	= isset($goleknilaip->rata_rata) ? $goleknilaip->rata_rata : 0;
+			$ratae 	= isset($goleknilaie->rata_rata) ? $goleknilaie->rata_rata : 0;
+			$ratau 	= isset($goleknilaiu->rata_rata) ? $goleknilaiu->rata_rata : 0;
+							
+		}
 		$arraysurat[] = array(
-			'jenis' 		=> 'Kompetensi Inti 3',
-			'jumlah' 		=> $rata3,
+			'jenis' 		=> 'Penilaian Harian',
+			'jumlah' 		=> $ratap,
 		);
 		$arraysurat[] = array(
-			'jenis' 		=> 'Kompetensi Inti 4',
-			'jumlah' 		=> $rata4,
+			'jenis' 		=> 'Evaluasi',
+			'jumlah' 		=> $ratae,
+		);
+		$arraysurat[] = array(
+			'jenis' 		=> 'Ujian',
+			'jumlah' 		=> $ratau,
 		);
 		echo json_encode($arraysurat);
 	}
 	public function jsonStatpermuatan(Request $request) {
 		$arraysurat	= [];
 		$idrapot 	= $request->val01;
-		$rdata 		= Rapotan::where('id', $idrapot)->first();
-		$PAI3		= $rdata->PAI3;
-		$PAI4		= $rdata->PAI4;
-		$PPKN3		= $rdata->PPKN3;
-		$PPKN4		= $rdata->PPKN4;
-		$BI3		= $rdata->BI3;
-		$BI4		= $rdata->BI4;
-		$MAT3		= $rdata->MAT3;
-		$MAT4		= $rdata->MAT4;
-		$IPA3		= $rdata->IPA3;
-		$IPA4		= $rdata->IPA4;
-		$IPS3		= $rdata->IPS3;
-		$IPS4		= $rdata->IPS4;
-		$SBDP3		= $rdata->SBDP3;
-		$SBDP4		= $rdata->SBDP4;
-		$PJOK3		= $rdata->PJOK3;
-		$PJOK4		= $rdata->PJOK4;
-		$BJ3		= $rdata->BJ3;
-		$BJ4		= $rdata->BJ4;
-		$BING3		= $rdata->BING3;
-		$BING4		= $rdata->BING4;
-		$BA3		= $rdata->BA3;
-		$BA4		= $rdata->BA4;
-		$TIK3		= $rdata->TIK3;
-		$TIK4		= $rdata->TIK4;
-		$total3 	= 0;
-		$total4		= 0;
-		$count3		= 0;
-		$count4		= 0;
-		if ($PAI3 != 0){ 
-			$arraysurat[] = array(
-				'jenis' 		=> 'PAIdBP',
-				'jumlah3' 		=> $PAI3,
-				'jumlah4' 		=> $PAI4,
-			);
+		$getdata 	= Rapotan::where('id', $idrapot)->first();
+		if (isset($getdata->id)){
+			$nama 			= $getdata->nama;
+			$kelas			= $getdata->kelas;
+			$noinduk 		= $getdata->noinduk;
+			$nisn			= $getdata->nisn;
+			$tapel 			= $getdata->tapel;
+			$semester		= $getdata->semester;
+			$id_sekolah		= $getdata->id_sekolah;
+			$fase			= $getdata->fase;
+			$semestercari	= mb_substr($semester, 0, 1);
+
+			if ($fase == 'MATABA'){
+				$arraysurat[] = [
+					'jenis' 		=> 'AL-ISLAM',
+					'jumlah' 		=> $getdata->n01,
+					'teks' 			=> $getdata->k02,
+				];
+				$arraysurat[] = [
+					'jenis' 		=> 'KOGNITIF',
+					'jumlah' 		=> $getdata->n02,
+					'teks' 			=> $getdata->k05,
+				];
+				$arraysurat[] = [
+					'jenis' 		=> 'BAHASA',
+					'jumlah' 		=> $getdata->n03,
+					'teks' 			=> $getdata->k08,
+				];
+				$arraysurat[] = [
+					'jenis' 		=> 'FISIK MOTORIK',
+					'jumlah' 		=> $getdata->n04,
+					'teks' 			=> $getdata->k11,
+				];
+			} else {
+				for ($index = 1; $index <= 30; $index++) {
+					$kode 			= 'k'.sprintf("% 02s", $index);
+					$field_huruf 	= 'h'.sprintf("% 02s", $index);
+					$field_nilai 	= 'n'.sprintf("% 02s", $index);
+					$matpel 		= $getdata->$field_huruf;
+					$kkm 			= $getdata->$field_nilai;
+					$matpel 		= str_replace('Mulok; ', '', $matpel);
+					$matpel 		= str_replace('Wajib; ', '', $matpel);
+					if ($getdata->$kode !== '' && $getdata->$kode !== null) {
+						$datacari 	= $getdata->$kode;
+						$cekjenis 	= explode('[pisah]', $datacari);
+						if (isset($cekjenis[1])) {
+							$afektif 	= $cekjenis[0];
+							$muatan 	= $cekjenis[1];
+							$golekakhir = DB::table('db_nilai')
+											->whereIn('jennilai', ['pts', 'pat'])
+											->where('noinduk', $noinduk)
+											->where('semester', $semestercari)
+											->where('tapel', $tapel)
+											->where('matpel', $muatan)
+											->where('id_sekolah', $id_sekolah)
+											->select('noinduk', DB::raw('AVG(nilai) as rata_rata'))
+											->groupBy('noinduk')
+											->first();
+			
+							$golekharian= DB::table('db_nilai')
+											->whereIn('jennilai', ['p01', 'p02', 'p03', 'p04', 'p05', 'e01', 'e02', 'e03', 'e04', 'e05'])
+											->where('noinduk', $noinduk)
+											->where('semester', $semestercari)
+											->where('tapel', $tapel)
+											->where('matpel', $muatan)
+											->where('id_sekolah', $id_sekolah)
+											->select('noinduk', DB::raw('AVG(nilai) as rata_rata'))
+											->groupBy('noinduk')
+											->first();
+			
+							$rataakhir 	= isset($golekakhir->rata_rata) ? $golekakhir->rata_rata : 0;
+							$rataharian = isset($golekharian->rata_rata) ? $golekharian->rata_rata : 0;
+							$arraysurat[] = [
+								'jenis' 		=> $muatan,
+								'jumlah3' 		=> $rataharian,
+								'jumlah4' 		=> $rataakhir,
+							];
+						}
+					}
+				}
+			}
+			
 		}
-		if ($PPKN3 != 0){ 
-			$arraysurat[] = array(
-				'jenis' 		=> 'PPKn',
-				'jumlah3' 		=> $PPKN3,
-				'jumlah4' 		=> $PPKN4,
-			);
-		 }
-		if ($BI3 != 0){ 
-			$arraysurat[] = array(
-				'jenis' 		=> 'BI',
-				'jumlah3' 		=> $BI3,
-				'jumlah4' 		=> $BI4,
-			);
-		 }
-		if ($MAT3 != 0){ 
-			$arraysurat[] = array(
-				'jenis' 		=> 'MAT',
-				'jumlah3' 		=> $MAT3,
-				'jumlah4' 		=> $MAT4,
-			); 
-		}
-		if ($IPA3 != 0){ 
-			$arraysurat[] = array(
-				'jenis' 		=> 'IPA',
-				'jumlah3' 		=> $IPA3,
-				'jumlah4' 		=> $IPA4,
-			);
-		 }
-		if ($IPS3 != 0){ 
-			$arraysurat[] = array(
-				'jenis' 		=> 'IPS',
-				'jumlah3' 		=> $IPS3,
-				'jumlah4' 		=> $IPS4,
-			);
-		 }
-		if ($SBDP3 != 0){ 
-			$arraysurat[] = array(
-				'jenis' 		=> 'SBDP',
-				'jumlah3' 		=> $SBDP3,
-				'jumlah4' 		=> $SBDP4,
-			);
-		 }
-		if ($PJOK3 != 0){
-			$arraysurat[] = array(
-				'jenis' 		=> 'PJOK',
-				'jumlah3' 		=> $PJOK3,
-				'jumlah4' 		=> $PJOK4,
-			);
-		 }
-		if ($BJ3 != 0){ 
-			$arraysurat[] = array(
-				'jenis' 		=> 'BJ',
-				'jumlah3' 		=> $BJ3,
-				'jumlah4' 		=> $BJ4,
-			);
-		}
-		if ($BING3 != 0){
-			$arraysurat[] = array(
-				'jenis' 		=> 'BING',
-				'jumlah3' 		=> $BING3,
-				'jumlah4' 		=> $BING4,
-			);
-		 }
-		if ($BA3 != 0){ 
-			$arraysurat[] = array(
-				'jenis' 		=> 'BA',
-				'jumlah3' 		=> $BA3,
-				'jumlah4' 		=> $BA4,
-			);
-		 }
-		if ($TIK3 != 0){
-			$arraysurat[] = array(
-				'jenis' 		=> 'TIK',
-				'jumlah3' 		=> $TIK3,
-				'jumlah4' 		=> $TIK4,
-			);
-		 }
-		
-		
 		echo json_encode($arraysurat);
+	}
+	public function viewBiodataSiswa(Request $request) {
+		$data			= [];
+		$urutanwerno	= array('red','green','blue','yellow','navy','teal','orange','maroon','black','aqua');
+		$urutanbg		= array('primary','success','warning','info','danger','secondary','primary','success','warning','info');
+		$id 			= $request->input('id');
+		$previlage  	= Session('previlage');
+        if ($previlage !== null) {
+			$datainduk 	= Datainduk::where('id', $id)->first();
+			if (isset($datainduk->id)){
+				$iduser					= Session('id');
+				$getdatauser			= User::where('id', $iduser)->first();
+				$klsajar				= $getdatauser->klsajar ?? '';
+				$semester 				= $getdatauser->smt ?? '1';
+				$tapel 					= $getdatauser->tapel ?? '';
+				$data['datainduk']  	= $datainduk;
+				$data['semester']  		= $semester;
+				$data['tapel']  		= $tapel;
+				return view('simaster.biodatasiswa', $data);
+			} else {
+				$data['kalimatheader']  = 'Mohon Maaf';
+				$data['kalimatbody']  	= 'ID Siswa '.$id.' Tidak di Temukan';
+				return view('errors.notready', $data);
+			}
+        } else {
+			$data['kalimatheader']  	= 'Mohon Maaf';
+        	$data['kalimatbody']  		= 'Session Expired, Please Reloggin';
+            return view('errors.notready', $data);
+        }
 	}
 	//BUKU TAMU
 	public function exbukuTamu(Request $request) {
@@ -2351,29 +3569,53 @@ class FrontpageController extends Controller
 		$email  	= $request->input('val06');
 		$hape  		= $request->input('val07');
 		$id_sekolah = $request->input('val08');
-		if($request->hasFile('file')) {
-			$ImageExt	= $request->file('file')->getClientOriginalExtension();
-			$file_tmp	= $request->file('file');
-			$data 		= file_get_contents($file_tmp);
-			$foto 		= 'data:image/' . $ImageExt . ';base64,' . base64_encode($data);
-		} else { $foto = ''; }
-		$input = Bukutamu::create([
-			 'nama'			=> $nama, 
-			 'instansi'		=> $instansi, 
-			 'keperluan'	=> $keperluan, 
-			 'hape'			=> $hape, 
-			 'email'		=> $email, 
-			 'pejabat'		=> $pejabat, 
-			 'foto'			=> $foto,
-			 'id_sekolah'	=> $id_sekolah
-		]);
-		if ($input){
-			return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Welcome '.$nama]);
-			return back();
+		
+		if ($nama == 'pengecekanfirebase'){
+			$firebaseid  	= $request->input('val01');
+			$idsekolah   	= $request->input('val03');
+			$ceksekolah 	= Sekolah::where('id', $idsekolah)->first();
+			if (isset($ceksekolah->id)){
+				$url 		= $ceksekolah->domain;
+				if ($firebaseid == '' OR is_null($firebaseid)){
+					$url 	= $url.'/frontpage?id='.$idsekolah;
+				} else {
+					$url 	= $url.'/frontpage?id='.$idsekolah.'?firebaseid='.$firebaseid;
+				}
+			} else {
+				$url 		=  url('/').'/frontpage?id='.$idsekolah;
+			}
+			echo $url;
 		} else {
-			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Sistem Error, Silahkan Coba Beberapa Saat Lagi']);
-			return back();
-		}		
+			if($request->hasFile('file')) {
+				$ImageExt	= $request->file('file')->getClientOriginalExtension();
+				$file_tmp	= $request->file('file');
+				$data 		= file_get_contents($file_tmp);
+				$foto 		= 'data:image/' . $ImageExt . ';base64,' . base64_encode($data);
+			} else { $foto = ''; }
+			$nama 		= formatPesan($nama);
+			$instansi 	= formatPesan($instansi);
+			$keperluan 	= formatPesan($keperluan);
+			$hape 		= formatPesan($hape);
+			$email 		= formatPesan($email);
+			$pejabat 	= formatPesan($pejabat);
+
+			$input = Bukutamu::create([
+				 'nama'			=> $nama,
+				 'instansi'		=> $instansi, 
+				 'keperluan'	=> $keperluan, 
+				 'hape'			=> $hape, 
+				 'email'		=> $email, 
+				 'pejabat'		=> $pejabat, 
+				 'id_sekolah'	=> $id_sekolah
+			]);
+			if ($input){
+				return response()->json(['icon' => 'success', 'warna' => '#5ba035', 'status' => 'Sukses', 'message' => 'Welcome '.$nama]);
+				return back();
+			} else {
+				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Sistem Error, Silahkan Coba Beberapa Saat Lagi']);
+				return back();
+			}
+		}
     }
     public function exTamucari(Request $request) {
         $tahun   	= $request->input('val01');
@@ -2449,93 +3691,128 @@ class FrontpageController extends Controller
 	}
 	public function ctkFormkesanggupan($id){
 		$homebase				= url("/");
-		$rsetting				= Sekolah::where('id', session('sekolah_id_sekolah'))->first();
-		$sekolah 				= $rsetting->nama_sekolah;
-		$yayasan 				= $rsetting->nama_yayasan;
-		$alamat 				= $rsetting->alamat;
-		$kepalasekolah 			= $rsetting->kepala_sekolah->nama;
-		$mutiara 				= $rsetting->slogan;
-		$logo 					= $rsetting->logo;
-		$statppdb				= '';
-		$kodebaru				= '';
-		$kodepindahan 			= '';
-		$hargaformulir 			= '';
-		$namabank 				= '';
-		$norek 					= '';
-		$periode 				= '';
-		$setspp1 				= '';
-		$setspp2 				= '';
-		$setspp3 				= '';
-		$setdpp1 				= '';
-		$setdpp2 				= '';
-		$setdpp3 				= '';
-		$byrdpp1 				= '';
-		$byrdpp2 				= '';
-		$byrdpp3 				= '';
-		$sql 					= Layanan::orderBy('layanan', 'ASC')->get();
-		if (!empty($sql)){
-			foreach ($sql as $rlayanan){
-				$status 		= $rlayanan->status;
-				$layanan 		= $rlayanan->layanan;
-				if ($layanan == 'periodepsb') { $periode = $status; }
-				if ($layanan == 'ppdb') { $statppdb = $status; }
-				if ($layanan == 'kodebaru') { $kodebaru = $status; }
-				if ($layanan == 'kodepindahan') { $kodepindahan = $status; }
-				if ($layanan == 'hargaformulir') { $hargaformulir = $status; }
-				if ($layanan == 'namabank') { $namabank = $status; }
-				if ($layanan == 'norek') { $norek = $status; }
-				if ($layanan == 'spp1') { $setspp1 = $status; }
-				if ($layanan == 'spp2') { $setspp2 = $status; }
-				if ($layanan == 'spp3') { $setspp3 = $status; }
-				if ($layanan == 'dpp1') { $setdpp1 = $status; }
-				if ($layanan == 'dpp2') { $setdpp2 = $status; }
-			}
-		}
-		if ($setspp1 != ''){
-			$byrspp1 = number_format( $setspp1 , 0 , '.' , ',' );
-		} else { $byrspp1 = 0; }
-		if ($setspp2 != ''){
-			$byrspp2 = number_format( $setspp2 , 0 , '.' , ',' );
-		} else { $byrspp2 = 0; }
-		if ($setspp3 != ''){
-			$byrspp3 = number_format( $setspp3 , 0 , '.' , ',' );
-		} else { $byrspp3 = 0; }
-		if ($setdpp1 != ''){
-			$byrdpp1 = number_format( $setdpp1 , 0 , '.' , ',' );
-		}
-		if ($setdpp2 != ''){
-			$byrdpp2 = number_format( $setdpp2 , 0 , '.' , ',' );
-		}
-		if ($setdpp3 != ''){
-			$byrdpp3 = number_format( $setdpp3 , 0 , '.' , ',' );
-		}
-		$cekdata				= Datapsb::where('id', $id)->count();
-		if ($cekdata != 0){
-			$datapsb				= Datapsb::where('id', $id)->orderBy('id', 'DESC')->first();
+		$datapsb				= $this->getAuthorizedPpdbRecord($id);
+		if (isset($datapsb->id)){
+			$statppdb				= '';
+			$kodebaru				= '';
+			$kodepindahan 			= '';
+			$hargaformulir 			= '';
+			$namabank 				= '';
+			$norek 					= '';
+			$periode 				= '';
+			$setspp1 				= '';
+			$setspp2 				= '';
+			$setspp3 				= '';
+			$setdpp1 				= '';
+			$setdpp2 				= '';
+			$setdpp3 				= '';
+			$byrdpp1 				= '';
+			$byrdpp2 				= '';
+			$byrdpp3 				= '';
 			$nik					= $datapsb->nik;
-			$cekpelengkap			= Datapelengkappsb::where('niksiswa', $nik)->first();
-			if (isset($cekpelengkap->niksiswa)){
-				$scanakta 	= $cekpelengkap->scanakta;
-				$scanfoto	= $cekpelengkap->scanfoto;
-				$scankk 	= $cekpelengkap->scankk;
-				$scanket 	= $cekpelengkap->scanket;
-				$telpon 	= $cekpelengkap->telpon;
+			$rsetting				= Sekolah::where('id', $datapsb->id_sekolah)->first();
+			$sekolah 				= $rsetting->nama_sekolah;
+			$yayasan 				= $rsetting->nama_yayasan;
+			$alamat 				= $rsetting->alamat;
+			$kepalasekolah 			= $rsetting->kepala_sekolah->nama;
+			$mutiara 				= $rsetting->slogan;
+			$logo 					= $rsetting->logo;
+			$kopsurat 				= $rsetting->kopsurat;
+			if ($kopsurat == '' OR $kopsurat == null){
+				$kopsurat			= '<tr>
+										<td colspan="3" rowspan="9" align="left" valign="top" style="border-bottom:double"><img src="'.$logo.'" width="120" height="120" /></td>
+										<td colspan="6">&nbsp;</td>
+										<td colspan="2" rowspan="2" align="center" valign="middle" style="border-bottom:double; border-top:double; border-left:double; border-right:double;"><strong>'.$datapsb->kodependaf.'</strong></td>
+									</tr>
+									<tr>
+										<td colspan="6">&nbsp;</td>
+									</tr>
+									<tr>
+										<td colspan="8" align="center"><b>'.$yayasan.'</b></td>
+									</tr>
+									<tr>
+										<td colspan="8" align="center"><b>'.$sekolah.'</b></td>
+									</tr>
+									<tr>
+										<td colspan="8" align="center"><strong>PANITIA PENERIMAAN PESERTA  DIDIK BARU (P2DB)</strong></td>
+									</tr>
+									<tr>
+										<td colspan="8" align="center">'.config('global.nomerinduksekolah').'</td>
+									</tr>
+									<tr>
+										<td colspan="8" align="center"><strong>'.$alamat.'</strong></td>
+									</tr>
+									<tr>
+										<td colspan="8" align="center">'.config('global.email').'</td>
+									</tr>
+									<tr>
+										<td width="21" style="border-bottom:double">&nbsp;</td>
+										<td width="33" style="border-bottom:double">&nbsp;</td>
+										<td width="56" style="border-bottom:double">&nbsp;</td>
+										<td width="22" style="border-bottom:double">&nbsp;</td>
+										<td width="25" style="border-bottom:double">&nbsp;</td>
+										<td width="198" style="border-bottom:double">&nbsp;</td>
+										<td width="39" style="border-bottom:double">&nbsp;</td>
+										<td width="129" style="border-bottom:double">&nbsp;</td>
+									</tr>';
 			} else {
-				$scanakta 	= '';
-				$scanfoto	= '';
-				$scankk 	= '';
-				$scanket 	= '';
-				$telpon 	= '';
+				$kopsurat			= '<tr><td colspan="11"><img src="'.$homebase.'/'.$kopsurat.'" width="100%" /></td></tr>';
 			}
-			$statcetak	= '';
+			$sql 					= Layanan::where('id_sekolah', $datapsb->id_sekolah)->orderBy('layanan', 'ASC')->get();
+			if (!empty($sql)){
+				foreach ($sql as $rlayanan){
+					$status 		= $rlayanan->status;
+					$layanan 		= $rlayanan->layanan;
+					if ($layanan == 'periodepsb') { $periode = $status; }
+					if ($layanan == 'ppdb') { $statppdb = $status; }
+					if ($layanan == 'kodebaru') { $kodebaru = $status; }
+					if ($layanan == 'kodepindahan') { $kodepindahan = $status; }
+					if ($layanan == 'hargaformulir') { $hargaformulir = $status; }
+					if ($layanan == 'namabank') { $namabank = $status; }
+					if ($layanan == 'norek') { $norek = $status; }
+					if ($layanan == 'spp1') { $setspp1 = $status; }
+					if ($layanan == 'spp2') { $setspp2 = $status; }
+					if ($layanan == 'spp3') { $setspp3 = $status; }
+					if ($layanan == 'dpp1') { $setdpp1 = $status; }
+					if ($layanan == 'dpp2') { $setdpp2 = $status; }
+				}
+			}
+			if ($setspp1 != ''){
+				$byrspp1 = number_format( $setspp1 , 0 , '.' , ',' );
+			} else { $byrspp1 = 0; }
+			if ($setspp2 != ''){
+				$byrspp2 = number_format( $setspp2 , 0 , '.' , ',' );
+			} else { $byrspp2 = 0; }
+			if ($setspp3 != ''){
+				$byrspp3 = number_format( $setspp3 , 0 , '.' , ',' );
+			} else { $byrspp3 = 0; }
+			if ($setdpp1 != ''){
+				$byrdpp1 = number_format( $setdpp1 , 0 , '.' , ',' );
+			}
+			if ($setdpp2 != ''){
+				$byrdpp2 = number_format( $setdpp2 , 0 , '.' , ',' );
+			}
+			if ($setdpp3 != ''){
+				$byrdpp3 = number_format( $setdpp3 , 0 , '.' , ',' );
+			}
+			$cekpelengkap	= Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah', $datapsb->id_sekolah)->first();
+			$scanakta		= $cekpelengkap->getPSBAkta->xfile ?? '';
+			$scanfoto		= $cekpelengkap->getPSBFoto->xfile ?? '';
+			$scankk			= $cekpelengkap->getPSBKK->xfile ?? '';
+			$scanket		= $cekpelengkap->getPSBKet->xfile ?? '';
+			$scanbukti		= $cekpelengkap->getPSBBukti->xfile ?? '';
+			
+			$statcetak		= '';
 			if ($scanakta == ''){ $statcetak = $statcetak.'<br />Mohon Melengkapi Scan/Foto Akta Terlebih Dahulu'; }
 			if ($scanfoto == ''){ $statcetak = $statcetak.'<br />Mohon Melengkapi Scan Foto Terlebih Dahulu'; }
 			if ($scankk == ''){ $statcetak = $statcetak.'<br />Mohon Melengkapi Scan/Foto Kartu Keluarga Terlebih Dahulu'; }
-			if ($scanket == ''){ $statcetak = $statcetak.'<br />Mohon Melengkapi Scan/Foto Keterangan dari Sekolah Terlebih Dahulu'; }
+			if ($scanket == ''){ $statcetak = $statcetak.'<br />Mohon Melengkapi Scan/Foto Keterangan Lulus'; }
+			
 			$tahun					= date("Y");
 			$tasks					= [];
 			$tasks['logo']			= $homebase.'/'.$logo;
 			$tasks['logo_grey']		= $homebase.'/'.$rsetting->logo_grey;
+			$tasks['kopsurat']		= $kopsurat;
 			$tasks['rsetting']		= $rsetting;
 			$tasks['yayasan']		= $yayasan;
 			$tasks['sekolah']		= $sekolah;
@@ -2554,14 +3831,14 @@ class FrontpageController extends Controller
 			$tasks['tahun']			= $tahun;
 			return view('cetak.formkesanggupan', $tasks);
 		} else {
-			return view('error.hilang');
+			return view('errors.hilang');
 		}
     }
 	public function viewObservasi($id){
 		$homebase			= url("/");
-		$cekdata 			= Datapsb::where('id', $id)->count();
-		if ($cekdata == 0){
-			return view('error.hilang');
+		$getdata 			= $this->getAuthorizedPpdbRecord($id);
+		if (!isset($getdata->id)){
+			return view('errors.hilang');
 		} else {
 			$bulanlist 		= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
 			$tgliki			= date("d");
@@ -2578,8 +3855,8 @@ class FrontpageController extends Controller
 			$kepalasekolah 	= $rsetting->kepala_sekolah->nama;
 			$mutiara 		= $rsetting->slogan;
 			$logo 			= $rsetting->logo;
+			$logo_grey 		= $rsetting->logo_grey;
 			$ketuapanitia	= $kepalasekolah;
-			$getdata 		= Datapsb::where('id', $id)->first();
 			$nik			= $getdata->nik;
 			$kodependaf		= $getdata->kodependaf;
 			$nama 			= $getdata->nama;
@@ -2639,21 +3916,17 @@ class FrontpageController extends Controller
 			$gedung			= (int)$getdata->dana2;
 			$spp			= (int)$getdata->dana3;
 			$kegiatan		= $getdata->dana4;
+			$getnamawaka 	= Dataindukstaff::where('id_sekolah', Session('sekolah_id_sekolah'))->where('jabatan', 'Waka Kesiswaan')->first();
+			$wakakesiswaan 	= $getnamawaka->nama ?? '';
 			
 			$cekpelengkap	= Datapelengkappsb::where('niksiswa', $nik)->first();
-			if (isset($cekpelengkap->niksiswa)){
-				$scanakta 	= $cekpelengkap->scanakta;
-				$scanfoto	= $cekpelengkap->scanfoto;
-				$scankk 	= $cekpelengkap->scankk;
-				$scanket 	= $cekpelengkap->scanket;
-				$telpon 	= $cekpelengkap->telpon;
-			} else {
-				$scanakta 	= '';
-				$scanfoto	= '';
-				$scankk 	= '';
-				$scanket 	= '';
-				$telpon 	= '';
-			}
+			$scanakta		= $cekpelengkap->getPSBAkta->xfile ?? $homebase.'/dist/img/aktehilang.png';
+			$scanfoto		= $cekpelengkap->getPSBFoto->xfile ?? $homebase.'/dist/img/fotohilang.png';
+			$scankk			= $cekpelengkap->getPSBKK->xfile ?? $homebase.'/dist/img/kkhilang.png';
+			$scanket		= $cekpelengkap->getPSBKet->xfile ?? $homebase.'/dist/img/kethilang.png';
+			$scanbukti		= $cekpelengkap->getPSBBukti->xfile ?? $homebase.'/dist/img/buktihilang.png';
+			$telpon			= $cekpelengkap->telpon ?? '';
+			
 
 			$statppdb				= '';
 			$kodebaru				= '';
@@ -2668,7 +3941,7 @@ class FrontpageController extends Controller
 			$setdpp1 				= '';
 			$setdpp2 				= '';
 			$setdpp3 				= '';
-			$sql 					= Layanan::orderBy('layanan', 'ASC')->get();
+			$sql 					= Layanan::where('id_sekolah', session('sekolah_id_sekolah'))->orderBy('layanan', 'ASC')->get();
 			if (!empty($sql)){
 				foreach ($sql as $rlayanan){
 					$status 		= $rlayanan->status;
@@ -2697,6 +3970,7 @@ class FrontpageController extends Controller
 			$tot3a		= 0;
 			$tot3b		= 0;
 			$tot4		= 0;
+			
 			if ($hasil == 'DITERIMA'){
 				if ($n1 != ''){ 
 					$pembagi1++; 
@@ -2842,7 +4116,7 @@ class FrontpageController extends Controller
 					<td colspan="8" class="judul">'.$alamat.'</td>
 				  </tr>
 				  <tr>
-					<td colspan="8" class="judul">NIS : '.$rsetting->nis.' – NSS : '.$rsetting->nss.' – NPSN : '.$rsetting->npsn.'</td>
+					<td colspan="8" class="judul">NIS : '.$rsetting->nis.' - NSS : '.$rsetting->nss.' - NPSN : '.$rsetting->npsn.'</td>
 				  </tr>
 				  <tr>
 					<td colspan="8" class="judul"><i>Telpon '.$rsetting->telp.' Email '.$rsetting->email.'</i></td>
@@ -3091,7 +4365,7 @@ class FrontpageController extends Controller
 				  </tr>
 				  <tr>
 					<td colspan="5" align="center"><strong>'.$kepalasekolah.'</strong></td>
-					<td colspan="6" align="center"><strong>__________________</strong></td>
+					<td colspan="6" align="center"><strong>'.$wakakesiswaan.'</strong></td>
 				  </tr>
 				</table>
 				<div style="page-break-before: always">
@@ -3110,7 +4384,7 @@ class FrontpageController extends Controller
 					<td colspan="9">Terakreditasi A</td>
 				  </tr>
 				  <tr>
-					<td colspan="9" class="judul">NIS : '.$rsetting->nis.' – NSS : '.$rsetting->nss.' – NPSN : '.$rsetting->npsn.'</td>
+					<td colspan="9" class="judul">NIS : '.$rsetting->nis.' - NSS : '.$rsetting->nss.' - NPSN : '.$rsetting->npsn.'</td>
 				  </tr>
 				  <tr>
 					<td colspan="9" class="judul"><i>Telpon '.$rsetting->telp.' Email '.$rsetting->email.'</i></td>
@@ -3247,11 +4521,10 @@ class FrontpageController extends Controller
 				  </tr>
 				  <tr>
 					<td colspan="5" align="center"><strong>'.$kepalasekolah.'</strong></td>
-					<td colspan="6" align="center"><strong>__________________</strong></td>
+					<td colspan="6" align="center"><strong>'.$wakakesiswaan.'</strong></td>
 				  </tr>
 				</table>';
-			}
-			else if ($hasil == 'BELUM DITERIMA'){
+			} else if ($hasil == 'BELUM DITERIMA'){
 				$generatetbl= '
 				<table width="800" border="0" cellpadding="0" cellspacing="0">
 				  <tr>
@@ -3268,7 +4541,7 @@ class FrontpageController extends Controller
 					<td colspan="8" class="judul">'.$alamat.'</td>
 				  </tr>
 				  <tr>
-					<td colspan="8" class="judul">NIS : '.$rsetting->nis.' – NSS : '.$rsetting->nss.' – NPSN : '.$rsetting->npsn.'</td>
+					<td colspan="8" class="judul">NIS : '.$rsetting->nis.' - NSS : '.$rsetting->nss.' - NPSN : '.$rsetting->npsn.'</td>
 				  </tr>
 				  <tr>
 					<td colspan="8" class="judul"><i>Telpon '.$rsetting->telp.' Email '.$rsetting->email.'</i></td>
@@ -3402,11 +4675,10 @@ class FrontpageController extends Controller
 				  </tr>
 				  <tr>
 					<td colspan="5" align="center"><strong>'.$kepalasekolah.'</strong></td>
-					<td colspan="6" align="center"><strong>___________________</strong></td>
+					<td colspan="6" align="center"><strong>'.$wakakesiswaan.'</strong></td>
 				  </tr>
 				</table>';
-			}
-			else {
+			} else {
 				$generatetbl= '
 				<table width="800" border="0" cellpadding="0" cellspacing="0">
 				  <tr>
@@ -3423,7 +4695,7 @@ class FrontpageController extends Controller
 					<td colspan="8" class="judul">'.$alamat.'</td>
 				  </tr>
 				  <tr>
-					<td colspan="8" class="judul">NIS : '.$rsetting->nis.' – NSS : '.$rsetting->nss.' – NPSN : '.$rsetting->npsn.'</td>
+					<td colspan="8" class="judul">NIS : '.$rsetting->nis.' - NSS : '.$rsetting->nss.' - NPSN : '.$rsetting->npsn.'</td>
 				  </tr>
 				  <tr>
 					<td colspan="8" class="judul"><i>Telpon '.$rsetting->telp.' Email '.$rsetting->email.'</i></td>
@@ -3557,7 +4829,7 @@ class FrontpageController extends Controller
 				  </tr>
 				  <tr>
 					<td colspan="5" align="center"><strong>'.$kepalasekolah.'</strong></td>
-					<td colspan="6" align="center"><strong>__________________</strong></td>
+					<td colspan="6" align="center"><strong>'.$wakakesiswaan.'</strong></td>
 				  </tr>
 				</table>';
 			}
@@ -3566,14 +4838,16 @@ class FrontpageController extends Controller
 			$tasks 					= [];
 			$tasks['generatetbl']	= $generatetbl;
 			$tasks['qrcode']		= $qrcode;
+			$tasks['logo_grey']		= url('/').'/'.$logo_grey;
+		
 			return view('cetak.observasi', $tasks);
 		}		
 	}
 	public function viewBiodatapsb($id){
 		$homebase			= url("/");
-		$cekdata 			= Datapsb::where('id', $id)->count();
-		if ($cekdata == 0){
-			return view('error.hilang');
+		$getdata 			= $this->getAuthorizedPpdbRecord($id);
+		if (!isset($getdata->id)){
+			return view('errors.hilang');
 		} else {
 			$bulanlist 		= array(1 => "Januari", 2 => "Februari", 3 => "Maret", 4 => "April", 5 => "Mei", 6 => "Juni", 7 => "Juli", 8 => "Agustus", 9 => "September", 10 => "Oktober", 11 => "November", 12 => "Desember");
 			$tgliki			= date("d");
@@ -3584,7 +4858,6 @@ class FrontpageController extends Controller
 			$alamatcetak	= $homebase.'/biodatapsb/'.$id;
 			$qrcode 		= QrCode::size(150)->generate($alamatcetak);
 			$ketuapanitia	= '________________';
-			$getdata 		= Datapsb::where('id', $id)->first();
 			$nik			= $getdata->nik;
 			$kodependaf		= $getdata->kodependaf;
 			$nama 			= $getdata->nama;
@@ -3656,41 +4929,11 @@ class FrontpageController extends Controller
 			else { $alamatwali = ''; }
 
 			$cekpelengkap	= Datapelengkappsb::where('niksiswa', $nik)->first();
-			if (isset($cekpelengkap->niksiswa)){
-				if ($cekpelengkap->scanakta == ''){
-					$scanakta 	= $homebase.'/dist/img/aktehilang.png';
-				} else {
-					$scanakta 	= $homebase.'/dist/img/berkas/'.$cekpelengkap->scanakta;
-				}
-				if ($cekpelengkap->scanfoto == ''){
-					$scanfoto	= $homebase.'/dist/img/fotohilang.png';
-				} else {
-					$scanfoto	= $homebase.'/dist/img/berkas/'.$cekpelengkap->scanfoto;
-				}
-				if ($cekpelengkap->scankk == ''){
-					$scankk 	= $homebase.'/dist/img/kkhilang.png';
-				} else {
-					$scankk 	= $homebase.'/dist/img/berkas/'.$cekpelengkap->scankk;
-				}
-				if ($cekpelengkap->scanket == ''){
-					$scanket 	= $homebase.'/dist/img/kethilang.png';
-				} else {
-					$scanket 	= $homebase.'/dist/img/berkas/'.$cekpelengkap->scanket;
-				}
-				if ($cekpelengkap->scanbukti == ''){
-					$scanbukti 	= $homebase.'/dist/img/buktihilang.png';
-				} else {
-					$scanbukti 	= $homebase.'/dist/img/berkas/'.$cekpelengkap->scanbukti;
-				}
-			} else {
-				$scanakta 	= $homebase.'/dist/img/aktehilang.png';
-				$scanfoto	= $homebase.'/dist/img/fotohilang.png';
-				$scankk 	= $homebase.'/dist/img/kkhilang.png';
-				$scanket 	= $homebase.'/dist/img/kethilang.png';
-				$scanbukti 	= $homebase.'/dist/img/buktihilang.png';
-			}
-			
-			
+			$scanakta		= $cekpelengkap->getPSBAkta->xfile ?? $homebase.'/dist/img/aktehilang.png';
+			$scanfoto		= $cekpelengkap->getPSBFoto->xfile ?? $homebase.'/dist/img/fotohilang.png';
+			$scankk			= $cekpelengkap->getPSBKK->xfile ?? $homebase.'/dist/img/kkhilang.png';
+			$scanket		= $cekpelengkap->getPSBKet->xfile ?? $homebase.'/dist/img/kethilang.png';
+			$scanbukti		= $cekpelengkap->getPSBBukti->xfile ?? $homebase.'/dist/img/buktihilang.png';
 			if ($cekpelengkap->gayah == 'rangegaji1'){ 
 				$tulisgajiayah = '&lt; Rp. 500.000,00'; 
 			} else if ($cekpelengkap->gayah == 'rangegaji2'){ 
@@ -3726,7 +4969,7 @@ class FrontpageController extends Controller
 			$setdpp1 				= '';
 			$setdpp2 				= '';
 			$setdpp3 				= '';
-			$sql 					= Layanan::orderBy('layanan', 'ASC')->get();
+			$sql 					= Layanan::where('id_sekolah', session('sekolah_id_sekolah'))->orderBy('layanan', 'ASC')->get();
 			if (!empty($sql)){
 				foreach ($sql as $rlayanan){
 					$status 		= $rlayanan->status;
@@ -3747,553 +4990,557 @@ class FrontpageController extends Controller
 			}
 			$generatetbl= '
 				<table width="800" cellpadding="0" cellspacing="0" id="printiki">
-				  <tr>
-					<td colspan="3" rowspan="6"><img src="'.$homebase.'/'.$logo.'" width="98" height="98" /></td>
-					<td colspan="5">'.$yayasan.'</td>
-					<td width="58">NO.</td>
-					<td width="172" style="border-bottom:1px solid black;border-top:1px solid black;border-left:1px solid black;border-right:1px solid black;text-align:center;vertical-align:middle;">'.$kodependaf.'</td>
-				  </tr>
-				  <tr>
-					<td colspan="7">'.$sekolah.'</td>
-				  </tr>
-				  <tr>
-					<td colspan="7">Terakreditasi A</td>
-				  </tr>
-				  <tr>
-				 	 <td colspan="7" class="judul">NIS : '.$rsetting->nis.' – NSS : '.$rsetting->nss.' – NPSN : '.$rsetting->npsn.'</td>
-				  </tr>
-				  <tr>
-					<td colspan="7">'.$alamat.'</td>
-				  </tr>
-				  <tr>
-				  	<td colspan="7" style="color: #00F"><i>Telpon '.$rsetting->telp.' Email '.$rsetting->email.'</i></td>
-				  </tr>
-				  <tr>
-					<td align="left" valign="top" style="border-top:double">&nbsp;</td>
-					<td align="left" valign="top" style="border-top:double">&nbsp;</td>
-					<td width="51" align="left" valign="top" style="border-top:double">&nbsp;</td>
-					<td width="241" align="left" valign="top" style="border-top:double">&nbsp;</td>
-					<td align="left" valign="top" style="border-top:double">&nbsp;</td>
-					<td width="26" align="left" valign="top" style="border-top:double">&nbsp;</td>
-					<td width="61" align="left" valign="top" style="border-top:double">&nbsp;</td>
-					<td align="left" valign="top" style="border-top:double">&nbsp;</td>
-					<td align="left" valign="top" style="border-top:double">&nbsp;</td>
-					<td align="left" valign="top" style="border-top:double">&nbsp;</td>
-				  </tr>
-				  <tr>
-					<td colspan="10" align="center"><strong>FORMULIR PENDAFTARAN SISWA BARU</strong></td>
-				  </tr>
-				  <tr>
-					<td colspan="10" align="center"><strong>TAHUN PELAJARAN '.$tamasuk.'</strong></td>
-				  </tr>
-				  <tr>
-					<td colspan="10" align="center">&nbsp;</td>
-				  </tr>
-				  <tr>
-					<td colspan="10"></td>
-				  </tr>
-				  <tr>
-					<td colspan="10" style="background:#999; border-bottom:1px solid black;border-top:1px solid black;"><strong>DATA UMUM</strong></td>
-				  </tr>
-				  <tr>
-					<td colspan="10"><b><u>A. IDENTITAS CALON SISWA :</u></b></td>
-				  </tr>
-				  <tr>
-					<td width="27">1</td>
-					<td colspan="9">Nama Peserta Didik</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">a.Lengkap (sesuai akta kelahiran)</td>
-					<td width="7">:</td>
-					<td colspan="5">'.$nama.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">b. Panggilan</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->panggilan.'</td>
-				  </tr>
-				  <tr>
-					<td>2</td>
-					<td colspan="3">NIK SISWA</td>
-					<td>:</td>
-					<td colspan="5">'.$nik.'</td>
-				  </tr>
-				  <tr>
-					<td>3</td>
-					<td colspan="3">Jenis Kelamin</td>
-					<td>:</td>
-					<td colspan="5">'.$kelamin.'</td>
-				  </tr>
-				  <tr>
-					<td>4</td>
-					<td colspan="9">Kelahiran</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">a. Tempat</td>
-					<td>:</td>
-					<td colspan="5">'.$tmplahir.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">b. Tanggal-Bln-Tahun</td>
-					<td>:</td>
-					<td colspan="5">'.$tgllahir.' </td>
-				  </tr>
-				  <tr>
-					<td>5</td>
-					<td colspan="3">Umur (per Juli $thniki)</td>
-					<td>:</td>
-					<td colspan="5">'.$umur.'</td>
-				  </tr>
-				  <tr>
-					<td>6</td>
-					<td colspan="3">Agama</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->agama.'</td>
-				  </tr>
-				  <tr>
-					<td>7</td>
-					<td colspan="3">Kewarganegaraan</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->warga.'</td>
-				  </tr>
-				  <tr>
-					<td>8</td>
-					<td colspan="3">Anak Ke</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->anakke.' Dengan Jumlah Saudara :</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">a. Kandung</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->kandung.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">b. Tiri</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->tiri.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">c. Angkat</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->angkat.'</td>
-				  </tr>
-				  <tr>
-					<td>9</td>
-					<td colspan="3">Bahasa Sehari-hari di keluarga</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->bahasa.'</td>
-				  </tr>
-				  <tr>
-					<td>10</td>
-					<td colspan="3">Golongan Darah</td>
-					<td>:</td>
-					<td colspan="5">'.$darah.'</td>
-				  </tr>
-				  <tr>
-					<td>11</td>
-					<td colspan="9">Keadaan Jasmani</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">a.Berat badan</td>
-					<td>:</td>
-					<td colspan="5">'.$berat.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">b.Tinggi badan</td>
-					<td>:</td>
-					<td colspan="5">'.$tinggi.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">c.Penyakit yang pernah di derita</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->penyakit.'</td>
-				  </tr>
-				  <tr>
-					<td valign="top">11</td>
-					<td colspan="3" valign="top">Alamat Rumah</td>
-					<td valign="top">:</td>
-					<td colspan="5" valign="top">RT. '.$erte.' RW. '.$erwe.' KELURAHAN '.$kelurahan.' KECAMATAN '.$kecamatan.' KOTA/KABUPATEN '.$kota.' KODEPOS '.$kodepos.'</td>
-				  </tr>
-				  <tr>
-					<td>12</td>
-					<td colspan="3">Telepon Rumah</td>
-					<td>:</td>
-					<td colspan="5">'.$telpon.'</td>
-				  </tr>
-				  <tr>
-					<td>13</td>
-					<td colspan="3">Bertempat tinggal bersama</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->bersama.'</td>
-				  </tr>
-				  <tr>
-					<td>14</td>
-					<td colspan="3">Jarak tempat tinggal ke sekolah</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->jarak.' km</td>
-				  </tr>
-				  <tr>
-					<td colspan="10">&nbsp;</td>
-				  </tr>
-				  <tr>
-					<td colspan="10"><b><u>B. PERKEMBANGAN PESERTA DIDIK</u></b></td>
-				  </tr>
-				  <tr>
-					<td>1</td>
-					<td colspan="9">Masuk menjadi Peserta didik baru tingkat I</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">a.Asal Sekolah</td>
-					<td>:</td>
-					<td colspan="5">'.$asal.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">b.Alamat Sekolah Sebelumnya</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->alamattk.'</td>
-				  </tr>
-				  <tr>
-					<td>2</td>
-					<td colspan="9">Pindahan dari sekolah lain</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">a.Nama sekolah asal</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->pindahasal.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">b.Dari tingkat</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->pindahkelas.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">c.Diterima tanggal</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->pindahtgl.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">d.Ditingkat</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->pindahkekls.'</td>
-				  </tr>
-				  <tr>
-					<td>3</td>
-					<td colspan="9">NILAI RATA-RATA  RAPOT SEMESTER 1-5</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">a. Semester 1</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->semester1.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">b. Semester 2</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->semester2.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">c. Semester 3</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->semester3.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">d. Semester 4</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->semester4.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">e. Semester 5</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->semester5.'</td>
-				  </tr>
-				  <tr>
-					<td colspan="10">&nbsp;</td>
-				  </tr>
-				  <tr>
-					<td colspan="10"><b><u>C. IDENTITAS ORANG TUA/WALI :</u></b></td>
-				  </tr>
-				  <tr>
-					<td>1</td>
-					<td colspan="9">Ayah</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">a.Nama</td>
-					<td>:</td>
-					<td colspan="5">'.$namaayah.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">b.Pendidikan terakhir</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->payah.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">c.Pekerjaan</td>
-					<td>:</td>
-					<td colspan="5">'.$kerjaayah.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="9"><span style="color: #999">(jika wiraswasta disebutkan secara spesifik)</span></td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">d.Total Penghasilan satu bulan</td>
-					<td>:</td>
-					<td colspan="5">'.$tulisgajiayah.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">e.Alamat lengkap</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->aayah.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="9" style="color: #999">(diisi jika tidak serumah dengan calon siswa)</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">f.No. Telpon / HP yang bisa dihubungi</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->hayah.'</td>
-				  </tr>
-				  <tr>
-					<td colspan="10">&nbsp;</td>
-				  </tr>
-				  <tr>
-					<td>2</td>
-					<td colspan="9">Ibu</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">a.Nama</td>
-					<td>:</td>
-					<td colspan="5">'.$namaibu.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">b.Pendidikan Terakhir</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->pibu.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">c.Pekerjaan</td>
-					<td>:</td>
-					<td colspan="5">'.$kerjaibu.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="9" style="color: #999">(jika wiraswasta disebutkan secara spesifik)</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">d.Total Penghasilan satu bulan</td>
-					<td>:</td>
-					<td colspan="5">'.$tulisgajiibu.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">e.Alamat Lengkap</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->aaibu.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="9"><span style="color: #999">(diisi jika tidak serumah dengan calon siswa)</span></td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">f.No. Telpon / HP yang bisa dihubungi</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->hibu.'</td>
-				  </tr>
-				  <tr>
-					<td colspan="10">&nbsp;</td>
-				  </tr>
-				  <tr>
-					<td>3</td>
-					<td colspan="9">Wali Peserta Didik (jika mempunyai)</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">a.Nama</td>
-					<td>:</td>
-					<td colspan="5">'.$wali.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">b.Hubungan keluarga</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->hubwali.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">c.Pekerjaan/Jabatan</td>
-					<td>:</td>
-					<td colspan="5">'.$pekerjaanwali.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">d.Agama</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->agamawali.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">e.Alamat</td>
-					<td>:</td>
-					<td colspan="5">'.$alamatwali.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="3">f.No. Telpon / HP yang bisa dihubungi</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->hwali.'</td>
-				  </tr>
-				  <tr>
-					<td colspan="10">&nbsp;</td>
-				  </tr>
-				  <tr>
-					<td colspan="10" style="background:#999; border-bottom:1px solid black;border-top:1px solid black;"><strong>DATA KHUSUS CALON SISWA</strong></td>
-				  </tr>
-				  <tr>
-					<td valign="top">1</td>
-					<td colspan="3" valign="top">Kesulitan yang pernah dialami selama disekolah asal</td>
-					<td valign="top">:</td>
-					<td colspan="5" valign="top">'.$cekpelengkap->kesulitan.'</td>
-				  </tr>
-				  <tr>
-					<td>2</td>
-					<td colspan="3">Orang-orang yang tinggal bersama calon siswa</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->anggotarumah.'</td>
-				  </tr>
-				  <tr>
-					<td>3</td>
-					<td colspan="3">Kegiatan yang dapat dilakukan sendiri</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->kegiatansendiri.'</td>
-				  </tr>
-				  <tr>
-					<td>4</td>
-					<td colspan="3">Penglihatan</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->mata.'</td>
-				  </tr>
-				  <tr>
-					<td>5</td>
-					<td colspan="3">Pendengaran</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->telinga.'</td>
-				  </tr>
-				  <tr>
-					<td>6</td>
-					<td colspan="3">Penampilan</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->wajah.'</td>
-				  </tr>
-				  <tr>
-					<td>7</td>
-					<td colspan="3">Gaya belajar calon siswa (jika diketahui) </td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->gybljr.'</td>
-				  </tr>
-				  <tr>
-					<td>8</td>
-					<td colspan="3">Bakat khusus yang menonjol </td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->bakat.'</td>
-				  </tr>
-				  <tr>
-					<td>9</td>
-					<td colspan="3">Sumber Informasi</td>
-					<td>:</td>
-					<td colspan="5">'.$cekpelengkap->sumberinfo.'</td>
-				  </tr>
-				  <tr>
-					<td>10</td>
-					<td colspan="9">Prestasi yang pernah diraih selama di TK (dilengkapi dengan foto atau fotokopi piagam penghargaan):</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td width="27">a. </td>
-					<td colspan="8">'.$cekpelengkap->prestasi1.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td>b. </td>
-					<td colspan="8">'.$cekpelengkap->prestasi2.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td>c. </td>
-					<td colspan="8">'.$cekpelengkap->prestasi3.'</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td>d. </td>
-					<td colspan="8">'.$cekpelengkap->prestasi4.'</td>
-				  </tr>
-				  <tr>
-					<td colspan="10">&nbsp;</td>
-				  </tr>
-				  <tr>
-					<td colspan="10" style="font-size: x-small">Dimohon segera ke '.$sekolah.' untuk mengumpulkan persyaratan berupa :</td>
-				  </tr>
-				  <tr>
-					<td style="font-size: x-small">1</td>
-					<td colspan="6" style="font-size: x-small"><a href="'.$scanakta.'" target="_blank">Melampirkan fotocopy akta kelahiran dan fotocopy kartu keluarga</a></td>
-					<td width="128" rowspan="4" style="border-bottom:1px solid black;border-top:1px solid black;border-left:1px solid black;border-right:1px solid black;text-align:center;vertical-align:middle; "><img src="'.$scanfoto.'" width="98" height="120" /></td>
-					<td colspan="2" style="text-align: center">'.config('global.kota').', '.$tanggalctk.'</td>
-				  </tr>
-				  <tr>
-					<td style="font-size: x-small">2</td>
-					<td colspan="6" style="font-size: x-small"><a href="'.$scanfoto.'" target="_blank">Foto 4x6 sebanyak 2 lembar</a></td>
-					<td colspan="2" style="text-align: center">Orang Tua / Wali</td>
-				  </tr>
-				  <tr>
-					<td height="97" valign="top" style="font-size: x-small">3</td>
-					<td colspan="6" style="font-size: x-small" valign="top"><a href="'.$scankk.'" target="_blank">Slip Gaji Orang Tua</a><br /><a href="'.$scanket.'" target="_blank">Melampirkan fotocopy Raport dan Surat Pengantar dari Sekolah Asal</a></td>
-					<td colspan="2">&nbsp;</td>
-				  </tr>
-				  <tr>
-					<td>&nbsp;</td>
-					<td colspan="6" style="font-size: x-small">&nbsp;</td>
-					<td colspan="2" align="center">'.$namaayah.'</td>
-				  </tr>
-				</table>
-				<div style="page-break-before: always">
-				<img src="'.$scanakta.'"/>
-				<div style="page-break-before: always">
-				<img src="'.$scankk.'"/>
-				<div style="page-break-before: always">
-				<img src="'.$scanket.'"/>
-				<div style="page-break-before: always">
-				<img src="'.$scanbukti.'"/>';
+					<tr>
+						<td colspan="3" rowspan="6"><img src="'.$homebase.'/'.$logo.'" width="98" height="98" /></td>
+						<td colspan="5">'.$yayasan.'</td>
+						<td width="58">NO.</td>
+						<td width="172" style="border-bottom:1px solid black;border-top:1px solid black;border-left:1px solid black;border-right:1px solid black;text-align:center;vertical-align:middle;">'.$kodependaf.'</td>
+					</tr>
+					<tr>
+						<td colspan="7">'.$sekolah.'</td>
+					</tr>
+					<tr>
+						<td colspan="7">Terakreditasi A</td>
+					</tr>
+					<tr>
+						<td colspan="7" class="judul">NIS : '.$rsetting->nis.' – NSS : '.$rsetting->nss.' – NPSN : '.$rsetting->npsn.'</td>
+					</tr>
+					<tr>
+						<td colspan="7">'.$alamat.'</td>
+					</tr>
+					<tr>
+						<td colspan="7" style="color: #00F"><i>Telpon '.$rsetting->telp.' Email '.$rsetting->email.'</i></td>
+					</tr>
+					<tr>
+						<td align="left" valign="top" style="border-top:double">&nbsp;</td>
+						<td align="left" valign="top" style="border-top:double">&nbsp;</td>
+						<td width="51" align="left" valign="top" style="border-top:double">&nbsp;</td>
+						<td width="241" align="left" valign="top" style="border-top:double">&nbsp;</td>
+						<td align="left" valign="top" style="border-top:double">&nbsp;</td>
+						<td width="26" align="left" valign="top" style="border-top:double">&nbsp;</td>
+						<td width="61" align="left" valign="top" style="border-top:double">&nbsp;</td>
+						<td align="left" valign="top" style="border-top:double">&nbsp;</td>
+						<td align="left" valign="top" style="border-top:double">&nbsp;</td>
+						<td align="left" valign="top" style="border-top:double">&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan="10" align="center"><strong>FORMULIR PENDAFTARAN SISWA BARU</strong></td>
+					</tr>
+					<tr>
+						<td colspan="10" align="center"><strong>TAHUN PELAJARAN '.$tamasuk.'</strong></td>
+					</tr>
+					<tr>
+						<td colspan="10" align="center">&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan="10"></td>
+					</tr>
+					<tr>
+						<td colspan="10" style="background:#999; border-bottom:1px solid black;border-top:1px solid black;"><strong>DATA UMUM</strong></td>
+					</tr>
+					<tr>
+						<td colspan="10"><b><u>A. IDENTITAS CALON SISWA :</u></b></td>
+					</tr>
+					<tr>
+						<td width="27">1</td>
+						<td colspan="9">Nama Peserta Didik</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">a.Lengkap (sesuai akta kelahiran)</td>
+						<td width="7">:</td>
+						<td colspan="5">'.$nama.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">b. Panggilan</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->panggilan.'</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td colspan="3">NIK SISWA</td>
+						<td>:</td>
+						<td colspan="5">'.$nik.'</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td colspan="3">Jenis Kelamin</td>
+						<td>:</td>
+						<td colspan="5">'.$kelamin.'</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td colspan="9">Kelahiran</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">a. Tempat</td>
+						<td>:</td>
+						<td colspan="5">'.$tmplahir.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">b. Tanggal-Bln-Tahun</td>
+						<td>:</td>
+						<td colspan="5">'.$tgllahir.' </td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td colspan="3">Umur (per Juli $thniki)</td>
+						<td>:</td>
+						<td colspan="5">'.$umur.'</td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td colspan="3">Agama</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->agama.'</td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td colspan="3">Kewarganegaraan</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->warga.'</td>
+					</tr>
+					<tr>
+						<td>8</td>
+						<td colspan="3">Anak Ke</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->anakke.' Dengan Jumlah Saudara :</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">a. Kandung</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->kandung.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">b. Tiri</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->tiri.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">c. Angkat</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->angkat.'</td>
+					</tr>
+					<tr>
+						<td>9</td>
+						<td colspan="3">Bahasa Sehari-hari di keluarga</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->bahasa.'</td>
+					</tr>
+					<tr>
+						<td>10</td>
+						<td colspan="3">Golongan Darah</td>
+						<td>:</td>
+						<td colspan="5">'.$darah.'</td>
+					</tr>
+					<tr>
+						<td>11</td>
+						<td colspan="9">Keadaan Jasmani</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">a.Berat badan</td>
+						<td>:</td>
+						<td colspan="5">'.$berat.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">b.Tinggi badan</td>
+						<td>:</td>
+						<td colspan="5">'.$tinggi.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">c.Penyakit yang pernah di derita</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->penyakit.'</td>
+					</tr>
+					<tr>
+						<td valign="top">11</td>
+						<td colspan="3" valign="top">Alamat Rumah</td>
+						<td valign="top">:</td>
+						<td colspan="5" valign="top">RT. '.$erte.' RW. '.$erwe.' KELURAHAN '.$kelurahan.' KECAMATAN '.$kecamatan.' KOTA/KABUPATEN '.$kota.' KODEPOS '.$kodepos.'</td>
+					</tr>
+					<tr>
+						<td>12</td>
+						<td colspan="3">Telepon Rumah</td>
+						<td>:</td>
+						<td colspan="5">'.$telpon.'</td>
+					</tr>
+					<tr>
+						<td>13</td>
+						<td colspan="3">Bertempat tinggal bersama</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->bersama.'</td>
+					</tr>
+					<tr>
+						<td>14</td>
+						<td colspan="3">Jarak tempat tinggal ke sekolah</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->jarak.' km</td>
+					</tr>
+					<tr>
+						<td colspan="10">&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan="10"><b><u>B. PERKEMBANGAN PESERTA DIDIK</u></b></td>
+					</tr>
+					<tr>
+						<td>1</td>
+						<td colspan="9">Masuk menjadi Peserta didik baru tingkat I</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">a.Asal Sekolah</td>
+						<td>:</td>
+						<td colspan="5">'.$asal.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">b.Alamat Sekolah Sebelumnya</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->alamattk.'</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td colspan="9">Pindahan dari sekolah lain</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">a.Nama sekolah asal</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->pindahasal.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">b.Dari tingkat</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->pindahkelas.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">c.Diterima tanggal</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->pindahtgl.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">d.Ditingkat</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->pindahkekls.'</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td colspan="9">NILAI RATA-RATA  RAPOT SEMESTER 1-5</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">a. Semester 1</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->semester1.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">b. Semester 2</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->semester2.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">c. Semester 3</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->semester3.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">d. Semester 4</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->semester4.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">e. Semester 5</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->semester5.'</td>
+					</tr>
+					<tr>
+						<td colspan="10">&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan="10"><b><u>C. IDENTITAS ORANG TUA/WALI :</u></b></td>
+					</tr>
+					<tr>
+						<td>1</td>
+						<td colspan="9">Ayah</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">a.Nama</td>
+						<td>:</td>
+						<td colspan="5">'.$namaayah.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">b.Pendidikan terakhir</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->payah.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">c.Pekerjaan</td>
+						<td>:</td>
+						<td colspan="5">'.$kerjaayah.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="9"><span style="color: #999">(jika wiraswasta disebutkan secara spesifik)</span></td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">d.Total Penghasilan satu bulan</td>
+						<td>:</td>
+						<td colspan="5">'.$tulisgajiayah.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">e.Alamat lengkap</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->aayah.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="9" style="color: #999">(diisi jika tidak serumah dengan calon siswa)</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">f.No. Telpon / HP yang bisa dihubungi</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->hayah.'</td>
+					</tr>
+					<tr>
+						<td colspan="10">&nbsp;</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td colspan="9">Ibu</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">a.Nama</td>
+						<td>:</td>
+						<td colspan="5">'.$namaibu.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">b.Pendidikan Terakhir</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->pibu.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">c.Pekerjaan</td>
+						<td>:</td>
+						<td colspan="5">'.$kerjaibu.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="9" style="color: #999">(jika wiraswasta disebutkan secara spesifik)</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">d.Total Penghasilan satu bulan</td>
+						<td>:</td>
+						<td colspan="5">'.$tulisgajiibu.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">e.Alamat Lengkap</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->aaibu.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="9"><span style="color: #999">(diisi jika tidak serumah dengan calon siswa)</span></td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">f.No. Telpon / HP yang bisa dihubungi</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->hibu.'</td>
+					</tr>
+					<tr>
+						<td colspan="10">&nbsp;</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td colspan="9">Wali Peserta Didik (jika mempunyai)</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">a.Nama</td>
+						<td>:</td>
+						<td colspan="5">'.$wali.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">b.Hubungan keluarga</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->hubwali.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">c.Pekerjaan/Jabatan</td>
+						<td>:</td>
+						<td colspan="5">'.$pekerjaanwali.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">d.Agama</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->agamawali.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">e.Alamat</td>
+						<td>:</td>
+						<td colspan="5">'.$alamatwali.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="3">f.No. Telpon / HP yang bisa dihubungi</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->hwali.'</td>
+					</tr>
+					<tr>
+						<td colspan="10">&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan="10" style="background:#999; border-bottom:1px solid black;border-top:1px solid black;"><strong>DATA KHUSUS CALON SISWA</strong></td>
+					</tr>
+					<tr>
+						<td valign="top">1</td>
+						<td colspan="3" valign="top">Kesulitan yang pernah dialami selama disekolah asal</td>
+						<td valign="top">:</td>
+						<td colspan="5" valign="top">'.$cekpelengkap->kesulitan.'</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td colspan="3">Orang-orang yang tinggal bersama calon siswa</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->anggotarumah.'</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td colspan="3">Kegiatan yang dapat dilakukan sendiri</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->kegiatansendiri.'</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td colspan="3">Penglihatan</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->mata.'</td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td colspan="3">Pendengaran</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->telinga.'</td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td colspan="3">Penampilan</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->wajah.'</td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td colspan="3">Gaya belajar calon siswa (jika diketahui) </td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->gybljr.'</td>
+					</tr>
+					<tr>
+						<td>8</td>
+						<td colspan="3">Bakat khusus yang menonjol </td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->bakat.'</td>
+					</tr>
+					<tr>
+						<td>9</td>
+						<td colspan="3">Sumber Informasi</td>
+						<td>:</td>
+						<td colspan="5">'.$cekpelengkap->sumberinfo.'</td>
+					</tr>
+					<tr>
+						<td>10</td>
+						<td colspan="9">Prestasi yang pernah diraih selama di TK (dilengkapi dengan foto atau fotokopi piagam penghargaan):</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td width="27">a. </td>
+						<td colspan="8">'.$cekpelengkap->prestasi1.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>b. </td>
+						<td colspan="8">'.$cekpelengkap->prestasi2.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>c. </td>
+						<td colspan="8">'.$cekpelengkap->prestasi3.'</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>d. </td>
+						<td colspan="8">'.$cekpelengkap->prestasi4.'</td>
+					</tr>
+					<tr>
+						<td colspan="10">&nbsp;</td>
+					</tr>
+					<tr>
+						<td colspan="10" style="font-size: x-small">Dimohon segera ke '.$sekolah.' untuk mengumpulkan persyaratan berupa :</td>
+					</tr>
+					<tr>
+						<td style="font-size: x-small">1</td>
+						<td colspan="6" style="font-size: x-small">Melampirkan fotocopy akta kelahiran dan fotocopy kartu keluarga</td>
+						<td width="128" rowspan="4" style="border-bottom:1px solid black;border-top:1px solid black;border-left:1px solid black;border-right:1px solid black;text-align:center;vertical-align:middle; "><img src="'.$scanfoto.'" width="98" height="120" /></td>
+						<td colspan="2" style="text-align: center">'.config('global.kota').', '.$tanggalctk.'</td>
+					</tr>
+					<tr>
+						<td style="font-size: x-small">2</td>
+						<td colspan="6" style="font-size: x-small">Foto 4x6 sebanyak 2 lembar</td>
+						<td colspan="2" style="text-align: center">Orang Tua / Wali</td>
+					</tr>
+					<tr>
+						<td height="97" valign="top" style="font-size: x-small">3</td>
+						<td colspan="6" style="font-size: x-small" valign="top">Bukti Bayar Formulir<br />Melampirkan fotocopy Raport dan Surat Pengantar dari Sekolah Asal</td>
+						<td colspan="2">&nbsp;</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td colspan="6" style="font-size: x-small">&nbsp;</td>
+						<td colspan="2" align="center">'.$namaayah.'</td>
+					</tr>
+					<tr>
+						<td colspan="10" >Lampiran 1 : Scan Akta <br /><img width="100%" src="'.$scanakta.'"/></td>
+					</tr>
+					<tr>
+						<td colspan="10" >Lampiran 2 : Scan KK <br /><img width="100%" src="'.$scankk.'"/></td>
+					</tr>
+					<tr>
+						<td colspan="10" >Lampiran 3 : Scan Keterangan <br /><img width="100%" src="'.$scanket.'"/></td>
+					</tr>
+					<tr>
+						<td colspan="10" >Lampiran 4 : Scan Bukti Bayar <br /><img width="100%" src="'.$scanbukti.'"/></td>
+					</tr>
+				</table>';
 			
 			$tahun					= date("Y");
 			$tasks 					= [];
@@ -4304,9 +5551,9 @@ class FrontpageController extends Controller
 	}
 	public function viewKarpes ($id){
 		$homebase			= url("/");
-		$cekdata 			= Datapsb::where('id', $id)->count();
-		if ($cekdata == 0){
-			return view('error.hilang');
+		$getdata 			= $this->getAuthorizedPpdbRecord($id);
+		if (!isset($getdata->id)){
+			return view('errors.hilang');
 		} else {
 			$alamatcetak		= $homebase.'/karpes/'.$id;
 			$qrcode 			= QrCode::size(150)->generate($alamatcetak);
@@ -4315,12 +5562,14 @@ class FrontpageController extends Controller
 			$sekolah 			= config('global.sekolah');
 			$alamat  			= config('global.alamat');
 			$mutiara			= '';
-			$logo 				= '';
+			$logo 				= 'boxed-bg.jpg';
+			$logo_grey			= 'boxed-bg.jpg';
 			$rsetting			= Sekolah::where('id', session('sekolah_id_sekolah'));
 			if (isset($rsetting->id)){
 				$sekolah 			= $rsetting->nama_sekolah;
 				$yayasan 			= $rsetting->nama_yayasan;
 				$alamat 			= $rsetting->alamat;
+				$logo_grey 			= $rsetting->logo_grey;
 				if (isset($rsetting->kepala_sekolah->nama)){
 					$kepalasekolah 	= $rsetting->kepala_sekolah->nama;
 				} else {
@@ -4328,10 +5577,8 @@ class FrontpageController extends Controller
 				}
 				$mutiara 			= $rsetting->slogan;
 				$logo 				= $rsetting->logo;
-				
 			}
 			
-			$getdata 			= Datapsb::where('id', $id)->first();
 			$kodependaf			= $getdata->kodependaf;
 			$nik				= $getdata->nik;
 			$status				= $getdata->status;
@@ -4363,7 +5610,7 @@ class FrontpageController extends Controller
 			$setdpp1 				= '';
 			$setdpp2 				= '';
 			$setdpp3 				= '';
-			$sql 					= Layanan::orderBy('layanan', 'ASC')->get();
+			$sql 					= Layanan::where('id_sekolah',$id)->orderBy('layanan', 'ASC')->get();
 			if (!empty($sql)){
 				foreach ($sql as $rlayanan){
 					$layanan 		= $rlayanan->layanan;
@@ -4427,6 +5674,7 @@ class FrontpageController extends Controller
 			$jadwalujian			= $jadwalujian.'</table>';
 			$tahun					= date("Y");
 			$tasks 					= [];
+			$tasks['logo_grey']		= $homebase.'/'.$logo_grey;
 			$tasks['logo']			= $homebase.'/'.$logo;
 			$tasks['yayasan']		= $yayasan;
 			$tasks['sekolah']		= $sekolah;
@@ -4448,7 +5696,7 @@ class FrontpageController extends Controller
 		$id = $request->input('id');
 		$rsetting				= Sekolah::where('id', $id)->first();
 		if(!$rsetting){
-			return view('accessdenided');	
+			return view('accessdenided');
 		}
 		$sekolah 				= $rsetting->nama_sekolah;
 		$yayasan 				= $rsetting->nama_yayasan;
@@ -4473,7 +5721,7 @@ class FrontpageController extends Controller
 		$setdpp1 				= '';
 		$setdpp2 				= '';
 		$setdpp3 				= '';
-		$sql 					= Layanan::orderBy('layanan', 'ASC')->where('id_sekolah',$id)->get();
+		$sql 					= Layanan::where('id_sekolah',$id)->orderBy('layanan', 'ASC')->get();
 		if (!empty($sql)){
 			foreach ($sql as $rlayanan){
 				$status 		= $rlayanan->status;
@@ -4528,7 +5776,7 @@ class FrontpageController extends Controller
 		$setdpp1 				= '';
 		$setdpp2 				= '';
 		$setdpp3 				= '';
-		$sql 					= Layanan::orderBy('layanan', 'ASC')->where('id_sekolah',$id_sekolah)->get();
+		$sql 					= Layanan::where('id_sekolah',$id_sekolah)->orderBy('layanan', 'ASC')->get();
 		if (!empty($sql)){
 			foreach ($sql as $rlayanan){
 				$status 		= $rlayanan->status;
@@ -4571,6 +5819,7 @@ class FrontpageController extends Controller
 			$jarak		= $request->val21;
 			$telpon		= $request->val22;
 			$bersama	= $request->val23;
+			$buktiBayar	= $this->validatePpdbImageData($request->val24);
 			$ceknik		= strlen($niksiswa);
 			if ($ceknik != 16){
 				echo '<div class="alert alert-danger alert-dismissable">
@@ -4578,8 +5827,13 @@ class FrontpageController extends Controller
 						<h4><i class="icon fa fa-check"></i> Error</h4>
 						 NIK Haruslah 16 Karakter
 					  </div>';
-			}
-			else if($nama == '' OR $tmtlahir == '' OR $anakke == '' OR $tgllahir == '' OR $niksiswa == '' OR $umur == '' OR $jarak == '' OR $telpon == ''){
+			} else if ($buktiBayar === false){
+				echo '<div class="alert alert-danger alert-dismissable">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<h4><i class="icon fa fa-check"></i> Error</h4>
+						 Bukti pembayaran harus berupa file JPG atau PNG dengan ukuran maksimum 2MB
+					  </div>';
+			} else if ($nama == '' OR $tmtlahir == '' OR $anakke == '' OR $tgllahir == '' OR $niksiswa == '' OR $umur == '' OR $jarak == '' OR $telpon == ''){
 				echo '<div class="alert alert-danger alert-dismissable">
 						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 						<h4><i class="icon fa fa-check"></i> Error</h4>
@@ -4592,8 +5846,7 @@ class FrontpageController extends Controller
 						 Jarak dari Rumah Ke Sekolah : '.$jarak.'<br />
 						 Email : '.$telpon.'<br />
 					  </div>';
-			}
-			else {
+			} else {
 				if ($panggilan == ''){ $panggilan = '-'; }
 				if ($tinggi == ''){ $tinggi = '0'; }
 				if ($tinggi == ''){ $tinggi = '0'; }
@@ -4603,10 +5856,10 @@ class FrontpageController extends Controller
 				if ($penyakit == ''){ $penyakit = '-'; }
 				$count = Datapsb::where('nik', $niksiswa)->where('id_sekolah',$id_sekolah)->count();				
 				if ($count == 0) {
-					$kodethn 	 	= substr($tahun, -4);
+					$kodethn 	 	= substr($tahun, 0, 4);
 					$urutanbaru		= Datapsb::where('tahun', $kodethn)->where('kodepsb', 'baru')->where('id_sekolah',$id_sekolah)->count();
 					$urutanpindah	= Datapsb::where('tahun', $kodethn)->where('kodepsb', '!=', 'baru')->where('id_sekolah',$id_sekolah)->count();
-					$getid 			= Datapsb::orderBy('id', 'DESC')->where('id_sekolah',$id_sekolah)->first();
+					$getid 			= Datapsb::orderBy('id', 'DESC')->first();
 					if (isset($getid->id)){
 						$idne 		= $getid->id;
 						$idne		= $idne + 1;
@@ -4617,8 +5870,8 @@ class FrontpageController extends Controller
 					if ($kelas == 1) { 
 						$urutan  	= $urutanbaru + 1; 
 						$kodependaf = $kodebaru.'-'.$urutan; 
-						$kodepsb 	= 'baru';}
-					else { 
+						$kodepsb 	= 'baru';
+					} else { 
 						$urutan  	= $urutanpindah + 1; 
 						$kodependaf = $kodepindahan.'-'.$urutan; 
 						$kodepsb 	= 'mutasi kelas '.$kelas;
@@ -4722,6 +5975,16 @@ class FrontpageController extends Controller
 							'id_sekolah'    => $id_sekolah
 						]);
 						if ($gooo){
+							XFiles::updateOrCreate(
+								[
+									'xmarking'	=> $niksiswa.'-BuktiBayar',
+								],
+								[
+									'xtabel'	=> 'db_psb',
+									'xjenis'	=> $niksiswa,
+									'xfile'		=> $buktiBayar
+								]
+							);
 							$cekkelengkapan = Datapelengkappsb::where('niksiswa', $niksiswa)->where('id_sekolah',$id_sekolah)->count();
 							if ($cekkelengkapan == 0){
 								Datapelengkappsb::create([
@@ -4774,7 +6037,7 @@ class FrontpageController extends Controller
 									'scanfoto'		=> '',
 									'scankk'		=> '',
 									'scanket'		=> '',
-									'scanbukti'		=> '',
+									'scanbukti'		=> $niksiswa.'-BuktiBayar',
 									'id_sekolah'    => $id_sekolah
 								]);
 							} else {
@@ -4793,8 +6056,10 @@ class FrontpageController extends Controller
 									'telpon'		=> $telpon, 
 									'bersama'		=> $bersama, 
 									'marking'		=> $idne,
+									'scanbukti'		=> $niksiswa.'-BuktiBayar',
 								]);
 							}							
+							$this->storePpdbUploadAccess($id_sekolah, $niksiswa, $tgllahir);
 							echo 'sukses';
 						}
 						else {
@@ -4807,12 +6072,11 @@ class FrontpageController extends Controller
 					} else {
 						echo '<div class="alert alert-danger alert-dismissable">
 							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-							<h4><i class="icon fa fa-ban"></i> Error</h4>
-							Percobaan Permintaan Kode Pendaftaran Gagal 3x, mohon menghubungi admin PPDB untuk info lebih lanjut
+							<h4><i class="icon fa fa-ban"></i> '.$kodependaf.'</h4>
+							Percobaan Permintaan Kode Pendaftaran Gagal 3x, mohon menghubungi admin PPDB untuk info lebih lanjut'.$urutanbaru.'/'.$id_sekolah.'/'.$kodethn.'
 						  </div>';
 					}
-				}
-				else {
+				} else {
 					$status = '';
 					$umume 	= '';
 					$boleh 	= 'IYES';
@@ -4822,17 +6086,14 @@ class FrontpageController extends Controller
 						$kodep 	= $cekid->kodependaf;
 						$umume 	= $cekid->akhirumum;
 						$status = $cekid->status;
-						
 						if ($umume == ''){
 							if ($status == 'verified' OR $status == 'unverified'){
 								$boleh 	= 'NO';
-							}
-							else {
+							} else {
 								$boleh 	= 'IYES';
 								$idupdt = $cekid->id;
 							}
-						}
-						else {
+						} else {
 							$status	= $cekid->status;
 							$idupdt = $cekid->id;
 						}
@@ -4843,8 +6104,7 @@ class FrontpageController extends Controller
 							<h4><i class="icon fa fa-ban"></i> Error</h4>
 							 Data Anda Telah Ter Periksa, Mohon Bersabar Untuk Proses Seleksi dan Pengumuman.
 						  </div>';
-					}
-					else if ($status == 'verified' OR $status == 'unverified'){
+					} else if ($status == 'verified' OR $status == 'unverified'){
 						$kodethn 	 	= substr($tahun, -4);
 						$urutanbaru		= Datapsb::where('tahun', $kodethn)->where('kodepsb', 'baru')->where('id_sekolah',$id_sekolah)->count();
 						$urutanpindah	= Datapsb::where('tahun', $kodethn)->where('kodepsb', '!=', 'baru')->where('id_sekolah',$id_sekolah)->count();
@@ -4964,6 +6224,16 @@ class FrontpageController extends Controller
 								'id_sekolah'	=> $id_sekolah
 							]);
 							if ($gooo){
+								XFiles::updateOrCreate(
+									[
+										'xmarking'	=> $niksiswa.'-BuktiBayar',
+									],
+									[
+										'xtabel'	=> 'db_psb',
+										'xjenis'	=> $niksiswa,
+										'xfile'		=> $buktiBayar
+									]
+								);
 								$cekkelengkapan = Datapelengkappsb::where('niksiswa', $niksiswa)->where('id_sekolah',$id_sekolah)->count();
 								if ($cekkelengkapan == 0){
 									Datapelengkappsb::create([
@@ -5016,7 +6286,7 @@ class FrontpageController extends Controller
 										'scanfoto'		=> '',
 										'scankk'		=> '',
 										'scanket'		=> '',
-										'scanbukti'		=> '',
+										'scanbukti'		=> $niksiswa.'-BuktiBayar',
 										'id_sekolah'	=> $id_sekolah
 									]);
 								} else {
@@ -5034,9 +6304,11 @@ class FrontpageController extends Controller
 										'jarak'			=> $jarak, 
 										'telpon'		=> $telpon, 
 										'bersama'		=> $bersama, 
-										'marking'		=> $idne
+										'marking'		=> $idne,
+										'scanbukti'		=> $niksiswa.'-BuktiBayar',
 									]);
 								}							
+								$this->storePpdbUploadAccess($id_sekolah, $niksiswa, $tgllahir);
 								echo 'sukses';
 							}
 							else {
@@ -5053,8 +6325,7 @@ class FrontpageController extends Controller
 								Percobaan Permintaan Kode Pendaftaran Gagal 3x, mohon menghubungi admin PPDB untuk info lebih lanjut
 							  </div>';
 						}
-					}
-					else {
+					} else {
 						$qsimpandata = Datapsb::where('id', $idupdt)->update([
 							'nama'			=> $nama, 
 							'kelamin'		=> $kelamin, 
@@ -5067,6 +6338,16 @@ class FrontpageController extends Controller
 							'updated_at'	=> Carbon::now()
 						]);
 						if ($qsimpandata){
+							XFiles::updateOrCreate(
+								[
+									'xmarking'	=> $niksiswa.'-BuktiBayar',
+								],
+								[
+									'xtabel'	=> 'db_psb',
+									'xjenis'	=> $niksiswa,
+									'xfile'		=> $buktiBayar
+								]
+							);
 							$cekkelengkapan = Datapelengkappsb::where('niksiswa', $niksiswa)->where('id_sekolah',$id_sekolah)->count();
 							if ($cekkelengkapan == 0){
 								Datapelengkappsb::create([
@@ -5119,7 +6400,7 @@ class FrontpageController extends Controller
 									'scanfoto'		=> '',
 									'scankk'		=> '',
 									'scanket'		=> '',
-									'scanbukti'		=> '',
+									'scanbukti'		=> $niksiswa.'-BuktiBayar',
 									'id_sekolah'	=> $id_sekolah
 								]);
 							} else {
@@ -5138,8 +6419,10 @@ class FrontpageController extends Controller
 									'telpon'		=> $telpon, 
 									'bersama'		=> $bersama, 
 									'marking'		=> $idupdt,
+									'scanbukti'		=> $niksiswa.'-BuktiBayar',
 								]);
 							}
+							$this->storePpdbUploadAccess($id_sekolah, $niksiswa, $tgllahir);
 							echo 'sukses';
 						}
 						else {
@@ -5152,8 +6435,7 @@ class FrontpageController extends Controller
 					}
 				}
 			}
-		}
-		else if ($setkerja == 'ortu'){
+		} else if ($setkerja == 'ortu'){
 			$ayah		= strtoupper($request->val01);
 			$ibu		= strtoupper($request->val02);
 			$kayah		= $request->val03;
@@ -5191,8 +6473,7 @@ class FrontpageController extends Controller
 						 Kelurahan : '.$kelu.'<br />
 						 Kecamatan : '.$keca.'<br />
 					  </div>';
-			}
-			else {
+			} else {
 				$gooo = Datapsb::where('nik', $niksiswa)->where('id_sekolah',$id_sekolah)->update([
 					'alamatortu'	=> $alamat, 
 					'namaayah'		=> $ayah, 
@@ -5229,8 +6510,7 @@ class FrontpageController extends Controller
 						'hubwali'		=> $hubwali,
 					]);
 					echo 'sukses';
-				}
-				else {
+				} else {
 					echo '<div class="alert alert-danger alert-dismissable">
 					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 					<h4><i class="icon fa fa-ban"></i> Error</h4>
@@ -5238,8 +6518,7 @@ class FrontpageController extends Controller
 				  </div>';
 				}
 			}
-		}
-		else if ($setkerja == 'asaltk'){
+		} else if ($setkerja == 'asaltk'){
 			$asala		= $request->val01;
 			$almttk		= $request->val02;
 			$pindahasal	= $request->val03;
@@ -5283,18 +6562,15 @@ class FrontpageController extends Controller
 						'semester5'		=> $semester5,
 					]);
 					echo 'sukses';
-				}
-				else {
+				} else {
 					echo '<div class="alert alert-danger alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<h4><i class="icon fa fa-ban"></i> Error</h4>
-					 Sistem Gagal Terhubung Dengan Database, Silahkan Coba Beberapa Saat Lagi
-				  </div>';
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<h4><i class="icon fa fa-ban"></i> Error</h4>
+							Sistem Gagal Terhubung Dengan Database, Silahkan Coba Beberapa Saat Lagi
+						</div>';
 				}
-				
 			}
-		}
-		else {
+		} else {
 			$kesulitan	= $request->val01;
 			$bersamaly	= $request->val02;
 			$kegsndrly	= $request->val03;
@@ -5312,8 +6588,6 @@ class FrontpageController extends Controller
 			$arrbersama	= $request->val15;
 			$arrkegiatan= $request->val16;
 			$arrsumber	= $request->val17;
-
-
 			if($niksiswa == ''){
 				echo '<div class="alert alert-danger alert-dismissable">
 					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -5321,16 +6595,14 @@ class FrontpageController extends Controller
 					 Pastikan Semua Form Yang Bertanda Bintang di Bawah Sudah di Isi <br />
 					 NIK. Siswa : '.$niksiswa.'<br />
 				  </div>';
-			}
-			else {
+			} else {
 				$anggotakeluarga = '';
 				if (!empty($arrbersama)){
 					foreach ($arrbersama as $v) {
 						if ($v == 'Lain'){ 
 							if ($anggotakeluarga == '') { $anggotakeluarga = $bersamaly; }
 							else { $anggotakeluarga = $anggotakeluarga.'-'.$bersamaly; }
-						}
-						else {
+						} else {
 							if ($anggotakeluarga == '') { $anggotakeluarga = $v; }
 							else { $anggotakeluarga = $anggotakeluarga.'-'.$v; }
 						}			
@@ -5342,8 +6614,7 @@ class FrontpageController extends Controller
 						if ($r == 'Lain'){ 
 							if ($mandiri == '') { $mandiri = $kegsndrly; }
 							else { $mandiri = $mandiri.'-'.$kegsndrly; }
-						}
-						else {
+						} else {
 							if ($mandiri == '') { $mandiri = $r; }
 							else { $mandiri = $mandiri.'-'.$r; }
 						}			
@@ -5355,14 +6626,13 @@ class FrontpageController extends Controller
 						if ($s == 'Lain'){ 
 							if ($sumberlain == '') { $sumberlain = $idsbrlain; }
 							else { $sumberlain = $sumberlain.'-'.$idsbrlain; }
-						}
-						else {
+						} else {
 							if ($sumberlain == '') { $sumberlain = $s; }
 							else { $sumberlain = $sumberlain.'-'.$s; }
 						}			
 					}
 				}
-				$gooo 	= Datapelengkappsb::where('niksiswa', $niksiswa)->where('id_sekolah',$id_sekolah)->update([
+				$gooo = Datapelengkappsb::where('niksiswa', $niksiswa)->where('id_sekolah',$id_sekolah)->update([
 						'kesulitan'			=> $kesulitan,
 						'anggotarumah'		=> $anggotakeluarga,
 						'kegiatansendiri'	=> $mandiri,
@@ -5383,7 +6653,7 @@ class FrontpageController extends Controller
 						'status'		=> 40
 					]);
 					$getdata = Datapsb::where('nik', $niksiswa)->orderBy('id', 'DESC')->where('id_sekolah',$id_sekolah)->first();
-					echo '<div class="col-md-12">		
+					echo '<div class="col-md-12">
 							<div class="widget-user-header bg-yellow">
 							  <div class="widget-user-image">
 								<img class="img-circle" src="dist/img/wasimonghead.png" alt="User Avatar" height="90" width="100">
@@ -5410,97 +6680,110 @@ class FrontpageController extends Controller
 				}
 				else {
 					echo '<div class="alert alert-danger alert-dismissable">
-					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-					<h4><i class="icon fa fa-ban"></i> Error</h4>
-					 Sistem Gagal Terhubung Dengan Database, Silahkan Coba Beberapa Saat Lagi
-				  </div>';
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<h4><i class="icon fa fa-ban"></i> Error</h4>
+							Sistem Gagal Terhubung Dengan Database, Silahkan Coba Beberapa Saat Lagi
+						</div>';
 				}
 			}
-
 		}
     }
 	public function exSavefileppdb(Request $request) {
-		$id_sekolah 		= $request->id_sekolah;
+		$id_sekolah = $request->id_sekolah;
 		$nik 		= $request->nik;
+		$tgllahir	= $request->tgllahir;
+		$akte 		= $request->akte;
+		$foto 		= $request->foto;
+		$ksk 		= $request->ksk;
+		$keterangan	= $request->keterangan;
 		$sukses 	= '';
-		$ceknik 	= Datapsb::where('nik', $nik)->where('id_sekolah',$id_sekolah)->count();
+		$aktaImage = $this->validatePpdbImageData($akte);
+		$fotoImage = $this->validatePpdbImageData($foto);
+		$kkImage = $this->validatePpdbImageData($ksk);
+		$ketImage = $this->validatePpdbImageData($keterangan);
+		if ($tgllahir == '' || !$this->hasPpdbUploadAccess($id_sekolah, $nik, $tgllahir)) {
+			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Akses Ditolak', 'message' => 'Sesi upload tidak valid. Silahkan verifikasi ulang NIK dan tanggal lahir.'], 403);
+		}
+		if ($aktaImage === false || $fotoImage === false || $kkImage === false || $ketImage === false) {
+			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'File Tidak Valid', 'message' => 'File harus berupa JPG atau PNG dengan ukuran maksimum 2MB.'], 422);
+		}
+		$ceknik 	= Datapsb::where('nik', $nik)->where('tgllahir', $tgllahir)->where('id_sekolah',$id_sekolah)->count();
 		if ($ceknik != 0){
-			if ($request->hasFile('akte')) {
-				$validator = Validator::make($request->all(), [
-					'file' =>  'mimes:jpg,jpeg,png,PGN,JPG,JPEG|max:20000'
+			if ($foto != ''){
+				XFiles::updateOrCreate(
+					[
+						'xmarking'	=> $nik.'-Foto',
+					],
+					[
+						'xtabel'	=> 'db_psb',
+						'xjenis'	=> $nik,
+						'xfile'		=> $fotoImage
+					]
+				);
+				Datapsb::where('nik', $nik)->where('status', '40')->where('id_sekolah',$id_sekolah)->update([
+					'status'		=> 60
 				]);
-				if ($validator->fails()) {
-					$sukses 		= $sukses.'Gagal menyimpan Akte, maksimal 2 Mb, dan hanya JPG / PNG yang diperbolehkan<br />';			
-				} else {
-					$namafile		= $nik.'-akte.'.$request->file('akte')->getClientOriginalExtension();
-					$uploadedFile 	= $request->file('akte');
-					Storage::putFileAs('dist/img/berkas/',$uploadedFile,$namafile);
-				
-					Datapsb::where('nik', $nik)->where('status', '40')->where('id_sekolah',$id_sekolah)->update([
-						'status'		=> 50
-					]);
-					Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
-						'scanakta' => $namafile
-					]);
-					$sukses 		= $sukses.'Akte Berhasil di Upload<br />';
-				}
+				Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
+					'scanfoto' => $nik.'-Foto'
+				]);
+				$sukses 		= $sukses.'Foto Berhasil di Upload<br />';
 			}
-			if ($request->hasFile('foto')) {
-				$validator = Validator::make($request->all(), [
-					'file' =>  'mimes:jpg,jpeg,png,PGN,JPG,JPEG|max:20000'
+			if ($akte != ''){
+				XFiles::updateOrCreate(
+					[
+						'xmarking'	=> $nik.'-Akte',
+					],
+					[
+						'xtabel'	=> 'db_psb',
+						'xjenis'	=> $nik,
+						'xfile'		=> $aktaImage
+					]
+				);
+				Datapsb::where('nik', $nik)->where('status', '40')->where('id_sekolah',$id_sekolah)->update([
+					'status'		=> 50
 				]);
-				if ($validator->fails()) {
-					$sukses 		= $sukses.'Gagal menyimpan Foto, maksimal 2 Mb, dan hanya JPG / PNG yang diperbolehkan<br />';
-				} else {
-					$namafile		= $nik.'-foto.'.$request->file('foto')->getClientOriginalExtension();
-					$uploadedFile 	= $request->file('foto');
-					Storage::putFileAs('dist/img/berkas/',$uploadedFile,$namafile);
-					Datapsb::where('nik', $nik)->where('status', '50')->where('id_sekolah',$id_sekolah)->update([
-						'status'		=> 60
-					]);
-					Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
-						'scanfoto' => $namafile
-					]);
-					$sukses 		= $sukses.'Foto Berhasil di Upload<br />';
-				}
+				Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
+					'scanakta' => $nik.'-Akte'
+				]);
+				$sukses 		= $sukses.'Akte Berhasil di Upload<br />';
 			}
-			if ($request->hasFile('ksk')) {
-				$validator = Validator::make($request->all(), [
-					'file' =>  'mimes:jpg,jpeg,png,PGN,JPG,JPEG|max:20000'
+			if ($ksk != ''){
+				XFiles::updateOrCreate(
+					[
+						'xmarking'	=> $nik.'-KSK',
+					],
+					[
+						'xtabel'	=> 'db_psb',
+						'xjenis'	=> $nik,
+						'xfile'		=> $kkImage
+					]
+				);
+				Datapsb::where('nik', $nik)->where('status', '40')->where('id_sekolah',$id_sekolah)->update([
+					'status'		=> 70
 				]);
-				if ($validator->fails()) {
-					$sukses 		= $sukses.'Gagal menyimpan KK, maksimal 2 Mb, dan hanya JPG / PNG yang diperbolehkan<br />';			
-				} else {
-					$namafile		= $nik.'-kk.'.$request->file('ksk')->getClientOriginalExtension();
-					$uploadedFile 	= $request->file('ksk');
-					Storage::putFileAs('dist/img/berkas/',$uploadedFile,$namafile);
-					Datapsb::where('nik', $nik)->where('status', '60')->where('id_sekolah',$id_sekolah)->update([
-						'status'		=> 70
-					]);
-					Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
-						'scankk' => $namafile
-					]);
-					$sukses 		= $sukses.'KK Berhasil di Upload<br />';
-				}
+				Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
+					'scankk' => $nik.'-KSK'
+				]);
+				$sukses 		= $sukses.'KSK Berhasil di Upload<br />';
 			}
-			if ($request->hasFile('keterangan')) {
-				$validator = Validator::make($request->all(), [
-					'file' =>  'mimes:jpg,jpeg,png,PGN,JPG,JPEG|max:20000'
+			if ($keterangan != ''){
+				XFiles::updateOrCreate(
+					[
+						'xmarking'	=> $nik.'-SKL',
+					],
+					[
+						'xtabel'	=> 'db_psb',
+						'xjenis'	=> $nik,
+						'xfile'		=> $ketImage
+					]
+				);
+				Datapsb::where('nik', $nik)->where('status', '40')->where('id_sekolah',$id_sekolah)->update([
+					'status'		=> 80
 				]);
-				if ($validator->fails()) {
-					$sukses 		= $sukses.'Gagal menyimpan Surat Keterangan, maksimal 2 Mb, dan hanya JPG / PNG yang diperbolehkan<br />';			
-				} else {
-					$namafile		= $nik.'-ket.'.$request->file('keterangan')->getClientOriginalExtension();
-					$uploadedFile 	= $request->file('keterangan');
-					Storage::putFileAs('dist/img/berkas/',$uploadedFile,$namafile);
-					Datapsb::where('nik', $nik)->where('status', '70')->where('id_sekolah',$id_sekolah)->update([
-						'status'		=> 80
-					]);
-					Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
-						'scanket' => $namafile
-					]);
-					$sukses 		= $sukses.'Surat Keterangan Lulus Berhasil di Upload<br />';
-				}
+				Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
+					'scanket' => $nik.'-SKL'
+				]);
+				$sukses 		= $sukses.'Surat Keterangan Lulus Berhasil di Upload<br />';
 			}
 			return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => $sukses]);
 			return back();
@@ -5515,7 +6798,8 @@ class FrontpageController extends Controller
 		$tgllahir	= $request->val02;
 		$sukses 	= '';
 		$ceknik 	= Datapsb::where('nik', $nik)->where('tgllahir', $tgllahir)->where('id_sekolah',$id_sekolah)->count();
-		if ($ceknik != 0){			
+		if ($ceknik != 0){
+			$this->storePpdbUploadAccess($id_sekolah, $nik, $tgllahir);
 			return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Data NIK dan TTL ditemukan']);
 			return back();
 		} else {
@@ -5527,7 +6811,9 @@ class FrontpageController extends Controller
 		$id_sekolah 		= $request->id_sekolah;
 		$nik 		= $request->val01;
 		$tgllahir	= $request->val02;
-		$sukses 	= '';
+		if (!$this->hasPpdbUploadAccess($id_sekolah, $nik, $tgllahir)) {
+			return response('forbidden', 403);
+		}
 		$getkode 	= Datapsb::where('nik', $nik)->where('tgllahir', $tgllahir)->where('id_sekolah',$id_sekolah)->orderBy('id', 'DESC')->first();
 		if (isset($getkode->id)){
 			echo $getkode->id;
@@ -5536,122 +6822,130 @@ class FrontpageController extends Controller
 		}
 	}
 	public function exSaveberkasppdb(Request $request) {
-		$id_sekolah 		= $request->id_sekolah;
+		$id_sekolah = $request->id_sekolah;
 		$nik 		= $request->val01;
 		$jenis		= $request->val02;
-		$cekdata	= Datapelengkappsb::where('niksiswa', $nik)->count();
+		$tgllahir	= $request->val03;
+		$file		= $request->file;
+		$fileImage	= $this->validatePpdbImageData($file);
+		if ($tgllahir == '' || !$this->hasPpdbUploadAccess($id_sekolah, $nik, $tgllahir)) {
+			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Akses Ditolak', 'message' => 'Sesi upload tidak valid. Silahkan verifikasi ulang NIK dan tanggal lahir.'], 403);
+		}
+		if ($fileImage === false) {
+			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'File Tidak Valid', 'message' => 'File harus berupa JPG atau PNG dengan ukuran maksimum 2MB.'], 422);
+		}
+		$cekdata	= Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->count();
 		if ($cekdata != 0){
-			if ($request->hasFile('file')) {
-				$validator = Validator::make($request->all(), [
-					'file' =>  'mimes:jpg,jpeg,png,PGN,JPG,JPEG|max:20000'
-				]);
-				if ($validator->fails()) {
-					return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Gagal menyimpan, File maksimal 2 Mb, dan hanya JPG / PNG yang diperbolehkan']);
-					return back();				
+			$getfotolama	= Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->first();
+			if (isset($getfotolama->niksiswa)){
+				$idpel			= $getfotolama->id;
+				$idpsb			= $getfotolama->marking;
+				$scanaktalm		= $getfotolama->scanakta;
+				$scanfotolm		= $getfotolama->scanfoto;
+				$scankklm		= $getfotolama->scankk;
+				$scanketlm		= $getfotolama->scanket;
+				$scanbuktilm	= $getfotolama->scanbukti;
+				if ($jenis == 'AKTE'){
+					XFiles::updateOrCreate(
+						[
+							'xmarking'	=> $nik.'-Akte',
+						],
+						[
+							'xtabel'	=> 'db_psb',
+							'xjenis'	=> $nik,
+							'xfile'		=> $fileImage
+						]
+					);
+					Datapelengkappsb::where('id', $getfotolama->id)->update([
+						'scanakta' => $nik.'-Akte'
+					]);
+				} else if ($jenis == 'FOTO'){
+					XFiles::updateOrCreate(
+						[
+							'xmarking'	=> $nik.'-Foto',
+						],
+						[
+							'xtabel'	=> 'db_psb',
+							'xjenis'	=> $nik,
+							'xfile'		=> $fileImage
+						]
+					);
+					Datapelengkappsb::where('id', $getfotolama->id)->update([
+						'scanfoto' => $nik.'-Foto'
+					]);
+				} else if ($jenis == 'KK'){
+					XFiles::updateOrCreate(
+						[
+							'xmarking'	=> $nik.'-KSK',
+						],
+						[
+							'xtabel'	=> 'db_psb',
+							'xjenis'	=> $nik,
+							'xfile'		=> $fileImage
+						]
+					);
+					Datapelengkappsb::where('id', $getfotolama->id)->update([
+						'scankk' => $nik.'-KSK'
+					]);
+				} else if ($jenis == 'KET'){
+					XFiles::updateOrCreate(
+						[
+							'xmarking'	=> $nik.'-SKL',
+						],
+						[
+							'xtabel'	=> 'db_psb',
+							'xjenis'	=> $nik,
+							'xfile'		=> $fileImage
+						]
+					);
+					Datapelengkappsb::where('id', $getfotolama->id)->update([
+						'scanket' => $nik.'-SKL'
+					]);
 				} else {
-					$getfotolama	= Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->first();
-					if (isset($getfotolama->niksiswa)){
-						$idpel			= $getfotolama->id;
-						$idpsb			= $getfotolama->marking;
-						$scanaktalm		= $getfotolama->scanakta;
-						$scanfotolm		= $getfotolama->scanfoto;
-						$scankklm		= $getfotolama->scankk;
-						$scanketlm		= $getfotolama->scanket;
-						$scanbuktilm	= $getfotolama->scanbukti;
-						if ($jenis == 'AKTE'){
-							if ($scanaktalm != ''){
-								if (File::exists(base_path() ."/public/sdist/img/berkas/". $scanaktalm)) {
-								  File::delete(base_path() ."/public/dist/img/berkas/". $scanaktalm);
-								}
-							}
-							$namafile		= $nik.'-akte.'.$request->file('file')->getClientOriginalExtension();
-							$uploadedFile 	= $request->file('file');
-							Storage::putFileAs('dist/img/berkas/',$uploadedFile,$namafile);
-							Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
-								'scanakta' => $namafile
-							]);
-						} else if ($jenis == 'FOTO'){
-							if ($scanfotolm != ''){
-								if (File::exists(base_path() ."/public/sdist/img/berkas/". $scanfotolm)) {
-								  File::delete(base_path() ."/public/dist/img/berkas/". $scanfotolm);
-								}
-							}
-							$namafile		= $nik.'-foto.'.$request->file('file')->getClientOriginalExtension();
-							$uploadedFile 	= $request->file('file');
-							Storage::putFileAs('dist/img/berkas/',$uploadedFile,$namafile);
-							Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
-								'scanfoto' => $namafile
-							]);
-						} else if ($jenis == 'KK'){
-							if ($scankklm != ''){
-								if (File::exists(base_path() ."/public/sdist/img/berkas/". $scankklm)) {
-								  File::delete(base_path() ."/public/dist/img/berkas/". $scankklm);
-								}
-							}
-							$namafile		= $nik.'-kk.'.$request->file('file')->getClientOriginalExtension();
-							$uploadedFile 	= $request->file('file');
-							Storage::putFileAs('dist/img/berkas/',$uploadedFile,$namafile);
-							Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
-								'scankk' => $namafile
-							]);
-						} else if ($jenis == 'KET'){
-							if ($scanketlm != ''){
-								if (File::exists(base_path() ."/public/sdist/img/berkas/". $scanketlm)) {
-								  File::delete(base_path() ."/public/dist/img/berkas/". $scanketlm);
-								}
-							}
-							$namafile		= $nik.'-ket.'.$request->file('file')->getClientOriginalExtension();
-							$uploadedFile 	= $request->file('file');
-							Storage::putFileAs('dist/img/berkas/',$uploadedFile,$namafile);
-							Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
-								'scanket' => $namafile
-							]);
-						} else {
-							if ($scanbuktilm != ''){
-								if (File::exists(base_path() ."/public/sdist/img/berkas/". $scanbuktilm)) {
-								  File::delete(base_path() ."/public/dist/img/berkas/". $scanbuktilm);
-								}
-							}
-							$namafile	= $nik.'-bukti.'.$request->file('file')->getClientOriginalExtension();
-							$uploadedFile 	= $request->file('file');
-							Storage::putFileAs('dist/img/berkas/',$uploadedFile,$namafile);
-							Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah',$id_sekolah)->update([
-								'scanbukti' => $namafile
-							]);
-						
-						}
-						$cekstatus 		= Datapsb::where('nik', $nik)->where('id_sekolah',$id_sekolah)->orderBy('id', 'DESC')->first();
-						$idne 			= $cekstatus->id;
-						$status			= $cekstatus->status;
-						$persen			= 40;
-						if ($scanaktalm != ''){
-							$persen 	= $persen + 10;
-						}
-						if ($scanfotolm != ''){
-							$persen 	= $persen + 10;
-						}
-						if ($scankklm != ''){
-							$persen 	= $persen + 10;
-						}
-						if ($scanketlm != ''){
-							$persen 	= $persen + 10;
-						}
-						if ($scanbuktilm != ''){
-							$persen 	= $persen + 10;
-						}
-						if ($status == '40' OR $status == '50' OR $status == '60' OR $status == '70' OR $status == '80' OR $status == '90'){
-							Datapsb::where('id', $idne)->update([
-								'status'		=> $persen
-							]);
-						}
-						return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Upload '.$jenis.' Berhasil']);
-						return back();
-						
-					} else {
-						return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Mohon Maaf NIK Tidak ditemukan, pastikan anda telah menyelesaikan pendaftaran untuk anak anda dan pastikan NIK yang dimasukkan sesuai dengan : '.$nik ]);
-						return back();	
+					XFiles::updateOrCreate(
+						[
+							'xmarking'	=> $nik.'-BuktiBayar',
+						],
+						[
+							'xtabel'	=> 'db_psb',
+							'xjenis'	=> $nik,
+							'xfile'		=> $fileImage
+						]
+					);
+						Datapelengkappsb::where('id', $getfotolama->id)->update([
+							'scanbukti' => $nik.'-BuktiBayar'
+						]);
 					}
+				$cekstatus 		= Datapsb::where('nik', $nik)->where('id_sekolah',$id_sekolah)->orderBy('id', 'DESC')->first();
+				$idne 			= $cekstatus->id;
+				$status			= $cekstatus->status;
+				$persen			= 40;
+				if ($scanaktalm != ''){
+					$persen 	= $persen + 10;
 				}
+				if ($scanfotolm != ''){
+					$persen 	= $persen + 10;
+				}
+				if ($scankklm != ''){
+					$persen 	= $persen + 10;
+				}
+				if ($scanketlm != ''){
+					$persen 	= $persen + 10;
+				}
+				if ($scanbuktilm != ''){
+					$persen 	= $persen + 10;
+				}
+				if ($status == '40' OR $status == '50' OR $status == '60' OR $status == '70' OR $status == '80' OR $status == '90'){
+					Datapsb::where('id', $idne)->update([
+						'status'		=> $persen
+					]);
+				}
+				return response()->json(['icon' => 'success', 'warna' => '#5ba035',  'status' => 'Sukses.!', 'message' => 'Upload '.$jenis.' Berhasil']);
+				return back();
+				
+			} else {
+				return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Mohon Maaf NIK Tidak ditemukan, pastikan anda telah menyelesaikan pendaftaran untuk anak anda dan pastikan NIK yang dimasukkan sesuai dengan : '.$nik ]);
+				return back();	
 			}
 		} else {
 			return response()->json(['icon' => 'error', 'warna' => '#bf441d', 'status' => 'Gagal', 'message' => 'Mohon Maaf NIK Tidak ditemukan, pastikan anda telah menyelesaikan pendaftaran untuk anak anda dan pastikan NIK yang dimasukkan sesuai dengan : '.$nik ]);
@@ -5661,6 +6955,10 @@ class FrontpageController extends Controller
 	public function jsonDatacalonsiswa(Request $request) {
 		$nik 		= $request->val01;
 		$tgllahir	= $request->val02;
+		$id_sekolah	= $request->id_sekolah;
+		if (!$this->hasPpdbUploadAccess($id_sekolah, $nik, $tgllahir)) {
+			return response()->json([], 403);
+		}
 		$scanakta	= '';
 		$scanfoto	= '';
 		$scankk		= '';
@@ -5668,40 +6966,15 @@ class FrontpageController extends Controller
 		$scanbukti	= '';
 		$idpsb		= $nik;
 		$idpel		= $nik;
-		$getdata	= Datapelengkappsb::where('niksiswa', $nik)->first();
+		$getdata	= Datapelengkappsb::where('niksiswa', $nik)->where('id_sekolah', $id_sekolah)->first();
 		if (isset($getdata->niksiswa)){
 			$idpel			= $getdata->id;
 			$idpsb			= $getdata->marking;
-			$scanakta		= $getdata->scanakta;
-			$scanfoto		= $getdata->scanfoto;
-			$scankk			= $getdata->scankk;
-			$scanket		= $getdata->scanket;
-			$scanbukti		= $getdata->scanbukti;
-			if ($scanakta != ''){
-				if (File::exists(base_path()."/public/sdist/img/berkas/". $scanakta)) {
-				  $scanakta	= 'berkas/'.$scanakta;
-				}
-			}
-			if ($scanfoto != ''){
-				if (File::exists(base_path()."/public/sdist/img/berkas/". $scanfoto)) {
-				  $scanfoto	= 'berkas/'.$scanfoto;
-				}
-			}
-			if ($scankk != ''){
-				if (File::exists(base_path()."/public/sdist/img/berkas/". $scankk)) {
-				  $scankk	= 'berkas/'.$scankk;
-				}
-			}
-			if ($scanket != ''){
-				if (File::exists(base_path()."/public/sdist/img/berkas/". $scanket)) {
-				  $scanket	= 'berkas/'.$scanket;
-				}
-			}
-			if ($scanbukti != ''){
-				if (File::exists(base_path()."/public/sdist/img/berkas/". $scanbukti)) {
-				  $scanbukti	= 'berkas/'.$scanbukti;
-				}
-			}
+			$scanakta		= $getdata->getPSBAkta->xfile ?? '';
+			$scanfoto		= $getdata->getPSBFoto->xfile ?? '';
+			$scankk			= $getdata->getPSBKK->xfile ?? '';
+			$scanket		= $getdata->getPSBKet->xfile ?? '';
+			$scanbukti		= $getdata->getPSBBukti->xfile ?? '';
 		}
 		$arraysurat[] = array(
 			'idpsb' 		=> $idpsb,
@@ -5744,5 +7017,144 @@ class FrontpageController extends Controller
 			'isine'			=> $scanbukti
 		);
 		echo json_encode($arraysurat);
+	}
+	public function ctkLabelBuku($id){
+		$data	=   Perpumini::where('id', $id)->first();
+        $cetak 	= '<table width="100%" class="printiki" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td colspan="3" style="border-bottom-color: #000; border-bottom-style: double; border-bottom-width: thin;" valign="bottom"><br /><strong>'.$data->judul.'</td>
+					</tr>
+					<tr>
+						<td valign="top">ISBN</td>
+						<td valign="top">:</td>
+						<td valign="top">'.$data->isbn.'</td>
+					</tr>
+					<tr>
+						<td valign="top">Rak</td>
+						<td valign="top">:</td>
+						<td valign="top">'.$data->rakbuku.'</td>
+					</tr>
+					<tr>
+						<td valign="top">Kode Buku</td>
+						<td valign="top">:</td>
+						<td valign="top">'.$data->kodebuku.'</td>
+					</tr>
+					<tr>
+						<td valign="top">Pengarang</td>
+						<td valign="top">:</td>
+						<td valign="top">'.$data->pengarang.'</td>
+					</tr>
+					<tr>
+						<td valign="top">Penerbit</td>
+						<td valign="top">:</td>
+						<td valign="top">'.$data->penerbit.'</td>
+					</tr>
+				</table>';
+		$data['datatoprint'] = $cetak;
+        return view('cetak.labelbuku', $data);
+    }
+	public function viewTabelBulan(Request $request) {
+		$month 			= $request->month;
+		$year 			= $request->year;
+		$bentuk 		= $request->bentuk;
+		if ($bentuk == 'kalender'){
+			if ($month == 'latest') { $month =  date('m'); }
+			$daysInMonth 	= Carbon::createFromDate($year, $month, 1)->daysInMonth;
+			$startDate 		= Carbon::createFromDate($year, $month, 1)->startOfMonth()->startOfWeek();
+			$dates 			= [];
+			for ($day = 0; $day < $daysInMonth; $day++) {
+				$date 			= $startDate->copy()->addDays($day)->format('Y-m-d');
+				$count_kegiatan = RencanaKegiatan::where('mulai', $date)->count();
+				$cekharilibur 	= DB::table('db_hariliburnasional')->where('tanggal', $date)->where('id_sekolah', Session('sekolah_id_sekolah'))->count();
+				$dates[$date] 	= [
+					'jumlah_kegiatan' 	=> $count_kegiatan,
+					'is_holiday' 		=> $cekharilibur,
+					'keterangan' 		=> ''
+				];
+			}
+			$generatesurat 		= view('cetak.kalender', compact('month', 'year', 'dates', 'startDate'))->render();
+			echo $generatesurat;
+		} else if ($bentuk == 'listkalender'){
+			if ($month == 'latest') { $month =  date('m'); }
+			$daysInMonth 	= Carbon::createFromDate($year, $month, 1)->startOfMonth()->startOfWeek();
+
+			$kegiatan 		= RencanaKegiatan::where('mulai', '>', $daysInMonth)->get();
+			$harilibur 		= DB::table('db_hariliburnasional')->where('tanggal', '>', $daysInMonth)->where('id_sekolah', '!=', '3')->get();
+			$result 		= [];
+			foreach ($kegiatan as $item) {
+				$result[] = [
+					'mulai'				=> $item->mulai,
+					'namakegiatan'		=> $item->namakegiatan,
+					'penanggunggjawab'	=> $item->penanggunggjawab,
+				];
+			}
+			foreach ($harilibur as $item) {
+				$result[] = [
+					'mulai'				=> $item->tanggal,
+					'namakegiatan'		=> $item->namaharilibur,
+					'penanggunggjawab'	=> '',
+				];
+			}
+			if (!empty($result)) {
+				usort($result, function($a, $b) {
+					return strtotime($a['mulai']) - strtotime($b['mulai']);
+				});
+			}
+			$generatesurat 	= view('cetak.kalenderkegiatan', compact('result'))->render();
+			echo $generatesurat;
+		} else if ($bentuk == 'hariliburnasional'){
+			$sql 	= DB::table('db_hariliburnasional')->where('tanggal', 'LIKE', $year.'-%')->where('id_sekolah', Session('sekolah_id_sekolah'))->orderBy('tanggal', 'ASC')->groupBy('marking')->get();
+			echo json_encode($sql);
+		} else if ($bentuk == 'inputhariliburnasional'){
+			$mulai 			= $request->val01;
+			$akhir 			= $request->val02;
+			$nama 			= $request->val03;
+			$idne 			= $request->val04;
+			if ($idne != 'new'){
+				DB::table('db_hariliburnasional')->where('marking', $idne)->where('id_sekolah', Session('sekolah_id_sekolah'))->delete();
+			}
+			$marking		= $mulai.' s/d '.$akhir;
+			try {
+				DB::beginTransaction();
+				if ($mulai == $akhir){
+					DB::table('db_hariliburnasional')->insert([
+						'tanggal'       => $mulai,
+						'mulai'         => $mulai,
+						'akhir'        	=> $akhir,
+						'namaharilibur'	=> $nama,
+						'marking'		=> $marking,
+						'id_sekolah'   	=> Session('sekolah_id_sekolah'),
+					]);
+				} else if ($mulai < $akhir){
+					while ($mulai <= $akhir) {
+						DB::table('db_hariliburnasional')->insert([
+							'tanggal'       => $mulai,
+							'mulai'         => $mulai,
+							'akhir'         => $akhir,
+							'namaharilibur' => $nama,
+							'marking'		=> $marking,
+							'id_sekolah'    => Session('sekolah_id_sekolah'),
+						]);
+						$mulai = date('Y-m-d', strtotime($mulai . ' +1 day'));
+					}
+				} else {
+					DB::table('db_hariliburnasional')->insert([
+						'tanggal'       => $akhir,
+						'mulai'         => $mulai,
+						'akhir'        	=> $akhir,
+						'namaharilibur'	=> $nama,
+						'marking'		=> $marking,
+						'id_sekolah'   	=> Session('sekolah_id_sekolah'),
+					]);
+				}
+				DB::commit();
+				echo 'Data Success';
+			} catch (\Exception $e) {
+				DB::rollback();
+				$pesan = $e->getMessage();
+				echo $pesan; 
+			}
+		}
+		
 	}
 }

@@ -9,6 +9,13 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+    # Force XML/text feed endpoints through Laravel, even if the web server
+    # tries to treat them like directories and appends a trailing slash.
+    RewriteRule ^sitemap\.xml/?$ index.php [L]
+    RewriteRule ^robots\.txt/?$ index.php [L]
+    RewriteRule ^blog/sitemap\.xml/?$ index.php [L]
+    RewriteRule ^blog/robots\.txt/?$ index.php [L]
+
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$

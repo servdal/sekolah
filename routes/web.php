@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
@@ -10,18 +11,18 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PersuratanController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\BankSoalController;
-use Onecentlin\Adminer\Http\Controllers\AdminerController;
+use App\Http\Controllers\ExamController;
 
-Route::get('/', [AuthController::class, 'viewAuth']);
+
+Route::get('/s/{slug}', [FrontpageController::class, 'show']);
 Route::get('cekandroid/{id}', [AuthController::class, 'getFirebaseaccount']);
 Route::get('cekandroid', [AuthController::class, 'goToLogin']);
-Route::get('/adminer', [AdminerController::class, 'index'])->middleware('adminer.access');
 
 Route::post('authenticate', [AuthController::class, 'authenticate'])->name('authenticate');
-Route::post('exdaftarbaru', [AuthController::class, 'exDaftarBaru'])->name('exDaftarBaru');
+Route::post('exdaftarbaru', [AuthController::class, 'exDaftarBaru'])->middleware('throttle:register')->name('exDaftarBaru');
 Route::get('login', [AuthController::class, 'viewAuth'])->name('login');
-Route::post('exresetpassword', [AuthController::class, 'exResetPassword'])->name('exResetPassword');
-Route::post('exlogin', [AuthController::class, 'exLogin'])->name('exLogin');
+Route::post('exresetpassword', [AuthController::class, 'exResetPassword'])->middleware('throttle:password-reset')->name('exResetPassword');
+Route::post('exlogin', [AuthController::class, 'exLogin'])->middleware('throttle:login')->name('exLogin');
 Route::get('verifikasiemail',[AuthController::class, 'verifikasi'])->name('verifikasiemail');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -32,6 +33,7 @@ Route::get('viewlampiran/{id}', [FrontpageController::class, 'viewLampiran']);
 Route::get('buktibayar/{id}', [FrontpageController::class, 'viewBuktiBayar']);
 Route::get('rapot/{id}', [FrontpageController::class, 'viewRapot']);
 Route::get('printmark/{id}', [FrontpageController::class, 'viewPrintWithMark']);
+Route::get('printmarkbyid/{id}', [FrontpageController::class, 'viewPrintWithMarkID']);
 Route::get('ttdrapot/{id}', [FrontpageController::class, 'viewTtdRapot']);
 Route::get('ceking/{id}', [FrontpageController::class, 'cekingPembayaran']);
 Route::get('karpes/{id}', [FrontpageController::class, 'viewKarpes']);
@@ -52,12 +54,12 @@ Route::post('tamu/exbukutamu', [FrontpageController::class, 'exbukuTamu'])->name
 Route::post('tamu/carilaptamu', [FrontpageController::class, 'exTamucari'])->name('exTamucari');
 Route::post('tamu/bukutamu', [FrontpageController::class, 'bukuTamu'])->name('bukuTamu');
 Route::post('tamu/rekaptamu', [FrontpageController::class, 'rekapTamu'])->name('rekapTamu');
-Route::post('ppdb/daftar', [FrontpageController::class, 'exPpdb'])->name('exPpdb');
-Route::post('ppdb/savefileppdb', [FrontpageController::class, 'exSavefileppdb'])->name('exSavefileppdb');
-Route::post('ppdb/saveberkasppdb', [FrontpageController::class, 'exSaveberkasppdb'])->name('exSaveberkasppdb');
-Route::post('ppdb/ceknikppdb', [FrontpageController::class, 'exCeknikppdb'])->name('exCeknikppdb');
-Route::post('ppdb/getkodependaf', [FrontpageController::class, 'exGetkodependaf'])->name('exGetkodependaf');
-Route::post('ppdb/datacalonsiswa', [FrontpageController::class, 'jsonDatacalonsiswa'])->name('jsonDatacalonsiswa');
+Route::post('ppdb/daftar', [FrontpageController::class, 'exPpdb'])->middleware('throttle:10,1')->name('exPpdb');
+Route::post('ppdb/savefileppdb', [FrontpageController::class, 'exSavefileppdb'])->middleware('throttle:20,1')->name('exSavefileppdb');
+Route::post('ppdb/saveberkasppdb', [FrontpageController::class, 'exSaveberkasppdb'])->middleware('throttle:20,1')->name('exSaveberkasppdb');
+Route::post('ppdb/ceknikppdb', [FrontpageController::class, 'exCeknikppdb'])->middleware('throttle:10,1')->name('exCeknikppdb');
+Route::post('ppdb/getkodependaf', [FrontpageController::class, 'exGetkodependaf'])->middleware('throttle:20,1')->name('exGetkodependaf');
+Route::post('ppdb/datacalonsiswa', [FrontpageController::class, 'jsonDatacalonsiswa'])->middleware('throttle:20,1')->name('jsonDatacalonsiswa');
 Route::post('pip/saveabsen', [FrontpageController::class, 'exPresensiviewPIP'])->name('exPresensiviewPIP');
 Route::post('kwitansi/expersetujuanberkas', [FrontpageController::class, 'expersetujuanBerkas'])->name('expersetujuanBerkas');
 Route::post('rapot/getstatkd', [FrontpageController::class, 'jsonStatistikkd'])->name('jsonStatistikkd');
@@ -66,6 +68,10 @@ Route::post('rapot/getstatpermuatan', [FrontpageController::class, 'jsonStatperm
 
 Route::get('trackingid/{id}', [PersuratanController::class, 'viewTrackingbyid']);
 Route::get('ttdsurat/{id}', [PersuratanController::class, 'TtdSurat']);
+
+Route::get('/ujian/login', [ExamController::class, 'showLoginForm'])->name('exam.login');
+Route::post('/ujian/login', [ExamController::class, 'login'])->name('exam.login.post');
+Route::post('/ujian/logout', [ExamController::class, 'logout'])->name('exam.logout');
 
 Route::group([], function () {
 	/////////////////E-COMPLAIN////////////////////////
@@ -231,12 +237,15 @@ Route::group([], function () {
     Route::get('json/rekaphutang', [AdminController::class, 'getrekapHutang'])->name('getrekapHutang');
 	Route::post('excutor/simpantransaksi', [AdminController::class, 'simpanTransaksi'])->name('simpanTransaksi');
 	Route::post('excutor/exvalidasikwitansi', [AdminController::class, 'exValidasiKwitansi'])->name('exValidasiKwitansi');
-	
+	Route::get('cetakrapot', [AdminController::class, 'viewCetakRaport']);
+
 	Route::get('lapekskul', [GuruController::class, 'viewLapekskul']);
 	Route::get('penilaianekskul', [GuruController::class, 'viewNilekskul']);
 	Route::post('json/rincianekskul', [GuruController::class, 'jsonRincianekskul'])->name('jsonRincianekskul');
 	Route::get('nilekskul/{id}', [GuruController::class, 'viewPenEkskul']);
-	
+	Route::get('legger/{id}', [GuruController::class, 'viewLegger']);
+	Route::get('editorrapot/{id}', [GuruController::class, 'viewEditorRapot']);
+
 	Route::get('lapabsen', [GuruController::class, 'viewLapabsen']);
 	Route::get('json/presensiadmin', [GuruController::class, 'jsonPresensi'])->name('jsonPresensi');
 	
@@ -250,7 +259,9 @@ Route::group([], function () {
 	Route::post('json/jsjadwalrps', [GuruController::class, 'jsonJadwalRPS'])->name('jsonJadwalRPS');
 	Route::post('json/jssettingnilai', [GuruController::class, 'jsonDataSettingNilai'])->name('jsonDataSettingNilai');
 
-	
+	Route::get('rekapperkodekd', [GuruController::class, 'genRekapPerkodeKD']);
+	Route::get('summaryreport', [GuruController::class, 'genSummaryReport']);
+
 	Route::get('lognilai', [GuruController::class, 'viewLognilai'])->name('lognilai');
 	Route::get('kelas/{id}', [GuruController::class, 'viewGradeperkelas']);
 	Route::get('tahap/{id}', [GuruController::class, 'viewGradeperTahap']);
@@ -271,6 +282,7 @@ Route::group([], function () {
 	Route::post('guru/inputabsenekskul', [GuruController::class, 'exInputabsenekskul'])->name('exInputabsenekskul');
 	Route::post('guru/inputnilaiekskul', [GuruController::class, 'exInputnilaiekskul'])->name('exInputnilaiekskul');
 	Route::get('json/lognilai', [GuruController::class, 'jsonLognilai'])->name('jsonLognilai');
+	Route::post('json/lognilaiekskul', [GuruController::class, 'jsonLognilaiEKskul'])->name('jsonLognilaiEkskul');
 	Route::post('json/rinciannilai', [GuruController::class, 'jsonRinciannilai'])->name('jsonRinciannilai');
 	Route::post('guru/exverpresensi', [GuruController::class, 'exVerpresensi'])->name('exVerpresensi');
 	Route::post('guru/saveabsenall', [GuruController::class, 'exSaveabsenall'])->name('exSaveabsenall');
@@ -304,33 +316,7 @@ Route::group([], function () {
 	Route::post('guru/jalldatabeasiswa', [GuruController::class, 'jsonBeasiswa'])->name('jsonBeasiswa');
 	Route::post('guru/exsimpanbeasiswa', [GuruController::class, 'exSimpanBeasiswa'])->name('exSimpanBeasiswa');
 
-	Route::get('banksoal', [BankSoalController::class, 'viewIndex']);
-	Route::get('test', [BankSoalController::class, 'viewPortalUjian'])->name('viewPortalUjian');
-	Route::get('ujiancbt',[BankSoalController::class, 'viewUjianKompetensi'])->name('viewUjianKompetensi');
-    Route::get('tryout', [BankSoalController::class, 'viewTryOut'])->name('viewTryOut');
-	Route::post('exlogintest', [BankSoalController::class, 'exLoginTest'])->name('exLoginTest');
-	Route::post('exloginujian', [BankSoalController::class, 'exLoginUdin'])->name('exLoginUdin');
-
-	Route::post('exfirstsoal', [BankSoalController::class, 'getFirstSoal'])->name('getFirstSoal');
-	Route::post('exfirstdataujian', [BankSoalController::class, 'getFirstDataUjian'])->name('getFirstDataUjian');
-	Route::post('exinputbanksoal', [BankSoalController::class, 'exInputBankSoal'])->name('exInputBankSoal');
-	Route::post('exceksoalkembar', [BankSoalController::class, 'exCeksoalkembar'])->name('exCeksoalkembar');
-	Route::post('exsimpanjawaban', [BankSoalController::class, 'exSimpanJawaban'])->name('exSimpanJawaban');
-	Route::post('jsonaktiftest', [BankSoalController::class, 'dataJsonaktiftest'])->name('jsonaktiftest');
-	Route::get('getbanksoal', [BankSoalController::class, 'getBankSoal'])->name('getBankSoal');
-	Route::get('jsongetsoalaktif', [BankSoalController::class, 'jsonGetSoalAktif'])->name('jsonGetSoalAktif');
-	Route::post('exaddtest', [BankSoalController::class, 'exAddTest'])->name('exAddTest');
-	Route::post('exaddpesertatest', [BankSoalController::class, 'exAddPesertaTest'])->name('exAddPesertaTest');
-	Route::post('exhitungnilai', [BankSoalController::class, 'exHitungNilai'])->name('exHitungNilai');
-	Route::post('exaddtotxt', [BankSoalController::class, 'exAddtoTXT'])->name('exaddtotxt');
-	Route::post('jsonallcase', [BankSoalController::class, 'jsonallcase'])->name('jsonallcase');
-	Route::post('aktifet', [BankSoalController::class, 'aktifet'])->name('aktifet');
-	Route::post('jgetdetailpeserta', [BankSoalController::class, 'jgetdetailPeserta'])->name('jgetdetailPeserta');
-	Route::post('jsonallinterviewer', [BankSoalController::class, 'jsonallInterviewer'])->name('jsonallinterviewer');
-    Route::post('rad-json-pesertates', [BankSoalController::class, 'jsonPesertaTest'])->name('rad-json-pesertates');
-    Route::post('rad-json-datausercari', [BankSoalController::class, 'jsonUsercari'])->name('rad-json-datausercari');
-
-
+	
 	Route::get('biodata', [OrtuController::class, 'index']);
 	Route::post('json/viewdatainduk', [OrtuController::class, 'jsonViewDatainduk'])->name('jsonViewDatainduk');
 	Route::post('json/getstatdatakd', [OrtuController::class, 'jsonStatistikDatakd'])->name('jsonStatistikDatakd');
@@ -376,5 +362,48 @@ Route::group([], function () {
 	
 	Route::get('/backup/public', [BackupController::class, 'backupPublicFolder'])->name('backup.public');
 	Route::get('/backup/database', [BackupController::class, 'backupDatabase'])->name('backup.database');
-});
+	Route::post('/admin/git-pull', [BackupController::class, 'gitPullMain'])->name('backup.pull');
 
+	Route::get('buatqr', [PostController::class, 'viewBuatqr']);
+	Route::post('excreateqrcode', [PostController::class, 'exCreateqrcode'])->name('exCreateQR');
+
+	Route::get('/ujian', [BankSoalController::class,'viewUjian'])->name('exam.index');
+	Route::get('/ujian/create', [BankSoalController::class,'createUjian'])->name('exam.create');
+	Route::post('/ujian/store', [BankSoalController::class,'storeUjian'])->name('exam.store');
+	Route::get('/ujian/{exam}/edit', [BankSoalController::class,'editUjian'])->name('exam.edit');
+	Route::get('/ujian/data-soal/{exam}', [BankSoalController::class,'dataSoalExam'])->name('exam.data-soal');
+	Route::put('/exam/{exam}', [BankSoalController::class,'updateUjian'])->name('exam.update');
+	Route::delete('/ujian/{exam}', [BankSoalController::class,'destroyUjian'])->name('exam.destroy');
+	Route::get('/ujian/peserta/{kelas}', [BankSoalController::class,'loadPeserta'])->name('exam.participants');
+	Route::get('/ujian/soal', [BankSoalController::class,'getSoalData'])->name('exam.soal.json');
+	
+	Route::get('/exam/{exam}/questions', [BankSoalController::class,'manageQuestions'])
+		->name('exam.questions');
+
+	Route::post('/exam/{exam}/questions/add', [BankSoalController::class,'addQuestion'])
+		->name('exam.questions.add');
+
+	Route::delete('/exam/{exam}/questions/{question}', [BankSoalController::class,'removeQuestion'])
+		->name('exam.questions.remove');
+
+	Route::post('/exam/{exam}/questions/reorder', [BankSoalController::class,'reorderQuestions'])
+		->name('exam.questions.reorder');
+	
+	Route::get('banksoal', [BankSoalController::class, 'index'])->name('bank-soal.index');
+	Route::get('bank-soal/create', [BankSoalController::class,'create'])->name('bank-soal.create');
+	Route::post('bank-soal', [BankSoalController::class,'store'])->name('bank-soal.store');
+	Route::get('bank-soal/{bank_soal}/edit', [BankSoalController::class,'edit'])->name('bank-soal.edit');
+	Route::put('bank-soal/{bank_soal}', [BankSoalController::class,'update'])->name('bank-soal.update');
+	Route::delete('bank-soal/{bank_soal}', [BankSoalController::class,'destroy'])->name('bank-soal.destroy');
+	Route::get('bank-soal/{bank_soal}/preview', [BankSoalController::class,'show'])->name('bank-soal.preview');
+	Route::get('/bank-soal/form/{tipe}', function ($tipe) { return view("bank_soal.partials.$tipe"); });
+	Route::get('/bank-soal/form-edit/{tipe}/{id}', [BankSoalController::class,'formEdit']);
+
+	Route::get('/ujian/{id}', [ExamController::class, 'index'])->name('exam.show');
+	Route::get('/ujian/{id}/preview', [ExamController::class, 'preview'])->name('exam.preview');
+    Route::post('/tryout/save', [ExamController::class, 'storeAnswer'])->name('tryout.save');
+    Route::post('/tryout/finish', [ExamController::class, 'finishExam'])->name('tryout.finish');
+	Route::get('/ujian/{exam_id}/hasil', [ExamController::class, 'viewPesertaUjian'])->name('exam.result.index');
+	Route::get('/ujian/nilai/{exam_id}/{student_id}', [ExamController::class, 'grading'])->name('exam.grading');
+	Route::post('/ujian/nilai/simpan', [ExamController::class, 'storeGrading'])->name('exam.grading.store');
+});

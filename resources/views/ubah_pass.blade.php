@@ -63,6 +63,8 @@
     </div>
 </div>
 <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+<input type="hidden" name="reset_token" id="reset_token" value="{{ $token ?? '' }}">
+<input type="hidden" name="purpose" id="purpose" value="{{ $purpose ?? 'reset' }}">
 @endsection
 @push('script')
 <script type="text/javascript">
@@ -71,11 +73,19 @@
         var set01=document.getElementById('password').value;
         var set02=document.getElementById('password_confirm').value;
         var set03=document.getElementById('email').value;
+        var set04=document.getElementById('reset_token').value;
+        var set05=document.getElementById('purpose').value;
         var token=document.getElementById('token').value;
         if (set01 == ''){
             swal({
                 title: 'Mohon lengkapi',
-                text: 'Email Aktif Wajib di Isi',
+                text: 'Password wajib diisi',
+                type: 'info',
+            });
+        } else if (set01 !== set02) {
+            swal({
+                title: 'Mohon cek lagi',
+                text: 'Konfirmasi password tidak sama',
                 type: 'info',
             });
         } else {
@@ -84,6 +94,8 @@
                 formdata.set('val02',set01);
                 formdata.set('val03',set02);
                 formdata.set('val04',set03);
+                formdata.set('val05',set04);
+                formdata.set('val06',set05);
                 formdata.set('_token',token);
             url='{{ route("exResetPassword") }}';
             $.ajax({

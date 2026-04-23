@@ -11,49 +11,14 @@
 		border: thin solid #000;
 	}
 	table.background {
-		background: url("dist/img/logo-gray.jpg") no-repeat;	
+		background: url("{{$logo_grey}}") no-repeat;	
 		background-position:center;
 	}
 	</style>
 	</head>
 	<body>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-image: url('{{asset('dist/img/logo-gray.jpg')}}'); background-repeat: no-repeat; background-position: center;">
-		  <tr>
-			<td colspan="3" rowspan="9" align="left" valign="top" style="border-bottom:double"><img src="{!! $logo !!}" width="120" height="120" /></td>
-			<td colspan="6">&nbsp;</td>
-			<td colspan="2" rowspan="2" align="center" valign="middle" style="border-bottom:double; border-top:double; border-left:double; border-right:double;"><strong>{!! $datapsb->kodependaf !!}</strong></td>
-		  </tr>
-		  <tr>
-			<td colspan="6">&nbsp;</td>
-		  </tr>
-		  <tr>
-			<td colspan="8" align="center"><b>{!! $yayasan !!}</b></td>
-		  </tr>
-		  <tr>
-			<td colspan="8" align="center"><b>{!! $sekolah !!}</b></td>
-		  </tr>
-		  <tr>
-			<td colspan="8" align="center"><strong>PANITIA PENERIMAAN PESERTA  DIDIK BARU (P2DB)</strong></td>
-		  </tr>
-		  <tr>
-			<td colspan="8" align="center">{!! config('global.nomerinduksekolah') !!}</td>
-		  </tr>
-		  <tr>
-			<td colspan="8" align="center"><strong>{!! $alamat !!}</strong></td>
-		  </tr>
-		  <tr>
-			<td colspan="8" align="center">{!! config('global.email') !!}</td>
-		  </tr>
-		  <tr>
-			<td width="21" style="border-bottom:double">&nbsp;</td>
-			<td width="33" style="border-bottom:double">&nbsp;</td>
-			<td width="56" style="border-bottom:double">&nbsp;</td>
-			<td width="22" style="border-bottom:double">&nbsp;</td>
-			<td width="25" style="border-bottom:double">&nbsp;</td>
-			<td width="198" style="border-bottom:double">&nbsp;</td>
-			<td width="39" style="border-bottom:double">&nbsp;</td>
-			<td width="129" style="border-bottom:double">&nbsp;</td>
-		  </tr>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-image: url('{{ $logo_grey }}'); background-repeat: no-repeat; background-position: center;">
+		  {!! $kopsurat !!}
 		  <tr>
 			<td width="22">&nbsp;</td>
 			<td width="44">&nbsp;</td>
@@ -191,27 +156,6 @@
 		   </tr>
 		   <tr>
 			 <td>&nbsp;</td>
-			 <td colspan="2">&nbsp;</td>
-			 <td>:</td>
-			 <td style="border-bottom:double; border-top:double; border-left:double; border-right:double;">&nbsp;</td>
-			 <td colspan="6">&nbsp;&nbsp;2. Rp. {!! $byrspp2 !!},-</td>
-		   </tr>
-		   <tr>
-			 <td>&nbsp;</td>
-			 <td colspan="2">&nbsp;</td>
-			 <td>:</td>
-			 <td style="border-bottom:double; border-top:double; border-left:double; border-right:double;">&nbsp;</td>
-			 <td colspan="6">&nbsp;&nbsp;3. Rp. {!! $byrspp3 !!},-</td>
-		   </tr>
-		   <tr>
-			 <td>&nbsp;</td>
-			 <td colspan="2">&nbsp;</td>
-			 <td>:</td>
-			 <td style="border-bottom:double; border-top:double; border-left:double; border-right:double;">&nbsp;</td>
-			 <td colspan="6">&nbsp;&nbsp;4. Rp. .................................................... [ &gt;  Rp. {!! $byrspp3 !!},-  ]</td>
-		   </tr>
-		   <tr>
-			 <td>&nbsp;</td>
 			 <td>&nbsp;</td>
 			 <td>&nbsp;</td>
 			 <td>&nbsp;</td>
@@ -242,7 +186,14 @@
 			 <td colspan="2">&nbsp;</td>
 			 <td>:</td>
 			 <td style="border-bottom:double; border-top:double; border-left:double; border-right:double;">&nbsp;</td>
-			 <td colspan="6">&nbsp;&nbsp;3. Rp. .................................................... [ &gt; Rp. {!! $byrdpp2 !!},-  ]</td>
+			 <td colspan="6">&nbsp;&nbsp;3. Rp. {!! $byrspp3 !!},-</td>
+		   </tr>
+		   <tr>
+			 <td>&nbsp;</td>
+			 <td colspan="2">&nbsp;</td>
+			 <td>:</td>
+			 <td style="border-bottom:double; border-top:double; border-left:double; border-right:double;">&nbsp;</td>
+			 <td colspan="6">&nbsp;&nbsp;3. Rp. .................................................... [ &gt; Rp. {!! $byrspp3 !!},-  ]</td>
 		   </tr>
 		   <tr>
 			 <td>&nbsp;</td>

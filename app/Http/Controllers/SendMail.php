@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Defuse\Crypto\Crypto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\File;
 use Spatie\PdfToImage\Pdf;
@@ -16,7 +17,7 @@ function TerbilangA($x)
 {
 	$abil = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
 	if ($x < 12)
-	return " " . $abil[$x];
+	return " " . $abil[$x] ?? '';
 	elseif ($x < 20)
 	return TerbilangA($x - 10) . " belas";
 	elseif ($x < 100)
@@ -49,24 +50,45 @@ class SendMail extends Controller
             return false;
 		}
     }
+    protected static function issueUserActionToken(User $user, string $purpose): string
+    {
+        $rawToken = Str::random(64);
+
+        DB::table('user_action_tokens')
+            ->where('email', $user->email)
+            ->where('purpose', $purpose)
+            ->whereNull('used_at')
+            ->delete();
+
+        DB::table('user_action_tokens')->insert([
+            'email' => $user->email,
+            'purpose' => $purpose,
+            'token_hash' => hash('sha256', $rawToken),
+            'expires_at' => now()->addMinutes(30),
+            'used_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return url('/verifikasiemail') . '?email=' . urlencode($user->email) . '&token=' . urlencode($rawToken) . '&purpose=' . $purpose;
+    }
     public static function kirim($to_name,$to_email,$forget=false){
-        $date=date('YmdHis');
+        if ($to_email == 'jufrih@matabadu.sch.id'){ $to_email = 'jufrih@sdtqdu.sch.id'; }
+        if ($to_email == 'via@matabadu.sch.id'){ $to_email = 'via@sdtqdu.sch.id'; }
+        if ($to_email == 'nanik@matabadu.sch.id'){ $to_email = 'mataba@sdtqdu.sch.id'; }
+        if ($to_email == 'milda@matabadu.sch.id'){ $to_email = 'milda@sdtqdu.sch.id'; }
+        if ($to_email == 'hani@matabadu.sch.id'){ $to_email = 'hani@sdtqdu.sch.id'; }
+        if ($to_email == 'agus@matabadu.sch.id'){ $to_email = 'mataba@sdtqdu.sch.id'; }
+        if ($to_email == 'ariq@matabadu.sch.id'){ $to_email = 'mataba@sdtqdu.sch.id'; }
         $cekdata = User::where('email', $to_email)->orderBy('id', 'DESC')->first();
         if (isset($cekdata->id)){
             if($forget){
-                $string_enc     = $to_email.'|'.$date.'|FOR';
-                $url            = url('/verifikasiemail').'?key='.self::enkrip($string_enc);
+                $url            = self::issueUserActionToken($cekdata, 'reset');
                 $subject        = 'Ubah Password ('.$cekdata->fakpanjang.')';
                 $subjectmail    = 'Ubah Password';
                 $note           = 'Anda telah melakukan permohonan ubah password. Silahkan klik link berikut untuk melanjutkan proses.';
-                DB::table('password_resets')->insert([
-                    'email'     => $to_email,
-                    'token'     => self::enkrip($string_enc),
-                    'created_at'=> date("Y-m-d H:i:s")
-                ]);
             }else{
-                $string_enc     = $to_email.'|'.$date.'|VER';
-                $url            = url('/verifikasiemail').'?key='.self::enkrip($string_enc);
+                $url            = self::issueUserActionToken($cekdata, 'verify');
                 $subject        = 'Verifikasi Email ('.$cekdata->fakpanjang.')';
                 $subjectmail    = 'Verifikasi Email';
                 $note           = 'Email anda telah terdaftar di Aplikasi ('.$cekdata->fakpanjang.') Email ini dapat digunakan jika anda lupa password. Selanjutnya dimohon Bapak/Ibu membuat password untuk login ke aplikasi dengan cara Klik Tombol di bawah ini.';
@@ -79,11 +101,13 @@ class SendMail extends Controller
                 'subject'           => $subjectmail, 
                 'note'              => $note,
             );
-            if ($to_email != 'arsiparis@localhost.com'){
+            try {
                 Mail::send('mail/user', $data, function($message) use ($to_name, $to_email, $subject) {
                     $message->to($to_email, $to_name)->subject($subject);
                     $message->from('swandhana.fp@ub.ac.id','Mail Admin');
                 });
+            } catch (\Exception $e) {
+                $error = $e->getMessage();
             }
         }
     }
@@ -104,11 +128,20 @@ class SendMail extends Controller
                 'subject'       => $subject,
                 'note'          => $note,
             );
-            if ($to_email != 'arsiparis@localhost.com'){
+            if ($to_email == 'jufrih@matabadu.sch.id'){ $to_email = 'jufrih@sdtqdu.sch.id'; }
+            if ($to_email == 'via@matabadu.sch.id'){ $to_email = 'via@sdtqdu.sch.id'; }
+            if ($to_email == 'nanik@matabadu.sch.id'){ $to_email = 'mataba@sdtqdu.sch.id'; }
+            if ($to_email == 'milda@matabadu.sch.id'){ $to_email = 'milda@sdtqdu.sch.id'; }
+            if ($to_email == 'hani@matabadu.sch.id'){ $to_email = 'hani@sdtqdu.sch.id'; }
+            if ($to_email == 'agus@matabadu.sch.id'){ $to_email = 'mataba@sdtqdu.sch.id'; }
+            if ($to_email == 'ariq@matabadu.sch.id'){ $to_email = 'mataba@sdtqdu.sch.id'; }
+            try {
                 Mail::send('mail/useradmin', $data, function($message) use ($to_name, $to_email, $subject) {
                     $message->to($to_email, $to_name)->subject($subject);
                     $message->from('swandhana.fp@ub.ac.id','Mail Admin');
                 });
+            } catch (\Exception $e) {
+                $error = $e->getMessage();
             }
         }
     }
@@ -118,64 +151,20 @@ class SendMail extends Controller
             'subject'       => $subject,
             'note'          => $note,
         );
-        if ($to_email != 'arsiparis@localhost.com'){
+        if ($to_email == 'jufrih@matabadu.sch.id'){ $to_email = 'jufrih@sdtqdu.sch.id'; }
+        if ($to_email == 'via@matabadu.sch.id'){ $to_email = 'via@sdtqdu.sch.id'; }
+        if ($to_email == 'nanik@matabadu.sch.id'){ $to_email = 'mataba@sdtqdu.sch.id'; }
+        if ($to_email == 'milda@matabadu.sch.id'){ $to_email = 'milda@sdtqdu.sch.id'; }
+        if ($to_email == 'hani@matabadu.sch.id'){ $to_email = 'hani@sdtqdu.sch.id'; }
+        if ($to_email == 'agus@matabadu.sch.id'){ $to_email = 'mataba@sdtqdu.sch.id'; }
+        if ($to_email == 'ariq@matabadu.sch.id'){ $to_email = 'mataba@sdtqdu.sch.id'; }
+        try {
             Mail::send('mail/notif', $data, function($message) use ($to_name, $to_email, $subject) {
                 $message->to($to_email, $to_name)->subject($subject);
                 $message->from('swandhana.fp@ub.ac.id','Mail Admin');
             });
-        }
-        $jtokencari 	= User::where('email', $to_email)->whereNotNull('firebaseid')->get();
-        if (!empty($jtokencari)){
-            foreach ( $jtokencari as $rtokencari ){
-                $firebaseid = $rtokencari->firebase;
-                $msg = array (
-                    'message' 	=> $subject,
-                    'title'		=> Session('namaapps01'),
-                    'subtitle'	=> Session('fakpanjang'),
-                    'tickerText'=> 'Notification Centre',
-                    'image'		=> '',
-                    'vibrate'	=> 1,
-                    'sound'		=> 1,
-                    'largeIcon'	=> 'large_icon',
-                    'smallIcon'	=> 'small_icon'
-                );
-                $fields = array
-                (
-                    'to' 			=> $firebaseid,
-                    'priority'		=> 'high',
-                    'notification' 	=> [
-                        "title" => Session('namaapps01'),
-                        "sound" => "default",
-                        "body" 	=> $subject
-                    ],
-                    'data'			=> $msg
-                    
-                );
-                $headers = array
-                (
-                    'Authorization: key=' . config('global.API_ACCESS'),
-                    'Content-Type: application/json'
-                );
-                $url = 'https://fcm.googleapis.com/fcm/send';
-                $ch = curl_init();
-            
-                // Set the url, number of POST vars, POST data
-                curl_setopt($ch, CURLOPT_URL, $url);
-            
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            
-                // Disabling SSL Certificate support temporarly
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  0);
-                curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );		
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
-            
-                // Execute post
-                $result = curl_exec($ch);
-                curl_close($ch);
-            }
+        } catch (\Exception $e) {
+            $error = $e->getMessage();
         }
     }
     public static function mobilenotif($to_name,$to_email,$subject,$note){
@@ -230,6 +219,54 @@ class SendMail extends Controller
                     curl_close($ch);
                 }
             }
+        } else if ($to_email == 'perseorangan'){
+            $sjtokencariql 	= User::where('nip', $to_name)->whereNotNull('firebaseid')->get();
+            if (isset($sjtokencariql->firebaseid)){
+                $firebaseid = $sjtokencariql->firebaseid;
+                $msg = array (
+                    'message' 	=> $subject,
+                    'title'		=> 'Notification',
+                    'subtitle'	=> 'Please Cek on This Apps',
+                    'tickerText'=> 'Notification Centre',
+                    'image'		=> '',
+                    'vibrate'	=> 1,
+                    'sound'		=> 1,
+                    'largeIcon'	=> 'large_icon',
+                    'smallIcon'	=> 'small_icon'
+                );
+                $fields = array
+                (
+                    'to' 			=> $firebaseid,
+                    'priority'		=> 'high',
+                    'notification' 	=> [
+                        "title" => $subject,
+                        "sound" => "default",
+                        "body" 	=> $note
+                    ],
+                    'data'			=> $msg
+                    
+                );
+                $headers = array
+                (
+                    'Authorization: key=' . config('global.API_ACCESS'),
+                    'Content-Type: application/json'
+                );
+                $url = 'https://fcm.googleapis.com/fcm/send';
+                $ch = curl_init();
+                // Set the url, number of POST vars, POST data
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                // Disabling SSL Certificate support temporarly
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  0);
+                curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );		
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
+                // Execute post
+                $result = curl_exec($ch);
+                curl_close($ch);
+            }
         }
     }
     public static function kiriminbox($marking,$pengirim,$penerima,$email,$jenis,$kerja,$catatan,$tanggal){
@@ -237,6 +274,13 @@ class SendMail extends Controller
         $catatan    = '';
         $jenissrt   = '';
         $perihal    = 'Mail From '.$pengirim;
+        if ($email == 'jufrih@matabadu.sch.id'){ $email = 'jufrih@sdtqdu.sch.id'; }
+        if ($email == 'via@matabadu.sch.id'){ $email = 'via@sdtqdu.sch.id'; }
+        if ($email == 'nanik@matabadu.sch.id'){ $email = 'mataba@sdtqdu.sch.id'; }
+        if ($email == 'milda@matabadu.sch.id'){ $email = 'milda@sdtqdu.sch.id'; }
+        if ($email == 'hani@matabadu.sch.id'){ $email = 'hani@sdtqdu.sch.id'; }
+        if ($email == 'agus@matabadu.sch.id'){ $email = 'mataba@sdtqdu.sch.id'; }
+        if ($email == 'ariq@matabadu.sch.id'){ $email = 'mataba@sdtqdu.sch.id'; }
         $ceksurat 	= Suratkeluar::where('marking', $marking)->count();
         if ($ceksurat == 0){
             $ceksurat 	= Tabelskdanperaturan::where('marking', $marking)->count();

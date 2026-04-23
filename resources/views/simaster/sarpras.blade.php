@@ -1,21 +1,21 @@
 @extends('adminlte3.layout')
 @section('content')
-<div class="content-wrapper" >
-    <div class="content-header">
-        <div class="container">
+<div class="wrapper">
+    <section class="content-header">
+        <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0"> Sarana dan Prasarana</h1>
+                    <h1> Sarana dan Prasarana</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                     </ol>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="content" >
+    </section>
+    <section class="content">
         <div class="container-fluid">
             <div class="row" id="divutama">
                 <div class="col-md-12">
@@ -131,10 +131,71 @@
                 </div>
 			</div>
 		</div>
-	</div>
+	</section>
 </div>
 <div id="tempatctk" style="overflow: hidden; display: none;">
 	<div id="tabel_cetak"></div>
+	<div class="form-group">
+		<div class="row">
+			<div class="col-lg-5">
+				<label for="id_tarif">Tarif Sewa Perhari</label>
+				<input type="text" class="form-control" id="id_tarif" value="0">
+			</div>
+			<div class="col-lg-7">
+				<label for="id_statussewa">Status Sewa</label>
+				<select id="id_statussewa" class="form-control" >
+					<option value="Tidak di Sewa/Pinjamkan">Tidak di Sewa/Pinjamkan</option>
+					<option value="Di Sewa/Pinjamkan untuk kalangan internal">Di Sewa/Pinjamkan untuk kalangan internal</option>
+					<option value="Di Sewa/Pinjamkan untuk umum">Di Sewa/Pinjamkan untuk umum</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="id_pjruang">Permohonan Sewa / Pinjam di tujukan ke:</label>
+		<input type="text" class="form-control" id="id_pjruang" value="-">
+	</div>
+	<div class="form-group">
+		<div class="row">
+			<div class="col-lg-5">
+				<label for="addtarifgedung">Tarif Sewa Perhari</label>
+				<input type="text" class="form-control" id="addtarifgedung" value="0">
+			</div>			 
+			<div class="col-lg-7">
+				<label for="addstatusgedung">Status Sewa</label>
+				<select id="addstatusgedung" class="form-control" >
+					<option value="Tidak di Sewa/Pinjamkan">Tidak di Sewa/Pinjamkan</option>
+					<option value="Di Sewa/Pinjamkan untuk kalangan internal">Di Sewa/Pinjamkan untuk kalangan internal</option>
+					<option value="Di Sewa/Pinjamkan untuk umum">Di Sewa/Pinjamkan untuk umum</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="addpjgedung">Permohonan Sewa / Pinjam di tujukan ke:</label>
+		<input type="text" class="form-control" id="addpjgedung" value="-">
+	</div>
+	<div class="form-group">
+		<div class="row">
+			<div class="col-lg-5">
+				<label for="id_tarif2">Tarif Sewa Perhari</label>
+				<input type="text" class="form-control" id="id_tarif2" value="0">
+			</div>
+			<div class="col-lg-7">
+				<label for="id_statussewa2">Status Sewa</label>
+				<select id="id_statussewa2" class="form-control" >
+					<option value="Tidak di Sewa/Pinjamkan">Tidak di Sewa/Pinjamkan</option>
+					<option value="Di Sewa/Pinjamkan untuk kalangan internal">Di Sewa/Pinjamkan untuk kalangan internal</option>
+					<option value="Di Sewa/Pinjamkan untuk umum">Di Sewa/Pinjamkan untuk umum</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="id_pjruang2">Permohonan Sewa / Pinjam di tujukan ke:</label>
+		<input type="text" class="form-control" id="id_pjruang2" value="-">
+	</div>
+				
 </div>
 <div class="modal fade" id="modaladdgedung">
     <div class="modal-dialog">
@@ -157,26 +218,6 @@
 							<input type="text" class="form-control" id="addkodegedung">
 						</div>
 					</div>
-				</div>
-				<div class="form-group">
-					<div class="row">			  
-						<div class="col-lg-5">
-							<label for="addtarifgedung">Tarif Sewa Perhari</label>
-							<input type="text" class="form-control" id="addtarifgedung">
-						</div>			 
-						<div class="col-lg-7">
-							<label for="addstatusgedung">Status Sewa</label>
-							<select id="addstatusgedung" class="form-control" >
-								<option value="Tidak di Sewa/Pinjamkan">Tidak di Sewa/Pinjamkan</option>
-								<option value="Di Sewa/Pinjamkan untuk kalangan internal">Di Sewa/Pinjamkan untuk kalangan internal</option>
-								<option value="Di Sewa/Pinjamkan untuk umum">Di Sewa/Pinjamkan untuk umum</option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="addpjgedung">Permohonan Sewa / Pinjam di tujukan ke:</label>
-					<input type="text" class="form-control" id="addpjgedung">
 				</div>
 				<div class="form-group">
 					<label for="addfotogedung">File Foto Gedung</label>
@@ -302,26 +343,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="form-group">
-					<div class="row">			  
-						<div class="col-lg-5">
-							<label for="id_tarif">Tarif Sewa Perhari</label>
-							<input type="text" class="form-control" id="id_tarif">
-						</div>
-						<div class="col-lg-7">
-							<label for="id_statussewa">Status Sewa</label>
-							<select id="id_statussewa" class="form-control" >
-								<option value="Tidak di Sewa/Pinjamkan">Tidak di Sewa/Pinjamkan</option>
-								<option value="Di Sewa/Pinjamkan untuk kalangan internal">Di Sewa/Pinjamkan untuk kalangan internal</option>
-								<option value="Di Sewa/Pinjamkan untuk umum">Di Sewa/Pinjamkan untuk umum</option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="id_pjruang">Permohonan Sewa / Pinjam di tujukan ke:</label>
-					<input type="text" class="form-control" id="id_pjruang">
-				</div>
+				
 				<div class="form-group">
 					<label for="id_fotoruang">File Foto Ruangan</label>
 					<input type="file" id="id_fotoruang">
@@ -466,7 +488,14 @@
 				</div>
 				<div class="form-group">
 					<label for="aktif_tanggal">Tanggal Pelaksanaan</label>
-					<input type="text" class="form-control" id="aktif_tanggal">
+					<div class="row">
+						<div class="input-group margin">
+							<input type="text" class="form-control" placeholder="Tanggal" id="aktif_tanggal" data-inputmask-alias="datetime" data-inputmask-inputformat="yyyy-mm-dd" data-mask />
+							<span class="input-group-btn">
+								<button class="btn btn-info btn-flat" type="button" id="btnlihatlapharian">Tampilkan</button>
+							</span>
+						</div>
+					</div>
 				</div>
 				<div class="form-group">
 					<label for="aktif_driver">Penanggung Jawab / Driver</label>
@@ -587,27 +616,7 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<div class="row">
-						<div class="col-lg-5">
-							<label for="id_tarif2">Tarif Sewa Perhari</label>
-							<input type="text" class="form-control" id="id_tarif2">
-						</div>
-						<div class="col-lg-7">
-							<label for="id_statussewa2">Status Sewa</label>
-							<select id="id_statussewa2" class="form-control" >
-								<option value="Tidak di Sewa/Pinjamkan">Tidak di Sewa/Pinjamkan</option>
-								<option value="Di Sewa/Pinjamkan untuk kalangan internal">Di Sewa/Pinjamkan untuk kalangan internal</option>
-								<option value="Di Sewa/Pinjamkan untuk umum">Di Sewa/Pinjamkan untuk umum</option>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="id_pjruang2">Permohonan Sewa / Pinjam di tujukan ke:</label>
-					<input type="text" class="form-control" id="id_pjruang2">
-				</div>
-				<div class="form-group">
-					<label for="id_fotoruang2">File Foto Ruangan</label>
+					<label for="id_fotoruang2">File Foto Kendaraan</label>
 					<input type="file" id="id_fotoruang2">
 					<p class="help-block">File diperbolehkan hanya JPG / JPEG / PNG</p>
 				</div>
@@ -726,7 +735,7 @@
         }
     }
 	$(function () {
-		$("#aktif_tanggal").datepicker({format: 'yyyy-mm-dd'});
+		$('#aktif_tanggal').inputmask('yyyy-mm-dd', { 'placeholder': 'yyyy-mm-dd' });
 		CKEDITOR.env.isCompatible = true;
 		CKEDITOR.replace( 'aktif_keterangan', {
 			toolbarGroups: [{"name":"basicstyles","groups":["basicstyles", "list"]}],
@@ -797,7 +806,7 @@
 		var source = {
 			datatype: "json",
 			datafields: [
-				{ name: 'dot'},
+				{ name: 'id'},
 				{ name: 'namarg', type: 'text'},
 				{ name: 'namagd', type: 'text'},
 				{ name: 'kodegd', type: 'text'},
@@ -824,11 +833,10 @@
 		var dataAdapter = new $.jqx.dataAdapter(source);
 		var photoruang = function (row, column, value) {
 			var name = $('#gridk1').jqxGrid('getrowdata', row).foto;
-			if (name != ''){
-				var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="50" height="50" src="images/ruang/' + name + '"></div>';
-				
+			if (name == '' || name == null){
+				var img = '<div style="background: white;"></div>';	
 			} else {
-				var img = '<div style="background: white;"></div>';
+				var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="50" height="50" src="images/ruang/' + name + '"></div>';
 			}			
 			return img;
 		}
@@ -845,13 +853,13 @@
 			theme: "energyblue",
 			columns: [
 				{ text: 'Foto', editable: false, sortable: false, filterable: false, width: '5%', cellsrenderer: photoruang },
-				{ text: 'DIR', editable: false, sortable: false, filterable: false, align: 'center', columntype: 'button', width: '8%', cellsrenderer: function () {
+				{ text: 'DIR', editable: false, sortable: false, filterable: false, align: 'center', columntype: 'button', width: '5%', cellsrenderer: function () {
 					return "Cetak";
 					}, buttonclick: function (row) {		
 					editrow = row;	
 					var offset 		= $("#gridk1").offset();		
 					var dataRecord 	= $("#gridk1").jqxGrid('getrowdata', editrow);						
-					var goook		= dataRecord.dot;
+					var goook		= dataRecord.id;
 					var token 		= document.getElementById('token').value;
 					$.post('umum/ctkdir', { valkirim: goook, _token: token },
 					function(data){
@@ -872,15 +880,15 @@
 						});
 					}
 				},
-				{ text: 'Fasilitas', editable: false, sortable: false, filterable: false, columntype: 'button', width: 70, align: 'center', cellsrenderer: function () {
+				{ text: 'Fasilitas', editable: false, sortable: false, filterable: false, columntype: 'button', width: '7%', align: 'center', cellsrenderer: function () {
 					return "Fasilitas";
 					}, buttonclick: function (row) {
 						editrow = row;	
 						var offset 		= $("#gridk1").offset();
 						var dataRecord 	= $("#gridk1").jqxGrid('getrowdata', editrow);
-						var set01		= dataRecord.dot;
+						var set01		= dataRecord.id;
 						var set02		= dataRecord.namarg;
-						$("#fas_idruang").val(dataRecord.dot);
+						$("#fas_idruang").val(dataRecord.id);
 						$("#fas_ruang").val(dataRecord.namarg);
 						var token = document.getElementById('token').value;
 						var sourcedetail = {
@@ -917,15 +925,15 @@
 							source: datadetail,
 							theme: "energyblue",
 							columns: [
-								{ text: 'Nama Ruang', datafield: 'namarg', width: 150, cellsalign: 'left', align: 'center' },
-								{ text: 'Nama Barang', datafield: 'namabrg', width: 150, cellsalign: 'left', align: 'center' },
-								{ text: 'Jenis', datafield: 'jenis', width: 100, cellsalign: 'left', align: 'center' },
-								{ text: 'Merk', datafield: 'merek', width: 100, cellsalign: 'left', align: 'center' },
-								{ text: 'Tahun', datafield: 'tahunterima', width: 100, cellsalign: 'left', align: 'center' },
-								{ text: 'Satuan', datafield: 'jumlah', width: 100, cellsalign: 'left', align: 'center' },
-								{ text: 'Kondisi', datafield: 'kondisi', width: 100, cellsalign: 'left', align: 'center' },
-								{ text: 'Keterangan', datafield: 'keterangan', width: 250, cellsalign: 'left', align: 'center' },
-								{ text: 'Edit', datafield: 'Edit', width: 50, align: 'center', columntype: 'button', cellsrenderer: function () {
+								{ text: 'Nama Ruang', datafield: 'namarg', width: '15%', cellsalign: 'left', align: 'center' },
+								{ text: 'Nama Barang', datafield: 'namabrg', width: '15%', cellsalign: 'left', align: 'center' },
+								{ text: 'Jenis', datafield: 'jenis', width: '10%', cellsalign: 'left', align: 'center' },
+								{ text: 'Merk', datafield: 'merek', width: '10%', cellsalign: 'left', align: 'center' },
+								{ text: 'Tahun', datafield: 'tahunterima', width: '10%', cellsalign: 'left', align: 'center' },
+								{ text: 'Satuan', datafield: 'jumlah', width: '10%', cellsalign: 'left', align: 'center' },
+								{ text: 'Kondisi', datafield: 'kondisi', width: '10%', cellsalign: 'left', align: 'center' },
+								{ text: 'Keterangan', datafield: 'keterangan', width: '15%', cellsalign: 'left', align: 'center' },
+								{ text: 'Edit', datafield: 'Edit', width: '5%', align: 'center', columntype: 'button', cellsrenderer: function () {
 									return "Edit";
 									}, buttonclick: function (row) {
 									editrow = row;	
@@ -969,15 +977,15 @@
 							source: datarekapdetail,
 							selectionmode: 'multiplecellsextended',
 							columns: [
-								{ text: 'Nama Barang', datafield: 'namabrg', width: 150, cellsalign: 'left', align: 'center' },
-								{ text: 'Jenis', datafield: 'jenis', width: 100, cellsalign: 'left', align: 'center' },
-								{ text: 'Jumlah', datafield: 'jumlah', width: 100, cellsalign: 'left', align: 'center' },
-								{ text: 'Kondisi', datafield: 'kondisi', width: 100, cellsalign: 'left', align: 'center' },
+								{ text: 'Nama Barang', datafield: 'namabrg', width: '30%', cellsalign: 'left', align: 'center' },
+								{ text: 'Jenis', datafield: 'jenis', width: '20%', cellsalign: 'left', align: 'center' },
+								{ text: 'Jumlah', datafield: 'jumlah', width: '20%', cellsalign: 'left', align: 'center' },
+								{ text: 'Kondisi', datafield: 'kondisi', width: '30%', cellsalign: 'left', align: 'center' },
 							],
 						});
 					}
 				},
-				{ text: 'Edit', editable: false, sortable: false, filterable: false, datafield: 'Edit', width: 50, align: 'center', columntype: 'button', cellsrenderer: function () {
+				{ text: 'Edit', editable: false, sortable: false, filterable: false, datafield: 'Edit', width: '5%', align: 'center', columntype: 'button', cellsrenderer: function () {
 					return "Edit";
 					}, buttonclick: function (row) {
 					editrow = row;	
@@ -992,23 +1000,20 @@
 					$("#status").val(dataRecord.marking);
 					$("#id_kondisi").val(dataRecord.kondisi);
 					$("#id_utilitas").val(dataRecord.utilitas);
-					$("#idnya").val(dataRecord.dot);
+					$("#idnya").val(dataRecord.id);
 					$("#modaladdruang").modal('show');
 					}
 				},
-				{ text: 'Nama Ruang', datafield: 'namarg', width: 120, cellsalign: 'left', align: 'center'  },
-				{ text: 'Nama Gedung', filtertype: 'checkedlist', datafield: 'namagd', width: 150, cellsalign: 'left', align: 'center'  },
-				{ text: 'Kode Ruang', datafield: 'koderg', width: 100, align: 'center',  cellsalign: 'left'},
-				{ text: 'Petugas', datafield: 'petugas', width: 120, cellsalign: 'left', align: 'center' },
-				{ text: 'Pinjam di ajukan kepada', datafield: 'pejabat', width: '25%', cellsalign: 'left', align: 'center' },
-				{ text: 'Status', filtertype: 'checkedlist', datafield: 'statpinjam', width: '15%', align: 'center',  cellsalign: 'left'  },
-				{ text: 'Tarif Perhari', cellsformat: 'n', datafield: 'tarif', width: '10%', align: 'center',  cellsalign: 'right'  },
-				{ text: 'Luas', datafield: 'luas', width: 70, align: 'center',  cellsalign: 'left'  },
-				{ text: 'Kondisi', filtertype: 'checkedlist', datafield: 'kondisi', width: 70, align: 'center',  cellsalign: 'left'  },
-				{ text: 'Kapasitas', datafield: 'kapasitas', width: 70, align: 'center',  cellsalign: 'left'  },
-				{ text: 'Utilitas(Jam/Minggu)', datafield: 'utilitas', width: 70, align: 'center',  cellsalign: 'left'  },
-				{ text: 'Inputor', datafield: 'inputor', width: '15%', align: 'center',  cellsalign: 'left'  },
-				{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '7%', cellsrenderer: function () {
+				{ text: 'Nama Ruang', datafield: 'namarg', width: '10%', cellsalign: 'left', align: 'center'  },
+				{ text: 'Nama Gedung', filtertype: 'checkedlist', datafield: 'namagd', width: '7%', cellsalign: 'left', align: 'center'  },
+				{ text: 'Kode Ruang', datafield: 'koderg', width: '8%', align: 'center',  cellsalign: 'left'},
+				{ text: 'Petugas', datafield: 'petugas', width: '8%', cellsalign: 'left', align: 'center' },
+				{ text: 'Luas', datafield: 'luas', width: '7%', align: 'center',  cellsalign: 'left'  },
+				{ text: 'Kondisi', filtertype: 'checkedlist', datafield: 'kondisi', width: '8%', align: 'center',  cellsalign: 'left'  },
+				{ text: 'Kapasitas', datafield: 'kapasitas', width: '7%', align: 'center',  cellsalign: 'left'  },
+				{ text: 'Utilitas(Jam/Minggu)', datafield: 'utilitas', width: '8%', align: 'center',  cellsalign: 'left'  },
+				{ text: 'Inputor', datafield: 'inputor', width: '10%', align: 'center',  cellsalign: 'left'  },
+				{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '5%', cellsrenderer: function () {
 					return "Hapus";
 					}, buttonclick: function (row) {    
 					editrow = row;  
@@ -1022,7 +1027,7 @@
 					var val05		= '';
 					var val06		= '';
 					var val07		= '';
-					var val08		= dataRecord.dot;
+					var val08		= dataRecord.id;
 					var val09		= '';
 					var val10		= '';
 					var val11		= '';
@@ -1067,7 +1072,7 @@
 		var sourcegedung = {
 			datatype: "json",
 			datafields: [
-				{ name: 'dot'},
+				{ name: 'id'},
 				{ name: 'namagd', type: 'text'},
 				{ name: 'singgd', type: 'text'},
 				{ name: 'kodegd', type: 'text'},
@@ -1086,11 +1091,10 @@
 		var jsonGedung = new $.jqx.dataAdapter(sourcegedung);
 		var photogedung = function (row, column, value) {
 			var name = $('#gridgedung').jqxGrid('getrowdata', row).foto;
-			if (name != ''){
-				var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="50" height="50" src="images/gedung/' + name + '"></div>';
-				
-			} else {
+			if (name == '' || name == null){
 				var img = '<div style="background: white;"></div>';
+			} else {
+				var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="50" height="50" src="images/gedung/' + name + '"></div>';
 			}			
 			return img;
 		}
@@ -1106,14 +1110,11 @@
 			source: jsonGedung,
 			theme: "energyblue",
 			columns: [
-				{ text: 'Foto', editable: false, sortable: false, filterable: false, width: '5%', cellsrenderer: photogedung },
-				{ text: 'Nama Gedung', datafield: 'namagd', width: '15%', cellsalign: 'left', align: 'center'  },
-				{ text: 'Kode', datafield: 'kodegd', width: '10%', align: 'center',  cellsalign: 'left'},
-				{ text: 'Pinjam di ajukan kepada', datafield: 'pejabat', width: '25%', cellsalign: 'left', align: 'center' },
-				{ text: 'Status', filtertype: 'checkedlist', datafield: 'statpinjam', width: '15%', align: 'center',  cellsalign: 'left'  },
-				{ text: 'Tarif Perhari', cellsformat: 'n', datafield: 'tarif', width: '10%', align: 'center',  cellsalign: 'right'  },
-				{ text: 'Inputor', datafield: 'inputor', width: '15%', align: 'center',  cellsalign: 'left'  },
-				{ text: 'Edit', editable: false, sortable: false, filterable: false, datafield: 'Edit', width: '5%', align: 'center', columntype: 'button', cellsrenderer: function () {
+				{ text: 'Foto', editable: false, sortable: false, filterable: false, width: '10%', cellsrenderer: photogedung },
+				{ text: 'Nama Gedung', datafield: 'namagd', width: '30%', cellsalign: 'left', align: 'center'  },
+				{ text: 'Kode', datafield: 'kodegd', width: '15%', align: 'center',  cellsalign: 'left'},
+				{ text: 'Inputor', datafield: 'inputor', width: '25%', align: 'center',  cellsalign: 'left'  },
+				{ text: 'Edit', editable: false, sortable: false, filterable: false, datafield: 'Edit', width: '10%', align: 'center', columntype: 'button', cellsrenderer: function () {
 					return "Edit";
 					}, buttonclick: function (row) {
 					editrow = row;	
@@ -1124,11 +1125,11 @@
 					$("#addpjgedung").val(dataRecord.pjgedung);
 					$("#addstatusgedung").val(dataRecord.statpinjam);
 					$("#addtarifgedung").val(dataRecord.tarif);
-					$("#addidgedung").val(dataRecord.dot);
+					$("#addidgedung").val(dataRecord.id);
 					$("#modaladdgedung").modal('show');
 					}
 				},
-				{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '7%', cellsrenderer: function () {
+				{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '10%', cellsrenderer: function () {
 					return "Hapus";
 					}, buttonclick: function (row) {    
 					editrow = row;  
@@ -1187,12 +1188,10 @@
 		var sourcegarasi = {
 			datatype: "json",
 			datafields: [
-				{ name: 'dot'},
+				{ name: 'id'},
 				{ name: 'namagd', type: 'text'},
 				{ name: 'singgd', type: 'text'},
 				{ name: 'kodegd', type: 'text'},
-				{ name: 'fakpanjang', type: 'text'},	
-				{ name: 'fakultas', type: 'text'},
 				{ name: 'inputor', type: 'text'},
 			],
 			url: 'umum/allgarasi',
@@ -1221,7 +1220,7 @@
 						var dataRecord = $("#gridgarasi").jqxGrid('getrowdata', editrow);
 						$("#addnmgarasi").val(dataRecord.namagd);
 						$("#addkodegarasi").val(dataRecord.kodegd);
-						$("#addidgarasi").val(dataRecord.dot);
+						$("#addidgarasi").val(dataRecord.id);
 						$("#modaladdgarasi").modal('show');
 					}
 				},
@@ -1239,7 +1238,7 @@
 					var val05		= '';
 					var val06		= '';
 					var val07		= '';
-					var val08		= dataRecord.dot;
+					var val08		= dataRecord.id;
 					var val09		= '';
 					var val10		= '';
 					var val11		= '';
@@ -1311,11 +1310,10 @@
 		var dataAdapter = new $.jqx.dataAdapter(source);
 		var photoruang = function (row, column, value) {
 			var name = $('#gridkkendaraan').jqxGrid('getrowdata', row).foto;
-			if (name != ''){
-				var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="50" height="50" src="images/kendaraan/' + name + '"></div>';
-				
+			if (name == '' || name == null){
+				var img = '<div style="background: white;"></div>';	
 			} else {
-				var img = '<div style="background: white;"></div>';
+				var img = '<div style="background: white;"><img style="margin:2px; margin-left: 10px;" width="50" height="50" src="images/kendaraan/' + name + '"></div>';
 			}			
 			return img;
 		}
@@ -1331,8 +1329,8 @@
 			source: dataAdapter,
 			theme: "energyblue",
 			columns: [
-				{ text: 'Foto', editable: false, sortable: false, filterable: false, width: '10%', cellsrenderer: photoruang },
-				{ text: 'Tambah', editable: false, sortable: false, filterable: false, width: '10%', align: 'center', columntype: 'button', cellsrenderer: function () {
+				{ text: 'Foto', editable: false, sortable: false, filterable: false, width: '7%', cellsrenderer: photoruang },
+				{ text: 'Tambah', editable: false, sortable: false, filterable: false, width: '8%', align: 'center', columntype: 'button', cellsrenderer: function () {
 					return "Aktifitas";
 					}, buttonclick: function (row) {
 						editrow = row;	
@@ -1350,18 +1348,15 @@
 						$("#modaladdaktifitas").modal('show');
 					}
 				},
-				{ text: 'Nama Kendaraan', datafield: 'merek', width: 120, cellsalign: 'left', align: 'center'  },
-				{ text: 'Nama Garasi', filtertype: 'checkedlist', datafield: 'garasi', width: 150, cellsalign: 'left', align: 'center'  },
-				{ text: 'Kode Kendaraan', datafield: 'kodekendaraan', width: 100, align: 'center',  cellsalign: 'left'},
-				{ text: 'Petugas', datafield: 'driver', width: 120, cellsalign: 'left', align: 'center' },
-				{ text: 'NOPOL', datafield: 'nopol', width: 70, align: 'center',  cellsalign: 'left'  },
-				{ text: 'Kondisi', datafield: 'kondisi', width: 70, align: 'center',  cellsalign: 'left'  },
-				{ text: 'Kapasitas', datafield: 'kapasitas', width: 70, align: 'center',  cellsalign: 'left'  },
-				{ text: 'Pinjam di ajukan kepada', datafield: 'pejabat', width: '25%', cellsalign: 'left', align: 'center' },
-				{ text: 'Status', filtertype: 'checkedlist', datafield: 'statpinjam', width: '15%', align: 'center',  cellsalign: 'left'  },
-				{ text: 'Tarif Perhari', cellsformat: 'n', datafield: 'tarif', width: '10%', align: 'center',  cellsalign: 'right'  },
-				{ text: 'Utilitas(Jam/Minggu)', datafield: 'utilitas', width: 70, align: 'center',  cellsalign: 'left'  },
-				{ text: 'Edit', editable: false, sortable: false, filterable: false, datafield: 'Edit', width: 50, align: 'center', columntype: 'button', cellsrenderer: function () {
+				{ text: 'Nama Kendaraan', datafield: 'merek', width: '15%', cellsalign: 'left', align: 'center'  },
+				{ text: 'Nama Garasi', filtertype: 'checkedlist', datafield: 'garasi', width: '8%', cellsalign: 'left', align: 'center'  },
+				{ text: 'Kode Kendaraan', datafield: 'kodekendaraan', width: '7%', align: 'center',  cellsalign: 'left'},
+				{ text: 'Petugas', datafield: 'driver', width: '15%', cellsalign: 'left', align: 'center' },
+				{ text: 'NOPOL', datafield: 'nopol', width: '10%', align: 'center',  cellsalign: 'left'  },
+				{ text: 'Kondisi', datafield: 'kondisi', width: '10%', align: 'center',  cellsalign: 'left'  },
+				{ text: 'Kapasitas', datafield: 'kapasitas', width: '5%', align: 'center',  cellsalign: 'left'  },
+				{ text: 'Utilitas(Jam/Minggu)', datafield: 'utilitas', width: '5%', align: 'center',  cellsalign: 'left'  },
+				{ text: 'Edit', editable: false, sortable: false, filterable: false, datafield: 'Edit', width: '5%', align: 'center', columntype: 'button', cellsrenderer: function () {
 					return "Edit";
 					}, buttonclick: function (row) {
 						editrow = row;	
@@ -1380,7 +1375,7 @@
 						$("#modaladdkendaraan").modal('show');
 					}
 				},
-				{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '7%', cellsrenderer: function () {
+				{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '5%', cellsrenderer: function () {
 					return "Hapus";
 					}, buttonclick: function (row) {    
 					editrow = row;  
@@ -1474,6 +1469,7 @@
 			var val10	= document.getElementById('fas_ruang').value;
 			var val11	= document.getElementById('fas_kodefasruang').value;
 			var token 	= document.getElementById('token').value;
+			$("#modaladdfasilitas").modal('hide');
 			$.post('umum/exfasruang', { set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08, set09: val09, set10: val10, set11: val11, _token : token },
 			function(data){
 				var status  = data.status;
@@ -1487,7 +1483,6 @@
 					hideAfter: 5000,
 					stack: 1
 				});
-				$("#modaladdfasilitas").modal('hide');
 				$("#griddir").jqxGrid('updatebounddata');
 				$("#divview").jqxGrid('updatebounddata');
 				return false;
@@ -1524,6 +1519,7 @@
 				form_data.append('set12', val12);
 				form_data.append('set13', val13);
 				form_data.append('_token', '{{csrf_token()}}');
+				$("#modaladdruang").modal('hide');
 			$.ajax({
 				url: 'umum/exruang',
 				data: form_data,
@@ -1542,8 +1538,8 @@
 						hideAfter: 5000,
 						stack: 1
 					});
-					$("#modaladdruang").modal('hide');
-					window.setTimeout('location.reload()', 3000);				
+					var uri = window.location.href.split("#")[0];
+					setTimeout(function () { window.location=uri;}, 5000);
 					return false;
 				},
 				error: function (xhr, status, error) {
@@ -1586,6 +1582,7 @@
 				form_data.append('set12', val12);
 				form_data.append('set13', val13);
 				form_data.append('_token', '{{csrf_token()}}');
+				$("#modaladdgedung").modal('hide');
 			$.ajax({
 				url: 'umum/exruang',
 				data: form_data,
@@ -1604,8 +1601,8 @@
 						hideAfter: 5000,
 						stack: 1
 					});
-					$("#modaladdgedung").modal('hide');
-					window.setTimeout('location.reload()', 3000);
+					var uri = window.location.href.split("#")[0];
+					setTimeout(function () { window.location=uri;}, 5000);
 					return false;
 				},
 				error: function (xhr, status, error) {
@@ -1632,6 +1629,7 @@
 			var val12	= '';
 			var val13	= '';
 			var token 	= document.getElementById('token').value;
+			$("#modalhapus").modal('hide');
 			$.post('umum/exruang', { set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08, set09: val09, set10: val10, set11: val11, set12: val12, set13: val13, _token: token },
 			function(data){
 				var status  = data.status;
@@ -1645,7 +1643,6 @@
 					hideAfter: 5000,
 					stack: 1
 				});
-				$("#modalhapus").modal('hide');
 				$("#gridk1").jqxGrid('updatebounddata');
 				return false;
 			});
@@ -1681,6 +1678,7 @@
 				form_data.append('set12', val12);
 				form_data.append('set13', val13);
 				form_data.append('_token', '{{csrf_token()}}');
+				$("#modaladdkendaraan").modal('hide');
 			$.ajax({
 				url: 'umum/exkendaraan',
 				data: form_data,
@@ -1699,8 +1697,8 @@
 						hideAfter: 5000,
 						stack: 1
 					});
-					$("#modaladdkendaraan").modal('hide');
-					window.setTimeout('location.reload()', 3000);				
+					var uri = window.location.href.split("#")[0];
+					setTimeout(function () { window.location=uri;}, 5000);
 					return false;
 				},
 				error: function (xhr, status, error) {
@@ -1714,19 +1712,20 @@
 		});
 		$("#btnaddgarasi").click(function(){
 			var val01	= 'gedung';
-			var val02	= document.getElementById('addnmgedung').value;
-			var val03	= document.getElementById('addkodegedung').value;
+			var val02	= document.getElementById('addnmgarasi').value;
+			var val03	= document.getElementById('addkodegarasi').value;
 			var val04	= '';
 			var val05	= '';
 			var val06	= '';
 			var val07	= '';
-			var val08	= document.getElementById('addidgedung').value;
+			var val08	= document.getElementById('addidgarasi').value;
 			var val09	= '';
 			var val10	= '';
 			var val11	= '';
 			var val12	= '';
 			var val13	= '';
 			var token 	= document.getElementById('token').value;
+			$("#modaladdgarasi").modal('hide');
 			$.post('umum/exkendaraan', { set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08, set09: val09, set10: val10, set11: val11, set12: val12, set13: val13, _token: token },
 			function(data){
 				var status  = data.status;
@@ -1740,8 +1739,8 @@
 					hideAfter: 5000,
 					stack: 1
 				});
-				$("#modaladdgarasi").modal('hide');
-				window.setTimeout('window.location=window.location', 3000);
+				var uri = window.location.href.split("#")[0];
+            	setTimeout(function () { window.location=uri;}, 5000);
 				return false;
 			});
 		});
@@ -1760,6 +1759,7 @@
 			var val12	= '';
 			var val13	= '';
 			var token 	= document.getElementById('token').value;
+			$("#modaladdaktifitas").modal('hide');
 			$.post('umum/exkendaraan', { set01: val01, set02: val02, set03: val03, set04: val04, set05: val05, set06: val06, set07: val07, set08: val08, set09: val09, set10: val10, set11: val11, set12: val12, set13: val13, _token: token },
 			function(data){
 				var status  = data.status;
@@ -1773,7 +1773,6 @@
 					hideAfter: 5000,
 					stack: 1
 				});
-				$("#modaladdaktifitas").modal('hide');
 				return false;
 			});
 		});
@@ -1785,7 +1784,7 @@
 			var source = {
 				datatype: "json",
 				datafields: [
-					{ name: 'idne'},
+					{ name: 'id'},
 					{ name: 'idkendaraan', type: 'text'},
 					{ name: 'merek', type: 'text'},
 					{ name: 'garasi', type: 'text'},
@@ -1814,7 +1813,7 @@
 				showfilterrow: true,
 				theme: "energyblue",
 				columns: [
-					{ text: 'EDIT', editable: false, sortable: false, filterable: false, columntype: 'button', width: '7%', align: 'center', cellsrenderer: function () {
+					{ text: 'EDIT', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', align: 'center', cellsrenderer: function () {
 						return "EDIT";
 						}, buttonclick: function (row) {
 							editrow = row;	
@@ -1826,21 +1825,21 @@
 							$("#aktif_jenis").val(dataRecord.jenis);
 							$("#aktif_nominal").val(dataRecord.nominal);
 							$("#aktif_driver").val(dataRecord.driver);
-							$("#aktif_idne").val(dataRecord.idne);
+							$("#aktif_idne").val(dataRecord.id);
 							$("#aktif_idkendaraan").val(dataRecord.idkendaraan);
 							CKEDITOR.instances['aktif_keterangan'].setData(dataRecord.keterangan)
 							$("#modaladdaktifitas").modal('show');
 						}
 					},
 					{ text: 'Kendaraan', datafield: 'merek', width: '15%', cellsalign: 'left', align: 'center'  },
-					{ text: 'Nama Garasi', filtertype: 'checkedlist', datafield: 'garasi', width: '15%', cellsalign: 'left', align: 'center'  },
+					{ text: 'Nama Garasi', filtertype: 'checkedlist', datafield: 'garasi', width: '10%', cellsalign: 'left', align: 'center'  },
 					{ text: 'Petugas', datafield: 'driver', width: '15%', cellsalign: 'left', align: 'center' },
-					{ text: 'NOPOL', datafield: 'nopol', width: '15%', align: 'center',  cellsalign: 'left'  },
-					{ text: 'Jenis', filtertype: 'checkedlist', datafield: 'jenis', width: '10%', align: 'center',  cellsalign: 'left'  },
-					{ text: 'Tanggal', datafield: 'tanggal', width: '15%', align: 'center',  cellsalign: 'left'  },
-					{ text: 'Nominal', cellsformat: 'n', datafield: 'nominal', width: '12%', align: 'center',  cellsalign: 'right'  },
-					{ text: 'Keterangan', datafield: 'keterangan', width: '25%', cellsalign: 'left', align: 'center' },
-					{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '8%', cellsrenderer: function () {
+					{ text: 'NOPOL', datafield: 'nopol', width: '10%', align: 'center',  cellsalign: 'left'  },
+					{ text: 'Jenis', filtertype: 'checkedlist', datafield: 'jenis', width: '7%', align: 'center',  cellsalign: 'left'  },
+					{ text: 'Tanggal', datafield: 'tanggal', width: '10%', align: 'center',  cellsalign: 'left'  },
+					{ text: 'Nominal', cellsformat: 'n', datafield: 'nominal', width: '8%', align: 'center',  cellsalign: 'right'  },
+					{ text: 'Keterangan', datafield: 'keterangan', width: '15%', cellsalign: 'left', align: 'center' },
+					{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '5%', cellsrenderer: function () {
 						return "Hapus";
 						}, buttonclick: function (row) {    
 						editrow = row;  
@@ -1854,7 +1853,7 @@
 						var val05		= '';
 						var val06		= '';
 						var val07		= '';
-						var val08		= dataRecord.idne;
+						var val08		= dataRecord.id;
 						var val09		= '';
 						var val10		= '';
 						var val11		= '';
@@ -1905,7 +1904,7 @@
 			var source = {
 				datatype: "json",
 				datafields: [
-					{ name: 'idne'},
+					{ name: 'id'},
 					{ name: 'idkendaraan', type: 'text'},
 					{ name: 'merek', type: 'text'},
 					{ name: 'garasi', type: 'text'},
@@ -1935,7 +1934,7 @@
 				showfilterrow: true,
 				theme: "energyblue",
 				columns: [
-					{ text: 'EDIT', editable: false, sortable: false, filterable: false, columntype: 'button', width: '7%', align: 'center', cellsrenderer: function () {
+					{ text: 'EDIT', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', align: 'center', cellsrenderer: function () {
 						return "EDIT";
 						}, buttonclick: function (row) {
 							editrow = row;	
@@ -1947,21 +1946,21 @@
 							$("#aktif_jenis").val(dataRecord.jenis);
 							$("#aktif_nominal").val(dataRecord.nominal);
 							$("#aktif_driver").val(dataRecord.driver);
-							$("#aktif_idne").val(dataRecord.idne);
+							$("#aktif_idne").val(dataRecord.id);
 							$("#aktif_idkendaraan").val(dataRecord.idkendaraan);
 							CKEDITOR.instances['aktif_keterangan'].setData(dataRecord.keterangan)
 							$("#modaladdaktifitas").modal('show');
 						}
 					},
 					{ text: 'Kendaraan', datafield: 'merek', width: '15%', cellsalign: 'left', align: 'center'  },
-					{ text: 'Nama Garasi', filtertype: 'checkedlist', datafield: 'garasi', width: '15%', cellsalign: 'left', align: 'center'  },
+					{ text: 'Nama Garasi', filtertype: 'checkedlist', datafield: 'garasi', width: '10%', cellsalign: 'left', align: 'center'  },
 					{ text: 'Petugas', datafield: 'driver', width: '15%', cellsalign: 'left', align: 'center' },
-					{ text: 'NOPOL', datafield: 'nopol', width: '15%', align: 'center',  cellsalign: 'left'  },
-					{ text: 'Jenis', filtertype: 'checkedlist', datafield: 'jenis', width: '10%', align: 'center',  cellsalign: 'left'  },
-					{ text: 'Tanggal', datafield: 'tanggal', width: '15%', align: 'center',  cellsalign: 'left'  },
-					{ text: 'Nominal', cellsformat: 'n', datafield: 'nominal', width: '12%', align: 'center',  cellsalign: 'right'  },
-					{ text: 'Keterangan', datafield: 'keterangan', width: '25%', cellsalign: 'left', align: 'center' },
-					{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '8%', cellsrenderer: function () {
+					{ text: 'NOPOL', datafield: 'nopol', width: '10%', align: 'center',  cellsalign: 'left'  },
+					{ text: 'Jenis', filtertype: 'checkedlist', datafield: 'jenis', width: '7%', align: 'center',  cellsalign: 'left'  },
+					{ text: 'Tanggal', datafield: 'tanggal', width: '10%', align: 'center',  cellsalign: 'left'  },
+					{ text: 'Nominal', cellsformat: 'n', datafield: 'nominal', width: '8%', align: 'center',  cellsalign: 'right'  },
+					{ text: 'Keterangan', datafield: 'keterangan', width: '15%', cellsalign: 'left', align: 'center' },
+					{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '5%', cellsrenderer: function () {
 						return "Hapus";
 						}, buttonclick: function (row) {    
 						editrow = row;  
@@ -1975,7 +1974,7 @@
 						var val05		= '';
 						var val06		= '';
 						var val07		= '';
-						var val08		= dataRecord.idne;
+						var val08		= dataRecord.id;
 						var val09		= '';
 						var val10		= '';
 						var val11		= '';
@@ -2026,7 +2025,7 @@
 			var source = {
 				datatype: "json",
 				datafields: [
-					{ name: 'idne'},
+					{ name: 'id'},
 					{ name: 'idkendaraan', type: 'text'},
 					{ name: 'merek', type: 'text'},
 					{ name: 'garasi', type: 'text'},
@@ -2056,7 +2055,7 @@
 				showfilterrow: true,
 				theme: "energyblue",
 				columns: [
-					{ text: 'EDIT', editable: false, sortable: false, filterable: false, columntype: 'button', width: '7%', align: 'center', cellsrenderer: function () {
+					{ text: 'EDIT', editable: false, sortable: false, filterable: false, columntype: 'button', width: '5%', align: 'center', cellsrenderer: function () {
 						return "EDIT";
 						}, buttonclick: function (row) {
 							editrow = row;	
@@ -2068,21 +2067,21 @@
 							$("#aktif_jenis").val(dataRecord.jenis);
 							$("#aktif_nominal").val(dataRecord.nominal);
 							$("#aktif_driver").val(dataRecord.driver);
-							$("#aktif_idne").val(dataRecord.idne);
+							$("#aktif_idne").val(dataRecord.id);
 							$("#aktif_idkendaraan").val(dataRecord.idkendaraan);
 							CKEDITOR.instances['aktif_keterangan'].setData(dataRecord.keterangan)
 							$("#modaladdaktifitas").modal('show');
 						}
 					},
 					{ text: 'Kendaraan', datafield: 'merek', width: '15%', cellsalign: 'left', align: 'center'  },
-					{ text: 'Nama Garasi', filtertype: 'checkedlist', datafield: 'garasi', width: '15%', cellsalign: 'left', align: 'center'  },
+					{ text: 'Nama Garasi', filtertype: 'checkedlist', datafield: 'garasi', width: '10%', cellsalign: 'left', align: 'center'  },
 					{ text: 'Petugas', datafield: 'driver', width: '15%', cellsalign: 'left', align: 'center' },
-					{ text: 'NOPOL', datafield: 'nopol', width: '15%', align: 'center',  cellsalign: 'left'  },
-					{ text: 'Jenis', filtertype: 'checkedlist', datafield: 'jenis', width: '10%', align: 'center',  cellsalign: 'left'  },
-					{ text: 'Tanggal', datafield: 'tanggal', width: '15%', align: 'center',  cellsalign: 'left'  },
-					{ text: 'Nominal', cellsformat: 'n', datafield: 'nominal', width: '12%', align: 'center',  cellsalign: 'right'  },
-					{ text: 'Keterangan', datafield: 'keterangan', width: '25%', cellsalign: 'left', align: 'center' },
-					{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '8%', cellsrenderer: function () {
+					{ text: 'NOPOL', datafield: 'nopol', width: '10%', align: 'center',  cellsalign: 'left'  },
+					{ text: 'Jenis', filtertype: 'checkedlist', datafield: 'jenis', width: '7%', align: 'center',  cellsalign: 'left'  },
+					{ text: 'Tanggal', datafield: 'tanggal', width: '10%', align: 'center',  cellsalign: 'left'  },
+					{ text: 'Nominal', cellsformat: 'n', datafield: 'nominal', width: '8%', align: 'center',  cellsalign: 'right'  },
+					{ text: 'Keterangan', datafield: 'keterangan', width: '15%', cellsalign: 'left', align: 'center' },
+					{ text: 'Hapus', columntype: 'button', editable: false, sortable: false, filterable: false, width: '5%', cellsrenderer: function () {
 						return "Hapus";
 						}, buttonclick: function (row) {    
 						editrow = row;  
@@ -2090,13 +2089,13 @@
 						var dataRecord  = $("#gridlaporan").jqxGrid('getrowdata', editrow);
 						var token   	= document.getElementById('token').value;
 						var val01		= 'hapusaktifitas';
-						var val02		= '';
+						var val02		= dataRecord.idkendaraan;
 						var val03		= '';
 						var val04		= '';
 						var val05		= '';
 						var val06		= '';
 						var val07		= '';
-						var val08		= dataRecord.idne;
+						var val08		= dataRecord.id;
 						var val09		= '';
 						var val10		= '';
 						var val11		= '';
