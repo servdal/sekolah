@@ -24,6 +24,9 @@ Aplikasi ini dirancang untuk memudahkan administrasi sekolah dalam mengelola dat
 - Catatan Alquran: Simpan catatan murojaah / tahsin / Ziyadah / Tilawah.
 - Database Keuangan : Tabungan Siswa, Neraca Pemasukan dan Pengeluaran Sekolah, Laporan SPP / DPP / Insidental
 
+## DEMO PORDUK
+<a href="https://www.youtube.com/watch?v=SnnRsWWSdFY&t=424s">https://www.youtube.com/watch?v=SnnRsWWSdFY&t=424s</a>
+
 ## Instalasi Mobile Apps
 
 1. Unduh aplikasi dari [Google Play Store](https://play.google.com/store/apps/details?id=com.duidev.simaster).
